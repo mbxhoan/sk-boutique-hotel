@@ -172,3 +172,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/analytics-events.ts`
   - `lib/supabase/queries/operations.ts`
   - `supabase/migrations/20260412011500_phase_e_analytics_tracking.sql`
+
+### Entry 009
+- `time`: 2026-04-12T00:10:00+07:00
+- `prompt_summary`: Dập warning dev cross-origin HMR khi mở Next.js bằng IP mạng nội bộ, để giảm full reload và ổn định local admin/public refresh.
+- `commit_message`: `chore(next-dev): allow local network dev origins`
+- `main_files`:
+  - `next.config.ts`
