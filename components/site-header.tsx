@@ -16,7 +16,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="section-shell site-header__inner">
-        <LogoMark className="site-header__logo" priority />
+        <LogoMark className="site-header__logo" href={appendLocaleQuery("/", locale)} priority />
 
         <nav aria-label="Điều hướng chính" className="site-nav">
           {navItems.map((item) => {
@@ -45,7 +45,7 @@ export function SiteHeader() {
           </Link>
 
           <Link className="button button--solid site-header__cta" href={appendLocaleQuery("/lien-he", locale)}>
-            {translate(locale, "Đặt phòng")}
+            {translate(locale, "Kiểm tra phòng trống")}
           </Link>
         </div>
       </div>

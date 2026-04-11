@@ -3,6 +3,7 @@ import Link from "next/link";
 
 type LogoMarkProps = {
   className?: string;
+  href?: string;
   priority?: boolean;
   variant?: "dark" | "light" | "muted";
 };
@@ -28,14 +29,14 @@ const logoAssets = {
   }
 } as const;
 
-export function LogoMark({ className, priority = false, variant = "dark" }: LogoMarkProps) {
+export function LogoMark({ className, href = "/", priority = false, variant = "dark" }: LogoMarkProps) {
   const asset = logoAssets[variant];
 
   return (
     <Link
       aria-label="SK Boutique Hotel"
       className={`logo-mark${className ? ` ${className}` : ""}`}
-      href="/"
+      href={href}
     >
       <Image
         alt="SK Boutique Hotel"
