@@ -279,6 +279,7 @@ If inspecting data through MCP or admin tools:
 - Do not ignore VI/EN requirements.
 - Do not implement phase 2 complexity when phase 1 flow is incomplete.
 - Do not sacrifice maintainability for short-term hacks.
+- Do not repeat the issue that has already been done.
 
 ---
 

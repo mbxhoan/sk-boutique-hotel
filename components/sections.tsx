@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { AnalyticsLink } from "@/components/analytics-link";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery, translate } from "@/lib/locale";
@@ -46,12 +47,15 @@ export function ButtonLink({
   variant = "solid"
 }: ButtonLinkProps) {
   return (
-    <Link
+    <AnalyticsLink
       className={`button button--${variant}${className ? ` ${className}` : ""}`}
-      href={appendLocaleQuery(href, locale)}
+      eventType="cta_click"
+      href={href}
+      locale={locale}
+      metadata={{ variant }}
     >
       {children}
-    </Link>
+    </AnalyticsLink>
   );
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { PageTemplate } from "@/components/page-template";
 import { findPageBySlug, getStaticRouteParams } from "@/lib/site-content";
 import { resolveLocale, translate } from "@/lib/locale";
@@ -44,5 +45,10 @@ export default async function StaticPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  return <PageTemplate content={page} locale={locale} />;
+  return (
+    <>
+      <PageViewTracker eventType="page_view" locale={locale} pagePath={`/${slug}`} entityId={slug} entityType="static_page" />
+      <PageTemplate content={page} locale={locale} />
+    </>
+  );
 }

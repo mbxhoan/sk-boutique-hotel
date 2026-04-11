@@ -146,3 +146,29 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/workflow.types.ts`
   - `supabase/migrations/20260411235500_phase_e_payment_proof_confirmation.sql`
   - `supabase/seed.sql`
+
+### Entry 008
+- `time`: 2026-04-11T23:45:00+07:00
+- `prompt_summary`: Bổ sung phần còn sót từ blueprint/BRD/backlog bằng analytics tracking foundation, public CTA/page view instrumentation, và admin analytics stats.
+- `commit_message`: `feat(analytics): add public event tracking and admin stats`
+- `main_files`:
+  - `app/(marketing)/[slug]/page.tsx`
+  - `app/(marketing)/chi-nhanh/[slug]/page.tsx`
+  - `app/(marketing)/chi-nhanh/page.tsx`
+  - `app/(marketing)/phong/[slug]/page.tsx`
+  - `app/(marketing)/phong/page.tsx`
+  - `app/(marketing)/thanh-toan/[token]/page.tsx`
+  - `app/(marketing)/tin-tuc/[slug]/page.tsx`
+  - `app/(marketing)/tin-tuc/page.tsx`
+  - `app/api/public/track/route.ts`
+  - `components/analytics-link.tsx`
+  - `components/marketing-home.tsx`
+  - `components/page-view-tracker.tsx`
+  - `components/public-cms.tsx`
+  - `components/sections.tsx`
+  - `components/site-header.tsx`
+  - `lib/supabase/analytics.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/queries/analytics-events.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `supabase/migrations/20260412011500_phase_e_analytics_tracking.sql`

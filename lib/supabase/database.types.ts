@@ -546,6 +546,56 @@ export interface Database {
         } & RowTimestampFields>;
         Relationships: [];
       };
+      analytics_events: {
+        Row: {
+          branch_id: string | null;
+          created_at: string;
+          customer_id: string | null;
+          entity_id: string | null;
+          entity_type: string;
+          event_type: Database["public"]["Enums"]["analytics_event_type"];
+          id: string;
+          locale: string;
+          metadata: Json;
+          occurred_at: string;
+          page_path: string;
+          reservation_id: string | null;
+          room_type_id: string | null;
+          source: string;
+          updated_at: string;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          branch_id: string | null;
+          customer_id: string | null;
+          entity_id: string | null;
+          entity_type: string;
+          event_type: Database["public"]["Enums"]["analytics_event_type"];
+          id: string;
+          locale: string;
+          metadata: Json;
+          occurred_at: string;
+          page_path: string;
+          reservation_id: string | null;
+          room_type_id: string | null;
+          source: string;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          branch_id: string | null;
+          customer_id: string | null;
+          entity_id: string | null;
+          entity_type: string;
+          event_type: Database["public"]["Enums"]["analytics_event_type"];
+          id: string;
+          locale: string;
+          metadata: Json;
+          occurred_at: string;
+          page_path: string;
+          reservation_id: string | null;
+          room_type_id: string | null;
+          source: string;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
       availability_requests: {
         Row: {
           assigned_to: string | null;
@@ -891,6 +941,16 @@ export interface Database {
         | "closed"
         | "rejected"
         | "expired";
+      analytics_event_type:
+        | "page_view"
+        | "room_view"
+        | "branch_view"
+        | "cta_click"
+        | "gallery_click"
+        | "check_availability_click"
+        | "hold_room_click"
+        | "map_click"
+        | "payment_upload";
       payment_proof_status: "uploaded" | "verified" | "rejected";
       payment_request_status: "sent" | "pending_verification" | "verified" | "rejected" | "expired" | "cancelled";
       reservation_room_item_status: "active" | "released" | "cancelled";
@@ -1024,6 +1084,7 @@ export type RoomHoldRow = TableRow<"room_holds">;
 export type ReservationRow = TableRow<"reservations">;
 export type ReservationRoomItemRow = TableRow<"reservation_room_items">;
 export type AuditLogRow = TableRow<"audit_logs">;
+export type AnalyticsEventRow = TableRow<"analytics_events">;
 export type BranchInsert = TableInsert<"branches">;
 export type FloorInsert = TableInsert<"floors">;
 export type RoomTypeInsert = TableInsert<"room_types">;
@@ -1037,6 +1098,7 @@ export type RoomHoldInsert = TableInsert<"room_holds">;
 export type ReservationInsert = TableInsert<"reservations">;
 export type ReservationRoomItemInsert = TableInsert<"reservation_room_items">;
 export type AuditLogInsert = TableInsert<"audit_logs">;
+export type AnalyticsEventInsert = TableInsert<"analytics_events">;
 export type BranchUpdate = TableUpdate<"branches">;
 export type FloorUpdate = TableUpdate<"floors">;
 export type RoomTypeUpdate = TableUpdate<"room_types">;
@@ -1050,6 +1112,7 @@ export type RoomHoldUpdate = TableUpdate<"room_holds">;
 export type ReservationUpdate = TableUpdate<"reservations">;
 export type ReservationRoomItemUpdate = TableUpdate<"reservation_room_items">;
 export type AuditLogUpdate = TableUpdate<"audit_logs">;
+export type AnalyticsEventUpdate = TableUpdate<"analytics_events">;
 export type AvailabilityRequestStatus = Database["public"]["Enums"]["availability_request_status"];
 export type PaymentProofStatus = Database["public"]["Enums"]["payment_proof_status"];
 export type PaymentRequestStatus = Database["public"]["Enums"]["payment_request_status"];
@@ -1057,3 +1120,4 @@ export type RoomHoldStatus = Database["public"]["Enums"]["room_hold_status"];
 export type ReservationStatus = Database["public"]["Enums"]["reservation_status"];
 export type ReservationRoomItemStatus = Database["public"]["Enums"]["reservation_room_item_status"];
 export type RoomStatus = Database["public"]["Enums"]["room_status"];
+export type AnalyticsEventType = Database["public"]["Enums"]["analytics_event_type"];

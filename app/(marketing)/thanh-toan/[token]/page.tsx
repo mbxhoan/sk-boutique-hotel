@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { submitPaymentProofAction } from "@/app/actions/payments";
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import { resolveLocale } from "@/lib/locale";
 import { buildVietQrImageUrl, getPaymentRequestByPublicToken } from "@/lib/supabase/payments";
@@ -55,6 +56,15 @@ export default async function PaymentUploadPage({ params, searchParams }: PagePr
 
   return (
     <div className="portal-content">
+      <PageViewTracker
+        branchId={paymentRequest.branch_id}
+        eventType="payment_upload"
+        locale={locale}
+        pagePath="/thanh-toan/[token]"
+        entityId={paymentRequest.payment_code}
+        entityType="payment_request"
+        reservationId={paymentRequest.reservation_id}
+      />
       <section className="portal-section">
         <PortalSectionHeading
           description={{

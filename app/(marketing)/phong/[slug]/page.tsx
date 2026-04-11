@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
 import { resolveLocale } from "@/lib/locale";
@@ -45,5 +46,10 @@ export default async function RoomDetailPage({ params, searchParams }: PageProps
     notFound();
   }
 
-  return <CmsPageRenderer locale={locale} page={page} />;
+  return (
+    <>
+      <PageViewTracker eventType="room_view" locale={locale} pagePath={`/phong/${slug}`} entityId={slug} entityType="room_type" />
+      <CmsPageRenderer locale={locale} page={page} />
+    </>
+  );
 }

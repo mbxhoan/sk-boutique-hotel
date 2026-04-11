@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
 import { findNewsPageBySlug, getNewsStaticParams } from "@/lib/mock/public-cms";
@@ -45,5 +46,10 @@ export default async function NewsDetailPage({ params, searchParams }: PageProps
     notFound();
   }
 
-  return <CmsPageRenderer className="news-article__page" locale={locale} page={page} />;
+  return (
+    <>
+      <PageViewTracker eventType="page_view" locale={locale} pagePath={`/tin-tuc/${slug}`} entityId={slug} entityType="news_post" />
+      <CmsPageRenderer className="news-article__page" locale={locale} page={page} />
+    </>
+  );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
 import { resolveLocale } from "@/lib/locale";
@@ -45,5 +46,10 @@ export default async function BranchDetailPage({ params, searchParams }: PagePro
     notFound();
   }
 
-  return <CmsPageRenderer locale={locale} page={page} />;
+  return (
+    <>
+      <PageViewTracker eventType="branch_view" locale={locale} pagePath={`/chi-nhanh/${slug}`} entityId={slug} entityType="branch" />
+      <CmsPageRenderer locale={locale} page={page} />
+    </>
+  );
 }

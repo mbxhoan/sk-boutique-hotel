@@ -16,6 +16,7 @@ import { countPaymentRequests, listPaymentRequests } from "@/lib/supabase/querie
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { countAuditLogs, listAuditLogs } from "@/lib/supabase/queries/audit-logs";
+import { countAnalyticsEvents } from "@/lib/supabase/queries/analytics-events";
 import { countAvailabilityRequests, getAvailabilityRequestById, listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { countRoomHolds, countExpiringRoomHolds, listRoomHolds } from "@/lib/supabase/queries/room-holds";
@@ -398,6 +399,11 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   const pendingPaymentCount = await countPaymentRequests({ status: ["sent", "pending_verification"] });
   const verifiedPaymentCount = await countPaymentRequests({ status: "verified" });
   const auditTodayCount = await countAuditLogs({ since: getVietnamStartOfDayIso() });
+  const analyticsWindowSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const pageViewCount = await countAnalyticsEvents({ eventType: "page_view", since: analyticsWindowSince });
+  const roomViewCount = await countAnalyticsEvents({ eventType: "room_view", since: analyticsWindowSince });
+  const branchViewCount = await countAnalyticsEvents({ eventType: "branch_view", since: analyticsWindowSince });
+  const ctaClickCount = await countAnalyticsEvents({ eventType: "cta_click", since: analyticsWindowSince });
 
   const stats: WorkflowStatCard[] = [
     {
@@ -455,6 +461,38 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
       label_vi: "Audit trong ngày",
       tone: "default",
       value: `${auditTodayCount}`
+    },
+    {
+      detail_en: "Public page views tracked in the last 7 days.",
+      detail_vi: "Lượt xem public page trong 7 ngày gần nhất.",
+      label_en: "Page views",
+      label_vi: "Lượt xem",
+      tone: "soft",
+      value: `${pageViewCount}`
+    },
+    {
+      detail_en: "Room detail interest tracked in the last 7 days.",
+      detail_vi: "Lượt xem chi tiết phòng trong 7 ngày gần nhất.",
+      label_en: "Room views",
+      label_vi: "Xem phòng",
+      tone: "accent",
+      value: `${roomViewCount}`
+    },
+    {
+      detail_en: "Branch interest tracked in the last 7 days.",
+      detail_vi: "Lượt xem chi nhánh trong 7 ngày gần nhất.",
+      label_en: "Branch views",
+      label_vi: "Xem chi nhánh",
+      tone: "soft",
+      value: `${branchViewCount}`
+    },
+    {
+      detail_en: "Tracked CTA clicks in the last 7 days.",
+      detail_vi: "Số click CTA trong 7 ngày gần nhất.",
+      label_en: "CTA clicks",
+      label_vi: "CTA click",
+      tone: "default",
+      value: `${ctaClickCount}`
     }
   ];
 

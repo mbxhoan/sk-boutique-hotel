@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
 import { resolveLocale } from "@/lib/locale";
@@ -27,5 +28,10 @@ export default async function RoomsPage({ searchParams }: PageProps) {
   const locale = resolveLocale(resolvedSearchParams.lang);
   const page = await loadRoomCollectionPageCopy();
 
-  return <CmsPageRenderer locale={locale} page={page} />;
+  return (
+    <>
+      <PageViewTracker eventType="page_view" locale={locale} pagePath="/phong" entityType="room_collection" />
+      <CmsPageRenderer locale={locale} page={page} />
+    </>
+  );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
 import { newsCollectionPageCopy } from "@/lib/mock/public-cms";
@@ -25,5 +26,10 @@ export default async function NewsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
 
-  return <CmsPageRenderer locale={locale} page={newsCollectionPageCopy} />;
+  return (
+    <>
+      <PageViewTracker eventType="page_view" locale={locale} pagePath="/tin-tuc" entityType="news_collection" />
+      <CmsPageRenderer locale={locale} page={newsCollectionPageCopy} />
+    </>
+  );
 }

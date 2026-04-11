@@ -1,7 +1,5 @@
-import Link from "next/link";
-
+import { AnalyticsLink } from "@/components/analytics-link";
 import type { Locale } from "@/lib/locale";
-import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type {
   CmsAction,
@@ -59,9 +57,15 @@ function CmsActionLink({
   const variant = actionVariantMap[action.tone ?? "solid"];
 
   return (
-    <Link className={`button button--${variant}`} href={appendLocaleQuery(action.href, locale)}>
+    <AnalyticsLink
+      className={`button button--${variant}`}
+      eventType="cta_click"
+      href={action.href}
+      locale={locale}
+      metadata={{ tone: action.tone ?? "solid" }}
+    >
       {localize(locale, action.label)}
-    </Link>
+    </AnalyticsLink>
   );
 }
 
@@ -206,10 +210,7 @@ function CmsCollectionCard({
   locale: Locale;
 }) {
   const card = (
-    <PortalCard
-      className="cms-collection-card"
-      tone={toneToCardTone(item.tone)}
-    >
+    <PortalCard className="cms-collection-card" tone={toneToCardTone(item.tone)}>
       <div className="cms-collection-card__top">
         <PortalBadge tone={toneToBadgeTone(item.tone)}>{localize(locale, item.eyebrow)}</PortalBadge>
         <span className="cms-collection-card__chevron" aria-hidden="true">
@@ -233,9 +234,17 @@ function CmsCollectionCard({
   );
 
   return item.href ? (
-    <Link className="cms-collection-card__link" href={appendLocaleQuery(item.href, locale)}>
+    <AnalyticsLink
+      className="cms-collection-card__link"
+      entityId={item.href}
+      entityType="cms_collection_item"
+      eventType="cta_click"
+      href={item.href}
+      locale={locale}
+      metadata={{ title: item.title.vi }}
+    >
       {card}
-    </Link>
+    </AnalyticsLink>
   ) : (
     card
   );

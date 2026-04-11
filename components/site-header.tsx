@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { AnalyticsLink } from "@/components/analytics-link";
 import { navItems } from "@/lib/site-content";
 import { appendLocaleQuery, localeLabel, resolveLocale, translate } from "@/lib/locale";
 import { LogoMark } from "@/components/logo-mark";
@@ -44,9 +45,16 @@ export function SiteHeader() {
             {localeLabel(localeToggle)}
           </Link>
 
-          <Link className="button button--solid site-header__cta" href={appendLocaleQuery("/lien-he", locale)}>
+          <AnalyticsLink
+            className="button button--solid site-header__cta"
+            eventType="cta_click"
+            href="/lien-he"
+            locale={locale}
+            metadata={{ source: "site_header" }}
+            pagePath={pathname}
+          >
             {translate(locale, "Kiểm tra phòng trống")}
-          </Link>
+          </AnalyticsLink>
         </div>
       </div>
     </header>
