@@ -11,6 +11,7 @@ const reservationSelect = `
 
 type ReservationQueryOptions = {
   branchId?: string;
+  customerId?: string;
   limit?: number;
   status?: ReservationStatus | ReservationStatus[];
 };
@@ -22,6 +23,10 @@ export async function listReservations(options: ReservationQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
       }
 
       if (options.status) {
@@ -51,6 +56,10 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
       }
 
       if (options.status) {

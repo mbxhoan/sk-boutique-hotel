@@ -86,6 +86,46 @@ insert into public.branches (
   2
 );
 
+insert into public.branch_bank_accounts (
+  id,
+  branch_id,
+  bank_name,
+  bank_bin,
+  account_name,
+  account_number,
+  account_label,
+  qr_provider,
+  is_default,
+  is_active,
+  sort_order
+) values
+(
+  '66666666-6666-6666-6666-666666666661',
+  '11111111-1111-1111-1111-111111111111',
+  'Vietcombank',
+  '970436',
+  'SK Boutique Hotel Central',
+  '0111000123456',
+  'Central deposit account',
+  'vietqr',
+  true,
+  true,
+  1
+),
+(
+  '66666666-6666-6666-6666-666666666662',
+  '22222222-2222-2222-2222-222222222222',
+  'MB Bank',
+  '970422',
+  'SK Boutique Hotel Riverside',
+  '202420242024',
+  'Riverside deposit account',
+  'vietqr',
+  true,
+  true,
+  1
+);
+
 insert into public.floors (
   id,
   branch_id,

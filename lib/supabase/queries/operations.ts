@@ -1,5 +1,18 @@
-import type { BranchRow, FloorRow, ReservationRoomItemRow, RoomRow, RoomTypeRow } from "@/lib/supabase/database.types";
+import type {
+  BranchRow,
+  FloorRow,
+  PaymentProofRow,
+  PaymentRequestRow,
+  ReservationRoomItemRow,
+  ReservationRow,
+  RoomRow,
+  RoomTypeRow
+} from "@/lib/supabase/database.types";
+import { listBranchBankAccounts } from "@/lib/supabase/queries/branch-bank-accounts";
 import { listBranches } from "@/lib/supabase/queries/branches";
+import { listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { listPaymentProofs } from "@/lib/supabase/queries/payment-proofs";
+import { countPaymentRequests, listPaymentRequests } from "@/lib/supabase/queries/payment-requests";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { countAuditLogs, listAuditLogs } from "@/lib/supabase/queries/audit-logs";
@@ -7,7 +20,21 @@ import { countAvailabilityRequests, getAvailabilityRequestById, listAvailability
 import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { countRoomHolds, countExpiringRoomHolds, listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { countReservations, listReservations } from "@/lib/supabase/queries/reservations";
-import type { WorkflowAvailabilityRequest, WorkflowAuditLog, WorkflowBranchOption, WorkflowDashboardData, WorkflowReservation, WorkflowRoomHold, WorkflowRoomSuggestion, WorkflowRoomTypeOption, WorkflowSelection, WorkflowStatCard } from "@/lib/supabase/workflow.types";
+import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import type {
+  WorkflowAvailabilityRequest,
+  WorkflowAuditLog,
+  WorkflowBranchBankAccountOption,
+  WorkflowBranchOption,
+  WorkflowDashboardData,
+  WorkflowPaymentRequest,
+  WorkflowReservation,
+  WorkflowRoomHold,
+  WorkflowRoomSuggestion,
+  WorkflowRoomTypeOption,
+  WorkflowSelection,
+  WorkflowStatCard
+} from "@/lib/supabase/workflow.types";
 
 const roomSelect = `
   id, branch_id, floor_id, room_type_id, code, notes_vi, notes_en, status, is_active, created_at, updated_at
@@ -125,6 +152,61 @@ function toAuditLogView(
   };
 }
 
+function toPaymentRequestView(
+  request: Awaited<ReturnType<typeof listPaymentRequests>>[number],
+  branchMap: Record<string, BranchRow>,
+  roomTypeMap: Record<string, RoomTypeRow>,
+  latestProofMap: Record<string, PaymentProofRow>,
+  reservationMap: Record<string, ReservationRow>,
+  customerMap: Record<string, { email: string; full_name: string }>
+): WorkflowPaymentRequest {
+  const branch = branchMap[request.branch_id];
+  const reservation = reservationMap[request.reservation_id];
+  const roomType = reservation ? roomTypeMap[reservation.primary_room_type_id] : null;
+  const latestProof = latestProofMap[request.id] ?? null;
+  const customer = customerMap[request.customer_id];
+
+  return {
+    ...request,
+    branch_name_en: branch?.name_en ?? request.branch_id,
+    branch_name_vi: branch?.name_vi ?? request.branch_id,
+    customer_email: customer?.email ?? request.customer_id,
+    customer_name: customer?.full_name ?? request.customer_id,
+    latest_proof_file_name: latestProof?.file_name ?? null,
+    latest_proof_file_path: latestProof?.file_path ?? null,
+    latest_proof_id: latestProof?.id ?? null,
+    latest_proof_review_note: latestProof?.review_note ?? null,
+    latest_proof_status: latestProof?.status ?? null,
+    latest_proof_uploaded_at: latestProof?.created_at ?? null,
+    payment_upload_path: buildPaymentUploadPath(request),
+    qr_image_url: buildVietQrImageUrl(request),
+    reservation_booking_code: reservation?.booking_code ?? request.reservation_id,
+    reservation_room_code: reservation?.booking_code ?? request.reservation_id,
+    room_type_name_en: roomType?.name_en ?? null,
+    room_type_name_vi: roomType?.name_vi ?? null
+  };
+}
+
+function toPaymentProofView(
+  proof: PaymentProofRow,
+  branchMap: Record<string, BranchRow>,
+  paymentRequestMap: Record<string, PaymentRequestRow>,
+  reservationMap: Record<string, ReservationRow>
+) {
+  const paymentRequest = paymentRequestMap[proof.payment_request_id];
+  const reservation = paymentRequest ? reservationMap[paymentRequest.reservation_id] : null;
+  const branch = paymentRequest ? branchMap[paymentRequest.branch_id] : null;
+
+  return {
+    ...proof,
+    branch_name_en: branch?.name_en ?? paymentRequest?.branch_id ?? proof.customer_id,
+    branch_name_vi: branch?.name_vi ?? paymentRequest?.branch_id ?? proof.customer_id,
+    payment_code: paymentRequest?.payment_code ?? proof.payment_request_id,
+    reservation_booking_code: reservation?.booking_code ?? paymentRequest?.reservation_id ?? proof.payment_request_id,
+    reservation_room_code: reservation?.booking_code ?? paymentRequest?.reservation_id ?? proof.payment_request_id
+  };
+}
+
 function toSuggestionView(
   room: RoomRow,
   branchMap: Record<string, BranchRow>,
@@ -213,7 +295,7 @@ function getVietnamStartOfDayIso(date = new Date()) {
 }
 
 export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = {}): Promise<WorkflowDashboardData> {
-  const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs] = await Promise.all([
+  const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs, bankAccounts, paymentRequests, paymentProofs] = await Promise.all([
     listBranches(),
     listRoomTypes(),
     listActiveRooms(),
@@ -221,19 +303,42 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     listReservationRoomItems(),
     listAvailabilityRequests({ limit: 8 }),
     listRoomHolds({ limit: 8, status: ["active", "converted", "expired"] }),
-    listReservations({ limit: 8 }),
-    listAuditLogs({ limit: 10, since: getVietnamStartOfDayIso() })
+    listReservations({ limit: 20 }),
+    listAuditLogs({ limit: 10, since: getVietnamStartOfDayIso() }),
+    listBranchBankAccounts({ limit: 20 }),
+    listPaymentRequests({ limit: 12 }),
+    listPaymentProofs({ limit: 20 })
   ]);
 
   const branchMap = buildMap(branches);
   const roomTypeMap = buildMap(roomTypes);
   const roomMap = buildMap(rooms);
   const floorMap = buildMap(floors);
+  const reservationMap = buildMap(reservations);
   const reservationRoomItemMap = Object.fromEntries(
     reservationRoomItems
       .filter((item) => Boolean(item.reservation_id) && Boolean(item.room_id))
       .map((item) => [item.reservation_id, item.room_id])
   ) as Record<string, string>;
+  const latestPaymentProofMap = Object.fromEntries(
+    paymentProofs
+      .filter((proof) => Boolean(proof.payment_request_id))
+      .reduce((map, proof) => {
+        if (!map.has(proof.payment_request_id)) {
+          map.set(proof.payment_request_id, proof);
+        }
+        return map;
+      }, new Map<string, PaymentProofRow>())
+      .values()
+      .map((proof) => [proof.payment_request_id, proof] as const)
+  ) as Record<string, PaymentProofRow>;
+  const customerRows = await listCustomersByIds([
+    ...paymentRequests.map((request) => request.customer_id),
+    ...reservations.map((reservation) => reservation.customer_id)
+  ]);
+  const customerMap = Object.fromEntries(
+    customerRows.map((customer) => [customer.id, { email: customer.email, full_name: customer.full_name }])
+  ) as Record<string, { email: string; full_name: string }>;
 
   const availabilityRequests = requests.map((request) => toAvailabilityRequestView(request, branchMap, roomTypeMap));
   const activeRoomHolds = holds.map((hold) => toRoomHoldView(hold, branchMap, roomMap, roomTypeMap));
@@ -241,6 +346,14 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     toReservationView(reservation, branchMap, roomMap, roomTypeMap, reservationRoomItemMap)
   );
   const recentAuditLogs = auditLogs.map((log) => toAuditLogView(log, branchMap));
+  const branchBankAccountOptions = bankAccounts.map((account) => ({
+    ...account,
+    branch_name_en: branchMap[account.branch_id]?.name_en ?? account.branch_id,
+    branch_name_vi: branchMap[account.branch_id]?.name_vi ?? account.branch_id
+  }));
+  const paymentRequestViews = paymentRequests.map((request) =>
+    toPaymentRequestView(request, branchMap, roomTypeMap, latestPaymentProofMap, reservationMap, customerMap)
+  );
 
   const selectedRequest = selection.requestId
     ? availabilityRequests.find((request) => request.id === selection.requestId) ??
@@ -282,6 +395,8 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   const activeHoldCount = await countRoomHolds({ status: "active" });
   const expiringHoldCount = await countExpiringRoomHolds(30);
   const pendingReservationCount = await countReservations({ status: ["draft", "pending_deposit"] });
+  const pendingPaymentCount = await countPaymentRequests({ status: ["sent", "pending_verification"] });
+  const verifiedPaymentCount = await countPaymentRequests({ status: "verified" });
   const auditTodayCount = await countAuditLogs({ since: getVietnamStartOfDayIso() });
 
   const stats: WorkflowStatCard[] = [
@@ -318,6 +433,22 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
       value: `${pendingReservationCount}`
     },
     {
+      detail_en: "Deposit requests waiting for manual verification.",
+      detail_vi: "Payment request đang chờ staff verify.",
+      label_en: "Payment pending",
+      label_vi: "Chờ payment",
+      tone: "default",
+      value: `${pendingPaymentCount}`
+    },
+    {
+      detail_en: "Confirmed payments processed today.",
+      detail_vi: "Payment đã xác nhận trong ngày.",
+      label_en: "Verified payments",
+      label_vi: "Payment đã duyệt",
+      tone: "accent",
+      value: `${verifiedPaymentCount}`
+    },
+    {
       detail_en: "Audit entries created today.",
       detail_vi: "Audit entry trong ngày.",
       label_en: "Audit entries",
@@ -332,6 +463,8 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     availability_requests: availabilityRequests,
     audit_logs: recentAuditLogs,
     branch_options: branches,
+    branch_bank_account_options: branchBankAccountOptions,
+    payment_requests: paymentRequestViews,
     recent_reservations: recentReservations,
     room_suggestions: suggestions,
     room_type_options: roomTypes,

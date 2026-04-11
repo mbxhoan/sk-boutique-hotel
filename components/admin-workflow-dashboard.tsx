@@ -3,15 +3,23 @@ import Link from "next/link";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
-import { createReservationAction, createRoomHoldAction, releaseExpiredHoldsAction } from "@/app/(admin)/admin/actions";
+import {
+  createPaymentRequestAction,
+  createReservationAction,
+  createRoomHoldAction,
+  releaseExpiredHoldsAction,
+  verifyPaymentRequestAction
+} from "@/app/(admin)/admin/actions";
 import { adminDashboardCopy } from "@/lib/mock/admin-dashboard";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowDashboardData,
+  WorkflowBranchBankAccountOption,
   WorkflowReservation,
   WorkflowRoomHold,
   WorkflowRoomSuggestion,
   WorkflowRoomTypeOption,
+  WorkflowPaymentRequest,
   WorkflowStatCard
 } from "@/lib/supabase/workflow.types";
 
@@ -23,6 +31,17 @@ type AdminWorkflowDashboardProps = {
 
 function buildMap<T extends { id: string }>(items: T[]) {
   return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
+}
+
+function groupBankAccountsByBranch(accounts: WorkflowBranchBankAccountOption[]) {
+  return accounts.reduce<Record<string, WorkflowBranchBankAccountOption[]>>((acc, account) => {
+    if (!acc[account.branch_id]) {
+      acc[account.branch_id] = [];
+    }
+
+    acc[account.branch_id].push(account);
+    return acc;
+  }, {});
 }
 
 function formatDateTime(locale: Locale, value: string) {
@@ -40,12 +59,12 @@ function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
 }
 
-function formatMoney(locale: Locale, value: number) {
+function formatMoney(locale: Locale, value: number, currency = "VND") {
   const formatted = new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
     maximumFractionDigits: 0
   }).format(value);
 
-  return locale === "en" ? `${formatted} VND` : `${formatted} đ`;
+  return locale === "en" ? `${formatted} ${currency}` : `${formatted} ${currency === "VND" ? "đ" : currency}`;
 }
 
 function calculateNights(startAt: string, endAt: string) {
@@ -115,6 +134,18 @@ function badgeToneForReservation(status: WorkflowReservation["status"]) {
   }
 }
 
+function badgeToneForPayment(status: WorkflowPaymentRequest["status"]) {
+  switch (status) {
+    case "verified":
+      return "accent" as const;
+    case "pending_verification":
+    case "sent":
+      return "soft" as const;
+    default:
+      return "neutral" as const;
+  }
+}
+
 function statusLabel(locale: Locale, status: string) {
   const labels: Record<Locale, Record<string, string>> = {
     en: {
@@ -127,11 +158,15 @@ function statusLabel(locale: Locale, status: string) {
       in_review: "In review",
       new: "New",
       pending_deposit: "Pending deposit",
+      pending_verification: "Pending verification",
       quoted: "Quoted",
       rejected: "Rejected",
       released: "Released",
+      sent: "Sent",
       active: "Active",
-      confirmed: "Confirmed"
+      confirmed: "Confirmed",
+      verified: "Verified",
+      proof_uploaded: "Proof uploaded"
     },
     vi: {
       cancelled: "Đã hủy",
@@ -143,11 +178,15 @@ function statusLabel(locale: Locale, status: string) {
       in_review: "Đang duyệt",
       new: "Mới",
       pending_deposit: "Chờ deposit",
+      pending_verification: "Chờ verify",
       quoted: "Đã báo giá",
       rejected: "Từ chối",
       released: "Đã release",
+      sent: "Đã gửi",
       active: "Đang giữ",
-      confirmed: "Đã xác nhận"
+      confirmed: "Đã xác nhận",
+      verified: "Đã duyệt",
+      proof_uploaded: "Đã upload proof"
     }
   };
 
@@ -160,6 +199,7 @@ function buildAdminHref(locale: Locale, requestId: string) {
 
 function buildLookupMaps(data: WorkflowDashboardData) {
   return {
+    bankAccountsByBranch: groupBankAccountsByBranch(data.branch_bank_account_options),
     roomTypeMap: buildMap(data.room_type_options)
   };
 }
@@ -436,14 +476,20 @@ function HoldCard({
 }
 
 function ReservationCard({
+  bankAccounts,
+  canOperate,
   locale,
   reservation,
   roomType
 }: {
+  bankAccounts: WorkflowBranchBankAccountOption[];
+  canOperate: boolean;
   locale: Locale;
   reservation: WorkflowReservation;
   roomType: WorkflowRoomTypeOption | null;
 }) {
+  const branchBankAccounts = bankAccounts.filter((account) => account.branch_id === reservation.branch_id);
+
   return (
     <PortalCard className="portal-workflow-card" tone="default">
       <div className="portal-item-card__top">
@@ -481,6 +527,124 @@ function ReservationCard({
         <span>{locale === "en" ? "Room pricing" : "Giá phòng"}</span>
         <strong>{roomType ? formatMoney(locale, roomType.base_price) : "—"}</strong>
       </div>
+
+      {canOperate && reservation.status !== "confirmed" ? (
+        <form className="portal-form" action={createPaymentRequestAction}>
+          <input name="amount" type="hidden" value={String(reservation.deposit_amount || reservation.total_amount)} />
+          <input name="createdBy" type="hidden" value="staff" />
+          <input name="reservationId" type="hidden" value={reservation.id} />
+          <input name="source" type="hidden" value="admin_console" />
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Branch bank account" : "Tài khoản chi nhánh"}</span>
+            <select className="portal-field__control" name="branchBankAccountId" defaultValue="">
+              <option value="">{locale === "en" ? "Use default bank account" : "Dùng tài khoản mặc định"}</option>
+              {branchBankAccounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.bank_name} • {account.account_number}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
+            <textarea className="portal-field__control" name="note" rows={3} defaultValue={reservation.notes} />
+          </label>
+          <button className="button button--solid" type="submit">
+            {locale === "en" ? "Create payment request" : "Tạo payment request"}
+          </button>
+        </form>
+      ) : null}
+    </PortalCard>
+  );
+}
+
+function PaymentRequestCard({
+  bankAccounts,
+  canOperate,
+  locale,
+  paymentRequest
+}: {
+  bankAccounts: WorkflowBranchBankAccountOption[];
+  canOperate: boolean;
+  locale: Locale;
+  paymentRequest: WorkflowPaymentRequest;
+}) {
+  const bankAccountOptions = bankAccounts.filter((account) => account.branch_id === paymentRequest.branch_id);
+  const canVerify = paymentRequest.status === "pending_verification" || paymentRequest.status === "sent";
+
+  return (
+    <PortalCard className="portal-workflow-card" tone="default">
+      <div className="portal-item-card__top">
+        <p className="portal-item-card__code">{paymentRequest.payment_code}</p>
+        <PortalBadge tone={badgeToneForPayment(paymentRequest.status)}>{statusLabel(locale, paymentRequest.status)}</PortalBadge>
+      </div>
+      <h3 className="portal-item-card__title">{paymentRequest.customer_name}</h3>
+      <p className="portal-item-card__detail">
+        {locale === "en" ? paymentRequest.branch_name_en : paymentRequest.branch_name_vi}
+      </p>
+      <dl className="portal-profile-list">
+        <div className="portal-profile-list__item">
+          <dt className="portal-profile-list__label">{locale === "en" ? "Reservation" : "Reservation"}</dt>
+          <dd className="portal-profile-list__value">{paymentRequest.reservation_booking_code}</dd>
+        </div>
+        <div className="portal-profile-list__item">
+          <dt className="portal-profile-list__label">{locale === "en" ? "Amount" : "Số tiền"}</dt>
+          <dd className="portal-profile-list__value">{formatMoney(locale, paymentRequest.amount, paymentRequest.currency)}</dd>
+        </div>
+        <div className="portal-profile-list__item">
+          <dt className="portal-profile-list__label">{locale === "en" ? "Transfer content" : "Nội dung CK"}</dt>
+          <dd className="portal-profile-list__value">{paymentRequest.transfer_content}</dd>
+        </div>
+        <div className="portal-profile-list__item">
+          <dt className="portal-profile-list__label">{locale === "en" ? "Expires" : "Hết hạn"}</dt>
+          <dd className="portal-profile-list__value">{formatDateTime(locale, paymentRequest.public_upload_link_expires_at)}</dd>
+        </div>
+      </dl>
+      {paymentRequest.payment_upload_path ? (
+        <p className="portal-item-card__note">
+          <Link className="button button--text-light" href={appendLocaleQuery(paymentRequest.payment_upload_path, locale)}>
+            {locale === "en" ? "Open secure upload link" : "Mở link upload an toàn"}
+          </Link>
+        </p>
+      ) : null}
+      {paymentRequest.latest_proof_file_path ? (
+        <p className="portal-item-card__note">
+          {locale === "en" ? "Latest proof uploaded." : "Proof gần nhất đã upload."}
+        </p>
+      ) : null}
+
+      <div className="portal-qr-block">
+        <img alt={paymentRequest.payment_code} className="portal-qr-block__image" src={paymentRequest.qr_image_url} />
+      </div>
+
+      {canOperate && canVerify ? (
+        <form className="portal-form" action={verifyPaymentRequestAction}>
+          <input name="actorRole" type="hidden" value="staff" />
+          <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Status" : "Trạng thái"}</span>
+            <select className="portal-field__control" name="status" defaultValue="verified">
+              <option value="verified">{locale === "en" ? "Verify" : "Duyệt"}</option>
+              <option value="rejected">{locale === "en" ? "Reject" : "Từ chối"}</option>
+            </select>
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Review note" : "Ghi chú duyệt"}</span>
+            <textarea className="portal-field__control" name="reviewNote" rows={3} />
+          </label>
+          <button className="button button--solid" type="submit">
+            {locale === "en" ? "Save verification" : "Lưu verify"}
+          </button>
+        </form>
+      ) : null}
+
+      {bankAccountOptions.length ? (
+        <p className="portal-item-card__note">
+          {locale === "en"
+            ? `Default bank: ${bankAccountOptions.find((item) => item.is_default)?.bank_name ?? bankAccountOptions[0].bank_name}`
+            : `Tài khoản mặc định: ${bankAccountOptions.find((item) => item.is_default)?.bank_name ?? bankAccountOptions[0].bank_name}`}
+        </p>
+      ) : null}
     </PortalCard>
   );
 }
@@ -510,7 +674,7 @@ function AuditCard({
 }
 
 export function AdminWorkflowDashboard({ canOperate, data, locale }: AdminWorkflowDashboardProps) {
-  const { roomTypeMap } = buildLookupMaps(data);
+  const { bankAccountsByBranch, roomTypeMap } = buildLookupMaps(data);
   const selectedRequest = data.selected_request;
   const selectedRoomType = selectedRequest ? roomTypeMap[selectedRequest.room_type_id] : null;
 
@@ -630,20 +794,54 @@ export function AdminWorkflowDashboard({ canOperate, data, locale }: AdminWorkfl
         />
 
         <div className="portal-card-grid portal-card-grid--two">
-          {data.recent_reservations.length ? (
-            data.recent_reservations.map((reservation) => (
-              <ReservationCard
-                key={reservation.id}
-                locale={locale}
-                reservation={reservation}
-                roomType={roomTypeMap[reservation.primary_room_type_id] ?? null}
-              />
+            {data.recent_reservations.length ? (
+              data.recent_reservations.map((reservation) => (
+                <ReservationCard
+                  bankAccounts={bankAccountsByBranch[reservation.branch_id] ?? []}
+                  canOperate={canOperate}
+                  key={reservation.id}
+                  locale={locale}
+                  reservation={reservation}
+                  roomType={roomTypeMap[reservation.primary_room_type_id] ?? null}
+                />
             ))
           ) : (
             <SectionEmptyState
               description={locale === "en" ? "No reservations have been created yet." : "Chưa có reservation nào."}
               locale={locale}
               title={locale === "en" ? "Reservation list" : "Danh sách reservation"}
+            />
+          )}
+        </div>
+      </section>
+
+      <section className="portal-section" id="payments">
+        <PortalSectionHeading
+          description={{
+            en: "Deposit requests, public upload links, and manual verification live here.",
+            vi: "Deposit request, public upload link và verify thủ công nằm ở đây."
+          }}
+          eyebrow={{ en: "Payments", vi: "Thanh toán" }}
+          locale={locale}
+          title={{ en: "Payment queue", vi: "Hàng đợi payment" }}
+        />
+
+        <div className="portal-card-grid portal-card-grid--two">
+          {data.payment_requests.length ? (
+            data.payment_requests.map((paymentRequest) => (
+              <PaymentRequestCard
+                bankAccounts={data.branch_bank_account_options}
+                canOperate={canOperate}
+                key={paymentRequest.id}
+                locale={locale}
+                paymentRequest={paymentRequest}
+              />
+            ))
+          ) : (
+            <SectionEmptyState
+              description={locale === "en" ? "No payment requests are waiting yet." : "Chưa có payment request nào."}
+              locale={locale}
+              title={locale === "en" ? "Payment list" : "Danh sách payment"}
             />
           )}
         </div>

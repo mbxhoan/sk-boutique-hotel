@@ -121,3 +121,28 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(seed): align room_types seed rows with schema`
 - `main_files`:
   - `supabase/seed.sql`
+
+### Entry 007
+- `time`: 2026-04-11T23:20:00+07:00
+- `prompt_summary`: Triển khai phase E cho deposit QR, payment proof upload, manual payment verification, booking confirmation hooks, và member history UI trên nền Supabase thật.
+- `commit_message`: `feat(payments): add deposit QR, proof upload, and member history`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(marketing)/thanh-toan/[token]/page.tsx`
+  - `app/actions/payments.ts`
+  - `app/(member)/member/page.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/audit.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/env.ts`
+  - `lib/supabase/queries/branch-bank-accounts.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/payment-proofs.ts`
+  - `lib/supabase/queries/payment-requests.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/workflow.types.ts`
+  - `supabase/migrations/20260411235500_phase_e_payment_proof_confirmation.sql`
+  - `supabase/seed.sql`

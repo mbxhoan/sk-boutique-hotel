@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 
 import { createReservation, holdRoom, releaseExpiredHolds, submitAvailabilityRequest } from "@/lib/supabase/workflows";
+import {
+  createPaymentRequestAction as submitCreatePaymentRequestAction,
+  submitPaymentProofAction as submitPaymentProofActionImpl,
+  verifyPaymentRequestAction as verifyPaymentRequestActionImpl
+} from "@/app/actions/payments";
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -74,6 +79,10 @@ export async function submitAvailabilityRequestAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function createPaymentRequestAction(formData: FormData) {
+  return submitCreatePaymentRequestAction(formData);
+}
+
 export async function createRoomHoldAction(formData: FormData) {
   await holdRoom({
     actorRole: readOptionalString(formData, "actorRole") ?? "staff",
@@ -134,4 +143,12 @@ export async function releaseExpiredHoldsAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+}
+
+export async function submitPaymentProofAction(formData: FormData) {
+  return submitPaymentProofActionImpl(formData);
+}
+
+export async function verifyPaymentRequestAction(formData: FormData) {
+  return verifyPaymentRequestActionImpl(formData);
 }

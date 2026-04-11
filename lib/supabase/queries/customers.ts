@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/locale";
 import { defaultLocale } from "@/lib/locale";
 import type { CustomerRow } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { queryWithFallback } from "@/lib/supabase/queries/shared";
+import { queryWithFallback, queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 export type CustomerProfileInput = {
   authUserId: string;
@@ -34,6 +34,33 @@ export async function getCustomerByAuthUserId(authUserId: string) {
       return (data ?? null) as CustomerRow | null;
     },
     null as CustomerRow | null
+  );
+}
+
+export async function listCustomersByIds(customerIds: string[]) {
+  const uniqueIds = [...new Set(customerIds.filter(Boolean))];
+
+  if (!uniqueIds.length) {
+    return [] as CustomerRow[];
+  }
+
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        )
+        .in("id", uniqueIds)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []) as CustomerRow[];
+    },
+    [] as CustomerRow[]
   );
 }
 

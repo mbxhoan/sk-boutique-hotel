@@ -4,6 +4,7 @@ const publicKeyKeys = [
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "SUPABASE_ANON_KEY"
 ] as const;
+const paymentUploadTokenSecretKeys = ["PAYMENT_UPLOAD_TOKEN_SECRET"] as const;
 const serviceKeyKeys = ["SUPABASE_SERVICE_ROLE_KEY"] as const;
 
 function getFirstDefinedEnv(keys: readonly string[]) {
@@ -46,4 +47,12 @@ export function getSupabaseServiceRoleKey() {
 
 export function hasSupabaseServiceConfig() {
   return Boolean(getFirstDefinedEnv(serviceKeyKeys));
+}
+
+export function getPaymentUploadTokenSecret() {
+  return requireEnv(paymentUploadTokenSecretKeys, "payment upload token secret");
+}
+
+export function hasPaymentUploadTokenSecret() {
+  return Boolean(getFirstDefinedEnv(paymentUploadTokenSecretKeys));
 }
