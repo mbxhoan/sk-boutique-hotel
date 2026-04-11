@@ -84,3 +84,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/globals.css`
   - `package.json`
   - `package-lock.json`
+
+### Entry 004
+- `time`: 2026-04-11T20:44:35+07:00
+- `prompt_summary`: Thiết lập MCP client cho Supabase trong workspace bằng cấu hình .vscode/mcp.json để có thể inspect schema và data từ VS Code.
+- `commit_message`: `chore(vscode): add Supabase MCP client config`
+- `main_files`:
+  - `.vscode/mcp.json`
