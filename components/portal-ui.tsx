@@ -73,11 +73,13 @@ export function PortalStatCard({
   label: LocalizedText;
   locale: Locale;
   tone?: PortalCardTone;
-  value: string;
+  value: string | LocalizedText;
 }) {
+  const renderedValue = typeof value === "string" ? value : localize(locale, value);
+
   return (
     <article className={`portal-stat portal-stat--${tone}`}>
-      <p className="portal-stat__value">{value}</p>
+      <p className="portal-stat__value">{renderedValue}</p>
       <p className="portal-stat__label">{localize(locale, label)}</p>
       <p className="portal-stat__detail">{localize(locale, detail)}</p>
     </article>

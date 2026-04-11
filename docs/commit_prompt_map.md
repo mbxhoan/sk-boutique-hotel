@@ -40,3 +40,37 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/site-content.ts`
   - `lib/locale.ts`
   - `app/globals.css`
+
+### Entry 002
+- `time`: 2026-04-11T18:45:33+07:00
+- `prompt_summary`: Thiết lập nền Supabase thật cho phase C: clients, auth helpers, migration/seed cho branches, floors, rooms, room_types, customers, và nối route public qua query helpers theo feature.
+- `commit_message`: `feat(supabase): add hotel base schema and SSR data layer`
+- `main_files`:
+  - `package.json`
+  - `package-lock.json`
+  - `middleware.ts`
+  - `lib/supabase/auth.ts`
+  - `lib/supabase/browser.ts`
+  - `lib/supabase/content.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/env.ts`
+  - `lib/supabase/middleware.ts`
+  - `lib/supabase/read-client.ts`
+  - `lib/supabase/server.ts`
+  - `lib/supabase/service.ts`
+  - `lib/supabase/queries/branches.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/floors.ts`
+  - `lib/supabase/queries/room-types.ts`
+  - `lib/supabase/queries/rooms.ts`
+  - `lib/supabase/queries/shared.ts`
+  - `app/(marketing)/chi-nhanh/page.tsx`
+  - `app/(marketing)/chi-nhanh/[slug]/page.tsx`
+  - `app/(marketing)/phong/page.tsx`
+  - `app/(marketing)/phong/[slug]/page.tsx`
+  - `components/public-cms.tsx`
+  - `components/portal-ui.tsx`
+  - `lib/mock/public-cms.ts`
+  - `supabase/config.toml`
+  - `supabase/migrations/20260411112559_phase_c_hotel_core.sql`
+  - `supabase/seed.sql`

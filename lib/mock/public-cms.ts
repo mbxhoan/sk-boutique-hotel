@@ -24,7 +24,7 @@ export type CmsStat = {
   detail: LocalizedText;
   label: LocalizedText;
   tone?: CmsTone;
-  value: string;
+  value: string | LocalizedText;
 };
 
 export type CmsCollectionItem = {

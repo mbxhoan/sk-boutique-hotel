@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
-import { branchCollectionPageCopy } from "@/lib/mock/public-cms";
 import { resolveLocale } from "@/lib/locale";
+import { loadBranchCollectionPageCopy } from "@/lib/supabase/queries/branches";
 
 type PageProps = {
   searchParams?: Promise<{
@@ -14,16 +14,18 @@ type PageProps = {
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = await loadBranchCollectionPageCopy();
 
   return {
-    title: localize(locale, branchCollectionPageCopy.seo.title),
-    description: localize(locale, branchCollectionPageCopy.seo.description)
+    title: localize(locale, page.seo.title),
+    description: localize(locale, page.seo.description)
   };
 }
 
 export default async function BranchesPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = await loadBranchCollectionPageCopy();
 
-  return <CmsPageRenderer locale={locale} page={branchCollectionPageCopy} />;
+  return <CmsPageRenderer locale={locale} page={page} />;
 }
