@@ -6,6 +6,8 @@ export const localeQueryKey = "lang";
 
 const translations: Record<string, string> = {
   "Trang chủ": "Home",
+  "Phòng": "Rooms",
+  "Tin tức": "News",
   "Thương hiệu": "Brand",
   "Chi nhánh": "Branches",
   "Ưu đãi": "Offers",

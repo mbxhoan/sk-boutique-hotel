@@ -258,6 +258,7 @@ Kết quả mong muốn:
 ## Phase C — Supabase integration foundation
 Mục tiêu:
 - nối frontend với Supabase
+- kết nối mcp với supabase để kiểm tra dữ liệu / schema cho dự án SK boutique hotel
 - thiết lập auth, types, clients, env, query helpers, base tables
 
 ### Prompt mẫu

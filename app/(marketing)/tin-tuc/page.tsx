@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { MarketingHome } from "@/components/marketing-home";
-import { homePageCopy } from "@/lib/mock/public-cms";
+import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
+import { newsCollectionPageCopy } from "@/lib/mock/public-cms";
 import { resolveLocale } from "@/lib/locale";
 
 type PageProps = {
@@ -16,14 +16,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
 
   return {
-    title: localize(locale, homePageCopy.seo.title),
-    description: localize(locale, homePageCopy.seo.description)
+    title: localize(locale, newsCollectionPageCopy.seo.title),
+    description: localize(locale, newsCollectionPageCopy.seo.description)
   };
 }
 
-export default async function MarketingHomePage({ searchParams }: PageProps) {
+export default async function NewsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
 
-  return <MarketingHome locale={locale} />;
+  return <CmsPageRenderer locale={locale} page={newsCollectionPageCopy} />;
 }
