@@ -179,3 +179,16 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `chore(next-dev): allow local network dev origins`
 - `main_files`:
   - `next.config.ts`
+
+### Entry 010
+- `time`: 2026-04-12T00:45:00+07:00
+- `prompt_summary`: Seed authentication users cho admin portal, thêm gate đăng nhập admin, làm sidebar icon/collapse, và hạ size typography cho header/title trong admin UI.
+- `commit_message`: `feat(admin-auth): seed users and compact admin shell`
+- `main_files`:
+  - `app/(admin)/layout.tsx`
+  - `app/admin/sign-in/page.tsx`
+  - `app/globals.css`
+  - `components/admin-shell.tsx`
+  - `components/admin-sign-in-form.tsx`
+  - `lib/supabase/auth.ts`
+  - `supabase/seed.sql`

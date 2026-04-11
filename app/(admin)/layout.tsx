@@ -1,16 +1,19 @@
 import type { ReactNode } from "react";
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 import { AdminShell } from "@/components/admin-shell";
+import { canAccessAdminPortal, getSupabaseUser } from "@/lib/supabase/auth";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children
 }: Readonly<{
   children: ReactNode;
 }>) {
-  return (
-    <Suspense fallback={null}>
-      <AdminShell>{children}</AdminShell>
-    </Suspense>
-  );
+  const user = await getSupabaseUser().catch(() => null);
+
+  if (!canAccessAdminPortal(user)) {
+    redirect("/admin/sign-in");
+  }
+
+  return <AdminShell>{children}</AdminShell>;
 }

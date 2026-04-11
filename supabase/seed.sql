@@ -364,6 +364,171 @@ insert into public.rooms (
   true
 );
 
+insert into auth.users (
+  id,
+  instance_id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  is_super_admin,
+  created_at,
+  updated_at
+) values
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'system.admin@skboutiquehotel.example',
+  crypt('SkBoutique2026!', gen_salt('bf')),
+  now(),
+  jsonb_build_object(
+    'provider',
+    'email',
+    'providers',
+    jsonb_build_array('email'),
+    'role',
+    'system_admin',
+    'roles',
+    jsonb_build_array('system_admin')
+  ),
+  jsonb_build_object(
+    'full_name',
+    'SK System Admin',
+    'locale',
+    'vi'
+  ),
+  false,
+  now(),
+  now()
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'admin@skboutiquehotel.example',
+  crypt('SkBoutique2026!', gen_salt('bf')),
+  now(),
+  jsonb_build_object(
+    'provider',
+    'email',
+    'providers',
+    jsonb_build_array('email'),
+    'role',
+    'admin',
+    'roles',
+    jsonb_build_array('admin')
+  ),
+  jsonb_build_object(
+    'full_name',
+    'SK Admin',
+    'locale',
+    'vi'
+  ),
+  false,
+  now(),
+  now()
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'manager@skboutiquehotel.example',
+  crypt('SkBoutique2026!', gen_salt('bf')),
+  now(),
+  jsonb_build_object(
+    'provider',
+    'email',
+    'providers',
+    jsonb_build_array('email'),
+    'role',
+    'manager',
+    'roles',
+    jsonb_build_array('manager')
+  ),
+  jsonb_build_object(
+    'full_name',
+    'SK Manager',
+    'locale',
+    'vi'
+  ),
+  false,
+  now(),
+  now()
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'staff@skboutiquehotel.example',
+  crypt('SkBoutique2026!', gen_salt('bf')),
+  now(),
+  jsonb_build_object(
+    'provider',
+    'email',
+    'providers',
+    jsonb_build_array('email'),
+    'role',
+    'staff',
+    'roles',
+    jsonb_build_array('staff')
+  ),
+  jsonb_build_object(
+    'full_name',
+    'SK Staff',
+    'locale',
+    'vi'
+  ),
+  false,
+  now(),
+  now()
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'member@skboutiquehotel.example',
+  crypt('SkBoutique2026!', gen_salt('bf')),
+  now(),
+  jsonb_build_object(
+    'provider',
+    'email',
+    'providers',
+    jsonb_build_array('email'),
+    'role',
+    'member',
+    'roles',
+    jsonb_build_array('member')
+  ),
+  jsonb_build_object(
+    'full_name',
+    'Demo Member',
+    'locale',
+    'vi'
+  ),
+  false,
+  now(),
+  now()
+)
+on conflict (email) do update set
+  instance_id = excluded.instance_id,
+  aud = excluded.aud,
+  role = excluded.role,
+  encrypted_password = excluded.encrypted_password,
+  email_confirmed_at = excluded.email_confirmed_at,
+  raw_app_meta_data = excluded.raw_app_meta_data,
+  raw_user_meta_data = excluded.raw_user_meta_data,
+  is_super_admin = excluded.is_super_admin,
+  updated_at = excluded.updated_at;
+
 insert into public.customers (
   id,
   auth_user_id,
@@ -390,6 +555,20 @@ insert into public.customers (
   'seed',
   'seed',
   'Seed row for local development and schema inspection.',
+  now()
+),
+(
+  '55555555-5555-5555-5555-555555555552',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5',
+  'Demo Member',
+  'member@skboutiquehotel.example',
+  '+84 901 111 111',
+  'vi',
+  true,
+  now(),
+  'seed',
+  'auth_seed',
+  'Seed row linked to the local member auth account.',
   now()
 )
 on conflict (email) do update set
