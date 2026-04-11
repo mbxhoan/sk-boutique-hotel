@@ -114,3 +114,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/branches.ts`
   - `lib/supabase/queries/room-types.ts`
   - `supabase/migrations/20260411214500_phase_d_availability_hold_reservation.sql`
+
+### Entry 006
+- `time`: 2026-04-11T21:42:37+07:00
+- `prompt_summary`: Sửa lỗi `supabase db reset --linked --debug` do seed `room_types` dư 1 expression so với schema, khiến INSERT fail ở bước import seed.
+- `commit_message`: `fix(seed): align room_types seed rows with schema`
+- `main_files`:
+  - `supabase/seed.sql`
