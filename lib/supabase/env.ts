@@ -43,3 +43,7 @@ export function getSupabasePublishableKey() {
 export function getSupabaseServiceRoleKey() {
   return requireEnv(serviceKeyKeys, "service role key");
 }
+
+export function hasSupabaseServiceConfig() {
+  return Boolean(getFirstDefinedEnv(serviceKeyKeys));
+}

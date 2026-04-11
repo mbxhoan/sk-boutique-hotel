@@ -214,7 +214,7 @@ function patchBranchDetailPage(branch: BranchRow, branches: BranchRow[], fallbac
   };
 }
 
-async function listBranches() {
+export async function listBranches() {
   return queryWithFallback(
     async (client) => {
       const { data, error } = await client

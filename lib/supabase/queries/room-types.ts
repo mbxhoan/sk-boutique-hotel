@@ -258,7 +258,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
   };
 }
 
-async function listRoomTypes() {
+export async function listRoomTypes() {
   return queryWithFallback(
     async (client) => {
       const { data, error } = await client

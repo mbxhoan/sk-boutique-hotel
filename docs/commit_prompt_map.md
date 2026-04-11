@@ -91,3 +91,26 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `chore(vscode): add Supabase MCP client config`
 - `main_files`:
   - `.vscode/mcp.json`
+
+### Entry 005
+- `time`: 2026-04-11T22:10:00+07:00
+- `prompt_summary`: Triển khai phase D cho availability, hold, reservation workflow với schema Supabase, query/service helpers, và admin console tối thiểu.
+- `commit_message`: `feat(workflow): add availability, hold, and reservation console`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/admin/page.tsx`
+  - `app/globals.css`
+  - `components/admin-dashboard.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/workflows.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/availability-requests.ts`
+  - `lib/supabase/queries/room-holds.ts`
+  - `lib/supabase/queries/reservations.ts`
+  - `lib/supabase/queries/audit-logs.ts`
+  - `lib/supabase/queries/availability.ts`
+  - `lib/supabase/queries/branches.ts`
+  - `lib/supabase/queries/room-types.ts`
+  - `supabase/migrations/20260411214500_phase_d_availability_hold_reservation.sql`

@@ -1581,6 +1581,81 @@ textarea {
   font-weight: 700;
 }
 
+.portal-workflow-card {
+  gap: 0.85rem;
+}
+
+.portal-workflow-card__pricing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.25rem 0.85rem;
+  padding: 0.9rem 0.95rem;
+  border-radius: 1rem;
+  background: rgba(7, 17, 29, 0.04);
+}
+
+.portal-workflow-card__pricing span {
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.portal-workflow-card__pricing strong {
+  justify-self: end;
+  font-weight: 700;
+}
+
+.portal-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.portal-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.portal-field__label {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.portal-field__control {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--portal-text);
+  outline: none;
+}
+
+.portal-field__control::placeholder {
+  color: rgba(249, 245, 239, 0.46);
+}
+
+.portal-field__control:focus {
+  border-color: rgba(197, 160, 89, 0.74);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+}
+
+.portal-suggestion-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 1rem;
+}
+
+.portal-empty-state {
+  justify-content: center;
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.48);
+}
+
 .portal-shell {
   min-height: 100vh;
   padding: clamp(1rem, 2vw, 1.4rem);
@@ -1807,6 +1882,15 @@ textarea {
 .portal-shell .portal-profile-list__item,
 .portal-shell .portal-timeline__item {
   border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.portal-shell .portal-workflow-card__pricing {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.portal-shell .portal-field__control {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .marketing-home {

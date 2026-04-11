@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/lib/supabase/database.types";
-import { hasSupabasePublicConfig } from "@/lib/supabase/env";
+import { hasSupabasePublicConfig, hasSupabaseServiceConfig } from "@/lib/supabase/env";
 import { createSupabaseReadClient } from "@/lib/supabase/read-client";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type PublicSupabaseClient = SupabaseClient<Database>;
 
@@ -16,6 +17,21 @@ export async function queryWithFallback<T>(
 
   try {
     return await query(createSupabaseReadClient());
+  } catch {
+    return fallback;
+  }
+}
+
+export async function queryWithServiceFallback<T>(
+  query: (client: PublicSupabaseClient) => Promise<T>,
+  fallback: T
+) {
+  if (!hasSupabaseServiceConfig()) {
+    return fallback;
+  }
+
+  try {
+    return await query(createSupabaseServiceClient());
   } catch {
     return fallback;
   }
