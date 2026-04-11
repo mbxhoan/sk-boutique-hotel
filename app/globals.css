@@ -14,7 +14,7 @@
   --border-subtle: rgba(0, 12, 30, 0.08);
   --shadow-soft: 0 20px 40px rgba(0, 12, 30, 0.06);
   --shadow-strong: 0 30px 60px rgba(0, 12, 30, 0.1);
-  --font-display: "Playfair Display", "Times New Roman", Georgia, serif;
+  --font-display: "Montserrat", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Be Vietnam Pro", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
@@ -338,16 +338,16 @@ textarea {
 
 .hero__title {
   margin: 0;
-  max-width: 12ch;
+  max-width: 15ch;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 6rem);
+  font-size: clamp(2.45rem, 5.2vw, 4.15rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.92;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .hero__copy--stacked .hero__title {
-  max-width: 13ch;
+  max-width: 15ch;
   margin-inline: auto;
 }
 
@@ -517,10 +517,10 @@ textarea {
 .visual-panel__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 3.3rem);
+  font-size: clamp(1.55rem, 2.55vw, 2.6rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.94;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .visual-panel__description {
@@ -618,14 +618,14 @@ textarea {
 .section-heading__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4.8vw, 4.2rem);
+  font-size: clamp(1.8rem, 3.5vw, 3.1rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .section-heading--center .section-heading__title {
-  max-width: 14ch;
+  max-width: 15ch;
   margin-inline: auto;
 }
 
@@ -796,7 +796,7 @@ textarea {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 
 .content-card__description {
@@ -853,7 +853,7 @@ textarea {
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 
 .timeline-card__description,
@@ -897,7 +897,7 @@ textarea {
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 
 .contact-form {
@@ -985,10 +985,10 @@ textarea {
   margin: 0;
   max-width: 14ch;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4.6vw, 4rem);
+  font-size: clamp(1.9rem, 4vw, 3.8rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 0.94;
+  line-height: 1.08;
 }
 
 .closing-band__description {
@@ -1038,7 +1038,7 @@ textarea {
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 
 .site-footer__link-grid {
@@ -1167,12 +1167,22 @@ textarea {
 
 @media (max-width: 640px) {
   .hero__title {
-    font-size: clamp(2.4rem, 12vw, 4rem);
+    max-width: 13.5ch;
+    font-size: clamp(2.15rem, 10vw, 3.4rem);
+    line-height: 1.1;
   }
 
   .section-heading__title,
   .closing-band__title {
-    font-size: clamp(1.9rem, 10vw, 3rem);
+    font-size: clamp(1.7rem, 8.8vw, 2.6rem);
+    line-height: 1.1;
+  }
+
+  .marketing-home__title,
+  .cms-hero__title {
+    max-width: 13.5ch;
+    font-size: clamp(2.05rem, 10vw, 3.25rem);
+    line-height: 1.1;
   }
 
   .site-header__cta {
@@ -1299,10 +1309,10 @@ textarea {
 .portal-section-heading__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 4.5vw, 3.9rem);
+  font-size: clamp(1.75rem, 3.2vw, 3rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.96;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .portal-section-heading__description {
@@ -1455,7 +1465,7 @@ textarea {
   font-size: clamp(1.35rem, 2.5vw, 2.1rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.08;
 }
 
 .portal-item-card__detail {
@@ -1654,10 +1664,10 @@ textarea {
 .portal-shell__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.94;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .portal-shell__description {
@@ -1835,12 +1845,12 @@ textarea {
 
 .marketing-home__title {
   margin: 0;
-  max-width: 12ch;
+  max-width: 15ch;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 6rem);
+  font-size: clamp(2.45rem, 5.2vw, 4.15rem);
   font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 0.93;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .marketing-home__description {
@@ -1896,10 +1906,10 @@ textarea {
 .marketing-home__hero-panel-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  font-size: clamp(1.55rem, 2.5vw, 2.45rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.96;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .marketing-home__hero-panel-copy {
@@ -1947,10 +1957,10 @@ textarea {
 .marketing-home__pillar-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-size: clamp(1.25rem, 2.1vw, 1.9rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .marketing-home__pillar-description {
@@ -1976,10 +1986,10 @@ textarea {
 .marketing-home__trust-card-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+  font-size: clamp(1.4rem, 2.3vw, 2.15rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.96;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .marketing-home__trust-card-copy {
@@ -2031,7 +2041,7 @@ textarea {
   font-size: clamp(1.4rem, 2.6vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.02;
+  line-height: 1.08;
 }
 
 .marketing-home__workflow-copy {
@@ -2088,12 +2098,12 @@ textarea {
 
 .cms-hero__title {
   margin: 0;
-  max-width: 12ch;
+  max-width: 15ch;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 6rem);
+  font-size: clamp(2.45rem, 5.2vw, 4.15rem);
   font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 0.93;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .cms-hero__description {
@@ -2196,7 +2206,7 @@ textarea {
   font-size: clamp(1.35rem, 2.6vw, 2.1rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.08;
 }
 
 .cms-collection-card__description {
@@ -2227,7 +2237,7 @@ textarea {
   font-size: clamp(1.35rem, 2.6vw, 2.2rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.02;
+  line-height: 1.08;
 }
 
 .cms-zone-card__description {
@@ -2262,10 +2272,10 @@ textarea {
 .cms-band__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3.6vw, 3rem);
+  font-size: clamp(1.75rem, 3.3vw, 2.8rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 0.96;
+  line-height: 1.08;
 }
 
 .cms-band__description {
@@ -2355,11 +2365,13 @@ textarea {
   }
 
   .marketing-home__title {
-    font-size: clamp(2.5rem, 13vw, 4.5rem);
+    font-size: clamp(2.25rem, 11vw, 3.9rem);
+    line-height: 1.09;
   }
 
   .cms-hero__title {
-    font-size: clamp(2.5rem, 13vw, 4.5rem);
+    font-size: clamp(2.25rem, 11vw, 3.9rem);
+    line-height: 1.09;
   }
 
   .cms-band {

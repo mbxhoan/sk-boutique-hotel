@@ -74,3 +74,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/config.toml`
   - `supabase/migrations/20260411112559_phase_c_hotel_core.sql`
   - `supabase/seed.sql`
+
+### Entry 003
+- `time`: 2026-04-11T20:40:40+07:00
+- `prompt_summary`: Đồng bộ typography public site với DESIGN.md: chuyển headline sang Montserrat, giảm cỡ tiêu đề quá lớn, và nới line-height cho desktop/mobile.
+- `commit_message`: `fix(typography): align display scale with Montserrat spec`
+- `main_files`:
+  - `app/layout.tsx`
+  - `app/globals.css`
+  - `package.json`
+  - `package-lock.json`

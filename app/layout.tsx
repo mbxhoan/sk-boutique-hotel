@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import "@fontsource/playfair-display/400.css";
-import "@fontsource/playfair-display/700.css";
+import "@fontsource/montserrat/400.css";
+import "@fontsource/montserrat/700.css";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/700.css";
 
