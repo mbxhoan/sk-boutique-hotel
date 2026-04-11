@@ -1,0 +1,34 @@
+%% SK boutique hotel ERD diagrams
+%% Render in Mermaid Live Editor or supported Markdown viewers.
+
+%% Diagram A: Core booking and inventory
+
+erDiagram
+    HOTELS ||--o{ BRANCHES : has
+    BRANCHES ||--o{ FLOORS : has
+    BRANCHES ||--o{ BRANCH_ROOM_TYPES : offers
+    ROOM_TYPES ||--o{ BRANCH_ROOM_TYPES : available_in
+    ROOM_TYPES ||--o{ ROOM_TYPE_TRANSLATIONS : translated_as
+    ROOM_TYPES ||--o{ ROOM_TYPE_IMAGES : has
+    ROOM_TYPES ||--o{ ROOM_TYPE_AMENITIES : mapped_to
+    AMENITIES ||--o{ ROOM_TYPE_AMENITIES : used_by
+    FLOORS ||--o{ ROOMS : contains
+    ROOM_TYPES ||--o{ ROOMS : classifies
+    ROOMS ||--o{ ROOM_BLOCKS : blocked_by
+    ROOMS ||--o{ ROOM_MAINTENANCE_RECORDS : maintained_by
+    ROOMS ||--o{ ROOM_OPERATIONAL_STATUS_LOGS : status_changes
+    BRANCHES ||--o{ ROOM_AVAILABILITY_DAILY : summarized_as
+    ROOM_TYPES ||--o{ ROOM_AVAILABILITY_DAILY : summarized_as
+    CUSTOMERS ||--o{ AVAILABILITY_REQUESTS : submits
+    BRANCHES ||--o{ AVAILABILITY_REQUESTS : receives
+    AVAILABILITY_REQUESTS ||--o{ AVAILABILITY_REQUEST_ITEMS : includes
+    ROOM_TYPES ||--o{ AVAILABILITY_REQUEST_ITEMS : requested_as
+    CUSTOMERS ||--o{ RESERVATION_HOLDS : owns
+    BRANCHES ||--o{ RESERVATION_HOLDS : created_for
+    ROOM_TYPES ||--o{ RESERVATION_HOLDS : held_as
+    ROOMS ||--o{ RESERVATION_HOLDS : held_room
+    CUSTOMERS ||--o{ RESERVATIONS : places
+    BRANCHES ||--o{ RESERVATIONS : belongs_to
+    RESERVATIONS ||--o{ RESERVATION_ROOM_ITEMS : contains
+    ROOM_TYPES ||--o{ RESERVATION_ROOM_ITEMS : sold_as
+    ROOMS ||--o{ RESERVATION_ROOM_ITEMS : assigned_room
