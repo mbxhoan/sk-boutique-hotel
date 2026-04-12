@@ -364,6 +364,7 @@ insert into public.rooms (
   true
 );
 
+-- Seed password for internal accounts in development: SkbhAdmin2026!
 insert into auth.users (
   id,
   instance_id,
@@ -384,7 +385,7 @@ insert into auth.users (
   'authenticated',
   'authenticated',
   'sysadmin@skbh.vn',
-  '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
+  '$2y$10$CDqR55rYbp6o./ULnM7kkO3IbrxZM5b.Wc/vRWKCQQcv7zx0HleOq',
   now(),
   jsonb_build_object(
     'provider',
@@ -412,7 +413,7 @@ insert into auth.users (
   'authenticated',
   'authenticated',
   'admin@skbh.vn',
-  '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
+  '$2y$10$CDqR55rYbp6o./ULnM7kkO3IbrxZM5b.Wc/vRWKCQQcv7zx0HleOq',
   now(),
   jsonb_build_object(
     'provider',
@@ -440,7 +441,7 @@ insert into auth.users (
   'authenticated',
   'authenticated',
   'manager@skbh.vn',
-  '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
+  '$2y$10$CDqR55rYbp6o./ULnM7kkO3IbrxZM5b.Wc/vRWKCQQcv7zx0HleOq',
   now(),
   jsonb_build_object(
     'provider',
@@ -468,7 +469,7 @@ insert into auth.users (
   'authenticated',
   'authenticated',
   'staff@skbh.vn',
-  '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
+  '$2y$10$CDqR55rYbp6o./ULnM7kkO3IbrxZM5b.Wc/vRWKCQQcv7zx0HleOq',
   now(),
   jsonb_build_object(
     'provider',
@@ -496,7 +497,7 @@ insert into auth.users (
   'authenticated',
   'authenticated',
   'member@skbh.vn',
-  '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
+  '$2y$10$CDqR55rYbp6o./ULnM7kkO3IbrxZM5b.Wc/vRWKCQQcv7zx0HleOq',
   now(),
   jsonb_build_object(
     'provider',

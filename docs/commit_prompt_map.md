@@ -222,6 +222,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/browser.ts`
 
 ### Entry 015
+- `time`: 2026-04-12T01:30:00+07:00
+- `prompt_summary`: Chốt lại seeded admin password cho auth demo, đồng bộ hint UI để hết mơ hồ khi đăng nhập admin portal.
+- `commit_message`: `fix(auth-seed): use explicit dev password for seeded users`
+- `main_files`:
+  - `supabase/seed.sql`
+  - `components/admin-sign-in-form.tsx`
+
+### Entry 016
 - `time`: 2026-04-12T01:20:00+07:00
 - `prompt_summary`: Thêm rule trong AGENTS.md yêu cầu mọi error UI phải có fallback song ngữ VI/EN và sửa admin sign-in để không hiển thị lỗi raw/generic của Supabase.
 - `commit_message`: `fix(admin-auth): localize sign-in errors bilingually`
@@ -229,7 +237,7 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `AGENTS.md`
   - `components/admin-sign-in-form.tsx`
 
-### Entry 016
+### Entry 017
 - `time`: 2026-04-12T01:32:00+07:00
 - `prompt_summary`: Thêm toggle VI/EN cho admin sign-in và hiển thị copy/error theo đúng ngôn ngữ đang chọn hoặc mặc định.
 - `commit_message`: `feat(admin-auth): add bilingual locale switch to sign-in`

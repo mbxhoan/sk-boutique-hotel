@@ -22,8 +22,8 @@ const copy = {
     en: "Email"
   } satisfies LocalizedText,
   helper: {
-    vi: "Tài khoản seed dùng password local duy nhất cho môi trường dev.",
-    en: "Seeded accounts share one temporary local password for development."
+    vi: "Tài khoản seed dùng mật khẩu dev: SkbhAdmin2026!.",
+    en: "Seeded accounts use the dev password: SkbhAdmin2026!."
   } satisfies LocalizedText,
   password: {
     vi: "Mật khẩu",
