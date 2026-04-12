@@ -115,6 +115,12 @@ If translation infrastructure is not fully built yet, at minimum:
 - keep strings organized
 - avoid creating barriers to later extraction
 
+When rendering user-facing errors:
+- always provide a bilingual VI/EN fallback
+- never surface raw generic platform messages directly to the UI
+- prefer short, explicit, action-oriented messages over vague failures
+- if an upstream error is unknown, map it to a safe bilingual fallback before displaying it
+
 ---
 
 ## Pricing guidance

@@ -20,10 +20,6 @@ const copy = {
     vi: "Email",
     en: "Email"
   } satisfies LocalizedText,
-  errorFallback: {
-    vi: "Đăng nhập thất bại. Kiểm tra lại email và mật khẩu.",
-    en: "Sign-in failed. Check your email and password."
-  } satisfies LocalizedText,
   helper: {
     vi: "Tài khoản seed dùng password local duy nhất cho môi trường dev.",
     en: "Seeded accounts share one temporary local password for development."
@@ -32,6 +28,24 @@ const copy = {
     vi: "Mật khẩu",
     en: "Password"
   } satisfies LocalizedText,
+  errors: {
+    invalidCredentials: {
+      vi: "Sai email hoặc mật khẩu. / Invalid email or password.",
+      en: "Invalid email or password. / Sai email hoặc mật khẩu."
+    } satisfies LocalizedText,
+    missingConfig: {
+      vi: "Thiếu cấu hình đăng nhập Supabase. / Missing Supabase sign-in configuration.",
+      en: "Missing Supabase sign-in configuration. / Thiếu cấu hình đăng nhập Supabase."
+    } satisfies LocalizedText,
+    network: {
+      vi: "Không thể kết nối Supabase lúc này. / Unable to reach Supabase right now.",
+      en: "Unable to reach Supabase right now. / Không thể kết nối Supabase lúc này."
+    } satisfies LocalizedText,
+    fallback: {
+      vi: "Đăng nhập không thành công. Vui lòng thử lại. / Sign-in failed. Please try again.",
+      en: "Sign-in failed. Please try again. / Đăng nhập không thành công. Vui lòng thử lại."
+    } satisfies LocalizedText
+  },
   submit: {
     vi: "Đăng nhập",
     en: "Sign in"
@@ -41,6 +55,24 @@ const copy = {
     en: "Admin sign in"
   } satisfies LocalizedText
 } as const;
+
+function resolveSignInError(locale: "vi" | "en", error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("invalid login credentials") || message.includes("invalid email or password")) {
+    return localize(locale, copy.errors.invalidCredentials);
+  }
+
+  if (message.includes("missing supabase") || message.includes("requires public url") || message.includes("publishable key")) {
+    return localize(locale, copy.errors.missingConfig);
+  }
+
+  if (message.includes("fetch") || message.includes("network") || message.includes("failed to fetch")) {
+    return localize(locale, copy.errors.network);
+  }
+
+  return localize(locale, copy.errors.fallback);
+}
 
 export function AdminSignInForm({ locale }: AdminSignInFormProps) {
   const router = useRouter();
@@ -71,7 +103,7 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
       router.replace(nextHref);
       router.refresh();
     } catch (submittedError) {
-      setError(submittedError instanceof Error ? submittedError.message : localize(locale, copy.errorFallback));
+      setError(resolveSignInError(locale, submittedError));
     } finally {
       setIsSubmitting(false);
     }

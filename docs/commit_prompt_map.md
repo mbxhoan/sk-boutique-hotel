@@ -220,3 +220,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(supabase): inline public envs for browser client`
 - `main_files`:
   - `lib/supabase/browser.ts`
+
+### Entry 015
+- `time`: 2026-04-12T01:20:00+07:00
+- `prompt_summary`: Thêm rule trong AGENTS.md yêu cầu mọi error UI phải có fallback song ngữ VI/EN và sửa admin sign-in để không hiển thị lỗi raw/generic của Supabase.
+- `commit_message`: `fix(admin-auth): localize sign-in errors bilingually`
+- `main_files`:
+  - `AGENTS.md`
+  - `components/admin-sign-in-form.tsx`
