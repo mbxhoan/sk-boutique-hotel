@@ -192,3 +192,24 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-sign-in-form.tsx`
   - `lib/supabase/auth.ts`
   - `supabase/seed.sql`
+
+### Entry 011
+- `time`: 2026-04-12T00:55:00+07:00
+- `prompt_summary`: Sửa seed auth users để không còn fail ở `crypt()` do literal chưa ép kiểu trong local Supabase reset.
+- `commit_message`: `fix(seed): cast auth password literals for crypt`
+- `main_files`:
+  - `supabase/seed.sql`
+
+### Entry 012
+- `time`: 2026-04-12T01:00:00+07:00
+- `prompt_summary`: Bỏ hẳn phụ thuộc `crypt()` trong auth seed bằng bcrypt hash literal để Supabase local reset không còn lỗi thiếu function.
+- `commit_message`: `fix(seed): replace crypt with bcrypt hash literal`
+- `main_files`:
+  - `supabase/seed.sql`
+
+### Entry 013
+- `time`: 2026-04-12T01:05:00+07:00
+- `prompt_summary`: Sửa `ON CONFLICT` của auth seed từ email sang id vì local `auth.users` không có unique arbiter trên email.
+- `commit_message`: `fix(seed): upsert auth users by id`
+- `main_files`:
+  - `supabase/seed.sql`
