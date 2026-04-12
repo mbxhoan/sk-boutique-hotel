@@ -246,3 +246,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/admin/sign-in/page.tsx`
   - `app/globals.css`
   - `components/admin-sign-in-form.tsx`
+
+### Entry 018
+- `time`: 2026-04-12T01:45:00+07:00
+- `prompt_summary`: Thu nhỏ typography của portal shell/admin member area để text thường, tiêu đề, stats và auth heading không còn quá to.
+- `commit_message`: `fix(portal-typography): reduce admin and member text scale`
+- `main_files`:
+  - `app/globals.css`

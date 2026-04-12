@@ -1309,7 +1309,7 @@ textarea {
 .portal-section-heading__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.2vw, 3rem);
+  font-size: clamp(1.35rem, 2.4vw, 2.2rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;
@@ -1352,7 +1352,7 @@ textarea {
 .portal-stat__value {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -1462,7 +1462,7 @@ textarea {
 .portal-item-card__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.5vw, 2.1rem);
+  font-size: clamp(1.1rem, 1.9vw, 1.55rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.08;
@@ -1662,6 +1662,8 @@ textarea {
   display: grid;
   grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
   gap: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.62;
 }
 
 .portal-shell--member {
@@ -1746,7 +1748,7 @@ textarea {
 .portal-shell__eyebrow {
   margin: 0;
   color: var(--portal-text-muted);
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   line-height: 1;
@@ -1762,7 +1764,7 @@ textarea {
 .portal-shell__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.1vw, 2.1rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.65rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.12;
@@ -1771,6 +1773,7 @@ textarea {
 .portal-shell__description {
   margin: 0;
   color: var(--portal-text-soft);
+  font-size: 0.92rem;
 }
 
 .portal-shell__nav {
@@ -1789,7 +1792,7 @@ textarea {
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.03);
   color: var(--portal-text-soft);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   transition:
     color 0.18s ease,
     transform 0.18s ease,
@@ -1916,6 +1919,15 @@ textarea {
   color: var(--portal-text-soft);
 }
 
+.portal-shell .portal-section-heading__description,
+.portal-shell .portal-item-card__detail,
+.portal-shell .portal-item-card__note,
+.portal-shell .portal-timeline__detail,
+.portal-shell .portal-description {
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .portal-shell .portal-section-heading__title,
 .portal-shell .portal-item-card__title,
 .portal-shell .portal-profile-list__value,
@@ -1949,8 +1961,8 @@ textarea {
 .portal-shell--admin .portal-section-heading__title,
 .portal-shell--admin .portal-item-card__title,
 .portal-shell--admin .portal-timeline__title {
-  font-size: clamp(1.08rem, 1.35vw, 1.55rem);
-  line-height: 1.12;
+  font-size: clamp(1rem, 1.2vw, 1.35rem);
+  line-height: 1.16;
 }
 
 .portal-shell--admin .portal-section-heading__description,
@@ -1958,8 +1970,8 @@ textarea {
 .portal-shell--admin .portal-item-card__note,
 .portal-shell--admin .portal-timeline__detail,
 .portal-shell--admin .portal-description {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .portal-shell--admin.portal-shell--collapsed {
@@ -2077,7 +2089,7 @@ textarea {
 .admin-auth-card__title {
   margin: 1rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(1.65rem, 2.8vw, 2.15rem);
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;
