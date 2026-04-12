@@ -22,8 +22,8 @@ const copy = {
     en: "Email"
   } satisfies LocalizedText,
   helper: {
-    vi: "Tài khoản seed dùng mật khẩu dev: SkbhAdmin2026!.",
-    en: "Seeded accounts use the dev password: SkbhAdmin2026!."
+    vi: "Chạy npm run seed:auth sau khi reset DB. Mật khẩu dev: SkbhAdmin2026!.",
+    en: "Run npm run seed:auth after resetting the DB. Dev password: SkbhAdmin2026!."
   } satisfies LocalizedText,
   password: {
     vi: "Mật khẩu",

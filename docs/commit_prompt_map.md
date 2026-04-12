@@ -253,3 +253,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(portal-typography): reduce admin and member text scale`
 - `main_files`:
   - `app/globals.css`
+
+### Entry 019
+- `time`: 2026-04-12T02:00:00+07:00
+- `prompt_summary`: Tách seeding authentication users ra khỏi seed.sql sang script riêng dùng Supabase Auth admin API, đồng thời nối lại customer member sau khi seed auth.
+- `commit_message`: `feat(auth-seed): move seeded users into auth admin script`
+- `main_files`:
+  - `package.json`
+  - `scripts/seed-auth-users.mjs`
+  - `supabase/auth-users.seed.mjs`
+  - `supabase/seed.sql`
+  - `components/admin-sign-in-form.tsx`
