@@ -213,3 +213,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(seed): upsert auth users by id`
 - `main_files`:
   - `supabase/seed.sql`
+
+### Entry 014
+- `time`: 2026-04-12T01:12:00+07:00
+- `prompt_summary`: Sửa Supabase browser client để đọc env public bằng access trực tiếp, tránh Next.js bỏ qua biến khi bundle client.
+- `commit_message`: `fix(supabase): inline public envs for browser client`
+- `main_files`:
+  - `lib/supabase/browser.ts`
