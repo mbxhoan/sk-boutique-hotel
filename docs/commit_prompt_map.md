@@ -296,3 +296,29 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `public/favicon-16x16.png`
   - `public/favicon-32x32.png`
   - `public/favicon-512.png`
+
+### Entry 023
+- `time`: 2026-04-12T03:00:00+07:00
+- `prompt_summary`: Sửa favicon để browser ưu tiên icon vuông tương phản cao hơn, vì logo wordmark ngang quá nhỏ và khó nhận diện trong tab trình duyệt.
+- `commit_message`: `fix(brand-assets): make favicon use square logo tile`
+- `main_files`:
+  - `app/icon.tsx`
+  - `app/favicon.ico`
+  - `app/favicon-512.png`
+  - `app/apple-icon.png`
+  - `public/favicon.ico`
+  - `public/favicon-512.png`
+  - `public/apple-touch-icon.png`
+
+### Entry 024
+- `time`: 2026-04-12T03:10:00+07:00
+- `prompt_summary`: Gỡ code route metadata icon/OG và chuyển hoàn toàn sang file tĩnh trong app để tránh runtime error và giúp favicon/meta preview ổn định hơn trong dev.
+- `commit_message`: `fix(brand-assets): switch icon and og preview to static files`
+- `main_files`:
+  - `app/layout.tsx`
+  - `app/icon.tsx`
+  - `app/opengraph-image.tsx`
+  - `app/favicon.ico`
+  - `app/icon.png`
+  - `app/apple-icon.png`
+  - `app/opengraph-image.png`
