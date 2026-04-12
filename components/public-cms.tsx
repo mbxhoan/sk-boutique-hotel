@@ -112,6 +112,35 @@ function CmsHeroSectionRenderer({
   locale: Locale;
   section: CmsHeroSection;
 }) {
+  const centeredLayout = section.layout === "centered";
+
+  if (centeredLayout) {
+    return (
+      <section className="section cms-section cms-section--hero" id={section.id}>
+        <div className="section-shell cms-hero__shell cms-hero__shell--centered">
+          <div className="cms-hero__centered">
+            <div className="cms-hero__copy cms-hero__copy--centered">
+              <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
+              <h1 className="cms-hero__title">{localize(locale, section.title)}</h1>
+              <p className="cms-hero__description">{localize(locale, section.description)}</p>
+
+              <div className="cms-hero__actions cms-hero__actions--centered">
+                <CmsActionLink action={section.actions.primary} locale={locale} />
+                {section.actions.secondary ? <CmsActionLink action={section.actions.secondary} locale={locale} /> : null}
+              </div>
+            </div>
+
+            <div className="cms-hero__banner">
+              <CmsPreviewFrame frame={section.frame} locale={locale} size="hero" />
+            </div>
+
+            <PortalBulletList className="cms-hero__bullets cms-hero__bullets--centered" items={section.bullets} locale={locale} />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="section cms-section cms-section--hero" id={section.id}>
       <div className="section-shell cms-hero__shell">

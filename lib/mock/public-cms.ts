@@ -58,6 +58,7 @@ type CmsSectionBase = {
 
 export type CmsHeroSection = CmsSectionBase & {
   kind: "hero";
+  layout?: "centered" | "split";
   actions: {
     primary: CmsAction;
     secondary?: CmsAction;
@@ -367,6 +368,7 @@ const homePageSections: CmsSection[] = [
   {
     id: "hero",
     kind: "hero",
+    layout: "centered",
     eyebrow: text("Boutique hotel foundation", "Boutique hotel foundation"),
     title: text("Một shell khách sạn premium, manual-first và sẵn đường mở rộng.", "A premium, manual-first hotel shell that stays extensible."),
     description: text(

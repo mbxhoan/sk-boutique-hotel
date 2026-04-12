@@ -264,3 +264,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/auth-users.seed.mjs`
   - `supabase/seed.sql`
   - `components/admin-sign-in-form.tsx`
+
+### Entry 020
+- `time`: 2026-04-12T02:15:00+07:00
+- `prompt_summary`: Chỉnh homepage hero theo bố cục header, title lớn ở giữa, subtitle và banner lớn bên dưới; giữ hero split nguyên cho các trang con.
+- `commit_message`: `feat(homepage-hero): center hero copy and add banner layout`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`

@@ -2443,6 +2443,17 @@ textarea {
   padding-block: 0;
 }
 
+.cms-hero__shell--centered {
+  padding-block: clamp(1.4rem, 2.4vw, 2.2rem) 0;
+}
+
+.cms-hero__centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+
 .cms-hero__grid {
   display: grid;
   gap: 1.2rem;
@@ -2457,6 +2468,15 @@ textarea {
   padding-top: 0.15rem;
 }
 
+.cms-hero__copy--centered {
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  max-width: min(100%, 72rem);
+  margin-inline: auto;
+  padding-top: 0;
+}
+
 .cms-hero__title {
   margin: 0;
   max-width: 15ch;
@@ -2467,11 +2487,23 @@ textarea {
   line-height: 1.08;
 }
 
+.cms-hero__copy--centered .cms-hero__title {
+  max-width: 12ch;
+  font-size: clamp(3rem, 6.15vw, 5.6rem);
+  line-height: 0.98;
+}
+
 .cms-hero__description {
   margin: 0;
   max-width: 47rem;
   color: var(--muted);
   font-size: 1.03rem;
+}
+
+.cms-hero__copy--centered .cms-hero__description {
+  max-width: 50rem;
+  font-size: 1rem;
+  line-height: 1.62;
 }
 
 .cms-hero__actions {
@@ -2480,8 +2512,25 @@ textarea {
   gap: 0.75rem;
 }
 
+.cms-hero__actions--centered {
+  justify-content: center;
+}
+
 .cms-hero__bullets {
   margin-top: 0.2rem;
+}
+
+.cms-hero__bullets--centered {
+  width: min(100%, 72rem);
+  margin-top: 0.35rem;
+}
+
+.cms-hero__banner {
+  width: 100%;
+}
+
+.cms-hero__shell--centered .visual-panel--hero {
+  min-height: clamp(300px, 42vw, 640px);
 }
 
 .cms-hero__visual {
