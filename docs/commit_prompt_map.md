@@ -273,3 +273,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/mock/public-cms.ts`
   - `components/public-cms.tsx`
   - `app/globals.css`
+
+### Entry 021
+- `time`: 2026-04-12T02:30:00+07:00
+- `prompt_summary`: Đổi phần nội dung ngay dưới hero của homepage sang layout about-us với chữ bên trái, collage 2 ảnh bên phải và stats row bên dưới, đồng thời giữ các section CMS-ready phía sau.
+- `commit_message`: `feat(homepage-content): add about section with image collage`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`

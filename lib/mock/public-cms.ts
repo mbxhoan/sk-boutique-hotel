@@ -79,6 +79,13 @@ export type CmsSplitSection = CmsSectionBase & {
   reverse?: boolean;
 };
 
+export type CmsFeatureSection = CmsSectionBase & {
+  kind: "feature";
+  body: LocalizedText[];
+  frames: [CmsMediaFrame, CmsMediaFrame];
+  metrics: CmsStat[];
+};
+
 export type CmsCardsSection = CmsSectionBase & {
   kind: "cards";
   items: CmsCollectionItem[];
@@ -108,6 +115,7 @@ export type CmsSection =
   | CmsHeroSection
   | CmsStatsSection
   | CmsSplitSection
+  | CmsFeatureSection
   | CmsCardsSection
   | CmsBandSection
   | CmsLocaleZonesSection;
@@ -162,6 +170,36 @@ const premiumArticleFrame: CmsMediaFrame = {
   ),
   tone: "paper",
   title: text("Editorial hospitality", "Editorial hospitality")
+};
+
+const featureFrameLeft: CmsMediaFrame = {
+  chips: ["About us", "Interiors", "Guest comfort"],
+  description: text(
+    "Khung ảnh giả lập cho không gian lưu trú và cảm giác boutique.",
+    "A mock image frame for the stay experience and boutique mood."
+  ),
+  label: text("SK stay story", "SK stay story"),
+  note: text(
+    "Có thể thay bằng ảnh thật của phòng, lobby hoặc dining zone.",
+    "Can later become real photography for rooms, lobby, or dining zones."
+  ),
+  tone: "paper",
+  title: text("Warm, calm, premium", "Warm, calm, premium")
+};
+
+const featureFrameRight: CmsMediaFrame = {
+  chips: ["Signature", "Detail", "Mood"],
+  description: text(
+    "Khung ảnh thứ hai làm collage để tạo nhịp thị giác chéo.",
+    "A second frame layered into the collage to create visual rhythm."
+  ),
+  label: text("Visual detail", "Visual detail"),
+  note: text(
+    "Vùng này vẫn map được sang gallery hoặc CMS media field sau này.",
+    "This area can still map to gallery or CMS media fields later."
+  ),
+  tone: "gold",
+  title: text("Boutique detail", "Boutique detail")
 };
 
 const toCardItem = (
@@ -408,91 +446,63 @@ const homePageSections: CmsSection[] = [
     }
   },
   {
-    id: "signals",
-    kind: "stats",
-    eyebrow: text("Operational signals", "Operational signals"),
-    title: text("Nền tảng này ưu tiên vận hành manual-first nhưng không khóa tương lai.", "This foundation prioritizes manual-first operations without blocking the future."),
+    id: "about",
+    kind: "feature",
+    eyebrow: text("About us", "About us"),
+    title: text("Chúng tôi tạo một trải nghiệm lưu trú mềm, rõ và đáng nhớ.", "We create a stay experience that feels calm, clear, and memorable."),
     description: text(
-      "Các con số và nhãn đều có chỗ map sang database hoặc CMS sau này.",
-      "Every value and label can map to a database or CMS later."
+      "Phần này sẽ sớm map sang nội dung CMS thật cho brand story, service story, và ảnh không gian.",
+      "This section will later map cleanly to CMS content for brand story, service story, and interior imagery."
     ),
-    items: [
+    body: [
+      text(
+        "Từ public site đến member portal, mọi lớp UI đều được dựng để giữ nhịp boutique premium nhưng vẫn đủ gọn cho vận hành manual-first.",
+        "From the public site to the member portal, every UI layer is built to stay premium and boutique while remaining compact enough for manual-first operations."
+      ),
+      text(
+        "Khi dữ liệu thật sẵn sàng, section này chỉ cần đổi nguồn dữ liệu là có thể chạy như CMS-driven content mà không phải đổi route hay layout.",
+        "When real data is ready, this section only needs a data-source swap to behave like CMS-driven content without changing the route or layout."
+      )
+    ],
+    frames: [featureFrameLeft, featureFrameRight],
+    metrics: [
       {
-        value: "VI/EN",
-        label: text("Song ngữ", "Bilingual"),
+        value: "03",
+        label: text("Room types", "Room types"),
         detail: text(
-          "Copy được tách riêng để sau này chuyển sang content records dễ hơn.",
-          "Copy is separated so it can move into content records later."
+          "Room types public đủ để staff map sang physical rooms sau này.",
+          "Public room types are ready for later mapping to physical rooms."
         ),
         tone: "paper"
+      },
+      {
+        value: "02",
+        label: text("Branches", "Branches"),
+        detail: text(
+          "Chi nhánh có thể giữ copy, map, và workflow riêng.",
+          "Branches can keep their own copy, maps, and workflow."
+        ),
+        tone: "gold"
       },
       {
         value: "30m",
         label: text("Hold SLA", "Hold SLA"),
         detail: text(
-          "Mặc định 30 phút nhưng đủ chỗ để chỉnh bằng dữ liệu thật.",
-          "Defaults to 30 minutes while leaving room for real data."
-        ),
-        tone: "gold"
-      },
-      {
-        value: "QR",
-        label: text("Thanh toán", "Payment"),
-        detail: text(
-          "QR, booking code và proof upload là một luồng thủ công rõ ràng.",
-          "QR, booking code, and proof upload are presented as one clear manual flow."
+          "Hạn giữ phòng mặc định vẫn editable theo branch hoặc rule thật.",
+          "The default hold window stays editable by branch or real rule."
         ),
         tone: "ink"
-      },
-      {
-        value: "Audit",
-        label: text("Vận hành", "Operations"),
-        detail: text(
-          "Các hành động nhạy cảm có chỗ cho audit log và quyền truy vết.",
-          "Sensitive actions have space for audit logs and traceability."
-        ),
-        tone: "paper"
       }
     ]
   },
   {
-    id: "cms-ready",
-    kind: "split",
-    eyebrow: text("CMS-ready content model", "CMS-ready content model"),
-    title: text("Room types, branches và blog/news đều dùng cùng nhịp schema.", "Room types, branches, and blog/news all share the same schema rhythm."),
-    description: text(
-      "Homepage chỉ là một tập section config. Cùng pattern đó có thể dùng cho list, detail, và article sau này.",
-      "The homepage is just a section-config set. The same pattern can power list, detail, and article pages later."
-    ),
-    bullets: [
-      text("Section data lives separately from JSX.", "Section data lives separately from JSX."),
-      text("Renderers stay small and reusable.", "Renderers stay small and reusable."),
-      text("Bilingual copy is stored close to the page record.", "Bilingual copy stays close to the page record."),
-      text("Future Supabase tables can mirror this structure.", "Future Supabase tables can mirror this structure.")
-    ],
-    frame: {
-      chips: ["home", "room", "branch", "news"],
-      description: text(
-        "Một layout mô phỏng cách CMS sẽ đẩy data vào section.",
-        "A layout that simulates how CMS data flows into sections."
-      ),
-      label: text("Section config", "Section config"),
-      note: text(
-        "Không hard-code page content trong component.",
-        "No page content is hard-coded in the component."
-      ),
-      tone: "paper",
-      title: text("Config-driven sections", "Config-driven sections")
-    }
-  },
-  {
     id: "destinations",
     kind: "cards",
-    eyebrow: text("Public destinations", "Public destinations"),
-    title: text("Các vùng nội dung chính của public site.", "The public site’s main content areas."),
+    eyebrow: text("Our services", "Our services"),
+    title: text("Các trụ cột nội dung của public site.", "The public site’s main content pillars."),
     description: text(
-      "Mỗi card dưới đây đã có slug và layout riêng, đủ gần để map sang CMS records sau này.",
-      "Each card below already has a slug and layout, close enough to map into CMS records later."
+      "Mỗi card dưới đây đã có slug và layout riêng, đủ gần để map sang CMS records hoặc collection records sau này.",
+      "Each card below already has a slug and layout, close enough to map into future CMS or collection records."
     ),
     items: [
       toCardItem(

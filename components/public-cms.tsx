@@ -7,6 +7,7 @@ import type {
   CmsBandSection,
   CmsCardsSection,
   CmsCollectionItem,
+  CmsFeatureSection,
   CmsHeroSection,
   CmsLocaleZonesSection,
   CmsMediaFrame,
@@ -231,6 +232,60 @@ function CmsSplitSectionRenderer({
   );
 }
 
+function CmsFeatureSectionRenderer({
+  locale,
+  section
+}: {
+  locale: Locale;
+  section: CmsFeatureSection;
+}) {
+  return (
+    <section className="section cms-section cms-section--feature" id={section.id}>
+      <div className="section-shell cms-feature__shell">
+        <div className="cms-feature__grid">
+          <div className="cms-feature__copy">
+            <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
+            <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
+            <p className="cms-feature__description">{localize(locale, section.description)}</p>
+
+            <div className="cms-feature__body">
+              {section.body.map((paragraph) => (
+                <p className="cms-feature__paragraph" key={paragraph.vi}>
+                  {localize(locale, paragraph)}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="cms-feature__visual" aria-hidden="true">
+            <div className="cms-feature__stack">
+              <div className="cms-feature__frame cms-feature__frame--back">
+                <CmsPreviewFrame frame={section.frames[0]} locale={locale} size="section" />
+              </div>
+              <div className="cms-feature__frame cms-feature__frame--front">
+                <CmsPreviewFrame frame={section.frames[1]} locale={locale} size="section" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="portal-stat-grid cms-feature__metrics">
+          {section.metrics.map((item, index) => (
+            <PortalStatCard
+              detail={item.detail}
+              label={item.label}
+              locale={locale}
+              key={`${item.label.vi}-${index}`}
+              tone={toneToCardTone(item.tone)}
+              value={item.value}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CmsCollectionCard({
   item,
   locale
@@ -393,6 +448,8 @@ export function CmsSectionRenderer({
       return <CmsStatsSectionRenderer locale={locale} section={section} />;
     case "split":
       return <CmsSplitSectionRenderer locale={locale} section={section} />;
+    case "feature":
+      return <CmsFeatureSectionRenderer locale={locale} section={section} />;
     case "cards":
       return <CmsCardsSectionRenderer locale={locale} section={section} />;
     case "band":
