@@ -2028,8 +2028,54 @@ textarea {
   backdrop-filter: blur(22px);
 }
 
+.admin-auth-card__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.admin-auth-card__locale-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.24rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-auth-card__locale-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  color: var(--portal-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.admin-auth-card__locale-link:hover {
+  color: var(--portal-text);
+  transform: translateY(-1px);
+}
+
+.admin-auth-card__locale-link--active {
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.98), rgba(171, 132, 60, 0.88));
+  color: var(--ink);
+}
+
 .admin-auth-card__title {
-  margin: 0.85rem 0 0;
+  margin: 1rem 0 0;
   font-family: var(--font-display);
   font-size: clamp(1.65rem, 2.8vw, 2.15rem);
   font-weight: 700;

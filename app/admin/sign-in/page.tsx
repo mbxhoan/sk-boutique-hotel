@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminSignInForm } from "@/components/admin-sign-in-form";
@@ -29,6 +30,20 @@ const pageCopy = {
   } satisfies LocalizedText
 } as const;
 
+function buildSignInLocaleHref(locale: "vi" | "en", next?: string) {
+  const url = new URL("/admin/sign-in", "https://sk-boutique-hotel.local");
+
+  if (next?.startsWith("/")) {
+    url.searchParams.set("next", next);
+  }
+
+  if (locale === "en") {
+    url.searchParams.set("lang", "en");
+  }
+
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
@@ -43,6 +58,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function AdminSignInPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const nextHref = resolvedSearchParams.next?.startsWith("/") ? resolvedSearchParams.next : null;
   const user = await getSupabaseUser().catch(() => null);
 
   if (canAccessAdminPortal(user)) {
@@ -56,7 +72,23 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
   return (
     <main className="admin-auth-page">
       <section className="admin-auth-card">
-        <PortalBadge tone="accent">{localize(locale, pageCopy.eyebrow)}</PortalBadge>
+        <div className="admin-auth-card__topbar">
+          <PortalBadge tone="accent">{localize(locale, pageCopy.eyebrow)}</PortalBadge>
+          <div className="admin-auth-card__locale-switch" aria-label={locale === "en" ? "Language switch" : "Chuyển ngôn ngữ"}>
+            <Link
+              className={`admin-auth-card__locale-link${locale === "vi" ? " admin-auth-card__locale-link--active" : ""}`}
+              href={buildSignInLocaleHref("vi", nextHref ?? undefined)}
+            >
+              VI
+            </Link>
+            <Link
+              className={`admin-auth-card__locale-link${locale === "en" ? " admin-auth-card__locale-link--active" : ""}`}
+              href={buildSignInLocaleHref("en", nextHref ?? undefined)}
+            >
+              EN
+            </Link>
+          </div>
+        </div>
         <h1 className="admin-auth-card__title">{localize(locale, pageCopy.title)}</h1>
         <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p>
         <AdminSignInForm locale={locale} />

@@ -116,10 +116,10 @@ If translation infrastructure is not fully built yet, at minimum:
 - avoid creating barriers to later extraction
 
 When rendering user-facing errors:
-- always provide a bilingual VI/EN fallback
+- always localize the message to the currently selected language
 - never surface raw generic platform messages directly to the UI
 - prefer short, explicit, action-oriented messages over vague failures
-- if an upstream error is unknown, map it to a safe bilingual fallback before displaying it
+- if an upstream error is unknown, map it to a safe localized fallback before displaying it
 
 ---
 

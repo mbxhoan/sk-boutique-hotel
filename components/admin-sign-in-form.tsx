@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { appendLocaleQuery } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 
 type AdminSignInFormProps = {
@@ -30,22 +31,26 @@ const copy = {
   } satisfies LocalizedText,
   errors: {
     invalidCredentials: {
-      vi: "Sai email hoặc mật khẩu. / Invalid email or password.",
-      en: "Invalid email or password. / Sai email hoặc mật khẩu."
+      vi: "Sai email hoặc mật khẩu.",
+      en: "Invalid email or password."
     } satisfies LocalizedText,
     missingConfig: {
-      vi: "Thiếu cấu hình đăng nhập Supabase. / Missing Supabase sign-in configuration.",
-      en: "Missing Supabase sign-in configuration. / Thiếu cấu hình đăng nhập Supabase."
+      vi: "Thiếu cấu hình đăng nhập Supabase.",
+      en: "Missing Supabase sign-in configuration."
     } satisfies LocalizedText,
     network: {
-      vi: "Không thể kết nối Supabase lúc này. / Unable to reach Supabase right now.",
-      en: "Unable to reach Supabase right now. / Không thể kết nối Supabase lúc này."
+      vi: "Không thể kết nối Supabase lúc này.",
+      en: "Unable to reach Supabase right now."
     } satisfies LocalizedText,
     fallback: {
-      vi: "Đăng nhập không thành công. Vui lòng thử lại. / Sign-in failed. Please try again.",
-      en: "Sign-in failed. Please try again. / Đăng nhập không thành công. Vui lòng thử lại."
+      vi: "Đăng nhập không thành công. Vui lòng thử lại.",
+      en: "Sign-in failed. Please try again."
     } satisfies LocalizedText
   },
+  signingIn: {
+    vi: "Đang đăng nhập...",
+    en: "Signing in..."
+  } satisfies LocalizedText,
   submit: {
     vi: "Đăng nhập",
     en: "Sign in"
@@ -100,7 +105,7 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
         throw authError;
       }
 
-      router.replace(nextHref);
+      router.replace(appendLocaleQuery(nextHref, locale));
       router.refresh();
     } catch (submittedError) {
       setError(resolveSignInError(locale, submittedError));
@@ -142,7 +147,7 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
 
       <div className="admin-auth-form__actions">
         <button className="button button--solid" disabled={isSubmitting} type="submit">
-          {isSubmitting ? (locale === "en" ? "Signing in..." : "Đang đăng nhập...") : localize(locale, copy.submit)}
+          {isSubmitting ? localize(locale, copy.signingIn) : localize(locale, copy.submit)}
         </button>
       </div>
 

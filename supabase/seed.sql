@@ -383,7 +383,7 @@ insert into auth.users (
   '00000000-0000-0000-0000-000000000000',
   'authenticated',
   'authenticated',
-  'system.admin@skbh.vn',
+  'sysadmin@skbh.vn',
   '$2y$10$c06.hoddVzNtJ/VQPhwt7uXEjZdVPOOIG87gi.GSl3LfXmpT95ZuW',
   now(),
   jsonb_build_object(

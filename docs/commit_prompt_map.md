@@ -228,3 +228,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `AGENTS.md`
   - `components/admin-sign-in-form.tsx`
+
+### Entry 016
+- `time`: 2026-04-12T01:32:00+07:00
+- `prompt_summary`: Thêm toggle VI/EN cho admin sign-in và hiển thị copy/error theo đúng ngôn ngữ đang chọn hoặc mặc định.
+- `commit_message`: `feat(admin-auth): add bilingual locale switch to sign-in`
+- `main_files`:
+  - `AGENTS.md`
+  - `app/admin/sign-in/page.tsx`
+  - `app/globals.css`
+  - `components/admin-sign-in-form.tsx`
