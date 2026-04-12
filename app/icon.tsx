@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
+import logo from "@/public/logo.png";
 
+export const runtime = "edge";
 export const size = {
   width: 64,
   height: 64
@@ -13,22 +15,26 @@ export default function Icon() {
       <div
         style={{
           alignItems: "center",
-          background:
-            "linear-gradient(135deg, #000c1e 0%, #102b49 100%)",
+          background: "#fbf9f5",
           borderRadius: "16px",
-          color: "#fbf9f5",
+          boxShadow: "inset 0 0 0 1px rgba(197,160,89,0.25)",
           display: "flex",
-          fontFamily: "serif",
-          fontSize: 28,
-          fontWeight: 700,
-          height: "100%",
           justifyContent: "center",
-          letterSpacing: "-0.08em",
-          lineHeight: 1,
+          height: "100%",
+          overflow: "hidden",
+          padding: 8,
           width: "100%"
         }}
       >
-        SK
+        <img
+          alt="SK Boutique Hotel"
+          src={logo.src}
+          style={{
+            height: "100%",
+            objectFit: "contain",
+            width: "100%"
+          }}
+        />
       </div>
     ),
     size

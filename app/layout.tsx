@@ -17,21 +17,30 @@ export const metadata: Metadata = {
   description:
     "SK Boutique Hotel - frontend foundation cho website khách sạn premium, member portal và admin shell theo Next.js App Router.",
   icons: {
-    icon: "/icon",
-    shortcut: "/icon",
-    apple: "/icon"
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png"
   },
   openGraph: {
     title: "SK Boutique Hotel",
     description:
       "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area.",
+    images: [
+      {
+        alt: "SK Boutique Hotel",
+        height: 630,
+        url: "/opengraph-image",
+        width: 1200
+      }
+    ],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "SK Boutique Hotel",
     description:
-      "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area."
+      "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area.",
+    images: ["/opengraph-image"]
   }
 };
 

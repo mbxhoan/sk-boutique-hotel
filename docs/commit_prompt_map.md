@@ -282,3 +282,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/mock/public-cms.ts`
   - `components/public-cms.tsx`
   - `app/globals.css`
+
+### Entry 022
+- `time`: 2026-04-12T02:45:00+07:00
+- `prompt_summary`: Tạo favicon và meta social preview từ `public/logo.png`, đồng thời cập nhật metadata root để link trang chính hiển thị logo đúng brand.
+- `commit_message`: `feat(brand-assets): generate favicon and social preview from logo`
+- `main_files`:
+  - `app/layout.tsx`
+  - `app/icon.tsx`
+  - `app/opengraph-image.tsx`
+  - `public/favicon.ico`
+  - `public/apple-touch-icon.png`
+  - `public/favicon-16x16.png`
+  - `public/favicon-32x32.png`
+  - `public/favicon-512.png`
