@@ -342,3 +342,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed.sql`
   - `package.json`
   - `tsconfig.json`
+
+### Entry 026
+- `time`: 2026-04-13T09:23:57+07:00
+- `prompt_summary`: Sửa lỗi Next.js conflict giữa public favicon file và app favicon file bằng cách giữ một nguồn favicon duy nhất để `/favicon.ico` không còn 500 khi dev.
+- `commit_message`: `fix(brand-assets): remove duplicate public favicon`
+- `main_files`:
+  - `public/favicon.ico`
+  - `app/layout.tsx`
+  - `app/favicon.ico`
