@@ -14,6 +14,8 @@ export type CmsAction = {
 export type CmsMediaFrame = {
   chips?: string[];
   description: LocalizedText;
+  image?: string;
+  imageAlt?: LocalizedText;
   label: LocalizedText;
   note?: LocalizedText;
   tone?: CmsTone;
@@ -192,6 +194,8 @@ const featureFrameLeft: CmsMediaFrame = {
     "Khung ảnh giả lập cho không gian lưu trú và cảm giác boutique.",
     "A mock image frame for the stay experience and boutique mood."
   ),
+  image: "/hero/hero-2.png",
+  imageAlt: text("Phòng khách boutique sáng và tinh tế", "A bright and refined boutique room"),
   label: text("SK stay story", "SK stay story"),
   note: text(
     "Có thể thay bằng ảnh thật của phòng, lobby hoặc dining zone.",
@@ -207,6 +211,8 @@ const featureFrameRight: CmsMediaFrame = {
     "Khung ảnh thứ hai làm collage để tạo nhịp thị giác chéo.",
     "A second frame layered into the collage to create visual rhythm."
   ),
+  image: "/hero/hero-3.png",
+  imageAlt: text("Không gian boutique với nhịp thị giác ấm", "A warm boutique space with layered visual rhythm"),
   label: text("Visual detail", "Visual detail"),
   note: text(
     "Vùng này vẫn map được sang gallery hoặc CMS media field sau này.",

@@ -391,6 +391,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/public-cms.tsx`
   - `app/globals.css`
 
+### Entry 031
+- `time`: 2026-04-13T17:14:20+07:00
+- `prompt_summary`: Replace the two collage frames in the About section with real images so the feature block reads like a visual editorial collage instead of mock panels.
+- `commit_message`: `feat(homepage-collage): swap feature frames to real images`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

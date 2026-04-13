@@ -437,6 +437,66 @@ textarea {
   min-height: clamp(260px, 32vw, 420px);
 }
 
+.visual-panel--image {
+  overflow: hidden;
+  background: transparent;
+}
+
+.visual-panel--image::before,
+.visual-panel--image::after {
+  z-index: 1;
+}
+
+.visual-panel__image-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.visual-panel__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.visual-panel--image .visual-panel__grain {
+  z-index: 1;
+  opacity: 0.08;
+}
+
+.visual-panel--image .visual-panel__top,
+.visual-panel--image .visual-panel__body,
+.visual-panel--image .visual-panel__note {
+  z-index: 2;
+}
+
+.visual-panel--image .visual-panel__label,
+.visual-panel--image .visual-panel__title,
+.visual-panel--image .visual-panel__description,
+.visual-panel--image .visual-panel__note,
+.visual-panel--image .visual-panel__chip {
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
+}
+
+.visual-panel--image.visual-panel--paper .visual-panel__label,
+.visual-panel--image.visual-panel--paper .visual-panel__title,
+.visual-panel--image.visual-panel--paper .visual-panel__description,
+.visual-panel--image.visual-panel--paper .visual-panel__note {
+  color: var(--surface);
+}
+
+.visual-panel--image.visual-panel--gold .visual-panel__label,
+.visual-panel--image.visual-panel--gold .visual-panel__title,
+.visual-panel--image.visual-panel--gold .visual-panel__description,
+.visual-panel--image.visual-panel--gold .visual-panel__note {
+  color: var(--ink);
+}
+
+.visual-panel--image .visual-panel__chips .visual-panel__chip {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .visual-panel--ink {
   background:
     linear-gradient(160deg, rgba(0, 12, 30, 0.96), rgba(0, 36, 68, 0.86)),

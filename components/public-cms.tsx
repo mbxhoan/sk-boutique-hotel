@@ -80,9 +80,26 @@ function CmsPreviewFrame({
   locale: Locale;
   size?: "hero" | "section";
 }) {
+  const hasImage = Boolean(frame.image);
+
   return (
-    <div className={`visual-panel visual-panel--${frame.tone ?? "ink"} visual-panel--${size}`}>
+    <div
+      className={`visual-panel visual-panel--${frame.tone ?? "ink"} visual-panel--${size}${
+        hasImage ? " visual-panel--image" : ""
+      }`}
+    >
       <span className="visual-panel__grain" aria-hidden="true" />
+
+      {frame.image ? (
+        <div className="visual-panel__image-wrap">
+          <img
+            alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
+            className="visual-panel__image"
+            loading="lazy"
+            src={frame.image}
+          />
+        </div>
+      ) : null}
 
       <div className="visual-panel__top">
         <p className="visual-panel__label">{localize(locale, frame.label)}</p>
