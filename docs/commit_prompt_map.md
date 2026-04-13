@@ -351,3 +351,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `public/favicon.ico`
   - `app/layout.tsx`
   - `app/favicon.ico`
+
+### Entry 027
+- `time`: 2026-04-13T09:23:38+07:00
+- `prompt_summary`: Sửa lỗi Supabase seed `\i` không được support trong `seed.sql` bằng cách inline content pages seed vào SQL thuần để `supabase db reset` chạy qua được.
+- `commit_message`: `fix(seed): inline content pages seed into main seed file`
+- `main_files`:
+  - `supabase/seed.sql`
+  - `supabase/seed-content-pages.sql`
+  - `scripts/generate-content-pages-seed.mjs`
