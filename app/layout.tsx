@@ -8,6 +8,8 @@ import "@fontsource/be-vietnam-pro/700.css";
 
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
+
 export const metadata: Metadata = {
   title: {
     default: "SK Boutique Hotel",
@@ -53,6 +55,7 @@ export default function RootLayout({
     <html lang="vi">
       <body className="site-body">
         {children}
+        <Analytics />
       </body>
     </html>
   );
