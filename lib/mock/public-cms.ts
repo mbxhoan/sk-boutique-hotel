@@ -524,19 +524,19 @@ const homePageSections: CmsSection[] = [
     id: "about",
     kind: "feature",
     eyebrow: text("About us", "About us"),
-    title: text("Chúng tôi tạo một trải nghiệm lưu trú mềm, rõ và đáng nhớ.", "We create a stay experience that feels calm, clear, and memorable."),
+    title: text("Chạm vào một kỳ nghỉ tinh tế hơn.", "Embrace a more refined vacation."),
     description: text(
-      "Phần này sẽ sớm map sang nội dung CMS thật cho brand story, service story, và ảnh không gian.",
-      "This section will later map cleanly to CMS content for brand story, service story, and interior imagery."
+      "Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.",
+      "Boutique accommodations are designed to provide a sense of privacy, sophistication, and relaxation in every moment."
     ),
     body: [
       text(
-        "Từ public site đến member portal, mọi lớp UI đều được dựng để giữ nhịp boutique premium nhưng vẫn đủ gọn cho vận hành manual-first.",
-        "From the public site to the member portal, every UI layer is built to stay premium and boutique while remaining compact enough for manual-first operations."
+        "Kỳ nghỉ sang trọng, trải nghiệm tinh tế",
+        "Boutique stay, refined experience"
       ),
       text(
-        "Khi dữ liệu thật sẵn sàng, section này chỉ cần đổi nguồn dữ liệu là có thể chạy như CMS-driven content mà không phải đổi route hay layout.",
-        "When real data is ready, this section only needs a data-source swap to behave like CMS-driven content without changing the route or layout."
+        "Nghỉ ngơi theo cách có gu",
+        "Relax in style"
       )
     ],
     frames: [featureFrameLeft, featureFrameRight],
