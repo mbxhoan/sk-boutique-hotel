@@ -543,16 +543,16 @@ const homePageSections: CmsSection[] = [
     metrics: [
       {
         value: "03",
-        label: text("Room types", "Room types"),
+        label: text("Hạng phòng", "Room types"),
         detail: text(
-          "Room types public đủ để staff map sang physical rooms sau này.",
+          "Hạng phòng public đủ để staff map sang physical rooms sau này.",
           "Public room types are ready for later mapping to physical rooms."
         ),
         tone: "paper"
       },
       {
-        value: "02",
-        label: text("Branches", "Branches"),
+        value: "01",
+        label: text("Chi nhánh", "Branches"),
         detail: text(
           "Chi nhánh có thể giữ copy, map, và workflow riêng.",
           "Branches can keep their own copy, maps, and workflow."
@@ -818,7 +818,7 @@ const branchCollectionPage: CmsPageCopy = {
         },
         {
           value: "Rooms",
-          label: text("Room types", "Room types"),
+          label: text("Hạng phòng", "Room types"),
           detail: text(
             "Public branch page có thể dẫn tới các room types theo branch.",
             "The public branch page can point into branch-specific room types."

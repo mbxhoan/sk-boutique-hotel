@@ -439,7 +439,421 @@ insert into public.content_pages (
   'SK Boutique Hotel',
   'Từ không gian, dịch vụ đến từng chi tiết nhỏ, mọi thứ được sắp đặt để bạn tận hưởng một kỳ nghỉ thoải mái và khác biệt.',
   'From the ambiance and service to the smallest details, everything is arranged for you to enjoy a comfortable and unique vacation.',
-  '{"kind":"home","slug":"/","seo":{"title":{"vi":"SK Boutique Hotel","en":"SK Boutique Hotel"},"description":{"vi":"Từ không gian, dịch vụ đến từng chi tiết nhỏ, mọi thứ được sắp đặt để bạn tận hưởng một kỳ nghỉ thoải mái và khác biệt.","en":"From the ambiance and service to the smallest details, everything is arranged for you to enjoy a comfortable and unique vacation."}},"sections":[{"id":"hero","kind":"hero","layout":"centered","eyebrow":{"vi":"SK Boutique Hotel","en":"SK Boutique Hotel"},"title":{"vi":"Chạm vào một kỳ nghỉ tinh tế hơn.","en":"Embrace a more refined vacation."},"description":{"vi":"Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.","en":"Boutique accommodations are designed to provide a sense of privacy, sophistication, and relaxation in every moment."},"actions":{"primary":{"href":"/phong","label":{"vi":"Khám phá phòng","en":"Explore rooms"},"tone":"solid"},"secondary":{"href":"/tin-tuc","label":{"vi":"Xem tin tức","en":"Read news"},"tone":"ghost"}},"bullets":[{"vi":"Public site, member portal, and admin shell are separated from day one.","en":"Public site, member portal, and admin shell are separated from day one."},{"vi":"Room types stay public while operations stay physical-room based.","en":"Room types stay public while operations stay physical-room based."},{"vi":"Hold expiry, payment verification, and audit logging stay visible in the UI model.","en":"Hold expiry, payment verification, and audit logging stay visible in the UI model."}],"frame":{"chips":["Phase 1 manual-first","VI/EN","Supabase-ready"],"description":{"vi":"Một frame mô phỏng tổng quan website và các shell chức năng.","en":"A frame that stands in for the website overview and its functional shells."},"label":{"vi":"Homepage overview","en":"Homepage overview"},"note":{"vi":"Chỉ cần thay data source là đổi được nội dung.","en":"Switch the data source and the content updates cleanly."},"tone":"ink","title":{"vi":"Public site / Member portal / Admin console","en":"Public site / Member portal / Admin console"}}},{"id":"about","kind":"feature","eyebrow":{"vi":"About us","en":"About us"},"title":{"vi":"Chạm vào một kỳ nghỉ tinh tế hơn.","en":"Embrace a more refined vacation."},"description":{"vi":"Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.","en":"Boutique accommodations are designed to provide a sense of privacy, sophistication, and relaxation in every moment."},"body":[{"vi":"Kỳ nghỉ sang trọng, trải nghiệm tinh tế","en":"Boutique stay, refined experience"},{"vi":"Nghỉ ngơi theo cách có gu","en":"Relax in style"}],"frames":[{"chips":["About us","Interiors","Guest comfort"],"description":{"vi":"Khung ảnh giả lập cho không gian lưu trú và cảm giác boutique.","en":"A mock image frame for the stay experience and boutique mood."},"label":{"vi":"SK stay story","en":"SK stay story"},"note":{"vi":"Có thể thay bằng ảnh thật của phòng, lobby hoặc dining zone.","en":"Can later become real photography for rooms, lobby, or dining zones."},"tone":"paper","title":{"vi":"Warm, calm, premium","en":"Warm, calm, premium"}},{"chips":["Signature","Detail","Mood"],"description":{"vi":"Khung ảnh thứ hai làm collage để tạo nhịp thị giác chéo.","en":"A second frame layered into the collage to create visual rhythm."},"label":{"vi":"Visual detail","en":"Visual detail"},"note":{"vi":"Vùng này vẫn map được sang gallery hoặc CMS media field sau này.","en":"This area can still map to gallery or CMS media fields later."},"tone":"gold","title":{"vi":"Boutique detail","en":"Boutique detail"}}],"metrics":[{"value":"03","label":{"vi":"Room types","en":"Room types"},"detail":{"vi":"Room types public đủ để staff map sang physical rooms sau này.","en":"Public room types are ready for later mapping to physical rooms."},"tone":"paper"},{"value":"02","label":{"vi":"Branches","en":"Branches"},"detail":{"vi":"Chi nhánh có thể giữ copy, map, và workflow riêng.","en":"Branches can keep their own copy, maps, and workflow."},"tone":"gold"},{"value":"30m","label":{"vi":"Hold SLA","en":"Hold SLA"},"detail":{"vi":"Hạn giữ phòng mặc định vẫn editable theo branch hoặc rule thật.","en":"The default hold window stays editable by branch or real rule."},"tone":"ink"}]},{"id":"destinations","kind":"cards","eyebrow":{"vi":"Our services","en":"Our services"},"title":{"vi":"Các trụ cột nội dung của public site.","en":"The public site’s main content pillars."},"description":{"vi":"Mỗi card dưới đây đã có slug và layout riêng, đủ gần để map sang CMS records hoặc collection records sau này.","en":"Each card below already has a slug and layout, close enough to map into future CMS or collection records."},"items":[{"href":"/phong","eyebrow":{"vi":"Rooms","en":"Rooms"},"title":{"vi":"Phòng & room types","en":"Rooms & room types"},"description":{"vi":"Danh sách phòng để public xem và staff map sang physical room sau này.","en":"A room list that public guests can browse and staff can later map to physical rooms."},"meta":[{"vi":"Phòng","en":"Rooms"},{"vi":"Pricing-ready","en":"Pricing-ready"}],"tone":"paper"},{"href":"/chi-nhanh","eyebrow":{"vi":"Branches","en":"Branches"},"title":{"vi":"Chi nhánh","en":"Branches"},"description":{"vi":"Trang chi nhánh với vùng content VI/EN, map và điểm mạnh địa điểm.","en":"Branch pages with VI/EN content zones, maps, and location strengths."},"meta":[{"vi":"Map-ready","en":"Map-ready"},{"vi":"VI/EN","en":"VI/EN"}],"tone":"gold"},{"href":"/tin-tuc","eyebrow":{"vi":"News","en":"News"},"title":{"vi":"Blog / news","en":"Blog / news"},"description":{"vi":"Danh sách bài viết, cập nhật, và news editorial layout.","en":"Article listings, updates, and an editorial news layout."},"meta":[{"vi":"Editorial","en":"Editorial"},{"vi":"SEO-ready","en":"SEO-ready"}],"tone":"ink"}]},{"id":"next-step","kind":"band","eyebrow":{"vi":"Phase 1 boundary","en":"Phase 1 boundary"},"title":{"vi":"Không bán booking tự động. Chỉ dẫn khách vào đúng flow manual-first.","en":"No automatic booking. Guide guests into the right manual-first flow."},"description":{"vi":"CTA ở đây giữ đúng phase 1: kiểm tra phòng trống, giữ phòng, và liên hệ staff.","en":"The CTA here stays phase 1 correct: check availability, hold a room, and contact staff."},"actions":{"primary":{"href":"/lien-he","label":{"vi":"Kiểm tra phòng trống","en":"Check availability"},"tone":"solid"},"secondary":{"href":"/member","label":{"vi":"Member portal","en":"Member portal"},"tone":"text"}}}]}'::jsonb,
+  '{
+    "kind": "home",
+    "slug": "/",
+    "seo": {
+        "title": {
+            "vi": "SK Boutique Hotel",
+            "en": "SK Boutique Hotel"
+        },
+        "description": {
+            "vi": "Từ không gian, dịch vụ đến từng chi tiết nhỏ, mọi thứ được sắp đặt để bạn tận hưởng một kỳ nghỉ thoải mái và khác biệt.",
+            "en": "From the ambiance and service to the smallest details, everything is arranged for you to enjoy a comfortable and unique vacation."
+        }
+    },
+    "sections": [
+        {
+            "id": "hero",
+            "kind": "hero",
+            "layout": "carousel",
+            "eyebrow": {
+                "vi": "SK Boutique Hotel",
+                "en": "SK Boutique Hotel"
+            },
+            "title": {
+                "vi": "Chào mừng đến SK Boutique Hotel",
+                "en": "Welcome to SK Boutique Hotel"
+            },
+            "description": {
+                "vi": "Trải nghiệm lưu trú boutique đẳng cấp, nơi sự tinh tế gặp gỡ sự thoải mái.",
+                "en": "Experience premium boutique hospitality where elegance meets comfort."
+            },
+            "actions": {
+                "primary": {
+                    "href": "/phong",
+                    "label": {
+                        "vi": "Khám phá phòng",
+                        "en": "Explore rooms"
+                    },
+                    "tone": "solid"
+                },
+                "secondary": {
+                    "href": "/lien-he",
+                    "label": {
+                        "vi": "Liên hệ ngay",
+                        "en": "Contact us"
+                    },
+                    "tone": "ghost"
+                }
+            },
+            "bullets": [],
+            "frame": {
+                "chips": [],
+                "description": {
+                    "vi": "",
+                    "en": ""
+                },
+                "label": {
+                    "vi": "",
+                    "en": ""
+                },
+                "tone": "ink",
+                "title": {
+                    "vi": "",
+                    "en": ""
+                }
+            },
+            "slides": [
+                {
+                    "image": "/hero/hero-1.png",
+                    "eyebrow": {
+                        "vi": "SK Boutique Hotel",
+                        "en": "SK Boutique Hotel"
+                    },
+                    "title": {
+                        "vi": "Chào mừng đến SK Boutique Hotel",
+                        "en": "Welcome to SK Boutique Hotel"
+                    },
+                    "description": {
+                        "vi": "Nơi sự tinh tế trong từng chi tiết tạo nên trải nghiệm lưu trú khó quên.",
+                        "en": "Where refined details craft an unforgettable stay experience."
+                    },
+                    "actions": {
+                        "primary": {
+                            "href": "/phong",
+                            "label": {
+                                "vi": "Khám phá phòng",
+                                "en": "Explore rooms"
+                            },
+                            "tone": "solid"
+                        },
+                        "secondary": {
+                            "href": "/lien-he",
+                            "label": {
+                                "vi": "Liên hệ ngay",
+                                "en": "Contact us"
+                            },
+                            "tone": "ghost"
+                        }
+                    }
+                },
+                {
+                    "image": "/hero/hero-2.png",
+                    "eyebrow": {
+                        "vi": "Phòng nghỉ",
+                        "en": "Our Rooms"
+                    },
+                    "title": {
+                        "vi": "Phòng nghỉ sang trọng, thanh lịch",
+                        "en": "Elegant luxury rooms"
+                    },
+                    "description": {
+                        "vi": "Mỗi căn phòng là một câu chuyện riêng — yên tĩnh, ấm áp và đầy đủ tiện nghi cao cấp.",
+                        "en": "Each room tells its own story — calm, warm, and fully equipped with premium amenities."
+                    },
+                    "actions": {
+                        "primary": {
+                            "href": "/phong",
+                            "label": {
+                                "vi": "Xem tất cả phòng",
+                                "en": "View all rooms"
+                            },
+                            "tone": "solid"
+                        },
+                        "secondary": {
+                            "href": "/lien-he",
+                            "label": {
+                                "vi": "Đặt phòng ngay",
+                                "en": "Book now"
+                            },
+                            "tone": "ghost"
+                        }
+                    }
+                },
+                {
+                    "image": "/hero/hero-3.png",
+                    "eyebrow": {
+                        "vi": "Trải nghiệm",
+                        "en": "Experience"
+                    },
+                    "title": {
+                        "vi": "Thư giãn đẳng cấp, tầm nhìn tuyệt đẹp",
+                        "en": "Premium relaxation, breathtaking views"
+                    },
+                    "description": {
+                        "vi": "Tận hưởng không gian nghỉ dưỡng hoàn hảo với hồ bơi, lounge bar và tầm nhìn toàn cảnh.",
+                        "en": "Enjoy the perfect retreat with pool, lounge bar, and panoramic views."
+                    },
+                    "actions": {
+                        "primary": {
+                            "href": "/chi-nhanh",
+                            "label": {
+                                "vi": "Khám phá chi nhánh",
+                                "en": "Explore branches"
+                            },
+                            "tone": "solid"
+                        },
+                        "secondary": {
+                            "href": "/lien-he",
+                            "label": {
+                                "vi": "Liên hệ tư vấn",
+                                "en": "Get in touch"
+                            },
+                            "tone": "ghost"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "about",
+            "kind": "feature",
+            "eyebrow": {
+                "vi": "About us",
+                "en": "About us"
+            },
+            "title": {
+                "vi": "Chạm vào một kỳ nghỉ tinh tế hơn.",
+                "en": "Embrace a more refined vacation."
+            },
+            "description": {
+                "vi": "Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.",
+                "en": "Boutique accommodations are designed to provide a sense of privacy, sophistication, and relaxation in every moment."
+            },
+            "body": [
+                {
+                    "vi": "Kỳ nghỉ sang trọng, trải nghiệm tinh tế",
+                    "en": "Boutique stay, refined experience"
+                },
+                {
+                    "vi": "Nghỉ ngơi theo cách có gu",
+                    "en": "Relax in style"
+                }
+            ],
+            "frames": [
+                {
+                    "chips": [
+                        "About us",
+                        "Interiors",
+                        "Guest comfort"
+                    ],
+                    "description": {
+                        "vi": "Khung ảnh giả lập cho không gian lưu trú và cảm giác boutique.",
+                        "en": "A mock image frame for the stay experience and boutique mood."
+                    },
+                    "label": {
+                        "vi": "SK stay story",
+                        "en": "SK stay story"
+                    },
+                    "note": {
+                        "vi": "Có thể thay bằng ảnh thật của phòng, lobby hoặc dining zone.",
+                        "en": "Can later become real photography for rooms, lobby, or dining zones."
+                    },
+                    "tone": "paper",
+                    "title": {
+                        "vi": "Warm, calm, premium",
+                        "en": "Warm, calm, premium"
+                    },
+                    "image": "/hero/hero-1.png"
+                },
+                {
+                    "chips": [
+                        "Signature",
+                        "Detail",
+                        "Mood"
+                    ],
+                    "description": {
+                        "vi": "Khung ảnh thứ hai làm collage để tạo nhịp thị giác chéo.",
+                        "en": "A second frame layered into the collage to create visual rhythm."
+                    },
+                    "label": {
+                        "vi": "Visual detail",
+                        "en": "Visual detail"
+                    },
+                    "note": {
+                        "vi": "Vùng này vẫn map được sang gallery hoặc CMS media field sau này.",
+                        "en": "This area can still map to gallery or CMS media fields later."
+                    },
+                    "tone": "gold",
+                    "title": {
+                        "vi": "Boutique detail",
+                        "en": "Boutique detail"
+                    },
+                    "image": "/hero/hero-1.png"
+                }
+            ],
+            "metrics": [
+                {
+                    "value": "03",
+                    "label": {
+                        "vi": "Hạng phòng",
+                        "en": "Room types"
+                    },
+                    "detail": {
+                        "vi": "Đa dạng hạng phòng.",
+                        "en": "Public room types are ready for later mapping to physical rooms."
+                    },
+                    "tone": "paper"
+                },
+                {
+                    "value": "02",
+                    "label": {
+                        "vi": "Branches",
+                        "en": "Branches"
+                    },
+                    "detail": {
+                        "vi": "Chi nhánh có thể giữ copy, map, và workflow riêng.",
+                        "en": "Branches can keep their own copy, maps, and workflow."
+                    },
+                    "tone": "gold"
+                },
+                {
+                    "value": "30m",
+                    "label": {
+                        "vi": "Hold SLA",
+                        "en": "Hold SLA"
+                    },
+                    "detail": {
+                        "vi": "Hạn giữ phòng mặc định vẫn editable theo branch hoặc rule thật.",
+                        "en": "The default hold window stays editable by branch or real rule."
+                    },
+                    "tone": "ink"
+                }
+            ]
+        },
+        {
+            "id": "destinations",
+            "kind": "cards",
+            "eyebrow": {
+                "vi": "Our services",
+                "en": "Our services"
+            },
+            "title": {
+                "vi": "Các trụ cột nội dung của public site.",
+                "en": "The public site’s main content pillars."
+            },
+            "description": {
+                "vi": "Mỗi card dưới đây đã có slug và layout riêng, đủ gần để map sang CMS records hoặc collection records sau này.",
+                "en": "Each card below already has a slug and layout, close enough to map into future CMS or collection records."
+            },
+            "items": [
+                {
+                    "href": "/phong",
+                    "eyebrow": {
+                        "vi": "Rooms",
+                        "en": "Rooms"
+                    },
+                    "title": {
+                        "vi": "Phòng & room types",
+                        "en": "Rooms & room types"
+                    },
+                    "description": {
+                        "vi": "Danh sách phòng để public xem và staff map sang physical room sau này.",
+                        "en": "A room list that public guests can browse and staff can later map to physical rooms."
+                    },
+                    "meta": [
+                        {
+                            "vi": "Phòng",
+                            "en": "Rooms"
+                        },
+                        {
+                            "vi": "Pricing-ready",
+                            "en": "Pricing-ready"
+                        }
+                    ],
+                    "tone": "paper"
+                },
+                {
+                    "href": "/chi-nhanh",
+                    "eyebrow": {
+                        "vi": "Branches",
+                        "en": "Branches"
+                    },
+                    "title": {
+                        "vi": "Chi nhánh",
+                        "en": "Branches"
+                    },
+                    "description": {
+                        "vi": "Trang chi nhánh với vùng content VI/EN, map và điểm mạnh địa điểm.",
+                        "en": "Branch pages with VI/EN content zones, maps, and location strengths."
+                    },
+                    "meta": [
+                        {
+                            "vi": "Map-ready",
+                            "en": "Map-ready"
+                        },
+                        {
+                            "vi": "VI/EN",
+                            "en": "VI/EN"
+                        }
+                    ],
+                    "tone": "gold"
+                },
+                {
+                    "href": "/tin-tuc",
+                    "eyebrow": {
+                        "vi": "News",
+                        "en": "News"
+                    },
+                    "title": {
+                        "vi": "Blog / news",
+                        "en": "Blog / news"
+                    },
+                    "description": {
+                        "vi": "Danh sách bài viết, cập nhật, và news editorial layout.",
+                        "en": "Article listings, updates, and an editorial news layout."
+                    },
+                    "meta": [
+                        {
+                            "vi": "Editorial",
+                            "en": "Editorial"
+                        },
+                        {
+                            "vi": "SEO-ready",
+                            "en": "SEO-ready"
+                        }
+                    ],
+                    "tone": "ink"
+                }
+            ]
+        },
+        {
+            "id": "next-step",
+            "kind": "band",
+            "eyebrow": {
+                "vi": "Phase 1 boundary",
+                "en": "Phase 1 boundary"
+            },
+            "title": {
+                "vi": "Không bán booking tự động. Chỉ dẫn khách vào đúng flow manual-first.",
+                "en": "No automatic booking. Guide guests into the right manual-first flow."
+            },
+            "description": {
+                "vi": "CTA ở đây giữ đúng phase 1: kiểm tra phòng trống, giữ phòng, và liên hệ staff.",
+                "en": "The CTA here stays phase 1 correct: check availability, hold a room, and contact staff."
+            },
+            "actions": {
+                "primary": {
+                    "href": "/lien-he",
+                    "label": {
+                        "vi": "Kiểm tra phòng trống",
+                        "en": "Check availability"
+                    },
+                    "tone": "solid"
+                },
+                "secondary": {
+                    "href": "/member",
+                    "label": {
+                        "vi": "Member portal",
+                        "en": "Member portal"
+                    },
+                    "tone": "text"
+                }
+            }
+        }
+    ]
+}'::jsonb,
   0,
   true
 ),
