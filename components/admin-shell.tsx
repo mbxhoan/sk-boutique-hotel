@@ -28,7 +28,7 @@ function buildSectionHref(pathname: string, search: string, href: string) {
 function ShellIcon({
   name
 }: {
-  name: "audit" | "branches" | "collapse" | "dashboard" | "expand" | "operations";
+  name: "audit" | "branches" | "collapse" | "content" | "dashboard" | "expand" | "operations" | "roles" | "users";
 }) {
   if (name === "collapse" || name === "expand") {
     return (
@@ -91,6 +91,49 @@ function ShellIcon({
     );
   }
 
+  if (name === "users") {
+    return (
+      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+        <path
+          d="M9 8.1A2.85 2.85 0 1 0 9 2.4a2.85 2.85 0 0 0 0 5.7ZM4.25 15.6c.45-2.2 2.15-3.7 4.75-3.7s4.3 1.5 4.75 3.7"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.2"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "roles") {
+    return (
+      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+        <path
+          d="M6.75 4.25h4.5M5 7.25h8M6.75 10.25h4.5M4.75 13.25h8.5"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.4"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "content") {
+    return (
+      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+        <path
+          d="M4.25 3.75H11l2.75 2.75v7.75H4.25V3.75Z"
+          stroke="currentColor"
+          strokeLinejoin="round"
+          strokeWidth="1.2"
+        />
+        <path d="M11 3.75V6.5h2.75" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M6.25 9h5.5M6.25 11.5h5.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
   return (
     <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
       <path
@@ -102,6 +145,14 @@ function ShellIcon({
       <path d="M7 14.5V10.5H11V14.5" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
     </svg>
   );
+}
+
+function isActiveNavItem(pathname: string, href: string) {
+  if (href.startsWith("#")) {
+    return pathname === "/admin";
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function AdminShell({ children }: AdminShellProps) {
@@ -177,33 +228,33 @@ export function AdminShell({ children }: AdminShellProps) {
         </div>
 
         <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="portal-shell__nav">
-          {adminDashboardCopy.nav.map((item) => {
-            const label = localize(locale, item.label);
+          {adminDashboardCopy.navGroups.map((group) => (
+            <div className="portal-shell__nav-group" key={group.label.vi}>
+              <p className="portal-shell__nav-group-title">{localize(locale, group.label)}</p>
+              <div className="portal-shell__nav-group-items">
+                {group.items.map((item) => {
+                  const label = localize(locale, item.label);
+                  const resolvedHref = buildSectionHref(pathname, search, item.href);
+                  const active = isActiveNavItem(pathname, item.href);
 
-            return (
-              <a
-                className="portal-shell__nav-link"
-                href={buildSectionHref(pathname, search, item.href)}
-                key={item.href}
-                title={label}
-              >
-                <span className="portal-shell__nav-icon" aria-hidden="true">
-                  <ShellIcon
-                    name={
-                      item.href === "#operations"
-                        ? "operations"
-                        : item.href === "#branches"
-                          ? "branches"
-                          : item.href === "#audit"
-                            ? "audit"
-                            : "dashboard"
-                    }
-                  />
-                </span>
-                <span className="portal-shell__nav-label">{label}</span>
-              </a>
-            );
-          })}
+                  return (
+                    <a
+                      aria-current={active ? "page" : undefined}
+                      className={`portal-shell__nav-link${active ? " portal-shell__nav-link--active" : ""}`}
+                      href={resolvedHref}
+                      key={item.href}
+                      title={label}
+                    >
+                      <span className="portal-shell__nav-icon" aria-hidden="true">
+                        <ShellIcon name={item.icon} />
+                      </span>
+                      <span className="portal-shell__nav-label">{label}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <PortalCard className="portal-shell__sidebar-card" tone="soft">

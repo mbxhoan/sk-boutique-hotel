@@ -1,8 +1,14 @@
 import type { LocalizedText } from "@/lib/mock/i18n";
 
 export type AdminNavItem = {
+  icon: "audit" | "branches" | "content" | "dashboard" | "operations" | "roles" | "users";
   href: string;
   label: LocalizedText;
+};
+
+export type AdminNavGroup = {
+  label: LocalizedText;
+  items: AdminNavItem[];
 };
 
 export type AdminStat = {
@@ -35,6 +41,7 @@ export type AdminDashboardCopy = {
   audit: AdminAuditItem[];
   branches: AdminBranchItem[];
   nav: AdminNavItem[];
+  navGroups: AdminNavGroup[];
   queues: AdminQueueItem[];
   sections: {
     audit: {
@@ -146,6 +153,7 @@ export const adminDashboardCopy = {
   ],
   nav: [
     {
+      icon: "dashboard",
       href: "#overview",
       label: {
         vi: "Tổng quan",
@@ -153,6 +161,7 @@ export const adminDashboardCopy = {
       }
     },
     {
+      icon: "operations",
       href: "#operations",
       label: {
         vi: "Vận hành",
@@ -160,6 +169,7 @@ export const adminDashboardCopy = {
       }
     },
     {
+      icon: "branches",
       href: "#branches",
       label: {
         vi: "Chi nhánh",
@@ -167,11 +177,94 @@ export const adminDashboardCopy = {
       }
     },
     {
+      icon: "audit",
       href: "#audit",
       label: {
         vi: "Audit log",
         en: "Audit log"
       }
+    }
+  ],
+  navGroups: [
+    {
+      label: {
+        vi: "Vận hành",
+        en: "Operations"
+      },
+      items: [
+        {
+          icon: "dashboard",
+          href: "#overview",
+          label: {
+            vi: "Tổng quan",
+            en: "Overview"
+          }
+        },
+        {
+          icon: "operations",
+          href: "#operations",
+          label: {
+            vi: "Vận hành",
+            en: "Operations"
+          }
+        },
+        {
+          icon: "branches",
+          href: "#branches",
+          label: {
+            vi: "Chi nhánh",
+            en: "Branches"
+          }
+        },
+        {
+          icon: "audit",
+          href: "#audit",
+          label: {
+            vi: "Audit log",
+            en: "Audit log"
+          }
+        }
+      ]
+    },
+    {
+      label: {
+        vi: "Quản trị",
+        en: "Administration"
+      },
+      items: [
+        {
+          icon: "users",
+          href: "/admin/accounts",
+          label: {
+            vi: "Tài khoản",
+            en: "Accounts"
+          }
+        },
+        {
+          icon: "roles",
+          href: "/admin/roles",
+          label: {
+            vi: "Phân quyền",
+            en: "Roles"
+          }
+        }
+      ]
+    },
+    {
+      label: {
+        vi: "Nội dung",
+        en: "Content"
+      },
+      items: [
+        {
+          icon: "content",
+          href: "/admin/content-pages",
+          label: {
+            vi: "Bài viết & trang",
+            en: "Pages & posts"
+          }
+        }
+      ]
     }
   ],
   queues: [

@@ -367,3 +367,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(auth-middleware): ignore malformed supabase cookies`
 - `main_files`:
   - `lib/supabase/middleware.ts`
+
+### Entry 029
+- `time`: 2026-04-13T10:08:45+07:00
+- `prompt_summary`: Add admin sidebar groups and route pages for account management, roles/permissions, and pages/posts so the operational shell also exposes the missing admin content menus.
+- `commit_message`: `feat(admin-menu): add account role and content management routes`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-management-page.tsx`
+  - `lib/mock/admin-dashboard.ts`
+  - `lib/mock/admin-management.ts`
+  - `app/(admin)/admin/accounts/page.tsx`
+  - `app/(admin)/admin/roles/page.tsx`
+  - `app/(admin)/admin/content-pages/page.tsx`
+  - `app/globals.css`
