@@ -417,3 +417,5 @@ on conflict (email) do update set
   source = excluded.source,
   notes = excluded.notes,
   last_seen_at = excluded.last_seen_at;
+
+\i ./seed-content-pages.sql

@@ -307,6 +307,47 @@ export interface Database {
           }
         ];
       };
+      content_pages: {
+        Row: {
+          content_json: Json;
+          created_at: string;
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_published: boolean;
+          page_type: "home" | "page" | "collection" | "detail";
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_at: string;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          content_json: Json;
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_published: boolean;
+          page_type: "home" | "page" | "collection" | "detail";
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          content_json: Json;
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_published: boolean;
+          page_type: "home" | "page" | "collection" | "detail";
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
       customers: {
         Row: {
           auth_user_id: string | null;

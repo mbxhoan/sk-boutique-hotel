@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
 import { localize } from "@/lib/mock/i18n";
-import { findNewsPageBySlug, getNewsStaticParams } from "@/lib/mock/public-cms";
 import { resolveLocale } from "@/lib/locale";
+import { getContentNewsStaticParams, loadNewsPageBySlug } from "@/lib/supabase/queries/content-pages";
 
 type PageProps = {
   params: Promise<{
@@ -16,15 +16,15 @@ type PageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return getNewsStaticParams();
+export async function generateStaticParams() {
+  return getContentNewsStaticParams();
 }
 
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
-  const page = findNewsPageBySlug(slug);
+  const page = await loadNewsPageBySlug(slug);
 
   if (!page) {
     return {};
@@ -40,7 +40,7 @@ export default async function NewsDetailPage({ params, searchParams }: PageProps
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
-  const page = findNewsPageBySlug(slug);
+  const page = await loadNewsPageBySlug(slug);
 
   if (!page) {
     notFound();

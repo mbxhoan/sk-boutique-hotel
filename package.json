@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "seed:auth": "node scripts/seed-auth-users.mjs"
+    "seed:auth": "node scripts/seed-auth-users.mjs",
+    "generate:content-pages-seed": "node scripts/generate-content-pages-seed.mjs"
   },
   "dependencies": {
     "@fontsource/be-vietnam-pro": "^5.2.8",

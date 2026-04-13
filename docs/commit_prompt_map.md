@@ -322,3 +322,23 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/icon.png`
   - `app/apple-icon.png`
   - `app/opengraph-image.png`
+
+### Entry 025
+- `time`: 2026-04-13T09:03:28+07:00
+- `prompt_summary`: Dựng content_pages/loader để homepage và các trang public đọc từ Supabase trước, rồi seed lại toàn bộ public content hiện tại để có thể chỉnh sửa sau trong admin portal.
+- `commit_message`: `feat(content-pages): move public content into Supabase seed`
+- `main_files`:
+  - `app/(marketing)/page.tsx`
+  - `app/(marketing)/[slug]/page.tsx`
+  - `app/(marketing)/tin-tuc/page.tsx`
+  - `app/(marketing)/tin-tuc/[slug]/page.tsx`
+  - `components/marketing-home.tsx`
+  - `lib/supabase/content-pages.seed-data.ts`
+  - `lib/supabase/queries/content-pages.ts`
+  - `lib/supabase/database.types.ts`
+  - `scripts/generate-content-pages-seed.mjs`
+  - `supabase/migrations/20260413093000_phase_f_content_pages.sql`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+  - `package.json`
+  - `tsconfig.json`
