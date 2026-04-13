@@ -383,6 +383,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/globals.css`
 
 ### Entry 030
+- `time`: 2026-04-13T17:11:04+07:00
+- `prompt_summary`: Turn the section below About us into a curated showcase of three selected room types, each with an image, title, and short description like the reference layout.
+- `commit_message`: `feat(homepage-showcase): add selected room cards below about section`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.
 - `commit_message`: `feat(homepage): add hero carousel slider with 3 slides and bilingual content`

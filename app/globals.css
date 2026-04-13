@@ -3081,6 +3081,33 @@ textarea {
   min-height: 100%;
 }
 
+.cms-collection-card--image {
+  gap: 0.8rem;
+}
+
+.cms-collection-card--image .cms-collection-card__visual {
+  overflow: hidden;
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(0, 12, 30, 0.08);
+}
+
+.cms-collection-card__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.12 / 1;
+  object-fit: cover;
+}
+
+.cms-collection-card--image .cms-collection-card__body {
+  gap: 0.45rem;
+  padding-top: 0;
+}
+
+.cms-collection-card__body--image {
+  padding-inline: 0;
+}
+
 .cms-collection-card__top {
   display: flex;
   align-items: flex-start;

@@ -39,6 +39,8 @@ export type CmsStat = {
 };
 
 export type CmsCollectionItem = {
+  image?: string;
+  imageAlt?: LocalizedText;
   description: LocalizedText;
   href: string;
   meta: LocalizedText[];
@@ -220,14 +222,18 @@ const toCardItem = (
   title: LocalizedText,
   description: LocalizedText,
   meta: LocalizedText[],
-  tone: CmsTone = "paper"
+  tone: CmsTone = "paper",
+  image?: string,
+  imageAlt?: LocalizedText
 ): CmsCollectionItem => ({
   href,
   eyebrow,
   title,
   description,
   meta,
-  tone
+  tone,
+  image,
+  imageAlt
 });
 
 const roomItems: CmsCollectionItem[] = [
@@ -236,35 +242,48 @@ const roomItems: CmsCollectionItem[] = [
     text("Phòng", "Room"),
     text("Deluxe Bay View", "Deluxe Bay View"),
     text(
-      "Phòng sáng, tối giản và hướng vịnh cho khách lưu trú ngắn ngày.",
-      "Bright and minimal room facing the bay for short stays."
+      "Phòng sáng, tối giản và hướng vịnh cho kỳ nghỉ ngắn ngày.",
+      "A bright, minimal bay-view room for shorter stays."
     ),
     [text("2 khách", "2 guests"), text("32 m²", "32 sqm"), text("From 2.400.000", "From 2,400,000")],
-    "paper"
+    "paper",
+    "/hero/hero-1.png",
+    text("Deluxe Bay View", "Deluxe Bay View")
   ),
   toCardItem(
     "/phong/heritage-suite",
     text("Phòng", "Room"),
     text("Heritage Suite", "Heritage Suite"),
     text(
-      "Suite rộng hơn cho khách cần cảm giác ở lại lâu hơn và riêng tư hơn.",
-      "A larger suite for guests who want more privacy and a longer-stay feel."
+      "Suite rộng rãi cho khách cần riêng tư và cảm giác ở lâu hơn.",
+      "A spacious suite for guests who want privacy and a longer-stay feel."
     ),
     [text("4 khách", "4 guests"), text("48 m²", "48 sqm"), text("From 3.800.000", "From 3,800,000")],
-    "gold"
+    "gold",
+    "/hero/hero-2.png",
+    text("Heritage Suite", "Heritage Suite")
   ),
   toCardItem(
     "/phong/garden-studio",
     text("Phòng", "Room"),
     text("Garden Studio", "Garden Studio"),
     text(
-      "Studio nhẹ, đủ sáng và phù hợp với khách ưu tiên giá trị tinh gọn.",
-      "A light studio for guests who prefer a concise value proposition."
+      "Studio gọn nhẹ, đủ sáng và dễ chọn cho khách ưu tiên value.",
+      "A compact, bright studio for guests who want a clear value pick."
     ),
     [text("2 khách", "2 guests"), text("28 m²", "28 sqm"), text("From 1.900.000", "From 1,900,000")],
-    "ink"
+    "ink",
+    "/hero/hero-3.png",
+    text("Garden Studio", "Garden Studio")
   )
 ];
+
+const homeRoomItems: CmsCollectionItem[] = roomItems.map((item, index) => ({
+  ...item,
+  image: ["/hero/hero-1.png", "/hero/hero-2.png", "/hero/hero-3.png"][index],
+  imageAlt: item.title,
+  meta: []
+}));
 
 const branchItems: CmsCollectionItem[] = [
   toCardItem(
@@ -524,7 +543,7 @@ const homePageSections: CmsSection[] = [
     id: "about",
     kind: "feature",
     eyebrow: text("About us", "About us"),
-    title: text("Chạm vào một kỳ nghỉ tinh tế hơn.", "Embrace a more refined vacation."),
+    title: text("Chạm vào một kỳ nghỉ tinh tế hơn", "Embrace a more refined vacation."),
     description: text(
       "Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.",
       "Boutique accommodations are designed to provide a sense of privacy, sophistication, and relaxation in every moment."
@@ -573,38 +592,13 @@ const homePageSections: CmsSection[] = [
   {
     id: "destinations",
     kind: "cards",
-    eyebrow: text("Our services", "Our services"),
-    title: text("Các trụ cột nội dung của public site.", "The public site’s main content pillars."),
+    eyebrow: text("Selected rooms", "Selected rooms"),
+    title: text("Ba hạng phòng được chọn.", "Three selected room types."),
     description: text(
-      "Mỗi card dưới đây đã có slug và layout riêng, đủ gần để map sang CMS records hoặc collection records sau này.",
-      "Each card below already has a slug and layout, close enough to map into future CMS or collection records."
+      "Mỗi card có 1 ảnh, 1 tiêu đề và 1 mô tả ngắn để đọc như một curated room showcase.",
+      "Each card has one image, one title, and one short description so it reads like a curated room showcase."
     ),
-    items: [
-      toCardItem(
-        "/phong",
-        text("Rooms", "Rooms"),
-        text("Phòng & room types", "Rooms & room types"),
-        text("Danh sách phòng để public xem và staff map sang physical room sau này.", "A room list that public guests can browse and staff can later map to physical rooms."),
-        [text("Phòng", "Rooms"), text("Pricing-ready", "Pricing-ready")],
-        "paper"
-      ),
-      toCardItem(
-        "/chi-nhanh",
-        text("Branches", "Branches"),
-        text("Chi nhánh", "Branches"),
-        text("Trang chi nhánh với vùng content VI/EN, map và điểm mạnh địa điểm.", "Branch pages with VI/EN content zones, maps, and location strengths."),
-        [text("Map-ready", "Map-ready"), text("VI/EN", "VI/EN")],
-        "gold"
-      ),
-      toCardItem(
-        "/tin-tuc",
-        text("News", "News"),
-        text("Blog / news", "Blog / news"),
-        text("Danh sách bài viết, cập nhật, và news editorial layout.", "Article listings, updates, and an editorial news layout."),
-        [text("Editorial", "Editorial"), text("SEO-ready", "SEO-ready")],
-        "ink"
-      )
-    ]
+    items: homeRoomItems
   },
   {
     id: "next-step",

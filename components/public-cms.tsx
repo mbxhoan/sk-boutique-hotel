@@ -299,6 +299,42 @@ function CmsCollectionCard({
   item: CmsCollectionItem;
   locale: Locale;
 }) {
+  if (item.image) {
+    const image = (
+      <PortalCard className="cms-collection-card cms-collection-card--image" tone={toneToCardTone(item.tone)}>
+        <div className="cms-collection-card__visual">
+          <img
+            alt={item.imageAlt ? localize(locale, item.imageAlt) : localize(locale, item.title)}
+            className="cms-collection-card__image"
+            loading="lazy"
+            src={item.image}
+          />
+        </div>
+
+        <div className="cms-collection-card__body cms-collection-card__body--image">
+          <h3 className="cms-collection-card__title">{localize(locale, item.title)}</h3>
+          <p className="cms-collection-card__description">{localize(locale, item.description)}</p>
+        </div>
+      </PortalCard>
+    );
+
+    return item.href ? (
+      <AnalyticsLink
+        className="cms-collection-card__link"
+        entityId={item.href}
+        entityType="cms_collection_item"
+        eventType="cta_click"
+        href={item.href}
+        locale={locale}
+        metadata={{ title: item.title.vi }}
+      >
+        {image}
+      </AnalyticsLink>
+    ) : (
+      image
+    );
+  }
+
   const card = (
     <PortalCard className="cms-collection-card" tone={toneToCardTone(item.tone)}>
       <div className="cms-collection-card__top">

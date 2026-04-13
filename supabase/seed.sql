@@ -610,11 +610,11 @@ insert into public.content_pages (
             "id": "about",
             "kind": "feature",
             "eyebrow": {
-                "vi": "About us",
+                "vi": "Về chúng tôi",
                 "en": "About us"
             },
             "title": {
-                "vi": "Chạm vào một kỳ nghỉ tinh tế hơn.",
+                "vi": "Chạm vào một kỳ nghỉ tinh tế hơn",
                 "en": "Embrace a more refined vacation."
             },
             "description": {
