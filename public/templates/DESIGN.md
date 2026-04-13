@@ -30,7 +30,7 @@ For floating navigation or mobile menus, utilize **Glassmorphism**. Apply `surfa
 ## 3. Typography: The Bilingual Prestige
 The system utilizes a high-contrast scale to create an editorial hierarchy. Both fonts are selected for their impeccable support of Vietnamese diacritics.
 
-*   **Display & Headlines (Playfair Display):** Our "Voice." It should be used sparingly but boldly. Use `display-lg` for hero titles, often with negative letter-spacing (-0.02em) to increase the "fashion-mag" feel.
+*   **Display & Headlines (Montserrat):** Our "Voice." It should be used sparingly but boldly. Use `display-lg` for hero titles, often with negative letter-spacing (-0.02em) to increase the "fashion-mag" feel.
 *   **Body & Titles (Be Vietnam Pro):** Our "Service." A clean, modern sans-serif that ensures legibility. Vietnamese characters remain balanced and elegant even at the `body-sm` level.
 *   **The Signature Lockup:** Always pair a `label-md` (All Caps, tracked out +10%) in Gold above a `headline-lg` in Deep Navy. This "Category > Title" pairing is the hallmark of the SK Boutique brand.
 

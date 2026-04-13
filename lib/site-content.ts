@@ -121,8 +121,10 @@ export type PageContent = {
 
 export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
-  { label: "Thương hiệu", href: "/thuong-hieu" },
+  { label: "Phòng", href: "/phong" },
+  { label: "Tin tức", href: "/tin-tuc" },
   { label: "Chi nhánh", href: "/chi-nhanh" },
+  { label: "Thương hiệu", href: "/thuong-hieu" },
   { label: "Ưu đãi", href: "/uu-dai" },
   { label: "Dịch vụ", href: "/dich-vu" },
   { label: "Về chúng tôi", href: "/ve-chung-toi" },
@@ -151,7 +153,7 @@ export const siteInfo = {
   phone: "+84 28 0000 2020",
   email: "hello@skboutiquehotel.example",
   hours: "08:00 - 22:00",
-  legal: "© 2026 SK Boutique Hotel. Template tĩnh để bạn thay logo, ảnh và nội dung thật."
+  legal: "© 2026 SK Boutique Hotel. Front-end foundation manual-first, sẵn sàng cho Supabase sau này."
 } as const;
 
 export const pages: PageContent[] = [
@@ -1210,7 +1212,9 @@ export function findPageBySlug(slug: string) {
 }
 
 export function getStaticRouteParams() {
-  return pages.filter((page) => page.slug !== "/").map((page) => ({
-    slug: page.slug.replace(/^\//, "")
-  }));
+  return pages
+    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh")
+    .map((page) => ({
+      slug: page.slug.replace(/^\//, "")
+    }));
 }

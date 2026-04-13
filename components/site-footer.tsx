@@ -15,9 +15,12 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="section-shell site-footer__grid">
         <div className="site-footer__brand">
-          <LogoMark className="site-footer__logo" variant="muted" />
+          <LogoMark className="site-footer__logo" href={appendLocaleQuery("/", locale)} variant="muted" />
           <p className="site-footer__copy">
-            {translate(locale, "Template tĩnh cho SK Boutique Hotel, dựng theo tinh thần editorial, sẵn chỗ thay logo, ảnh và nội dung thật.")}
+            {translate(
+              locale,
+              "Frontend foundation cho SK Boutique Hotel, manual-first, sẵn cho marketing, member và admin shells."
+            )}
           </p>
         </div>
 

@@ -13,7 +13,7 @@ Mở `http://localhost:3000`.
 
 ## Cấu trúc trang
 
-- `/` - Trang chủ
+- `/` - Marketing home shell
 - `/thuong-hieu` - Thương hiệu
 - `/chi-nhanh` - Chi nhánh
 - `/uu-dai` - Ưu đãi
@@ -22,6 +22,8 @@ Mở `http://localhost:3000`.
 - `/lien-he` - Liên hệ
 - `/tuyen-dung` - Tuyển dụng
 - `/ho-tro` - Hỗ trợ
+- `/member` - Member area shell
+- `/admin` - Admin area shell
 
 ## Logo
 

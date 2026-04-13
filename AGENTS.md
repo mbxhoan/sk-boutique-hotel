@@ -115,6 +115,12 @@ If translation infrastructure is not fully built yet, at minimum:
 - keep strings organized
 - avoid creating barriers to later extraction
 
+When rendering user-facing errors:
+- always localize the message to the currently selected language
+- never surface raw generic platform messages directly to the UI
+- prefer short, explicit, action-oriented messages over vague failures
+- if an upstream error is unknown, map it to a safe localized fallback before displaying it
+
 ---
 
 ## Pricing guidance
@@ -279,6 +285,7 @@ If inspecting data through MCP or admin tools:
 - Do not ignore VI/EN requirements.
 - Do not implement phase 2 complexity when phase 1 flow is incomplete.
 - Do not sacrifice maintainability for short-term hacks.
+- Do not repeat the issue that has already been done.
 
 ---
 

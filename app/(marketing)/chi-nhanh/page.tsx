@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+
+import { PageViewTracker } from "@/components/page-view-tracker";
+import { CmsPageRenderer } from "@/components/public-cms";
+import { localize } from "@/lib/mock/i18n";
+import { resolveLocale } from "@/lib/locale";
+import { loadBranchCollectionPageCopy } from "@/lib/supabase/queries/branches";
+
+type PageProps = {
+  searchParams?: Promise<{
+    lang?: string;
+  }>;
+};
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = await loadBranchCollectionPageCopy();
+
+  return {
+    title: localize(locale, page.seo.title),
+    description: localize(locale, page.seo.description)
+  };
+}
+
+export default async function BranchesPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = await loadBranchCollectionPageCopy();
+
+  return (
+    <>
+      <PageViewTracker eventType="page_view" locale={locale} pagePath="/chi-nhanh" entityType="branch_collection" />
+      <CmsPageRenderer locale={locale} page={page} />
+    </>
+  );
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { AnalyticsLink } from "@/components/analytics-link";
 import { navItems } from "@/lib/site-content";
 import { appendLocaleQuery, localeLabel, resolveLocale, translate } from "@/lib/locale";
 import { LogoMark } from "@/components/logo-mark";
@@ -16,7 +17,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="section-shell site-header__inner">
-        <LogoMark className="site-header__logo" priority />
+        <LogoMark className="site-header__logo" href={appendLocaleQuery("/", locale)} priority />
 
         <nav aria-label="Điều hướng chính" className="site-nav">
           {navItems.map((item) => {
@@ -44,9 +45,16 @@ export function SiteHeader() {
             {localeLabel(localeToggle)}
           </Link>
 
-          <Link className="button button--solid site-header__cta" href={appendLocaleQuery("/lien-he", locale)}>
-            {translate(locale, "Đặt phòng")}
-          </Link>
+          <AnalyticsLink
+            className="button button--solid site-header__cta"
+            eventType="cta_click"
+            href="/lien-he"
+            locale={locale}
+            metadata={{ source: "site_header" }}
+            pagePath={pathname}
+          >
+            {translate(locale, "Kiểm tra phòng trống")}
+          </AnalyticsLink>
         </div>
       </div>
     </header>

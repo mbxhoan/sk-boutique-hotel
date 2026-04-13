@@ -6,6 +6,8 @@ export const localeQueryKey = "lang";
 
 const translations: Record<string, string> = {
   "Trang chủ": "Home",
+  "Phòng": "Rooms",
+  "Tin tức": "News",
   "Thương hiệu": "Brand",
   "Chi nhánh": "Branches",
   "Ưu đãi": "Offers",
@@ -15,6 +17,7 @@ const translations: Record<string, string> = {
   "Tuyển dụng": "Careers",
   "Hỗ trợ": "Support",
   "Đặt phòng": "Book Now",
+  "Kiểm tra phòng trống": "Check availability",
   "Khám phá": "Explore",
   "Liên hệ mẫu": "Sample contact",
   "Địa chỉ": "Address",
@@ -89,11 +92,12 @@ const translations: Record<string, string> = {
   "Mọi chi tiết đều có thể thay đổi, nhưng template này vẫn giữ nguyên khung.": "Every detail can change, but this template keeps its structure.",
   "Nếu cần, bạn chỉ việc thay logo trong public và cập nhật các ảnh placeholder bằng asset của mình.": "If needed, just replace the logo in public and update the placeholder images with your own assets.",
   "Đây là nơi bạn nối form thật khi sẵn sàng.": "This is where you connect the real form when you're ready.",
-  "Template tĩnh cho SK Boutique Hotel, dựng theo tinh thần editorial, sẵn chỗ thay logo, ảnh và nội dung thật.": "A static template for SK Boutique Hotel, built with an editorial spirit and ready for your logo, images, and real content.",
+  "Frontend foundation cho SK Boutique Hotel, manual-first, sẵn cho marketing, member và admin shells.": "A manual-first front-end foundation for SK Boutique Hotel, ready for marketing, member, and admin shells.",
   "Chỉ cần thay file logo trong thư mục /public, header và footer sẽ đổi theo.": "Swap the logo files in /public and the header and footer will update accordingly.",
   "Một số chủ đề cần chặn?": "Need to block some topics?",
   "Địa chỉ mẫu, Quận trung tâm, TP.HCM": "Sample address, central district, Ho Chi Minh City",
-  "Khả năng mở rộng": "Scalability"
+  "Khả năng mở rộng": "Scalability",
+  "Frontend foundation manual-first, sẵn sàng cho Supabase sau này.": "A manual-first front-end foundation ready for Supabase later."
 };
 
 export function resolveLocale(input?: string | null): Locale {
