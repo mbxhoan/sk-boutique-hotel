@@ -407,7 +407,7 @@ const homePageSections: CmsSection[] = [
     id: "hero",
     kind: "hero",
     layout: "centered",
-    eyebrow: text("Boutique hotel foundation", "Boutique hotel foundation"),
+    eyebrow: text("SK Boutique Hotel", "SK Boutique Hotel"),
     title: text("Một shell khách sạn premium, manual-first và sẵn đường mở rộng.", "A premium, manual-first hotel shell that stays extensible."),
     description: text(
       "Homepage mới được dựng để có thể map thành CMS sections sau này mà không phải thay lại route hay component structure.",

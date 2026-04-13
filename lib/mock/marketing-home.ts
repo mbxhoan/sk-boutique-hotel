@@ -72,8 +72,8 @@ export const marketingHomeCopy = {
       en: "SK Boutique Hotel is being built as a premium front-end foundation, ready for Supabase later while staying detached from the real database in this phase."
     },
     eyebrow: {
-      vi: "Boutique hotel foundation",
-      en: "Boutique hotel foundation"
+      vi: "SK Boutique Hotel",
+      en: "SK Boutique Hotel"
     },
     primaryCta: {
       href: "/lien-he",

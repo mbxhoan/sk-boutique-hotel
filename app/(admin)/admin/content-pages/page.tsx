@@ -29,7 +29,7 @@ export default async function AdminContentPagesPage({ searchParams }: PageProps)
   return (
     <AdminManagementPage
       actions={
-        <Link className="button button--text-light" href={appendLocaleQuery("/", locale)}>
+        <Link className="button button--text-light" target="_blank" href={appendLocaleQuery("/", locale)}>
           {locale === "en" ? "View public site" : "Xem website"}
         </Link>
       }
