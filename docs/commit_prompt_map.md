@@ -409,6 +409,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/public-cms.tsx`
   - `app/globals.css`
 
+### Entry 033
+- `time`: 2026-04-13T17:28:24+07:00
+- `prompt_summary`: Redesign the public site header into a premium boutique menu with compact top-level nav, dropdowns for Discover/About SK, a tablet/mobile drawer, and a stronger booking CTA.
+- `commit_message`: `feat(header-nav): redesign public menu for boutique hotel navigation`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

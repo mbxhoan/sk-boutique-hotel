@@ -1,6 +1,19 @@
+import type { LocalizedText } from "@/lib/mock/i18n";
+
 export type LinkItem = {
   label: string;
   href: string;
+};
+
+export type HeaderMenuItem = {
+  children?: HeaderMenuItem[];
+  href: string;
+  label: LocalizedText;
+};
+
+export type HeaderMenuConfig = {
+  cta: HeaderMenuItem;
+  items: HeaderMenuItem[];
 };
 
 export type MetricItem = {
@@ -132,6 +145,49 @@ export const navItems: LinkItem[] = [
   { label: "Tuyển dụng", href: "/tuyen-dung" },
   { label: "Hỗ trợ", href: "/ho-tro" }
 ];
+
+export const headerMenu: HeaderMenuConfig = {
+  items: [
+    {
+      href: "/phong",
+      label: { vi: "Phòng", en: "Rooms" }
+    },
+    {
+      href: "/chi-nhanh",
+      label: { vi: "Chi nhánh", en: "Branches" }
+    },
+    {
+      href: "/uu-dai",
+      label: { vi: "Ưu đãi", en: "Offers" }
+    },
+    {
+      href: "/dich-vu",
+      label: { vi: "Dịch vụ", en: "Services" }
+    },
+    {
+      href: "#discover",
+      label: { vi: "Khám phá", en: "Discover" },
+      children: [
+        { href: "/tin-tuc", label: { vi: "Tin tức", en: "News" } },
+        { href: "/thuong-hieu", label: { vi: "Thương hiệu", en: "Brand" } }
+      ]
+    },
+    {
+      href: "#about-sk",
+      label: { vi: "Về SK", en: "About SK" },
+      children: [
+        { href: "/ve-chung-toi", label: { vi: "Về chúng tôi", en: "About us" } },
+        { href: "/lien-he", label: { vi: "Liên hệ", en: "Contact" } },
+        { href: "/tuyen-dung", label: { vi: "Tuyển dụng", en: "Careers" } },
+        { href: "/ho-tro", label: { vi: "Hỗ trợ", en: "Support" } }
+      ]
+    }
+  ],
+  cta: {
+    href: "/lien-he",
+    label: { vi: "Đặt phòng", en: "Book now" }
+  }
+};
 
 export const footerLinks = navItems;
 
