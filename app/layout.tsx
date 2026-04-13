@@ -29,7 +29,7 @@ export const metadata: Metadata = {
       {
         alt: "SK Boutique Hotel",
         height: 630,
-        url: "/opengraph-image.png",
+        url: "/opengraph-image.jpg",
         width: 1200
       }
     ],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "SK Boutique Hotel",
     description:
       "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area.",
-    images: ["/opengraph-image.png"]
+    images: ["/opengraph-image.jpg"]
   }
 };
 

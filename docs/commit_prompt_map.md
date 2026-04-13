@@ -321,7 +321,7 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/favicon.ico`
   - `app/icon.png`
   - `app/apple-icon.png`
-  - `app/opengraph-image.png`
+  - `app/opengraph-image.jpg`
 
 ### Entry 025
 - `time`: 2026-04-13T09:03:28+07:00
