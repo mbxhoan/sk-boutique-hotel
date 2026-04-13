@@ -11,26 +11,41 @@ export async function updateSupabaseSession(request: NextRequest) {
 
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient<Database>(getSupabaseUrl(), getSupabasePublishableKey(), {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => {
-          request.cookies.set(name, value);
-        });
-
-        response = NextResponse.next({ request });
-
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
+  const clearSupabaseCookies = () => {
+    for (const cookie of request.cookies.getAll()) {
+      if (cookie.name.startsWith("sb-") || cookie.name.includes("auth-token")) {
+        response.cookies.set(cookie.name, "", {
+          expires: new Date(0),
+          path: "/"
         });
       }
     }
-  });
+  };
 
-  await supabase.auth.getUser();
+  try {
+    const supabase = createServerClient<Database>(getSupabaseUrl(), getSupabasePublishableKey(), {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
+
+          response = NextResponse.next({ request });
+
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        }
+      }
+    });
+
+    await supabase.auth.getUser();
+  } catch {
+    clearSupabaseCookies();
+  }
 
   return response;
 }

@@ -360,3 +360,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed.sql`
   - `supabase/seed-content-pages.sql`
   - `scripts/generate-content-pages-seed.mjs`
+
+### Entry 028
+- `time`: 2026-04-13T10:01:31+07:00
+- `prompt_summary`: Harden Supabase middleware against malformed auth cookies so `next dev` and `/admin` no longer crash on JSON parse errors from stale session data.
+- `commit_message`: `fix(auth-middleware): ignore malformed supabase cookies`
+- `main_files`:
+  - `lib/supabase/middleware.ts`
