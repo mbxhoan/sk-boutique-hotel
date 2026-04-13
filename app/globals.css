@@ -447,6 +447,26 @@ textarea {
   z-index: 1;
 }
 
+.cms-feature__frame .visual-panel--image::before {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: inherit;
+  background:
+    linear-gradient(160deg, rgba(236, 233, 226, 0.34), rgba(197, 160, 89, 0.16)),
+    linear-gradient(180deg, rgba(0, 12, 30, 0.06), rgba(0, 12, 30, 0.2));
+  mix-blend-mode: screen;
+  opacity: 0.82;
+}
+
+.cms-feature__frame .visual-panel--image::after {
+  inset: auto auto -18% -10%;
+  width: 64%;
+  height: 52%;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0.72;
+}
+
 .visual-panel__image-wrap {
   position: absolute;
   inset: 0;
@@ -461,7 +481,7 @@ textarea {
 
 .visual-panel--image .visual-panel__grain {
   z-index: 1;
-  opacity: 0.08;
+  opacity: 0.06;
 }
 
 .visual-panel--image .visual-panel__top,

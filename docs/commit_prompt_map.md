@@ -400,6 +400,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/public-cms.tsx`
   - `app/globals.css`
 
+### Entry 032
+- `time`: 2026-04-13T17:20:19+07:00
+- `prompt_summary`: Replace the 30m hold SLA stat with a more content-led metric and add a soft warm-gray overlay layer to the about collage images so text reads more clearly over the visuals.
+- `commit_message`: `fix(homepage-collage): soften feature images and update metric copy`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

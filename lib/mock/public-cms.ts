@@ -585,11 +585,11 @@ const homePageSections: CmsSection[] = [
         tone: "gold"
       },
       {
-        value: "30m",
-        label: text("Hold SLA", "Hold SLA"),
+        value: "VI/EN",
+        label: text("Ngôn ngữ", "Language"),
         detail: text(
-          "Hạn giữ phòng mặc định vẫn editable theo branch hoặc rule thật.",
-          "The default hold window stays editable by branch or real rule."
+          "Nội dung public luôn có vùng Việt và Anh riêng, sẵn cho CMS sau này.",
+          "Public content always keeps separate Vietnamese and English zones, ready for CMS later."
         ),
         tone: "ink"
       }
