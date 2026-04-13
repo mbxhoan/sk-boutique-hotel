@@ -20,6 +20,17 @@ export type CmsMediaFrame = {
   title: LocalizedText;
 };
 
+export type CmsHeroSlide = {
+  image: string;
+  eyebrow: LocalizedText;
+  title: LocalizedText;
+  description: LocalizedText;
+  actions: {
+    primary: CmsAction;
+    secondary?: CmsAction;
+  };
+};
+
 export type CmsStat = {
   detail: LocalizedText;
   label: LocalizedText;
@@ -58,13 +69,14 @@ type CmsSectionBase = {
 
 export type CmsHeroSection = CmsSectionBase & {
   kind: "hero";
-  layout?: "centered" | "split";
+  layout?: "centered" | "split" | "carousel";
   actions: {
     primary: CmsAction;
     secondary?: CmsAction;
   };
   bullets: LocalizedText[];
   frame: CmsMediaFrame;
+  slides?: CmsHeroSlide[];
 };
 
 export type CmsStatsSection = CmsSectionBase & {
@@ -406,12 +418,12 @@ const homePageSections: CmsSection[] = [
   {
     id: "hero",
     kind: "hero",
-    layout: "centered",
+    layout: "carousel",
     eyebrow: text("SK Boutique Hotel", "SK Boutique Hotel"),
-    title: text("Một shell khách sạn premium, manual-first và sẵn đường mở rộng.", "A premium, manual-first hotel shell that stays extensible."),
+    title: text("Chào mừng đến SK Boutique Hotel", "Welcome to SK Boutique Hotel"),
     description: text(
-      "Homepage mới được dựng để có thể map thành CMS sections sau này mà không phải thay lại route hay component structure.",
-      "The new homepage is structured so it can map to CMS sections later without changing the route or component structure."
+      "Trải nghiệm lưu trú boutique đẳng cấp, nơi sự tinh tế gặp gỡ sự thoải mái.",
+      "Experience premium boutique hospitality where elegance meets comfort."
     ),
     actions: {
       primary: {
@@ -420,30 +432,93 @@ const homePageSections: CmsSection[] = [
         tone: "solid"
       },
       secondary: {
-        href: "/tin-tuc",
-        label: text("Xem tin tức", "Read news"),
+        href: "/lien-he",
+        label: text("Liên hệ ngay", "Contact us"),
         tone: "ghost"
       }
     },
-    bullets: [
-      text("Public site, member portal, and admin shell are separated from day one.", "Public site, member portal, and admin shell are separated from day one."),
-      text("Room types stay public while operations stay physical-room based.", "Room types stay public while operations stay physical-room based."),
-      text("Hold expiry, payment verification, and audit logging stay visible in the UI model.", "Hold expiry, payment verification, and audit logging stay visible in the UI model.")
-    ],
+    bullets: [],
     frame: {
-      chips: ["Phase 1 manual-first", "VI/EN", "Supabase-ready"],
-      description: text(
-        "Một frame mô phỏng tổng quan website và các shell chức năng.",
-        "A frame that stands in for the website overview and its functional shells."
-      ),
-      label: text("Homepage overview", "Homepage overview"),
-      note: text(
-        "Chỉ cần thay data source là đổi được nội dung.",
-        "Switch the data source and the content updates cleanly."
-      ),
+      chips: [],
+      description: text("", ""),
+      label: text("", ""),
       tone: "ink",
-      title: text("Public site / Member portal / Admin console", "Public site / Member portal / Admin console")
-    }
+      title: text("", "")
+    },
+    slides: [
+      {
+        image: "/hero/hero-1.png",
+        eyebrow: text("SK Boutique Hotel", "SK Boutique Hotel"),
+        title: text(
+          "Chào mừng đến SK Boutique Hotel",
+          "Welcome to SK Boutique Hotel"
+        ),
+        description: text(
+          "Nơi sự tinh tế trong từng chi tiết tạo nên trải nghiệm lưu trú khó quên.",
+          "Where refined details craft an unforgettable stay experience."
+        ),
+        actions: {
+          primary: {
+            href: "/phong",
+            label: text("Khám phá phòng", "Explore rooms"),
+            tone: "solid"
+          },
+          secondary: {
+            href: "/lien-he",
+            label: text("Liên hệ ngay", "Contact us"),
+            tone: "ghost"
+          }
+        }
+      },
+      {
+        image: "/hero/hero-2.png",
+        eyebrow: text("Phòng nghỉ", "Our Rooms"),
+        title: text(
+          "Phòng nghỉ sang trọng, thanh lịch",
+          "Elegant luxury rooms"
+        ),
+        description: text(
+          "Mỗi căn phòng là một câu chuyện riêng — yên tĩnh, ấm áp và đầy đủ tiện nghi cao cấp.",
+          "Each room tells its own story — calm, warm, and fully equipped with premium amenities."
+        ),
+        actions: {
+          primary: {
+            href: "/phong",
+            label: text("Xem tất cả phòng", "View all rooms"),
+            tone: "solid"
+          },
+          secondary: {
+            href: "/lien-he",
+            label: text("Đặt phòng ngay", "Book now"),
+            tone: "ghost"
+          }
+        }
+      },
+      {
+        image: "/hero/hero-3.png",
+        eyebrow: text("Trải nghiệm", "Experience"),
+        title: text(
+          "Thư giãn đẳng cấp, tầm nhìn tuyệt đẹp",
+          "Premium relaxation, breathtaking views"
+        ),
+        description: text(
+          "Tận hưởng không gian nghỉ dưỡng hoàn hảo với hồ bơi, lounge bar và tầm nhìn toàn cảnh.",
+          "Enjoy the perfect retreat with pool, lounge bar, and panoramic views."
+        ),
+        actions: {
+          primary: {
+            href: "/chi-nhanh",
+            label: text("Khám phá chi nhánh", "Explore branches"),
+            tone: "solid"
+          },
+          secondary: {
+            href: "/lien-he",
+            label: text("Liên hệ tư vấn", "Get in touch"),
+            tone: "ghost"
+          }
+        }
+      }
+    ]
   },
   {
     id: "about",
@@ -1982,8 +2057,8 @@ export const homePageCopy: CmsPageCopy = {
   seo: {
     title: text("SK Boutique Hotel", "SK Boutique Hotel"),
     description: text(
-      "Homepage CMS-ready cho SK Boutique Hotel, dựng theo cấu trúc section config.",
-      "CMS-ready homepage for SK Boutique Hotel, built from section config."
+      "Từ không gian, dịch vụ đến từng chi tiết nhỏ, mọi thứ được sắp đặt để bạn tận hưởng một kỳ nghỉ thoải mái và khác biệt.",
+      "From the ambiance and service to the smallest details, everything is arranged for you to enjoy a comfortable and unique vacation."
     )
   },
   sections: homePageSections

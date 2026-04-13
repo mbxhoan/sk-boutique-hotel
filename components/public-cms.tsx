@@ -1,4 +1,5 @@
 import { AnalyticsLink } from "@/components/analytics-link";
+import { HeroCarousel } from "@/components/hero-carousel";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type {
@@ -113,6 +114,11 @@ function CmsHeroSectionRenderer({
   locale: Locale;
   section: CmsHeroSection;
 }) {
+  /* Carousel layout — used on homepage */
+  if (section.layout === "carousel" && section.slides?.length) {
+    return <HeroCarousel locale={locale} slides={section.slides} />;
+  }
+
   const centeredLayout = section.layout === "centered";
 
   if (centeredLayout) {
