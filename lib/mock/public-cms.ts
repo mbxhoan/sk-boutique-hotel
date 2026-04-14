@@ -288,7 +288,6 @@ const homeRoomItems: CmsCollectionItem[] = roomItems.map((item, index) => ({
   ...item,
   image: ["/hero/hero-1.png", "/hero/hero-2.png", "/hero/hero-3.png"][index],
   imageAlt: item.title,
-  meta: []
 }));
 
 const branchItems: CmsCollectionItem[] = [

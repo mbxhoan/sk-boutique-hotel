@@ -1,5 +1,6 @@
 import { AnalyticsLink } from "@/components/analytics-link";
 import { HeroCarousel } from "@/components/hero-carousel";
+import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type {
@@ -479,6 +480,18 @@ function CmsCardsSectionRenderer({
   locale: Locale;
   section: CmsCardsSection;
 }) {
+  if (section.id === "destinations") {
+    return (
+      <SelectedRoomsCarousel
+        description={section.description}
+        eyebrow={section.eyebrow}
+        items={section.items}
+        locale={locale}
+        title={section.title}
+      />
+    );
+  }
+
   return (
     <section className="section cms-section cms-section--cards" id={section.id}>
       <div className="section-shell">

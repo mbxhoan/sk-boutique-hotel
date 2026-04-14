@@ -504,6 +504,18 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/public-cms.tsx`
   - `app/globals.css`
 
+### Entry 045
+- `time`: 2026-04-14T12:24:00+07:00
+- `prompt_summary`: Chuyển Selected rooms thành slider carousel responsive theo layout minh hoạ, với card overlay dạng premium, arrows/dots, và hiển thị 1 ảnh mỗi card trên mobile.
+- `commit_message`: `feat(home-selected-rooms): add responsive room carousel`
+- `main_files`:
+  - `components/selected-rooms-carousel.tsx`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.
