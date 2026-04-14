@@ -3512,6 +3512,7 @@ textarea {
   display: flex;
   gap: var(--cms-room-carousel-gap);
   align-items: stretch;
+  justify-content: center;
   width: max-content;
   min-width: 100%;
   margin-inline: auto;

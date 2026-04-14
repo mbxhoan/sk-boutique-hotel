@@ -525,6 +525,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/mock/public-cms.ts`
   - `supabase/seed-content-pages.sql`
 
+### Entry 048
+- `time`: 2026-04-14T13:05:00+07:00
+- `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
+- `commit_message`: `fix(home-selected-rooms): center carousel track content`
+- `main_files`:
+  - `app/globals.css`
+
 ### Entry 046
 - `time`: 2026-04-14T12:31:00+07:00
 - `prompt_summary`: Căn lại carousel Selected rooms vào giữa khung section để không bị bám mép trái trên desktop, đồng thời giữ scroll-snap responsive cho tablet/mobile.

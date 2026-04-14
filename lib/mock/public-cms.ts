@@ -597,7 +597,7 @@ const homePageSections: CmsSection[] = [
   {
     id: "destinations",
     kind: "cards",
-    eyebrow: text("Rooms", "Selected rooms"),
+    eyebrow: text("Hạng phòng", "Hotel Rooms"),
     title: text("Nơi dấu ấn được đặt tên", "Where the signature is set"),
     description: text(
       "Đa dang hạng phòng với số lượng phòng phù hợp với mọi nhu cầu lưu trú.",
