@@ -139,13 +139,14 @@ export function SiteHeader() {
                   className={`site-header__dropdown${active ? " site-header__dropdown--active" : ""}`}
                   key={dropdownId}
                   open={isDropdownOpen}
-                  onToggle={(event) => {
-                    setOpenDropdown(event.currentTarget.open ? dropdownId : null);
-                  }}
                 >
                   <summary
                     className={`site-header__nav-link site-header__nav-link--summary${active ? " site-header__nav-link--active" : ""}`}
                     aria-label={label}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setOpenDropdown((current) => (current === dropdownId ? null : dropdownId));
+                    }}
                   >
                     <span>{label}</span>
                     <ChevronIcon />
@@ -276,13 +277,18 @@ export function SiteHeader() {
                       className="site-header__drawer-group"
                       key={drawerGroupId}
                       open={isDrawerGroupOpen}
-                      onToggle={(event) => {
-                        setOpenDrawerGroup(event.currentTarget.open ? drawerGroupId : null);
-                      }}
                     >
                       <summary
                         className={`site-header__drawer-link site-header__drawer-link--summary${active ? " site-header__drawer-link--active" : ""}`}
                         aria-label={label}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          setOpenDrawerGroup((current) => {
+                            const currentIsOpen = current === undefined ? active : current === drawerGroupId;
+
+                            return currentIsOpen ? null : drawerGroupId;
+                          });
+                        }}
                       >
                         <span>{label}</span>
                         <ChevronIcon />

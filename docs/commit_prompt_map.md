@@ -496,6 +496,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/site-header.tsx`
   - `app/globals.css`
 
+### Entry 044
+- `time`: 2026-04-14T12:03:00+07:00
+- `prompt_summary`: Rút about visual về một ảnh duy nhất thay vì hai ảnh chồng nhau, đồng thời giảm chiều cao responsive để không tạo khoảng trống vô ích trên tablet/mobile.
+- `commit_message`: `fix(home-about): reduce visual stack to a single image`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

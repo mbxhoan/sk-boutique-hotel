@@ -211,7 +211,7 @@ const featureFrameRight: CmsMediaFrame = {
     "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
     "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/home/pool3.jpg",
+  image: "/home/block.jpg",
   imageAlt: text("Không gian boutique với nhịp thị giác ấm", "A warm boutique space with layered visual rhythm"),
   label: text("Visual detail", "Visual detail"),
   note: text(

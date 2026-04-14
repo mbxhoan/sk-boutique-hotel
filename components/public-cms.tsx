@@ -329,7 +329,6 @@ function CmsFeatureSectionRenderer({
 
             <div className="cms-feature__visual cms-feature__visual--about" aria-hidden="true">
               <div className="cms-about-visual__stack">
-                <CmsAboutVisualCard frame={section.frames[0]} locale={locale} variant="back" />
                 <CmsAboutVisualCard frame={section.frames[1]} locale={locale} variant="front" />
               </div>
             </div>
