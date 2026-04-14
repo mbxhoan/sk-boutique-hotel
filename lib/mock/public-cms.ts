@@ -191,10 +191,10 @@ const premiumArticleFrame: CmsMediaFrame = {
 const featureFrameLeft: CmsMediaFrame = {
   chips: ["About us", "Interiors", "Guest comfort"],
   description: text(
-    "Khung ảnh giả lập cho không gian lưu trú và cảm giác boutique.",
-    "A mock image frame for the stay experience and boutique mood."
+    "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
+    "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/hero/hero-2.png",
+  image: "/home/block.jpg",
   imageAlt: text("Phòng khách boutique sáng và tinh tế", "A bright and refined boutique room"),
   label: text("SK stay story", "SK stay story"),
   note: text(
@@ -208,10 +208,10 @@ const featureFrameLeft: CmsMediaFrame = {
 const featureFrameRight: CmsMediaFrame = {
   chips: ["Signature", "Detail", "Mood"],
   description: text(
-    "Khung ảnh thứ hai làm collage để tạo nhịp thị giác chéo.",
-    "A second frame layered into the collage to create visual rhythm."
+    "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
+    "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/hero/hero-3.png",
+  image: "/home/pool3.jpg",
   imageAlt: text("Không gian boutique với nhịp thị giác ấm", "A warm boutique space with layered visual rhythm"),
   label: text("Visual detail", "Visual detail"),
   note: text(
@@ -219,7 +219,7 @@ const featureFrameRight: CmsMediaFrame = {
     "This area can still map to gallery or CMS media fields later."
   ),
   tone: "gold",
-  title: text("Boutique detail", "Boutique detail")
+  title: text("Warm, calm, premium", "Warm, calm, premium")
 };
 
 const toCardItem = (
@@ -253,7 +253,7 @@ const roomItems: CmsCollectionItem[] = [
     ),
     [text("2 khách", "2 guests"), text("32 m²", "32 sqm"), text("From 2.400.000", "From 2,400,000")],
     "paper",
-    "/hero/hero-1.png",
+    "/home/bed1.jpg",
     text("Deluxe Bay View", "Deluxe Bay View")
   ),
   toCardItem(
@@ -266,7 +266,7 @@ const roomItems: CmsCollectionItem[] = [
     ),
     [text("4 khách", "4 guests"), text("48 m²", "48 sqm"), text("From 3.800.000", "From 3,800,000")],
     "gold",
-    "/hero/hero-2.png",
+    "/home/bed1.jpg",
     text("Heritage Suite", "Heritage Suite")
   ),
   toCardItem(
@@ -279,7 +279,7 @@ const roomItems: CmsCollectionItem[] = [
     ),
     [text("2 khách", "2 guests"), text("28 m²", "28 sqm"), text("From 1.900.000", "From 1,900,000")],
     "ink",
-    "/hero/hero-3.png",
+    "/home/bed1.jpg",
     text("Garden Studio", "Garden Studio")
   )
 ];
@@ -585,11 +585,11 @@ const homePageSections: CmsSection[] = [
         tone: "gold"
       },
       {
-        value: "VI/EN",
-        label: text("Ngôn ngữ", "Language"),
+        value: "24/7",
+        label: text("Hỗ trợ", "Support"),
         detail: text(
-          "Nội dung public luôn có vùng Việt và Anh riêng, sẵn cho CMS sau này.",
-          "Public content always keeps separate Vietnamese and English zones, ready for CMS later."
+          "Chúng tôi có mặt mọi lúc khi bạn cần booking hay hỗ trợ sử dụng dịch vụ.",
+          "We're here whenever you need to book or get help with our services."
         ),
         tone: "ink"
       }

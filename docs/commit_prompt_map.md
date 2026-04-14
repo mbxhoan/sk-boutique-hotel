@@ -423,6 +423,39 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/globals.css`
 
+### Entry 035
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Dời overlay của 2 ảnh collage xuống phần đáy để highlight cụm text ngay khu vực được khoanh đỏ.
+- `commit_message`: `style(cms-feature): move collage overlays to bottom bands`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 036
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Thay ô VI/EN trên homepage bằng metric hỗ trợ 24/7 để phần stat đọc đúng nội dung dịch vụ.
+- `commit_message`: `feat(homepage-metrics): swap bilingual stat for 24-7 support`
+- `main_files`:
+  - `lib/mock/marketing-home.ts`
+
+### Entry 037
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Làm section About-us của homepage thành collage editorial có backdrop mờ phía sau, giống ảnh minh hoạ user gửi.
+- `commit_message`: `feat(home-about): add editorial collage backdrop`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 038
+- `time`: 2026-04-14T10:41:12+07:00
+- `prompt_summary`: Chỉnh about-us ở homepage theo ảnh minh hoạ với 2 card overlay chồng lớp, backdrop blur và bỏ stat row để section giống mẫu hơn.
+- `commit_message`: `feat(home-about): add layered overlay collage for about section`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

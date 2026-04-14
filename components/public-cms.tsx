@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { AnalyticsLink } from "@/components/analytics-link";
 import { HeroCarousel } from "@/components/hero-carousel";
 import type { Locale } from "@/lib/locale";
@@ -121,6 +123,32 @@ function CmsPreviewFrame({
 
       {frame.note ? <p className="visual-panel__note">{localize(locale, frame.note)}</p> : null}
     </div>
+  );
+}
+
+function CmsAboutVisualCard({
+  frame,
+  locale,
+  variant
+}: {
+  frame: CmsMediaFrame;
+  locale: Locale;
+  variant: "back" | "front";
+}) {
+  return (
+    <article className={`cms-about-card cms-about-card--${variant}`}>
+      <img
+        alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
+        className="cms-about-card__image"
+        loading="lazy"
+        src={frame.image}
+      />
+      <span className="cms-about-card__overlay" aria-hidden="true" />
+      <div className="cms-about-card__content">
+        <h3 className="cms-about-card__title">{localize(locale, frame.title)}</h3>
+        <p className="cms-about-card__description">{localize(locale, frame.description)}</p>
+      </div>
+    </article>
   );
 }
 
@@ -262,10 +290,59 @@ function CmsFeatureSectionRenderer({
   locale: Locale;
   section: CmsFeatureSection;
 }) {
+  const isAboutSection = section.id === "about";
+
+  if (isAboutSection) {
+    const backgroundImage = section.frames[0]?.image ?? section.frames[1]?.image;
+
+    return (
+      <section
+        className={`section cms-section cms-section--feature${isAboutSection ? " cms-section--feature-about" : ""}`}
+        id={section.id}
+      >
+        <div className={`section-shell cms-feature__shell${isAboutSection ? " cms-feature__shell--about" : ""}`}>
+          {backgroundImage ? (
+            <div
+              className="cms-feature__ambient"
+              aria-hidden="true"
+              style={{ backgroundImage: `url(${backgroundImage})` } as CSSProperties}
+            />
+          ) : null}
+
+          <div className="cms-feature__grid cms-feature__grid--about">
+            <div className="cms-feature__copy cms-feature__copy--about">
+              <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
+              <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
+              <p className="cms-feature__description">{localize(locale, section.description)}</p>
+
+              <div className="cms-feature__body cms-feature__body--about">
+                {section.body.map((paragraph) => (
+                  <p className="cms-feature__paragraph" key={paragraph.vi}>
+                    {localize(locale, paragraph)}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            <div className="cms-feature__visual cms-feature__visual--about" aria-hidden="true">
+              <div className="cms-about-visual__stack">
+                <CmsAboutVisualCard frame={section.frames[0]} locale={locale} variant="back" />
+                <CmsAboutVisualCard frame={section.frames[1]} locale={locale} variant="front" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="section cms-section cms-section--feature" id={section.id}>
-      <div className="section-shell cms-feature__shell">
-        <div className="cms-feature__grid">
+    <section
+      className={`section cms-section cms-section--feature${isAboutSection ? " cms-section--feature-about" : ""}`}
+      id={section.id}
+    >
+      <div className={`section-shell cms-feature__shell${isAboutSection ? " cms-feature__shell--about" : ""}`}>
+        <div className={`cms-feature__grid${isAboutSection ? " cms-feature__grid--about" : ""}`}>
           <div className="cms-feature__copy">
             <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
             <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
