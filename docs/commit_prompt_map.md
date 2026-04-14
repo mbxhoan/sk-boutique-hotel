@@ -456,6 +456,16 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 039
+- `time`: 2026-04-14T11:05:54+07:00
+- `prompt_summary`: Thêm lại stat row bên dưới about us trên homepage, đổi thứ tự nội dung thành 03 hạng phòng, 20 phút để vào trung tâm, và 24/7 hỗ trợ.
+- `commit_message`: `feat(home-about): restore stats strip under about collage`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

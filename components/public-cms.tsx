@@ -331,6 +331,19 @@ function CmsFeatureSectionRenderer({
               </div>
             </div>
           </div>
+
+          <div className="portal-stat-grid cms-feature__metrics">
+            {section.metrics.map((item, index) => (
+              <PortalStatCard
+                detail={item.detail}
+                label={item.label}
+                locale={locale}
+                key={`${item.label.vi}-${index}`}
+                tone={toneToCardTone(item.tone)}
+                value={item.value}
+              />
+            ))}
+          </div>
         </div>
       </section>
     );

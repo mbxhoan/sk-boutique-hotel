@@ -548,7 +548,7 @@ const homePageSections: CmsSection[] = [
   {
     id: "about",
     kind: "feature",
-    eyebrow: text("About us", "About us"),
+    eyebrow: text("Về chúng tôi", "About us"),
     title: text("Chạm vào một kỳ nghỉ tinh tế hơn", "Embrace a more refined vacation."),
     description: text(
       "Không gian lưu trú boutique được thiết kế để mang lại cảm giác riêng tư, chỉn chu và thư thái trong từng khoảnh khắc.",
@@ -567,7 +567,7 @@ const homePageSections: CmsSection[] = [
     frames: [featureFrameLeft, featureFrameRight],
     metrics: [
       {
-        value: "03",
+        value: text("03", "03"),
         label: text("Hạng phòng", "Room types"),
         detail: text(
           "Hạng phòng public đủ để staff map sang physical rooms sau này.",
@@ -576,20 +576,20 @@ const homePageSections: CmsSection[] = [
         tone: "paper"
       },
       {
-        value: "01",
-        label: text("Chi nhánh", "Branches"),
+        value: text("20 phút", "20 min"),
+        label: text("Trung tâm", "City center"),
         detail: text(
-          "Chi nhánh có thể giữ copy, map, và workflow riêng.",
-          "Branches can keep their own copy, maps, and workflow."
+          "Khoảng 20 phút để vào trung tâm thành phố.",
+          "About 20 minutes to the city center."
         ),
         tone: "gold"
       },
       {
-        value: "24/7",
+        value: text("24/7", "24/7"),
         label: text("Hỗ trợ", "Support"),
         detail: text(
-          "Chúng tôi có mặt mọi lúc khi bạn cần booking hay hỗ trợ sử dụng dịch vụ.",
-          "We're here whenever you need to book or get help with our services."
+          "Luôn có hỗ trợ khi khách cần.",
+          "Support is available whenever guests need it."
         ),
         tone: "ink"
       }
