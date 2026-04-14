@@ -671,10 +671,22 @@ textarea {
   height: auto;
   border-radius: inherit;
   background:
-    linear-gradient(160deg, rgba(236, 233, 226, 0.34), rgba(197, 160, 89, 0.16)),
-    linear-gradient(180deg, rgba(0, 12, 30, 0.06), rgba(0, 12, 30, 0.2));
-  mix-blend-mode: screen;
-  opacity: 0.82;
+    linear-gradient(180deg, rgba(248, 243, 234, 0.4) 0%, rgba(230, 217, 196, 0.16) 45%, rgba(0, 12, 30, 0.24) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 58%);
+  mix-blend-mode: normal;
+  opacity: 0.94;
+}
+
+.cms-feature__frame--back .visual-panel--image::before {
+  background:
+    linear-gradient(180deg, rgba(248, 243, 234, 0.48) 0%, rgba(211, 181, 132, 0.18) 46%, rgba(0, 12, 30, 0.18) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+}
+
+.cms-feature__frame--front .visual-panel--image::before {
+  background:
+    linear-gradient(180deg, rgba(248, 243, 234, 0.28) 0%, rgba(183, 206, 231, 0.12) 46%, rgba(0, 12, 30, 0.28) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 60%);
 }
 
 .cms-feature__frame .visual-panel--image::after {

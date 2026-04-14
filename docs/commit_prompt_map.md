@@ -218,8 +218,6 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `time`: 2026-04-12T01:12:00+07:00
 - `prompt_summary`: Sửa Supabase browser client để đọc env public bằng access trực tiếp, tránh Next.js bỏ qua biến khi bundle client.
 - `commit_message`: `fix(supabase): inline public envs for browser client`
-- `main_files`:
-  - `lib/supabase/browser.ts`
 
 ### Entry 015
 - `time`: 2026-04-12T01:30:00+07:00
@@ -416,6 +414,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/site-header.tsx`
   - `lib/site-content.ts`
+  - `app/globals.css`
+
+### Entry 034
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Áp overlay riêng cho 2 ảnh collage trong feature hero để chữ đọc rõ hơn và giữ cảm giác boutique ấm, mềm.
+- `commit_message`: `style(cms-feature): add warm overlays to collage frames`
+- `main_files`:
   - `app/globals.css`
 
 ### Entry 030
