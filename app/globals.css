@@ -297,6 +297,7 @@ textarea {
   inset: 0;
   z-index: 60;
   display: flex;
+  overflow: hidden;
 }
 
 .site-header__drawer-backdrop {
@@ -311,11 +312,14 @@ textarea {
   display: flex;
   flex-direction: column;
   width: min(100%, 26rem);
+  height: 100dvh;
+  max-height: 100dvh;
   padding: 1rem;
   background:
     radial-gradient(circle at top right, rgba(197, 160, 89, 0.12), transparent 28%),
-    linear-gradient(180deg, rgba(251, 249, 245, 0.99), rgba(245, 243, 239, 0.98));
+  linear-gradient(180deg, rgba(251, 249, 245, 0.99), rgba(245, 243, 239, 0.98));
   box-shadow: -24px 0 48px rgba(0, 12, 30, 0.16);
+  overscroll-behavior: contain;
 }
 
 .site-header__drawer-head {
@@ -363,7 +367,12 @@ textarea {
   flex-direction: column;
   gap: 0.6rem;
   padding-top: 0.25rem;
+  padding-bottom: 1rem;
+  min-height: 0;
+  flex: 1 1 auto;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .site-header__drawer-group {
@@ -1453,18 +1462,6 @@ textarea {
 
   .cms-feature__visual {
     min-height: 420px;
-  }
-
-  .cms-feature__visual--about {
-    min-height: 520px;
-  }
-
-  .cms-about-card--back {
-    width: min(100%, 46%);
-  }
-
-  .cms-about-card--front {
-    width: min(100%, 66%);
   }
 }
 
@@ -3743,6 +3740,50 @@ textarea {
   .cms-page--article .section-shell {
     width: min(100%, 100%);
   }
+
+  .cms-feature__grid--about {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .cms-feature__content--about {
+    gap: 1rem;
+  }
+
+  .cms-feature__copy--about {
+    max-width: 100%;
+  }
+
+  .cms-feature__visual--about {
+    min-height: auto;
+  }
+
+  .cms-about-visual__stack {
+    display: grid;
+    gap: 1rem;
+    min-height: auto;
+  }
+
+  .cms-about-card {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-height: 240px;
+    transform: none;
+  }
+
+  .cms-about-card--back,
+  .cms-about-card--front {
+    width: 100%;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
+
+  .cms-feature__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -3831,5 +3872,21 @@ textarea {
   .cms-about-card__description {
     max-width: 22ch;
     font-size: 0.88rem;
+  }
+
+  .cms-feature__grid--about {
+    gap: 1rem;
+  }
+
+  .cms-feature__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-about-card--back {
+    display: none;
+  }
+
+  .cms-about-card--front {
+    display: block;
   }
 }

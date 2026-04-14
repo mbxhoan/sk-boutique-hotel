@@ -82,11 +82,21 @@ export function SiteHeader() {
   const localeToggle = locale === "en" ? "vi" : "en";
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openDrawerGroup, setOpenDrawerGroup] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
     setDrawerOpen(false);
     setOpenDropdown(null);
+    setOpenDrawerGroup(undefined);
   }, [pathname, locale]);
+
+  useEffect(() => {
+    if (drawerOpen) {
+      return;
+    }
+
+    setOpenDrawerGroup(undefined);
+  }, [drawerOpen]);
 
   useEffect(() => {
     if (!drawerOpen) {
@@ -258,8 +268,18 @@ export function SiteHeader() {
                 const label = localize(locale, item.label);
 
                 if (item.children?.length) {
+                  const drawerGroupId = item.label.vi;
+                  const isDrawerGroupOpen = openDrawerGroup === undefined ? active : openDrawerGroup === drawerGroupId;
+
                   return (
-                    <details className="site-header__drawer-group" key={item.label.vi} open={active}>
+                    <details
+                      className="site-header__drawer-group"
+                      key={drawerGroupId}
+                      open={isDrawerGroupOpen}
+                      onToggle={(event) => {
+                        setOpenDrawerGroup(event.currentTarget.open ? drawerGroupId : null);
+                      }}
+                    >
                       <summary
                         className={`site-header__drawer-link site-header__drawer-link--summary${active ? " site-header__drawer-link--active" : ""}`}
                         aria-label={label}

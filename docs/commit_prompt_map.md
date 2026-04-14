@@ -488,6 +488,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/public-cms.tsx`
   - `app/globals.css`
 
+### Entry 043
+- `time`: 2026-04-14T11:52:00+07:00
+- `prompt_summary`: Sửa responsive mobile/iPad cho menu drawer và about us: submenu chỉ mở một mục, about section chuyển sang layout gọn hơn ở tablet/mobile, bỏ chồng overlay gây lỗi giao diện.
+- `commit_message`: `fix(responsive-header-about): stabilize mobile menu and about layout`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.
