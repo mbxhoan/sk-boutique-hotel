@@ -310,16 +310,31 @@ function CmsFeatureSectionRenderer({
           ) : null}
 
           <div className="cms-feature__grid cms-feature__grid--about">
-            <div className="cms-feature__copy cms-feature__copy--about">
-              <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
-              <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
-              <p className="cms-feature__description">{localize(locale, section.description)}</p>
+            <div className="cms-feature__content cms-feature__content--about">
+              <div className="cms-feature__copy cms-feature__copy--about">
+                <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
+                <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
+                <p className="cms-feature__description">{localize(locale, section.description)}</p>
 
-              <div className="cms-feature__body cms-feature__body--about">
-                {section.body.map((paragraph) => (
-                  <p className="cms-feature__paragraph" key={paragraph.vi}>
-                    {localize(locale, paragraph)}
-                  </p>
+                <div className="cms-feature__body cms-feature__body--about">
+                  {section.body.map((paragraph) => (
+                    <p className="cms-feature__paragraph" key={paragraph.vi}>
+                      {localize(locale, paragraph)}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="portal-stat-grid cms-feature__metrics">
+                {section.metrics.map((item, index) => (
+                  <PortalStatCard
+                    detail={item.detail}
+                    label={item.label}
+                    locale={locale}
+                    key={`${item.label.vi}-${index}`}
+                    tone={toneToCardTone(item.tone)}
+                    value={item.value}
+                  />
                 ))}
               </div>
             </div>
@@ -330,19 +345,6 @@ function CmsFeatureSectionRenderer({
                 <CmsAboutVisualCard frame={section.frames[1]} locale={locale} variant="front" />
               </div>
             </div>
-          </div>
-
-          <div className="portal-stat-grid cms-feature__metrics">
-            {section.metrics.map((item, index) => (
-              <PortalStatCard
-                detail={item.detail}
-                label={item.label}
-                locale={locale}
-                key={`${item.label.vi}-${index}`}
-                tone={toneToCardTone(item.tone)}
-                value={item.value}
-              />
-            ))}
           </div>
         </div>
       </section>

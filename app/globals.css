@@ -3328,24 +3328,17 @@ textarea {
   position: absolute;
   inset: 0 -10% -12% -10%;
   background:
-    linear-gradient(90deg, rgba(251, 249, 245, 0.98) 0%, rgba(251, 249, 245, 0.92) 26%, rgba(251, 249, 245, 0.4) 48%, rgba(251, 249, 245, 0) 66%),
-    linear-gradient(180deg, rgba(251, 249, 245, 0) 0%, rgba(251, 249, 245, 0.06) 52%, rgba(251, 249, 245, 0.72) 82%, rgba(251, 249, 245, 0.98) 100%);
-  backdrop-filter: blur(18px);
-  opacity: 1;
+    radial-gradient(circle at 14% 18%, rgba(251, 249, 245, 0.98) 0%, rgba(251, 249, 245, 0.84) 18%, rgba(251, 249, 245, 0.08) 62%, transparent 76%),
+    radial-gradient(circle at 86% 16%, rgba(251, 249, 245, 0.84) 0%, rgba(251, 249, 245, 0.22) 26%, transparent 58%),
+    radial-gradient(circle at 50% 96%, rgba(197, 160, 89, 0.18) 0%, rgba(197, 160, 89, 0.06) 14%, transparent 54%);
+  backdrop-filter: blur(14px);
+  opacity: 0.95;
   pointer-events: none;
   z-index: 0;
 }
 
 .cms-feature__shell--about::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 30%;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.14), transparent 54%),
-    linear-gradient(180deg, rgba(251, 249, 245, 0) 0%, rgba(251, 249, 245, 0.78) 68%, rgba(251, 249, 245, 0.98) 100%);
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
 .cms-feature__shell--about > * {
@@ -3380,6 +3373,13 @@ textarea {
   gap: clamp(1.8rem, 4.2vw, 3.5rem);
 }
 
+.cms-feature__content--about {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+}
+
 .cms-feature__copy {
   display: flex;
   flex-direction: column;
@@ -3389,7 +3389,7 @@ textarea {
 
 .cms-feature__copy--about {
   max-width: 40rem;
-  padding-block: clamp(0.75rem, 2vw, 1.5rem);
+  padding-block: clamp(0.75rem, 2vw, 1rem) 0;
 }
 
 .cms-feature__title {
@@ -3533,6 +3533,7 @@ textarea {
 }
 
 .cms-feature__metrics {
+  width: 100%;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 

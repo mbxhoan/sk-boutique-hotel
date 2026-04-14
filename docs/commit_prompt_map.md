@@ -466,6 +466,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 040
+- `time`: 2026-04-14T11:25:08+07:00
+- `prompt_summary`: Buộc dropdown menu header desktop chỉ cho phép mở một menu tại một thời điểm để mở menu mới thì menu cũ tự đóng.
+- `commit_message`: `fix(header-dropdown): keep only one desktop dropdown open`
+- `main_files`:
+  - `components/site-header.tsx`
+
+### Entry 041
+- `time`: 2026-04-14T11:25:08+07:00
+- `prompt_summary`: Bỏ vết cắt ngang còn lộ trong about us bằng cách làm mềm shell overlay và tắt lớp chân trời cứng phía sau section.
+- `commit_message`: `fix(home-about): soften shell overlay to remove horizontal seam`
+- `main_files`:
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

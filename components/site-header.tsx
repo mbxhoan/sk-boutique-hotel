@@ -81,9 +81,11 @@ export function SiteHeader() {
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     setDrawerOpen(false);
+    setOpenDropdown(null);
   }, [pathname, locale]);
 
   useEffect(() => {
@@ -119,8 +121,18 @@ export function SiteHeader() {
             const label = localize(locale, item.label);
 
             if (item.children?.length) {
+              const dropdownId = item.label.vi;
+              const isDropdownOpen = openDropdown === dropdownId;
+
               return (
-                <details className={`site-header__dropdown${active ? " site-header__dropdown--active" : ""}`} key={item.label.vi}>
+                <details
+                  className={`site-header__dropdown${active ? " site-header__dropdown--active" : ""}`}
+                  key={dropdownId}
+                  open={isDropdownOpen}
+                  onToggle={(event) => {
+                    setOpenDropdown(event.currentTarget.open ? dropdownId : null);
+                  }}
+                >
                   <summary
                     className={`site-header__nav-link site-header__nav-link--summary${active ? " site-header__nav-link--active" : ""}`}
                     aria-label={label}
