@@ -251,7 +251,7 @@ const roomItems: CmsCollectionItem[] = [
       "Không gian rộng rãi, lý tưởng cho gia đình, kết hợp sự tiện nghi và riêng tư với tầm nhìn sân vườn & hồ bơi.",
       "Spacious and refined, perfect for families seeking comfort, privacy, and serene garden & pool views."
     ),
-    [text("4 khách", "4 guests"), text("60 m²", "60 sqm"), text("From 2.400.000", "From 2,400,000")],
+    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 2.400.000", "From 2,400,000")],
     "paper",
     "/home/bed1.jpg",
     text("Family Room", "Family Room")
@@ -264,7 +264,7 @@ const roomItems: CmsCollectionItem[] = [
       "Thiết kế tinh gọn, ấm cúng, phù hợp cho cặp đôi hoặc khách công tác, mang lại trải nghiệm nghỉ dưỡng nhẹ nhàng.",
       "A cozy, well-designed retreat ideal for couples or solo travelers looking for a calm, elegant stay."
     ),
-    [text("2 khách", "2 guests"), text("25 m²", "25 sqm"), text("From 3.800.000", "From 3,800,000")],
+    [text("3 khách", "3 guests"), text("25 m²", "25 sqm"), text("From 3.800.000", "From 3,800,000")],
     "gold",
     "/home/bed1.jpg",
     text("Superior Room", "Superior Room")
@@ -277,7 +277,7 @@ const roomItems: CmsCollectionItem[] = [
       "Lựa chọn linh hoạt cho nhóm bạn hoặc gia đình nhỏ, cân bằng giữa không gian, tiện nghi và chi phí.",
       "Flexible and comfortable, designed for small groups with a balance of space, functionality, and value."
     ),
-    [text("4 khách", "4 guests"), text("35 m²", "35 sqm"), text("From 1.900.000", "From 1,900,000")],
+    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1.900.000", "From 1,900,000")],
     "ink",
     "/home/bed1.jpg",
     text("Quadruple Room", "Quadruple Room")
@@ -970,8 +970,8 @@ const roomDetails: CmsPageCopy[] = [
     seo: {
       title: text("Family Room", "Family Room"),
       description: text(
-        "Phòng Family Room với mô tả song ngữ, amenities và related rooms.",
-        "Family Room room with bilingual copy, amenities, and related rooms."
+        "Phòng Family Room với mô tả song ngữ, sức chứa 4 Người lớn & 2 Trẻ em, giường đôi và view sân vườn & hồ bơi.",
+        "Family Room with bilingual copy, capacity for 4 adults and 2 children, double bed, and garden & pool views."
       )
     },
     sections: [
@@ -981,8 +981,8 @@ const roomDetails: CmsPageCopy[] = [
         eyebrow: text("Room detail", "Room detail"),
         title: text("Family Room", "Family Room"),
         description: text(
-          "Room type này có vùng dành cho ảnh, mô tả ngắn, pricing note và flow giữ phòng.",
-          "This room type leaves space for imagery, a short description, pricing notes, and a hold flow."
+          "Room type này có vùng dành cho ảnh, mô tả ngắn, pricing note và view sân vườn & hồ bơi.",
+          "This room type leaves space for imagery, a short description, pricing notes, and garden & pool views."
         ),
         actions: {
           primary: {
@@ -997,9 +997,9 @@ const roomDetails: CmsPageCopy[] = [
           }
         },
         bullets: [
-          text("Show or hide public price.", "Show or hide public price."),
-          text("Map to one physical room in phase 1 UI.", "Map to one physical room in phase 1 UI."),
-          text("Keep a path ready for future OTA pricing.", "Keep a path ready for future OTA pricing.")
+          text("Sức chứa 4 Người lớn & 2 Trẻ em.", "Capacity for 4 adults and 2 children."),
+          text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
+          text("Giữ luồng đặt phòng manual-first.", "Keep the manual-first booking flow.")
         ],
         frame: premiumRoomFrame
       },
@@ -1014,9 +1014,9 @@ const roomDetails: CmsPageCopy[] = [
         ),
         items: [
           {
-            value: "2",
+            value: "6",
             label: text("Khách", "Guests"),
-            detail: text("Sức chứa cho lưu trú ngắn ngày.", "Capacity for short stays."),
+            detail: text("Sức chứa 4 Người lớn & 2 Trẻ em.", "Capacity for 4 adults and 2 children."),
             tone: "paper"
           },
           {
@@ -1026,7 +1026,7 @@ const roomDetails: CmsPageCopy[] = [
             tone: "gold"
           },
           {
-            value: "King",
+            value: text("Giường đôi", "Double bed"),
             label: text("Bed", "Bed"),
             detail: text("Bed type có thể chỉnh theo inventory.", "Bed type can vary by inventory."),
             tone: "ink"
@@ -1053,13 +1053,13 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("Nội dung VI", "VI content"),
             title: text("Mô tả tiếng Việt", "Vietnamese copy"),
             description: text(
-              "Phòng Family Room phù hợp cho khách muốn nhịp lưu trú nhẹ, yên tĩnh và rõ ràng về tiện ích.",
-              "Family Room suits guests who want a calm stay with clear amenities."
+              "Phòng Family Room phù hợp cho gia đình cần không gian rộng, riêng tư và tầm nhìn sân vườn & hồ bơi.",
+              "Family Room suits families who want spacious comfort, privacy, and garden & pool views."
             ),
             bullets: [
-              text("Không gian sáng và tối giản.", "A bright and minimal space."),
-              text("Giữ luồng đặt phòng manual-first.", "Keeps the manual-first booking flow."),
-              text("Có thể gắn CTA giữ phòng.", "Can include a room-hold CTA.")
+              text("4 Người lớn & 2 Trẻ em là sức chứa chính.", "Capacity for 4 adults and 2 children."),
+              text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
+              text("Giữ luồng đặt phòng manual-first.", "Keeps the manual-first booking flow.")
             ],
             note: text("Thiết kế nội dung sẵn cho CMS.", "Content design ready for CMS.")
           },
@@ -1067,12 +1067,12 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("EN content", "EN content"),
             title: text("English copy", "English copy"),
             description: text(
-              "This room is presented as a premium but restrained option for guests who want a clean stay story.",
-              "This room is presented as a premium but restrained option for guests who want a clean stay story."
+              "This room is presented as a spacious family option with clear capacity and garden & pool views.",
+              "This room is presented as a spacious family option with clear capacity and garden & pool views."
             ),
             bullets: [
-              text("A calm, premium room narrative.", "A calm, premium room narrative."),
-              text("Pricing can be shown or hidden.", "Pricing can be shown or hidden."),
+              text("Capacity for 4 adults and 2 children.", "Capacity for 4 adults and 2 children."),
+              text("Double bed and garden & pool views.", "Double bed and garden & pool views."),
               text("Structured for later CMS fetches.", "Structured for later CMS fetches.")
             ],
             note: text("Each block can later become a translation record.", "Each block can later become a translation record.")
@@ -1123,8 +1123,8 @@ const roomDetails: CmsPageCopy[] = [
     seo: {
       title: text("Superior Room", "Superior Room"),
       description: text(
-        "Superior Room dành cho khách cần một trải nghiệm rộng rãi hơn và sang hơn.",
-        "Superior Room is designed for guests who want a larger, more luxurious experience."
+        "Superior Room với mô tả song ngữ, sức chứa 2 Người lớn & 1 Trẻ em, giường đôi và view sân vườn & hồ bơi.",
+        "Superior Room with bilingual copy, capacity for 2 adults and 1 child, double bed, and garden & pool views."
       )
     },
     sections: [
@@ -1134,8 +1134,8 @@ const roomDetails: CmsPageCopy[] = [
         eyebrow: text("Room detail", "Room detail"),
         title: text("Superior Room", "Superior Room"),
         description: text(
-          "Suite này đủ rộng cho câu chuyện lưu trú dài hơn, riêng tư hơn và premium hơn.",
-          "This suite leaves room for a longer, more private, and more premium stay story."
+          "Phòng này đủ gọn cho cặp đôi hoặc khách công tác, nhưng vẫn giữ cảm giác riêng tư và premium.",
+          "This room stays compact for couples or business travelers while keeping a premium, private feel."
         ),
         actions: {
           primary: {
@@ -1150,28 +1150,28 @@ const roomDetails: CmsPageCopy[] = [
           }
         },
         bullets: [
-          text("Great for longer stays.", "Great for longer stays."),
-          text("Room content stays bilingual.", "Room content stays bilingual."),
-          text("Future CMS-ready relation fields.", "Future CMS-ready relation fields.")
+          text("Sức chứa 2 Người lớn & 1 Trẻ em.", "Capacity for 2 adults and 1 child."),
+          text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
+          text("Room content stays bilingual.", "Room content stays bilingual.")
         ],
         frame: {
           ...premiumRoomFrame,
-          chips: ["Suite", "Long stay", "Premium"]
+          chips: ["Room", "Compact", "Premium"]
         }
       },
       {
         id: "facts",
         kind: "stats",
         eyebrow: text("Room facts", "Room facts"),
-        title: text("Dữ liệu chính của suite", "Key suite data"),
+        title: text("Dữ liệu chính của phòng", "Key room data"),
         description: text(
           "Các trường này có thể map sang bảng room types hoặc pricing notes.",
           "These fields can map into room type tables or pricing notes."
         ),
         items: [
-          { value: "4", label: text("Khách", "Guests"), detail: text("Phù hợp nhóm nhỏ.", "Good for small groups."), tone: "paper" },
+          { value: "3", label: text("Khách", "Guests"), detail: text("Sức chứa 2 Người lớn & 1 Trẻ em.", "Capacity for 2 adults and 1 child."), tone: "paper" },
           { value: "25 m²", label: text("Diện tích", "Area"), detail: text("Không gian rộng hơn.", "A larger footprint."), tone: "gold" },
-          { value: "King", label: text("Bed", "Bed"), detail: text("Giường lớn và thoải mái.", "A large, comfortable bed."), tone: "ink" },
+          { value: text("Giường đôi", "Double bed"), label: text("Bed", "Bed"), detail: text("Giường lớn và thoải mái.", "A large, comfortable bed."), tone: "ink" },
           { value: "From", label: text("Public price", "Public price"), detail: text("Có thể ẩn khi cần.", "Can be hidden when needed."), tone: "paper" }
         ]
       },
@@ -1189,12 +1189,12 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("Nội dung VI", "VI content"),
             title: text("Bản tiếng Việt", "Vietnamese copy"),
             description: text(
-              "Suite này nhấn vào sự thoải mái, độ rộng và cảm giác riêng tư.",
-              "This suite emphasizes comfort, space, and privacy."
+              "Phòng Superior Room phù hợp cho cặp đôi hoặc khách công tác muốn sự gọn gàng, riêng tư và sáng sủa.",
+              "Superior Room suits couples or business travelers who want a compact, private, and bright stay."
             ),
             bullets: [
-              text("Rộng rãi hơn room tiêu chuẩn.", "Larger than the standard rooms."),
-              text("Hợp với customer journey dài hơn.", "Good for a longer customer journey."),
+              text("2 Người lớn & 1 Trẻ em là sức chứa chính.", "Capacity for 2 adults and 1 child."),
+              text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
               text("Giữ đúng manual-first phase.", "Keeps the manual-first phase.")
             ],
             note: text("Translation-friendly copy blocks.", "Translation-friendly copy blocks.")
@@ -1203,13 +1203,13 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("EN content", "EN content"),
             title: text("English copy", "English copy"),
             description: text(
-              "The suite story is kept restrained, premium, and easy to extend into CMS records.",
-              "The suite story is kept restrained, premium, and easy to extend into CMS records."
+              "The room story stays compact, premium, and easy to extend into CMS records.",
+              "The room story stays compact, premium, and easy to extend into CMS records."
             ),
             bullets: [
-              text("Premium without being flashy.", "Premium without being flashy."),
-              text("Structured for future CMS fields.", "Structured for future CMS fields."),
-              text("Supports future pricing overrides.", "Supports future pricing overrides.")
+              text("Capacity for 2 adults and 1 child.", "Capacity for 2 adults and 1 child."),
+              text("Double bed and garden & pool views.", "Double bed and garden & pool views."),
+              text("Structured for future CMS fields.", "Structured for future CMS fields.")
             ],
             note: text("Good fit for future translation entries.", "Good fit for future translation entries.")
           }
@@ -1217,7 +1217,7 @@ const roomDetails: CmsPageCopy[] = [
       },
       collectionSplitSection(
         "suite-notes",
-        text("Suite notes", "Suite notes"),
+        text("Room notes", "Room notes"),
         text("This page leaves room for related amenities and stay notes.", "This page leaves room for related amenities and stay notes."),
         text(
           "Booking notes, amenities and policy details can live in separate blocks later.",
@@ -1243,7 +1243,7 @@ const roomDetails: CmsPageCopy[] = [
       },
       collectionBand(
         "/lien-he",
-        text("Giữ suite", "Hold suite"),
+        text("Giữ phòng", "Hold room"),
         text("Muốn giữ Superior Room?", "Want to hold Superior Room?"),
         text(
           "Từ đây khách đi sang hold hoặc contact flow, không vào instant booking.",
@@ -1258,8 +1258,8 @@ const roomDetails: CmsPageCopy[] = [
     seo: {
       title: text("Quadruple Room", "Quadruple Room"),
       description: text(
-        "Quadruple Room là room type tinh gọn cho khách muốn giá trị dễ hiểu.",
-        "Quadruple Room is a concise room type for guests who want a clear value proposition."
+        "Quadruple Room với mô tả song ngữ, sức chứa 4 Người lớn & 1 Trẻ em, giường đôi và nhịp lưu trú linh hoạt.",
+        "Quadruple Room with bilingual copy, capacity for 4 adults and 1 child, double bed, and flexible stay options."
       )
     },
     sections: [
@@ -1269,8 +1269,8 @@ const roomDetails: CmsPageCopy[] = [
         eyebrow: text("Room detail", "Room detail"),
         title: text("Quadruple Room", "Quadruple Room"),
         description: text(
-          "Phòng này dành cho khách cần một trải nghiệm gọn, sáng và rõ ràng về giá trị.",
-          "This room is for guests who want a compact, bright, and value-led stay."
+          "Phòng này dành cho khách cần một trải nghiệm gọn, sáng, linh hoạt và rõ ràng về giá trị.",
+          "This room is for guests who want a compact, bright, flexible, and value-led stay."
         ),
         actions: {
           primary: {
@@ -1285,13 +1285,13 @@ const roomDetails: CmsPageCopy[] = [
           }
         },
         bullets: [
-          text("Compact and value-focused.", "Compact and value-focused."),
-          text("Bilingual room content.", "Bilingual room content."),
-          text("CMS-friendly pricing notes.", "CMS-friendly pricing notes.")
+          text("Sức chứa 4 Người lớn & 1 Trẻ em.", "Capacity for 4 adults and 1 child."),
+          text("Giường đôi và view linh hoạt.", "Double bed and flexible views."),
+          text("Bilingual room content.", "Bilingual room content.")
         ],
         frame: {
           ...premiumRoomFrame,
-          chips: ["Studio", "Value", "Bright"]
+          chips: ["Room", "Value", "Bright"]
         }
       },
       {
@@ -1304,9 +1304,9 @@ const roomDetails: CmsPageCopy[] = [
           "These fields are enough for the initial room type table."
         ),
         items: [
-          { value: "2", label: text("Khách", "Guests"), detail: text("Cho cặp đôi hoặc stay ngắn.", "For couples or short stays."), tone: "paper" },
+          { value: "5", label: text("Khách", "Guests"), detail: text("Sức chứa 4 Người lớn & 1 Trẻ em.", "Capacity for 4 adults and 1 child."), tone: "paper" },
           { value: "35 m²", label: text("Diện tích", "Area"), detail: text("Gọn nhưng đủ thoáng.", "Compact but still airy."), tone: "gold" },
-          { value: "Queen", label: text("Bed", "Bed"), detail: text("Bed type linh hoạt.", "Flexible bed type."), tone: "ink" },
+          { value: text("Giường đôi", "Double bed"), label: text("Bed", "Bed"), detail: text("Bed type linh hoạt.", "Flexible bed type."), tone: "ink" },
           { value: "From", label: text("Public price", "Public price"), detail: text("Có thể ẩn để chỉ hiện CTA.", "Can be hidden to show CTA only."), tone: "paper" }
         ]
       },
@@ -1324,12 +1324,12 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("Nội dung VI", "VI content"),
             title: text("Tiếng Việt", "Vietnamese copy"),
             description: text(
-              "Studio này là lựa chọn tinh gọn nhưng vẫn giữ cảm giác premium và sạch.",
-              "This studio is a concise option that still feels premium and clean."
+              "Phòng Quadruple Room phù hợp cho nhóm nhỏ hoặc gia đình cần không gian linh hoạt, sáng và sạch.",
+              "Quadruple Room suits small groups or families who need a flexible, bright, and clean stay."
             ),
             bullets: [
-              text("Tối ưu cho rate entry.", "Optimized for entry rate."),
-              text("Giữ room story đơn giản.", "Keeps the room story simple."),
+              text("4 Người lớn & 1 Trẻ em là sức chứa chính.", "Capacity for 4 adults and 1 child."),
+              text("Giường đôi và view linh hoạt.", "Double bed and flexible views."),
               text("Dễ map vào CMS later.", "Easy to map into CMS later.")
             ]
           },
@@ -1337,12 +1337,12 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("EN content", "EN content"),
             title: text("English copy", "English copy"),
             description: text(
-              "The room story stays minimal so it can be extended into future content blocks.",
-              "The room story stays minimal so it can be extended into future content blocks."
+              "The room story stays compact so it can be extended into future content blocks.",
+              "The room story stays compact so it can be extended into future content blocks."
             ),
             bullets: [
-              text("Entry-level but premium.", "Entry-level but premium."),
-              text("Clear UI and clear CTA.", "Clear UI and clear CTA."),
+              text("Capacity for 4 adults and 1 child.", "Capacity for 4 adults and 1 child."),
+              text("Double bed and flexible views.", "Double bed and flexible views."),
               text("Ready for future CMS content.", "Ready for future CMS content.")
             ]
           }

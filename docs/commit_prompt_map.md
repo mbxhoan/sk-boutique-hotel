@@ -516,6 +516,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 047
+- `time`: 2026-04-14T12:48:00+07:00
+- `prompt_summary`: Đồng bộ seed hạng phòng theo nội dung mới nhất: Family Room, Superior Room, Quadruple Room, cùng số khách, diện tích, giường và mô tả mới.
+- `commit_message`: `fix(room-types): sync latest room type seed data`
+- `main_files`:
+  - `supabase/seed.sql`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+
 ### Entry 046
 - `time`: 2026-04-14T12:31:00+07:00
 - `prompt_summary`: Căn lại carousel Selected rooms vào giữa khung section để không bị bám mép trái trên desktop, đồng thời giữ scroll-snap responsive cho tablet/mobile.
