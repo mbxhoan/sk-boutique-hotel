@@ -1,5 +1,3 @@
-import type { CSSProperties } from "react";
-
 import { AnalyticsLink } from "@/components/analytics-link";
 import { HeroCarousel } from "@/components/hero-carousel";
 import type { Locale } from "@/lib/locale";
@@ -293,22 +291,12 @@ function CmsFeatureSectionRenderer({
   const isAboutSection = section.id === "about";
 
   if (isAboutSection) {
-    const backgroundImage = section.frames[0]?.image ?? section.frames[1]?.image;
-
     return (
       <section
         className={`section cms-section cms-section--feature${isAboutSection ? " cms-section--feature-about" : ""}`}
         id={section.id}
       >
         <div className={`section-shell cms-feature__shell${isAboutSection ? " cms-feature__shell--about" : ""}`}>
-          {backgroundImage ? (
-            <div
-              className="cms-feature__ambient"
-              aria-hidden="true"
-              style={{ backgroundImage: `url(${backgroundImage})` } as CSSProperties}
-            />
-          ) : null}
-
           <div className="cms-feature__grid cms-feature__grid--about">
             <div className="cms-feature__content cms-feature__content--about">
               <div className="cms-feature__copy cms-feature__copy--about">

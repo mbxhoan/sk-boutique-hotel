@@ -480,6 +480,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/globals.css`
 
+### Entry 042
+- `time`: 2026-04-14T11:32:06+07:00
+- `prompt_summary`: Bỏ toàn bộ nền riêng của about us để section dùng nền page mặc định, tránh mọi vết cắt ngang còn lộ phía sau stats/collage.
+- `commit_message`: `fix(home-about): remove custom about background layers`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.
