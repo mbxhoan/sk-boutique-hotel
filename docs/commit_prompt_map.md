@@ -516,6 +516,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 046
+- `time`: 2026-04-14T12:31:00+07:00
+- `prompt_summary`: Căn lại carousel Selected rooms vào giữa khung section để không bị bám mép trái trên desktop, đồng thời giữ scroll-snap responsive cho tablet/mobile.
+- `commit_message`: `fix(home-selected-rooms): center carousel track`
+- `main_files`:
+  - `app/globals.css`
+
 ### Entry 030
 - `time`: 2026-04-13T13:21:00+07:00
 - `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.

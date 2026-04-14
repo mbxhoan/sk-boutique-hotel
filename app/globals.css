@@ -3512,6 +3512,9 @@ textarea {
   display: flex;
   gap: var(--cms-room-carousel-gap);
   align-items: stretch;
+  width: max-content;
+  min-width: 100%;
+  margin-inline: auto;
 }
 
 .cms-room-carousel__slide {

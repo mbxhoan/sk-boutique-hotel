@@ -244,49 +244,49 @@ const toCardItem = (
 
 const roomItems: CmsCollectionItem[] = [
   toCardItem(
-    "/phong/deluxe-bay-view",
+    "/phong/family-room",
     text("Phòng", "Room"),
-    text("Deluxe Bay View", "Deluxe Bay View"),
+    text("Family Room", "Family Room"),
     text(
-      "Phòng sáng, tối giản và hướng vịnh cho kỳ nghỉ ngắn ngày.",
-      "A bright, minimal bay-view room for shorter stays."
+      "Không gian rộng rãi, lý tưởng cho gia đình, kết hợp sự tiện nghi và riêng tư với tầm nhìn sân vườn & hồ bơi.",
+      "Spacious and refined, perfect for families seeking comfort, privacy, and serene garden & pool views."
     ),
-    [text("2 khách", "2 guests"), text("32 m²", "32 sqm"), text("From 2.400.000", "From 2,400,000")],
+    [text("4 khách", "4 guests"), text("60 m²", "60 sqm"), text("From 2.400.000", "From 2,400,000")],
     "paper",
     "/home/bed1.jpg",
-    text("Deluxe Bay View", "Deluxe Bay View")
+    text("Family Room", "Family Room")
   ),
   toCardItem(
-    "/phong/heritage-suite",
+    "/phong/superior-room",
     text("Phòng", "Room"),
-    text("Heritage Suite", "Heritage Suite"),
+    text("Superior Room", "Superior Room"),
     text(
-      "Suite rộng rãi cho khách cần riêng tư và cảm giác ở lâu hơn.",
-      "A spacious suite for guests who want privacy and a longer-stay feel."
+      "Thiết kế tinh gọn, ấm cúng, phù hợp cho cặp đôi hoặc khách công tác, mang lại trải nghiệm nghỉ dưỡng nhẹ nhàng.",
+      "A cozy, well-designed retreat ideal for couples or solo travelers looking for a calm, elegant stay."
     ),
-    [text("4 khách", "4 guests"), text("48 m²", "48 sqm"), text("From 3.800.000", "From 3,800,000")],
+    [text("2 khách", "2 guests"), text("25 m²", "25 sqm"), text("From 3.800.000", "From 3,800,000")],
     "gold",
     "/home/bed1.jpg",
-    text("Heritage Suite", "Heritage Suite")
+    text("Superior Room", "Superior Room")
   ),
   toCardItem(
-    "/phong/garden-studio",
+    "/phong/quadruple-room",
     text("Phòng", "Room"),
-    text("Garden Studio", "Garden Studio"),
+    text("Quadruple Room", "Quadruple Room"),
     text(
-      "Studio gọn nhẹ, đủ sáng và dễ chọn cho khách ưu tiên value.",
-      "A compact, bright studio for guests who want a clear value pick."
+      "Lựa chọn linh hoạt cho nhóm bạn hoặc gia đình nhỏ, cân bằng giữa không gian, tiện nghi và chi phí.",
+      "Flexible and comfortable, designed for small groups with a balance of space, functionality, and value."
     ),
-    [text("2 khách", "2 guests"), text("28 m²", "28 sqm"), text("From 1.900.000", "From 1,900,000")],
+    [text("4 khách", "4 guests"), text("35 m²", "35 sqm"), text("From 1.900.000", "From 1,900,000")],
     "ink",
     "/home/bed1.jpg",
-    text("Garden Studio", "Garden Studio")
+    text("Quadruple Room", "Quadruple Room")
   )
 ];
 
 const homeRoomItems: CmsCollectionItem[] = roomItems.map((item, index) => ({
   ...item,
-  image: ["/hero/hero-1.png", "/hero/hero-2.png", "/hero/hero-3.png"][index],
+  image: ["/home/bed1.jpg", "/home/bed1.jpg", "/home/bed1.jpg"][index],
   imageAlt: item.title,
 }));
 
@@ -597,11 +597,11 @@ const homePageSections: CmsSection[] = [
   {
     id: "destinations",
     kind: "cards",
-    eyebrow: text("Selected rooms", "Selected rooms"),
-    title: text("Ba hạng phòng được chọn.", "Three selected room types."),
+    eyebrow: text("Rooms", "Selected rooms"),
+    title: text("Nơi dấu ấn được đặt tên", "Where the signature is set"),
     description: text(
-      "Mỗi card có 1 ảnh, 1 tiêu đề và 1 mô tả ngắn để đọc như một curated room showcase.",
-      "Each card has one image, one title, and one short description so it reads like a curated room showcase."
+      "Đa dang hạng phòng với số lượng phòng phù hợp với mọi nhu cầu lưu trú.",
+      "A diverse range of room types with a boutique-appropriate number of rooms to fit every stay need."
     ),
     items: homeRoomItems
   },
@@ -966,12 +966,12 @@ const newsCollectionPage: CmsPageCopy = {
 const roomDetails: CmsPageCopy[] = [
   {
     kind: "detail",
-    slug: "/phong/deluxe-bay-view",
+    slug: "/phong/family-room",
     seo: {
-      title: text("Deluxe Bay View", "Deluxe Bay View"),
+      title: text("Family Room", "Family Room"),
       description: text(
-        "Phòng Deluxe Bay View với mô tả song ngữ, amenities và related rooms.",
-        "Deluxe Bay View room with bilingual copy, amenities, and related rooms."
+        "Phòng Family Room với mô tả song ngữ, amenities và related rooms.",
+        "Family Room room with bilingual copy, amenities, and related rooms."
       )
     },
     sections: [
@@ -979,7 +979,7 @@ const roomDetails: CmsPageCopy[] = [
         id: "hero",
         kind: "hero",
         eyebrow: text("Room detail", "Room detail"),
-        title: text("Deluxe Bay View", "Deluxe Bay View"),
+        title: text("Family Room", "Family Room"),
         description: text(
           "Room type này có vùng dành cho ảnh, mô tả ngắn, pricing note và flow giữ phòng.",
           "This room type leaves space for imagery, a short description, pricing notes, and a hold flow."
@@ -1020,7 +1020,7 @@ const roomDetails: CmsPageCopy[] = [
             tone: "paper"
           },
           {
-            value: "32 m²",
+            value: "60 m²",
             label: text("Diện tích", "Area"),
             detail: text("Một giá trị rõ để hiển thị trong CMS.", "A clear value for CMS display."),
             tone: "gold"
@@ -1053,8 +1053,8 @@ const roomDetails: CmsPageCopy[] = [
             eyebrow: text("Nội dung VI", "VI content"),
             title: text("Mô tả tiếng Việt", "Vietnamese copy"),
             description: text(
-              "Phòng Deluxe Bay View phù hợp cho khách muốn nhịp lưu trú nhẹ, yên tĩnh và rõ ràng về tiện ích.",
-              "Deluxe Bay View suits guests who want a calm stay with clear amenities."
+              "Phòng Family Room phù hợp cho khách muốn nhịp lưu trú nhẹ, yên tĩnh và rõ ràng về tiện ích.",
+              "Family Room suits guests who want a calm stay with clear amenities."
             ),
             bullets: [
               text("Không gian sáng và tối giản.", "A bright and minimal space."),
@@ -1104,12 +1104,12 @@ const roomDetails: CmsPageCopy[] = [
           "Cards này có thể dùng làm related content hoặc room suggestions.",
           "These cards can act as related content or room suggestions."
         ),
-        items: roomItems.filter((item) => item.href !== "/phong/deluxe-bay-view")
+        items: roomItems.filter((item) => item.href !== "/phong/family-room")
       },
       collectionBand(
         "/lien-he",
         text("Giữ phòng", "Hold room"),
-        text("Muốn giữ Deluxe Bay View cho một ngày cụ thể?", "Want to hold Deluxe Bay View for specific dates?"),
+        text("Muốn giữ Family Room cho một ngày cụ thể?", "Want to hold Family Room for specific dates?"),
         text(
           "Flow hiện tại dừng ở hold và xác minh thủ công, đúng phase 1.",
           "The current flow stops at hold and manual verification, exactly as phase 1 requires."
@@ -1119,12 +1119,12 @@ const roomDetails: CmsPageCopy[] = [
   },
   {
     kind: "detail",
-    slug: "/phong/heritage-suite",
+    slug: "/phong/superior-room",
     seo: {
-      title: text("Heritage Suite", "Heritage Suite"),
+      title: text("Superior Room", "Superior Room"),
       description: text(
-        "Heritage Suite dành cho khách cần một trải nghiệm rộng rãi hơn và sang hơn.",
-        "Heritage Suite is designed for guests who want a larger, more luxurious experience."
+        "Superior Room dành cho khách cần một trải nghiệm rộng rãi hơn và sang hơn.",
+        "Superior Room is designed for guests who want a larger, more luxurious experience."
       )
     },
     sections: [
@@ -1132,7 +1132,7 @@ const roomDetails: CmsPageCopy[] = [
         id: "hero",
         kind: "hero",
         eyebrow: text("Room detail", "Room detail"),
-        title: text("Heritage Suite", "Heritage Suite"),
+        title: text("Superior Room", "Superior Room"),
         description: text(
           "Suite này đủ rộng cho câu chuyện lưu trú dài hơn, riêng tư hơn và premium hơn.",
           "This suite leaves room for a longer, more private, and more premium stay story."
@@ -1170,7 +1170,7 @@ const roomDetails: CmsPageCopy[] = [
         ),
         items: [
           { value: "4", label: text("Khách", "Guests"), detail: text("Phù hợp nhóm nhỏ.", "Good for small groups."), tone: "paper" },
-          { value: "48 m²", label: text("Diện tích", "Area"), detail: text("Không gian rộng hơn.", "A larger footprint."), tone: "gold" },
+          { value: "25 m²", label: text("Diện tích", "Area"), detail: text("Không gian rộng hơn.", "A larger footprint."), tone: "gold" },
           { value: "King", label: text("Bed", "Bed"), detail: text("Giường lớn và thoải mái.", "A large, comfortable bed."), tone: "ink" },
           { value: "From", label: text("Public price", "Public price"), detail: text("Có thể ẩn khi cần.", "Can be hidden when needed."), tone: "paper" }
         ]
@@ -1179,7 +1179,7 @@ const roomDetails: CmsPageCopy[] = [
         id: "zones",
         kind: "locale-zones",
         eyebrow: text("VI / EN content", "VI / EN content"),
-        title: text("Vùng song ngữ cho Heritage Suite", "Bilingual zones for Heritage Suite"),
+        title: text("Vùng song ngữ cho Superior Room", "Bilingual zones for Superior Room"),
         description: text(
           "Mỗi ngôn ngữ giữ một block riêng và vẫn cùng layout.",
           "Each language keeps its own block while sharing the same layout."
@@ -1239,12 +1239,12 @@ const roomDetails: CmsPageCopy[] = [
           "Related cards giúp liên kết trong catalog mà không cần hard-code text.",
           "Related cards help the catalog connect without hard-coded copy."
         ),
-        items: roomItems.filter((item) => item.href !== "/phong/heritage-suite")
+        items: roomItems.filter((item) => item.href !== "/phong/superior-room")
       },
       collectionBand(
         "/lien-he",
         text("Giữ suite", "Hold suite"),
-        text("Muốn giữ Heritage Suite?", "Want to hold Heritage Suite?"),
+        text("Muốn giữ Superior Room?", "Want to hold Superior Room?"),
         text(
           "Từ đây khách đi sang hold hoặc contact flow, không vào instant booking.",
           "From here guests move into a hold or contact flow, not instant booking."
@@ -1254,12 +1254,12 @@ const roomDetails: CmsPageCopy[] = [
   },
   {
     kind: "detail",
-    slug: "/phong/garden-studio",
+    slug: "/phong/quadruple-room",
     seo: {
-      title: text("Garden Studio", "Garden Studio"),
+      title: text("Quadruple Room", "Quadruple Room"),
       description: text(
-        "Garden Studio là room type tinh gọn cho khách muốn giá trị dễ hiểu.",
-        "Garden Studio is a concise room type for guests who want a clear value proposition."
+        "Quadruple Room là room type tinh gọn cho khách muốn giá trị dễ hiểu.",
+        "Quadruple Room is a concise room type for guests who want a clear value proposition."
       )
     },
     sections: [
@@ -1267,7 +1267,7 @@ const roomDetails: CmsPageCopy[] = [
         id: "hero",
         kind: "hero",
         eyebrow: text("Room detail", "Room detail"),
-        title: text("Garden Studio", "Garden Studio"),
+        title: text("Quadruple Room", "Quadruple Room"),
         description: text(
           "Phòng này dành cho khách cần một trải nghiệm gọn, sáng và rõ ràng về giá trị.",
           "This room is for guests who want a compact, bright, and value-led stay."
@@ -1305,7 +1305,7 @@ const roomDetails: CmsPageCopy[] = [
         ),
         items: [
           { value: "2", label: text("Khách", "Guests"), detail: text("Cho cặp đôi hoặc stay ngắn.", "For couples or short stays."), tone: "paper" },
-          { value: "28 m²", label: text("Diện tích", "Area"), detail: text("Gọn nhưng đủ thoáng.", "Compact but still airy."), tone: "gold" },
+          { value: "35 m²", label: text("Diện tích", "Area"), detail: text("Gọn nhưng đủ thoáng.", "Compact but still airy."), tone: "gold" },
           { value: "Queen", label: text("Bed", "Bed"), detail: text("Bed type linh hoạt.", "Flexible bed type."), tone: "ink" },
           { value: "From", label: text("Public price", "Public price"), detail: text("Có thể ẩn để chỉ hiện CTA.", "Can be hidden to show CTA only."), tone: "paper" }
         ]
@@ -1372,12 +1372,12 @@ const roomDetails: CmsPageCopy[] = [
           "Cards related này phục vụ cross-sell hoặc room suggestions.",
           "These related cards support cross-sell or room suggestions."
         ),
-        items: roomItems.filter((item) => item.href !== "/phong/garden-studio")
+        items: roomItems.filter((item) => item.href !== "/phong/quadruple-room")
       },
       collectionBand(
         "/lien-he",
         text("Giữ phòng", "Hold room"),
-        text("Muốn giữ Garden Studio?", "Want to hold Garden Studio?"),
+        text("Muốn giữ Quadruple Room?", "Want to hold Quadruple Room?"),
         text(
           "Hold và verification vẫn là điểm kết của phase 1.",
           "Hold and verification remain the phase 1 finish line."
