@@ -608,11 +608,11 @@ const homePageSections: CmsSection[] = [
   {
     id: "next-step",
     kind: "band",
-    eyebrow: text("Phase 1 boundary", "Phase 1 boundary"),
-    title: text("Không bán booking tự động. Chỉ dẫn khách vào đúng flow manual-first.", "No automatic booking. Guide guests into the right manual-first flow."),
+    eyebrow: text("Booking", "Booking"),
+    title: text("Để lại nhu cầu của bạn tại đây.", "Leave your needs here."),
     description: text(
-      "CTA ở đây giữ đúng phase 1: kiểm tra phòng trống, giữ phòng, và liên hệ staff.",
-      "The CTA here stays phase 1 correct: check availability, hold a room, and contact staff."
+      "Nhân viên sẽ liên hệ cho bạn ngay khi nhận được yêu cầu, giúp bạn giữ phòng và giải đáp mọi thắc mắc về giá cả hoặc điều kiện lưu trú.",
+      "Our staff will get back to you as soon as your request comes in, helping you hold a room and answer any questions about pricing or stay details."
     ),
     actions: {
       primary: {

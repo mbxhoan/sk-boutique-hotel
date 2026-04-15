@@ -19,7 +19,7 @@ export function SiteFooter() {
           <p className="site-footer__copy">
             {translate(
               locale,
-              "Frontend foundation cho SK Boutique Hotel, manual-first, sẵn cho marketing, member và admin shells."
+              "Không gian lưu trú boutique mang phong cách tinh tế, riêng tư và ấm cúng. Chúng tôi mang đến trải nghiệm nghỉ dưỡng nhẹ nhàng, hiện đại, phù hợp cho cả du lịch và công tác."
             )}
           </p>
         </div>

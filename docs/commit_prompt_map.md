@@ -525,6 +525,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/mock/public-cms.ts`
   - `supabase/seed-content-pages.sql`
 
+### Entry 049
+- `time`: 2026-04-15T00:10:00+07:00
+- `prompt_summary`: Bổ sung images.qualities cho Next/Image để dập warning quality 85 và chuẩn bị tương thích Next.js 16.
+- `commit_message`: `fix(next-image): configure allowed image qualities`
+- `main_files`:
+  - `next.config.ts`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
