@@ -540,6 +540,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/site-footer.tsx`
   - `app/globals.css`
 
+### Entry 051
+- `time`: 2026-04-15T01:20:00+07:00
+- `prompt_summary`: Thêm section tiện nghi sau mục hạng phòng trên trang chủ với 2 panel boutique, nội dung song ngữ, và responsive mượt trên desktop/tablet/mobile.
+- `commit_message`: `feat(home-amenities): add responsive room amenities section`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `components/public-cms.tsx`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.

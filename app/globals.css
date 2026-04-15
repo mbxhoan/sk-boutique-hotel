@@ -3729,6 +3729,103 @@ textarea {
   transform: scale(1.08);
 }
 
+.cms-amenities__shell {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+
+.cms-amenities__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  align-items: start;
+}
+
+.cms-amenities__column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.cms-amenities__group-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.8vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+
+.cms-amenities__rule {
+  width: min(16rem, 100%);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(197, 160, 89, 0.95), rgba(197, 160, 89, 0.16));
+}
+
+.cms-amenities__card {
+  gap: 0;
+  padding: clamp(1rem, 2vw, 1.4rem);
+}
+
+.cms-amenities__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cms-amenities__item {
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1fr);
+  gap: 0.8rem;
+  padding-block: 0.95rem;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.08);
+}
+
+.cms-amenities__item:first-child {
+  padding-top: 0.2rem;
+}
+
+.cms-amenities__item:last-child {
+  padding-bottom: 0.2rem;
+  border-bottom: 0;
+}
+
+.cms-amenities__marker {
+  width: 0.54rem;
+  height: 0.54rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(197, 160, 89, 1), rgba(171, 132, 60, 0.72));
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.08);
+}
+
+.cms-amenities__text {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cms-amenities__label {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.cms-amenities__value {
+  color: var(--gold);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: right;
+}
+
 .cms-collection-card__link {
   display: block;
   height: 100%;
@@ -4133,6 +4230,25 @@ textarea {
   .cms-room-carousel__dots {
     gap: 0.5rem;
     margin-top: 1rem;
+  }
+
+  .cms-amenities__text {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cms-amenities__value {
+    text-align: left;
+  }
+}
+
+@media (max-width: 960px) {
+  .cms-amenities__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-amenities__group-title {
+    font-size: clamp(1.3rem, 4.8vw, 2rem);
   }
 }
 

@@ -1,5 +1,6 @@
 import { AnalyticsLink } from "@/components/analytics-link";
 import { HeroCarousel } from "@/components/hero-carousel";
+import { RoomAmenitiesSection } from "@/components/room-amenities-section";
 import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -603,6 +604,8 @@ export function CmsSectionRenderer({
       return <CmsFeatureSectionRenderer locale={locale} section={section} />;
     case "cards":
       return <CmsCardsSectionRenderer locale={locale} section={section} />;
+    case "amenities":
+      return <RoomAmenitiesSection locale={locale} section={section} />;
     case "band":
       return <CmsBandSectionRenderer locale={locale} section={section} />;
     case "locale-zones":
