@@ -187,9 +187,11 @@ export const socialLinks = [
 ];
 
 export const siteInfo = {
-  address: "Địa chỉ mẫu, Quận trung tâm, TP.HCM",
-  phone: "+84 28 0000 2020",
-  email: "hello@skboutiquehotel.example",
+  address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
+  phone: "+84 908 233 583",
+  zalo: "0908 233 583",
+  facebook: "https://www.facebook.com/p/SK-Boutique-Hotel-100088332707267/",
+  email: "skhotel.phuquoc@gmail.com",
   hours: "08:00 - 22:00",
   legal: "© 2026 SK Boutique Hotel. Front-end foundation manual-first, sẵn sàng cho Supabase sau này."
 } as const;
@@ -972,9 +974,11 @@ export const pages: PageContent[] = [
       title: "Một form mẫu ngắn gọn để khách đặt câu hỏi.",
       description: "Đây là nơi bạn nối form thật khi sẵn sàng.",
       details: [
-        { label: "Hotline", value: "+84 28 0000 2020", href: "tel:+842800002020" },
-        { label: "Email", value: "hello@skboutiquehotel.example", href: "mailto:hello@skboutiquehotel.example" },
-        { label: "Địa điểm", value: "Địa chỉ mẫu, Quận trung tâm, TP.HCM" },
+        { label: "Hotline", value: siteInfo.phone, href: "tel:+84908233583" },
+        { label: "Zalo", value: siteInfo.zalo, href: "https://zalo.me/0908233583" },
+        { label: "Facebook", value: "SK Boutique Hotel", href: siteInfo.facebook },
+        { label: "Email", value: siteInfo.email, href: `mailto:${siteInfo.email}` },
+        { label: "Địa điểm", value: siteInfo.address },
         { label: "Giờ làm việc", value: "08:00 - 22:00" }
       ],
       formTitle: "Gửi tin nhắn",
@@ -1215,13 +1219,13 @@ export const pages: PageContent[] = [
             kicker: "HOTLINE",
             title: "Gọi nhanh",
             description: "Phù hợp với khách cần phản hồi ngay hoặc thay đổi gấp.",
-            meta: "+84 28 0000 2020"
+            meta: siteInfo.phone
           },
           {
             kicker: "EMAIL",
             title: "Gửi yêu cầu",
             description: "Dùng cho các câu hỏi chi tiết, đặt phòng, hoặc hỗ trợ sau lưu trú.",
-            meta: "hello@skboutiquehotel.example"
+            meta: siteInfo.email
           },
           {
             kicker: "CHAT",

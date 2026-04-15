@@ -64,11 +64,18 @@ export function RoomAmenitiesSection({
                       <span className="cms-amenities__marker" aria-hidden="true" />
 
                       <div className="cms-amenities__text">
-                        <span className="cms-amenities__label">{localize(locale, item.label)}</span>
+                        <span className="cms-amenities__label">
+                          {localize(locale, item.label)}
+                          {item.icon === "water" ? (
+                            <span className="cms-amenities__label-icon" aria-hidden="true">
+                              <WaterIcon />
+                            </span>
+                          ) : null}
+                        </span>
 
                         {item.display === "check" ? (
-                          <span className={`cms-amenities__check${item.icon === "water" ? " cms-amenities__check--water" : ""}`} aria-label={localize(locale, item.label)}>
-                            {item.icon === "water" ? <WaterIcon /> : <CheckMark />}
+                          <span className="cms-amenities__check" aria-label={localize(locale, item.label)}>
+                            <CheckMark />
                           </span>
                         ) : (
                           <span className="cms-amenities__value">{item.value ? localize(locale, item.value) : null}</span>

@@ -574,6 +574,18 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 054
+- `time`: 2026-04-15T02:25:00+07:00
+- `prompt_summary`: Cập nhật thông tin liên hệ SK Boutique Hotel, đưa Facebook/Zalo vào footer, và chỉnh dòng hồ bơi ngoài trời để có icon nước bên trái nhưng vẫn giữ dấu check bên phải.
+- `commit_message`: `fix(contact-amenities): refresh contact details and pool icon`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `components/room-amenities-section.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.

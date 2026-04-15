@@ -1476,6 +1476,15 @@ textarea {
   line-height: 1.65;
 }
 
+.site-footer__detail-link {
+  color: rgba(247, 242, 234, 0.84);
+  transition: color 0.18s ease;
+}
+
+.site-footer__detail-link:hover {
+  color: #e8c87e;
+}
+
 .site-footer__bar {
   display: flex;
   justify-content: space-between;
@@ -3814,10 +3823,20 @@ textarea {
 }
 
 .cms-amenities__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   min-width: 0;
   color: var(--ink);
   font-size: 0.93rem;
   line-height: 1.5;
+}
+
+.cms-amenities__label-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5e9fd6;
 }
 
 .cms-amenities__value {

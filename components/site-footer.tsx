@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import { siteInfo } from "@/lib/site-content";
 import type { LocalizedText } from "@/lib/mock/i18n";
 
 type FooterLink = {
@@ -51,9 +52,6 @@ const footerNavGroups: FooterGroup[] = [
 const footerContact = {
   title: t("Liên hệ", "Contact"),
   badge: t("Hỗ trợ 24/7", "24/7 support"),
-  address: t("Địa chỉ mẫu, Quận trung tâm, TP.HCM", "Sample address, central district, Ho Chi Minh City"),
-  phone: "+84 28 0000 2020",
-  email: "hello@skboutiquehotel.example",
   support: t("Luôn sẵn sàng hỗ trợ khách lưu trú.", "Always ready to assist staying guests.")
 };
 
@@ -97,15 +95,39 @@ export function SiteFooter() {
             <dl className="site-footer__details">
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Address" : "Địa chỉ"}</dt>
-                <dd>{localize(locale, footerContact.address)}</dd>
+                <dd>{siteInfo.address}</dd>
               </div>
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Phone" : "Điện thoại"}</dt>
-                <dd>{footerContact.phone}</dd>
+                <dd>
+                  <a className="site-footer__detail-link" href={`tel:${siteInfo.phone.replace(/\s+/g, "")}`}>
+                    {siteInfo.phone}
+                  </a>
+                </dd>
               </div>
               <div className="site-footer__detail">
                 <dt>Email</dt>
-                <dd>{footerContact.email}</dd>
+                <dd>
+                  <a className="site-footer__detail-link" href={`mailto:${siteInfo.email}`}>
+                    {siteInfo.email}
+                  </a>
+                </dd>
+              </div>
+              <div className="site-footer__detail">
+                <dt>Facebook</dt>
+                <dd>
+                  <a className="site-footer__detail-link" href={siteInfo.facebook} rel="noreferrer" target="_blank">
+                    SK Boutique Hotel
+                  </a>
+                </dd>
+              </div>
+              <div className="site-footer__detail">
+                <dt>Zalo</dt>
+                <dd>
+                  <a className="site-footer__detail-link" href={`https://zalo.me/${siteInfo.zalo.replace(/\s+/g, "")}`} rel="noreferrer" target="_blank">
+                    {siteInfo.zalo}
+                  </a>
+                </dd>
               </div>
               <div className="site-footer__detail">
                 <dt>{footerContact.badge.vi}</dt>
