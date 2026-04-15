@@ -109,7 +109,8 @@ export type CmsCardsSection = CmsSectionBase & {
 
 export type CmsAmenityItem = {
   label: LocalizedText;
-  value: LocalizedText;
+  value?: LocalizedText;
+  display?: "check" | "text";
 };
 
 export type CmsAmenityGroup = {
@@ -258,9 +259,15 @@ const toCardItem = (
   imageAlt
 });
 
-const amenityItem = (labelVi: string, labelEn: string, valueVi: string, valueEn: string): CmsAmenityItem => ({
+const amenityTextItem = (labelVi: string, labelEn: string, valueVi: string, valueEn: string): CmsAmenityItem => ({
+  display: "text",
   label: text(labelVi, labelEn),
   value: text(valueVi, valueEn)
+});
+
+const amenityCheckItem = (labelVi: string, labelEn: string): CmsAmenityItem => ({
+  display: "check",
+  label: text(labelVi, labelEn)
 });
 
 const roomItems: CmsCollectionItem[] = [
@@ -639,30 +646,30 @@ const homePageSections: CmsSection[] = [
       {
         title: text("Tiện nghi khách sạn", "Hotel amenities"),
         items: [
-          amenityItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
-          amenityItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
-          amenityItem("Cửa sổ", "Windows", "Có", "Yes"),
-          amenityItem("Ban công", "Balcony", "Có", "Yes"),
-          amenityItem("Kê nệm phụ", "Extra mattress", "Có", "Yes"),
-          amenityItem("Bồn tắm", "Bathtub", "Có", "Yes"),
-          amenityItem("Bàn làm việc", "Desk", "Có", "Yes"),
-          amenityItem("Tủ lạnh", "Fridge", "Có", "Yes"),
-          amenityItem("Smart TV / Netflix", "Smart TV / Netflix", "Có smart TV", "Smart TV included"),
-          amenityItem("Máy sấy tóc", "Hair dryer", "Có", "Yes"),
-          amenityItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee", "Có", "Yes")
+          amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
+          amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
+          amenityCheckItem("Cửa sổ", "Windows"),
+          amenityCheckItem("Ban công", "Balcony"),
+          amenityCheckItem("Kê nệm phụ", "Extra mattress"),
+          amenityCheckItem("Bồn tắm", "Bathtub"),
+          amenityCheckItem("Bàn làm việc", "Desk"),
+          amenityCheckItem("Tủ lạnh", "Fridge"),
+          amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
+          amenityCheckItem("Máy sấy tóc", "Hair dryer"),
+          amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
         ]
       },
       {
         title: text("Thông tin khác", "Other information"),
         items: [
-          amenityItem("Hút thuốc", "Smoking", "Không", "No"),
-          amenityItem("Thú cưng", "Pets", "Không", "No"),
-          amenityItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
-          amenityItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
-          amenityItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
-          amenityItem("Phụ thu cuối tuần", "Weekend surcharge", "Không", "No"),
-          amenityItem("Check-in sớm", "Early check-in", "Có", "Yes"),
-          amenityItem("Phí check-in sớm", "Early check-in fee", "Không", "No")
+          // amenityCheckItem("Không hút thuốc", "No smoking"),
+          // amenityCheckItem("Không cho thú cưng", "No pets"),
+          amenityTextItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
+          amenityTextItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
+          amenityTextItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
+          amenityCheckItem("Không phụ thu cuối tuần", "No weekend surcharge"),
+          amenityCheckItem("Cho check-in sớm", "Early check-in available"),
+          amenityCheckItem("Không thu phí check-in sớm", "No early check-in fee")
         ]
       }
     ]

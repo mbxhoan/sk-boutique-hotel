@@ -551,6 +551,16 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/globals.css`
   - `supabase/seed-content-pages.sql`
 
+### Entry 052
+- `time`: 2026-04-15T01:45:00+07:00
+- `prompt_summary`: Thu gọn typography và width của section tiện nghi, đồng thời đổi các trạng thái yes/no sang dấu check và câu chữ tích cực hơn cho các chính sách không phụ thu.
+- `commit_message`: `fix(home-amenities): tighten copy and checkmark states`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
