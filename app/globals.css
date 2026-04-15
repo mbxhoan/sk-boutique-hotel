@@ -3142,10 +3142,10 @@ textarea {
   width: 3rem;
   height: 3rem;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
-  background: rgba(0, 12, 30, 0.35);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
   color: #fff;
   cursor: pointer;
   transition:
@@ -3155,17 +3155,26 @@ textarea {
 }
 
 .hero-carousel__nav:hover {
-  background: rgba(0, 12, 30, 0.6);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-50%) scale(1.06);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.32);
 }
 
 .hero-carousel__nav--prev {
-  left: clamp(0.75rem, 2vw, 1.5rem);
+  left: clamp(0.35rem, 1vw, 0.85rem);
+  transform: translate(-35%, -50%);
 }
 
 .hero-carousel__nav--next {
-  right: clamp(0.75rem, 2vw, 1.5rem);
+  right: clamp(0.35rem, 1vw, 0.85rem);
+  transform: translate(35%, -50%);
+}
+
+.hero-carousel__nav--prev:hover {
+  transform: translate(-35%, -50%) scale(1.06);
+}
+
+.hero-carousel__nav--next:hover {
+  transform: translate(35%, -50%) scale(1.06);
 }
 
 /* Dot indicators */
@@ -3264,6 +3273,24 @@ textarea {
   .hero-carousel__nav {
     width: 2.4rem;
     height: 2.4rem;
+  }
+
+  .hero-carousel__nav--prev {
+    left: -0.1rem;
+    transform: translate(-50%, -50%);
+  }
+
+  .hero-carousel__nav--next {
+    right: -0.1rem;
+    transform: translate(50%, -50%);
+  }
+
+  .hero-carousel__nav--prev:hover {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+
+  .hero-carousel__nav--next:hover {
+    transform: translate(50%, -50%) scale(1.04);
   }
 
   .hero-carousel__nav svg {
@@ -3698,18 +3725,28 @@ textarea {
 
 .cms-room-card__title {
   margin: 0;
-  max-width: 12ch;
+  max-width: 10.5ch;
+  min-height: calc(2 * 0.98em);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 3vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 0.95;
+  line-height: 0.98;
   text-align: center;
   text-wrap: balance;
 }
 
 .cms-room-card__description {
   margin: 0;
+  min-height: calc(3 * 1.55em);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   font-size: 0.95rem;
   line-height: 1.55;
   color: rgba(251, 249, 245, 0.9);
@@ -4286,7 +4323,7 @@ textarea {
   }
 
   .cms-room-card__title {
-    max-width: 11ch;
+    max-width: 10.5ch;
     font-size: clamp(1.8rem, 8vw, 2.4rem);
   }
 

@@ -594,6 +594,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/site-footer.tsx`
   - `app/globals.css`
 
+### Entry 056
+- `time`: 2026-04-15T14:42:07+07:00
+- `prompt_summary`: Đồng bộ thẻ room carousel theo số dòng cố định, và đẩy nút hero carousel ra mép để không che chữ tiêu đề trên desktop/mobile.
+- `commit_message`: `fix(home-carousels): align room cards and move hero arrows out`
+- `main_files`:
+  - `app/globals.css`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
