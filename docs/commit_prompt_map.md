@@ -586,6 +586,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
 
+### Entry 055
+- `time`: 2026-04-15T14:42:07+07:00
+- `prompt_summary`: Chuyển mục mạng xã hội ở footer sang icon button clickable theo mẫu, gọn hơn và có hover/focus rõ ràng.
+- `commit_message`: `feat(footer): add clickable social icon links`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
