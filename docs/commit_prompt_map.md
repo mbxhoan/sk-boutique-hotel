@@ -532,6 +532,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `next.config.ts`
 
+### Entry 050
+- `time`: 2026-04-15T00:35:00+07:00
+- `prompt_summary`: Redesign footer content theo boutique luxury style với brand intro, navigation nhóm, và contact info trên nền tối sang, responsive 3 cột sang 1 cột mobile.
+- `commit_message`: `feat(footer): redesign boutique luxury footer`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
