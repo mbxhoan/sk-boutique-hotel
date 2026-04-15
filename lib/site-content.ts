@@ -138,8 +138,6 @@ export const navItems: LinkItem[] = [
   { label: "Tin tức", href: "/tin-tuc" },
   { label: "Chi nhánh", href: "/chi-nhanh" },
   { label: "Thương hiệu", href: "/thuong-hieu" },
-  { label: "Ưu đãi", href: "/uu-dai" },
-  { label: "Dịch vụ", href: "/dich-vu" },
   { label: "Về chúng tôi", href: "/ve-chung-toi" },
   { label: "Liên hệ", href: "/lien-he" },
   { label: "Tuyển dụng", href: "/tuyen-dung" },
@@ -155,22 +153,6 @@ export const headerMenu: HeaderMenuConfig = {
     {
       href: "/chi-nhanh",
       label: { vi: "Chi nhánh", en: "Branches" }
-    },
-    {
-      href: "/uu-dai",
-      label: { vi: "Ưu đãi", en: "Offers" }
-    },
-    {
-      href: "/dich-vu",
-      label: { vi: "Dịch vụ", en: "Services" }
-    },
-    {
-      href: "#discover",
-      label: { vi: "Khám phá", en: "Discover" },
-      children: [
-        { href: "/tin-tuc", label: { vi: "Tin tức", en: "News" } },
-        { href: "/thuong-hieu", label: { vi: "Thương hiệu", en: "Brand" } }
-      ]
     },
     {
       href: "#about-sk",

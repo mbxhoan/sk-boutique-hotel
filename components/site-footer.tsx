@@ -30,12 +30,9 @@ const footerBrand = {
 
 const footerNavGroups: FooterGroup[] = [
   {
-    title: t("Khám phá", "Explore"),
+    title: t("Nội dung", "Content"),
     links: [
       { href: "/phong", label: t("Phòng", "Rooms") },
-      { href: "/chi-nhanh", label: t("Chi nhánh", "Branches") },
-      { href: "/uu-dai", label: t("Ưu đãi", "Offers") },
-      { href: "/dich-vu", label: t("Dịch vụ", "Services") },
       { href: "/tin-tuc", label: t("Tin tức", "News") },
       { href: "/thuong-hieu", label: t("Thương hiệu", "Brand") }
     ]

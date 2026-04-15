@@ -108,6 +108,7 @@ export type CmsCardsSection = CmsSectionBase & {
 };
 
 export type CmsAmenityItem = {
+  icon?: "water";
   label: LocalizedText;
   value?: LocalizedText;
   display?: "check" | "text";
@@ -267,6 +268,12 @@ const amenityTextItem = (labelVi: string, labelEn: string, valueVi: string, valu
 
 const amenityCheckItem = (labelVi: string, labelEn: string): CmsAmenityItem => ({
   display: "check",
+  label: text(labelVi, labelEn)
+});
+
+const amenityWaterItem = (labelVi: string, labelEn: string): CmsAmenityItem => ({
+  display: "check",
+  icon: "water",
   label: text(labelVi, labelEn)
 });
 
@@ -648,6 +655,7 @@ const homePageSections: CmsSection[] = [
         items: [
           amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
           amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
+          amenityWaterItem("Hồ bơi ngoài trời", "Outdoor pool"),
           amenityCheckItem("Cửa sổ", "Windows"),
           amenityCheckItem("Ban công", "Balcony"),
           amenityCheckItem("Kê nệm phụ", "Extra mattress"),

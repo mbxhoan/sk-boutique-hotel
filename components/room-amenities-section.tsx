@@ -17,6 +17,26 @@ function CheckMark() {
   );
 }
 
+function WaterIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 16 16" width="16">
+      <path
+        d="M8 2.5C8.78 3.56 10.75 6.03 11.6 7.46C12.22 8.51 12.5 9.24 12.5 10.1C12.5 12.56 10.56 14 8 14C5.44 14 3.5 12.56 3.5 10.1C3.5 9.24 3.78 8.51 4.4 7.46C5.25 6.03 7.22 3.56 8 2.5Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M5.8 10.3C5.94 11.46 6.88 12.1 8 12.1"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.2"
+      />
+    </svg>
+  );
+}
+
 export function RoomAmenitiesSection({
   locale,
   section
@@ -47,8 +67,8 @@ export function RoomAmenitiesSection({
                         <span className="cms-amenities__label">{localize(locale, item.label)}</span>
 
                         {item.display === "check" ? (
-                          <span className="cms-amenities__check" aria-label={localize(locale, item.label)}>
-                            <CheckMark />
+                          <span className={`cms-amenities__check${item.icon === "water" ? " cms-amenities__check--water" : ""}`} aria-label={localize(locale, item.label)}>
+                            {item.icon === "water" ? <WaterIcon /> : <CheckMark />}
                           </span>
                         ) : (
                           <span className="cms-amenities__value">{item.value ? localize(locale, item.value) : null}</span>

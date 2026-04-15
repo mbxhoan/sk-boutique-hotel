@@ -561,6 +561,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/globals.css`
   - `supabase/seed-content-pages.sql`
 
+### Entry 053
+- `time`: 2026-04-15T02:05:00+07:00
+- `prompt_summary`: Thêm hồ bơi ngoài trời vào amenities với icon nước, tạm ẩn các mục Ưu đãi/Dịch vụ/Khám phá khỏi menu, và đồng bộ seed/config lẫn ghi chú nơi thay ảnh.
+- `commit_message`: `fix(home-nav-amenities): hide menu items and add pool amenity`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `components/site-footer.tsx`
+  - `lib/site-content.ts`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.

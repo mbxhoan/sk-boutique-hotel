@@ -3836,6 +3836,10 @@ textarea {
   color: var(--gold-strong);
 }
 
+.cms-amenities__check--water {
+  color: #5e9fd6;
+}
+
 .cms-collection-card__link {
   display: block;
   height: 100%;
