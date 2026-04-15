@@ -1514,25 +1514,23 @@ textarea {
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
-  border: 1px solid rgba(197, 160, 89, 0.28);
+  padding: 0;
+  border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  background: transparent;
   color: #f7f2ea;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transition:
     transform 0.18s ease,
-    border-color 0.18s ease,
     background 0.18s ease,
-    color 0.18s ease,
-    box-shadow 0.18s ease;
+    opacity 0.18s ease,
+    filter 0.18s ease;
+  overflow: hidden;
 }
 
 .site-footer__social-link:hover {
   transform: translateY(-1px);
-  border-color: rgba(232, 200, 126, 0.82);
-  background: rgba(232, 200, 126, 0.12);
-  color: #f7f2ea;
-  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  filter: saturate(1.05);
 }
 
 .site-footer__social-link:focus-visible {
@@ -1540,9 +1538,11 @@ textarea {
   outline-offset: 3px;
 }
 
-.site-footer__social-link svg {
-  width: 1rem;
-  height: 1rem;
+.site-footer__social-image {
+  width: 1.45rem;
+  height: 1.45rem;
+  object-fit: contain;
+  display: block;
 }
 
 .not-found {
@@ -3144,7 +3144,7 @@ textarea {
   padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
   color: #fff;
   cursor: pointer;
@@ -3155,26 +3155,17 @@ textarea {
 }
 
 .hero-carousel__nav:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-50%) scale(1.06);
 }
 
 .hero-carousel__nav--prev {
-  left: clamp(0.35rem, 1vw, 0.85rem);
-  transform: translate(-35%, -50%);
+  left: clamp(0.75rem, 2vw, 1.5rem);
 }
 
 .hero-carousel__nav--next {
-  right: clamp(0.35rem, 1vw, 0.85rem);
-  transform: translate(35%, -50%);
-}
-
-.hero-carousel__nav--prev:hover {
-  transform: translate(-35%, -50%) scale(1.06);
-}
-
-.hero-carousel__nav--next:hover {
-  transform: translate(35%, -50%) scale(1.06);
+  right: clamp(0.75rem, 2vw, 1.5rem);
 }
 
 /* Dot indicators */
@@ -3276,21 +3267,11 @@ textarea {
   }
 
   .hero-carousel__nav--prev {
-    left: -0.1rem;
-    transform: translate(-50%, -50%);
+    left: 0.55rem;
   }
 
   .hero-carousel__nav--next {
-    right: -0.1rem;
-    transform: translate(50%, -50%);
-  }
-
-  .hero-carousel__nav--prev:hover {
-    transform: translate(-50%, -50%) scale(1.04);
-  }
-
-  .hero-carousel__nav--next:hover {
-    transform: translate(50%, -50%) scale(1.04);
+    right: 0.55rem;
   }
 
   .hero-carousel__nav svg {
@@ -3725,12 +3706,13 @@ textarea {
 
 .cms-room-card__title {
   margin: 0;
-  max-width: 10.5ch;
+  max-width: 9ch;
   min-height: calc(2 * 0.98em);
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  align-self: center;
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 3vw, 3rem);
   font-weight: 700;
@@ -4323,7 +4305,8 @@ textarea {
   }
 
   .cms-room-card__title {
-    max-width: 10.5ch;
+    max-width: 9ch;
+    align-self: center;
     font-size: clamp(1.8rem, 8vw, 2.4rem);
   }
 

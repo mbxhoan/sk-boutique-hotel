@@ -601,6 +601,21 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/globals.css`
 
+### Entry 057
+- `time`: 2026-04-15T15:24:20+07:00
+- `prompt_summary`: Giữ hero carousel arrows ở vị trí tự nhiên hơn với nền trong suốt, đồng thời thu hẹp title room card để Family Room cũng có thể wrap thành 2 dòng như các card còn lại.
+- `commit_message`: `fix(home-carousels): soften hero arrows and tighten room titles`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 058
+- `time`: 2026-04-15T16:27:04+07:00
+- `prompt_summary`: Thay icon social footer bằng file SVG brand thật từ public/logos cho Facebook và Zalo, giữ click behavior nhưng làm icon nhìn đẹp hơn.
+- `commit_message`: `feat(footer): use branded svg social icons`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
 ### Entry 048
 - `time`: 2026-04-14T13:05:00+07:00
 - `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
