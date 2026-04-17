@@ -6098,8 +6098,8 @@ textarea {
 }
 
 .payment-band__brands {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.45rem;
 }
 
@@ -6107,13 +6107,15 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  min-height: 2.35rem;
-  padding: 0.35rem 0.8rem;
-  border: 1px solid transparent;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.55rem;
+  border: 1px solid rgba(0, 12, 30, 0.08);
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 24px rgba(0, 12, 30, 0.06);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
@@ -6123,53 +6125,21 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.95rem;
-  height: 1.95rem;
-  padding: 0 0.34rem;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  padding: 0.1rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
-  font-size: 0.6rem;
+  background: rgba(0, 12, 30, 0.04);
 }
 
 .payment-band__brand-label {
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
-.payment-band__brand--diners {
-  background: #0f6eb5;
-  color: #fff;
-}
-
-.payment-band__brand--mastercard {
-  background: linear-gradient(135deg, #ea4d3d 0%, #f6a21d 100%);
-  color: #fff;
-}
-
-.payment-band__brand--amex {
-  background: #1f72cd;
-  color: #fff;
-}
-
-.payment-band__brand--jcb {
-  background: #ffffff;
-  border-color: rgba(0, 12, 30, 0.1);
-  color: var(--ink);
-}
-
-.payment-band__brand--visa {
-  background: #1b4ea8;
-  color: #fff;
-}
-
-.payment-band__brand--maestro {
-  background: linear-gradient(135deg, #243b92 0%, #e54844 100%);
-  color: #fff;
-}
-
-.payment-band__brand--cash {
-  background: rgba(30, 146, 68, 0.08);
-  border-color: rgba(30, 146, 68, 0.3);
-  color: #1e9244;
+.payment-band__brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .payment-band__note {
@@ -6336,6 +6306,10 @@ textarea {
 
   .payment-band__card {
     padding: 0.9rem 0.95rem;
+  }
+
+  .payment-band__brands {
+    /* grid-template-columns: repeat(2, minmax(0, 1fr)); */
   }
 
   .rooms-panel__summary {
@@ -6510,14 +6484,13 @@ textarea {
 
   .payment-band__brand {
     min-height: 2.15rem;
-    padding-inline: 0.7rem;
+    padding-inline: 0.65rem;
     font-size: 0.65rem;
   }
 
   .payment-band__brand-mark {
-    min-width: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.56rem;
+    min-width: 1.95rem;
+    height: 1.95rem;
   }
 
   .rooms-image-carousel__frame {

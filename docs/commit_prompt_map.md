@@ -720,3 +720,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/rooms-image-carousel.tsx`
   - `app/globals.css`
+
+### Entry 065
+- `time`: 2026-04-17T14:57:50+07:00
+- `prompt_summary`: Rút payment band còn 3 phương thức chính Mastercard, Visa, và tiền mặt, dùng đúng các logo SVG trong public/logos cho section thanh toán dùng chung.
+- `commit_message`: `fix(payment-band): simplify payment methods to three logos`
+- `main_files`:
+  - `components/payment-section.tsx`
+  - `app/globals.css`

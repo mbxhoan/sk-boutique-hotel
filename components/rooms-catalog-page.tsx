@@ -171,7 +171,7 @@ export function RoomsCatalogPage({
         </div>
       </section>
 
-      <RoomsImageCarousel locale={locale} />
+      {/* <RoomsImageCarousel locale={locale} /> */}
 
       <RoomCanvasModal
         locale={locale}
