@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { BookingSearchModal } from "@/components/booking-search-modal";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -59,6 +59,29 @@ function CloseIcon() {
   );
 }
 
+function LocaleToggleLink({
+  ariaLabel,
+  className,
+  href,
+  locale,
+  onClick
+}: {
+  ariaLabel: string;
+  className: string;
+  href: string;
+  locale: "en" | "vi";
+  onClick?: () => void;
+}) {
+  const flagSrc = locale === "en" ? "/flags/en.svg" : "/flags/vi.svg";
+
+  return (
+    <Link aria-label={ariaLabel} className={className} href={href} onClick={onClick}>
+      <Image alt="" aria-hidden="true" className="site-header__locale-flag" height={16} src={flagSrc} width={16} />
+      <span>{localeLabel(locale)}</span>
+    </Link>
+  );
+}
+
 function HeaderNavLink({
   active,
   href,
@@ -96,14 +119,12 @@ export function SiteHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openDrawerGroup, setOpenDrawerGroup] = useState<string | null | undefined>(undefined);
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setDrawerOpen(false);
     setOpenDropdown(null);
     setOpenDrawerGroup(undefined);
-    setBookingModalOpen(false);
   }, [pathname, locale]);
 
   useEffect(() => {
@@ -205,17 +226,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="site-header__actions">
-          <Link
-            aria-label={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
+          <LocaleToggleLink
+            ariaLabel={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
             className="site-header__locale"
             href={appendLocaleQuery(pathname, localeToggle)}
-          >
-            {localeLabel(localeToggle)}
-          </Link>
+            locale={localeToggle}
+          />
 
-          <button className="button button--solid site-header__cta" onClick={() => setBookingModalOpen(true)} type="button">
+          <Link className="button button--solid site-header__cta" href={appendLocaleQuery(headerMenu.cta.href, locale)}>
             {localize(locale, headerMenu.cta.label)}
-          </button>
+          </Link>
 
           <button
             aria-controls="site-header-drawer"
@@ -261,26 +281,22 @@ export function SiteHeader() {
                 </div>
 
                 <div className="site-header__drawer-actions">
-                  <Link
-                    aria-label={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
+                  <LocaleToggleLink
+                    ariaLabel={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
                     className="site-header__locale site-header__locale--drawer"
                     href={appendLocaleQuery(pathname, localeToggle)}
+                    locale={localeToggle}
                     onClick={() => setDrawerOpen(false)}
-                  >
-                    {localeLabel(localeToggle)}
-                  </Link>
+                  />
 
                   <div className="site-header__cta-wrap">
-                    <button
+                    <Link
                       className="button button--solid site-header__cta site-header__cta--drawer"
-                      onClick={() => {
-                        setDrawerOpen(false);
-                        setBookingModalOpen(true);
-                      }}
-                      type="button"
+                      href={appendLocaleQuery(headerMenu.cta.href, locale)}
+                      onClick={() => setDrawerOpen(false)}
                     >
                       {localize(locale, headerMenu.cta.label)}
-                    </button>
+                    </Link>
                   </div>
                 </div>
 
@@ -346,11 +362,9 @@ export function SiteHeader() {
                 </nav>
               </aside>
             </div>,
-            document.body
-          )
+          document.body
+        )
         : null}
-
-      <BookingSearchModal locale={locale} onClose={() => setBookingModalOpen(false)} open={bookingModalOpen} />
     </header>
   );
 }

@@ -43,8 +43,6 @@ const footerNavGroups: FooterGroup[] = [
     title: t("Thông tin", "Information"),
     links: [
       { href: "/about-us", label: t("Về chúng tôi", "About us") },
-      { href: "/lien-he", label: t("Liên hệ", "Contact") },
-      { href: "/tuyen-dung", label: t("Tuyển dụng", "Careers") },
       { href: "/ho-tro", label: t("Hỗ trợ", "Support") }
     ]
   }
@@ -63,7 +61,7 @@ export function SiteFooter() {
   const locale = resolveLocale(searchParams.get("lang"));
 
   return (
-    <footer className="site-footer site-footer--boutique">
+    <footer className="site-footer site-footer--boutique" id="site-footer">
       <div className="section-shell site-footer__panel">
         <div className="site-footer__grid">
           <section className="site-footer__brand" aria-label={localize(locale, footerBrand.eyebrow)}>

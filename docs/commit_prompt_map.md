@@ -767,3 +767,23 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/site-header.tsx`
   - `app/globals.css`
+
+### Entry 070
+- `time`: 2026-04-17T15:59:40+07:00
+- `prompt_summary`: Làm nhỏ chữ phần tiện nghi khách sạn trên tablet/iphone để label và check icon giữ cùng một dòng, đồng thời sửa popup chọn phòng cho dropdown hiển thị gọn trong modal như mockup.
+- `commit_message`: `fix(booking-ui): tighten facilities rows and room popup dropdowns`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 071
+- `time`: 2026-04-17T16:18:43+07:00
+- `prompt_summary`: Chốt CTA đặt phòng trên topbar về thẳng `/rooms`, làm gọn lại trang about-us theo hướng ảnh-led với slider khách hàng từ `/public/customers`, ẩn các nút tuyển dụng/contact dư thừa, và thêm cờ vào nút đổi ngôn ngữ.
+- `commit_message`: `feat(public-site): simplify about-us and restore rooms booking cta`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `components/site-footer.tsx`
+  - `components/about-us-page.tsx`
+  - `components/about-us-customer-carousel.tsx`
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/globals.css`
+  - `lib/site-content.ts`

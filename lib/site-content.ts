@@ -162,7 +162,7 @@ export const headerMenu: HeaderMenuConfig = {
     }
   ],
   cta: {
-    href: "/lien-he",
+    href: "/rooms",
     label: { vi: "Đặt phòng", en: "Book now" }
   }
 };
