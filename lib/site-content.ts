@@ -155,6 +155,10 @@ export const headerMenu: HeaderMenuConfig = {
       label: { vi: "Chi nhánh", en: "Branches" }
     },
     {
+      href: "#vi-tri",
+      label: { vi: "Vị trí", en: "Location" }
+    },
+    {
       href: "#about-sk",
       label: { vi: "Về SK", en: "About SK" },
       children: [

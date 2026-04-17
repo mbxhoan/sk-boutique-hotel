@@ -26,6 +26,14 @@ function isMenuItemActive(pathname: string, item: (typeof headerMenu.items)[numb
   return item.children?.some((child) => isRouteMatch(pathname, child.href)) ?? false;
 }
 
+function resolveHeaderHref(href: string, locale: "en" | "vi", currentHref: string) {
+  if (href.startsWith("#")) {
+    return appendLocaleQuery(`${currentHref}${href}`, locale);
+  }
+
+  return appendLocaleQuery(href, locale);
+}
+
 function ChevronIcon({ open }: { open?: boolean }) {
   return (
     <svg aria-hidden="true" className={`site-header__chevron${open ? " site-header__chevron--open" : ""}`} fill="none" height="14" viewBox="0 0 14 14" width="14">
@@ -53,11 +61,13 @@ function CloseIcon() {
 function HeaderNavLink({
   active,
   href,
+  currentHref,
   label,
   locale,
   onNavigate
 }: {
   active?: boolean;
+  currentHref: string;
   href: string;
   label: { en: string; vi: string };
   locale: "en" | "vi";
@@ -67,7 +77,7 @@ function HeaderNavLink({
     <Link
       aria-current={active ? "page" : undefined}
       className={`site-header__nav-link${active ? " site-header__nav-link--active" : ""}`}
-      href={appendLocaleQuery(href, locale)}
+      href={resolveHeaderHref(href, locale, currentHref)}
       onClick={onNavigate}
     >
       {localize(locale, label)}
@@ -80,6 +90,8 @@ export function SiteHeader() {
   const searchParams = useSearchParams();
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
+  const currentSearch = searchParams.toString();
+  const currentHref = `${pathname}${currentSearch ? `?${currentSearch}` : ""}`;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openDrawerGroup, setOpenDrawerGroup] = useState<string | null | undefined>(undefined);
@@ -159,7 +171,7 @@ export function SiteHeader() {
                         <Link
                           aria-current={childActive ? "page" : undefined}
                           className={`site-header__dropdown-link${childActive ? " site-header__dropdown-link--active" : ""}`}
-                          href={appendLocaleQuery(child.href, locale)}
+                          href={resolveHeaderHref(child.href, locale, currentHref)}
                           key={child.href}
                         >
                           {localize(locale, child.label)}
@@ -172,7 +184,14 @@ export function SiteHeader() {
             }
 
             return (
-              <HeaderNavLink active={active} href={item.href} key={item.href} label={item.label} locale={locale} />
+              <HeaderNavLink
+                active={active}
+                currentHref={currentHref}
+                href={item.href}
+                key={item.href}
+                label={item.label}
+                locale={locale}
+              />
             );
           })}
         </nav>
@@ -301,7 +320,7 @@ export function SiteHeader() {
                             <Link
                               aria-current={childActive ? "page" : undefined}
                               className={`site-header__drawer-sublink${childActive ? " site-header__drawer-sublink--active" : ""}`}
-                              href={appendLocaleQuery(child.href, locale)}
+                              href={resolveHeaderHref(child.href, locale, currentHref)}
                               key={child.href}
                               onClick={() => setDrawerOpen(false)}
                             >
@@ -317,6 +336,7 @@ export function SiteHeader() {
                 return (
                   <HeaderNavLink
                     active={active}
+                    currentHref={currentHref}
                     href={item.href}
                     key={item.href}
                     label={item.label}

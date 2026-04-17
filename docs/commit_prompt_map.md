@@ -664,3 +664,16 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/site-content.ts`
   - `lib/supabase/queries/room-types.ts`
   - `app/globals.css`
+
+### Entry 060
+- `time`: 2026-04-17T13:33:16+07:00
+- `prompt_summary`: Sửa lỗi calendar không đổi được ngày bắt đầu, tăng độ ưu tiên popup ngày, bỏ thanh topbar phụ ở trang phòng, và thêm mục Vị trí dùng chung để scroll tới section map ở mọi trang public.
+- `commit_message`: `fix(public-site): restore date selection and shared location anchor`
+- `main_files`:
+  - `components/availability-check-bar.tsx`
+  - `components/location-section.tsx`
+  - `components/public-cms.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/site-header.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`

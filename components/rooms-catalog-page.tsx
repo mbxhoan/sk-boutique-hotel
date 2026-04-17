@@ -2,20 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
+import { LocationSection } from "@/components/location-section";
 import { RoomCanvasModal } from "@/components/room-canvas-modal";
 import type { Locale } from "@/lib/locale";
-import { appendLocaleQuery } from "@/lib/locale";
 import { buildRoomDetailHref, buildRoomsHref, type RoomsSearchState } from "@/lib/room-routes";
-import {
-  buildRoomCatalogEntry,
-  formatRoomCurrency,
-  formatRoomPricePrefix,
-  type RoomCatalogEntry
-} from "@/lib/rooms/catalog";
+import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
 import { type RoomTypeRow } from "@/lib/supabase/database.types";
 
 type RoomsCatalogPageProps = {
@@ -26,51 +21,12 @@ type RoomsCatalogPageProps = {
   roomTypes: RoomTypeRow[];
 };
 
-type TabItem = {
-  href: string;
-  label: string;
-};
-
-function ShareIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
-      <path
-        d="M6.25 9.75L11.75 6.75M6.25 8.25L11.75 5.25M6.25 9.75L11.75 12.75M5.5 8.75C6.4665 8.75 7.25 7.9665 7.25 7C7.25 6.0335 6.4665 5.25 5.5 5.25C4.5335 5.25 3.75 6.0335 3.75 7C3.75 7.9665 4.5335 8.75 5.5 8.75ZM12.5 5.75C13.4665 5.75 14.25 4.9665 14.25 4C14.25 3.0335 13.4665 2.25 12.5 2.25C11.5335 2.25 10.75 3.0335 10.75 4C10.75 4.9665 11.5335 5.75 12.5 5.75ZM12.5 15.75C13.4665 15.75 14.25 14.9665 14.25 14C14.25 13.0335 13.4665 12.25 12.5 12.25C11.5335 12.25 10.75 13.0335 10.75 14C10.75 14.9665 11.5335 15.75 12.5 15.75Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.4"
-      />
-    </svg>
-  );
-}
-
 function formatCompactPrice(locale: Locale, price: number | null) {
   if (price == null) {
     return null;
   }
 
   return formatRoomCurrency(locale, price);
-}
-
-function buildTabs(locale: Locale): TabItem[] {
-  return locale === "en"
-    ? [
-        { href: "#rooms", label: "Rooms" },
-        { href: "#ve-khach-san", label: "About hotel" },
-        { href: "#bo-suu-tap", label: "Collection" },
-        { href: "#tien-ich", label: "Amenities" },
-        { href: "#vi-tri", label: "Location" },
-        { href: "#chinh-sach", label: "Policies" }
-      ]
-    : [
-        { href: "#rooms", label: "Phòng" },
-        { href: "#ve-khach-san", label: "Về khách sạn" },
-        { href: "#bo-suu-tap", label: "Bộ sưu tập" },
-        { href: "#tien-ich", label: "Tiện ích" },
-        { href: "#vi-tri", label: "Vị trí" },
-        { href: "#chinh-sach", label: "Chính sách" }
-      ];
 }
 
 function buildSections(locale: Locale) {
@@ -84,10 +40,6 @@ function buildSections(locale: Locale) {
         collection: {
           description: "A small visual collection with room and hotel scenes to keep the page premium and calm.",
           title: "Room collection"
-        },
-        location: {
-          description: "The public site can surface one polished branch story while keeping the operational details hidden in the back office.",
-          title: "Location and access"
         },
         policies: {
           bullets: ["Hold expiry defaults to 30 minutes.", "Payment is manual in phase 1.", "Booking confirmation follows staff verification."],
@@ -103,10 +55,6 @@ function buildSections(locale: Locale) {
         collection: {
           description: "Một bộ ảnh nhỏ đủ để giữ nhịp sang, nhẹ và không làm người xem rối mắt.",
           title: "Bộ sưu tập phòng"
-        },
-        location: {
-          description: "Trang công khai chỉ cần kể một câu chuyện chi nhánh thật gọn, còn vận hành chi tiết để team xử lý phía sau.",
-          title: "Vị trí và tiếp cận"
         },
         policies: {
           bullets: ["Hold tự hết hạn sau 30 phút.", "Thanh toán giai đoạn này là thủ công.", "Xác nhận booking chỉ gửi sau khi staff kiểm tra."],
@@ -237,23 +185,6 @@ export function RoomsCatalogPage({
   );
   const activeRoom = roomEntries.find((room) => room.slug === initialRoomSlug) ?? null;
   const sections = buildSections(locale);
-  const tabs = buildTabs(locale);
-  const lowestPublicPrice = roomEntries
-    .filter((room) => room.priceVisible && room.currentPrice != null)
-    .reduce<number | null>((lowest, room) => {
-      if (lowest == null) {
-        return room.currentPrice;
-      }
-
-      return Math.min(lowest, room.currentPrice ?? lowest);
-    }, null);
-  const shareHref = buildRoomsHref({
-    adults: initialFilters.adults,
-    checkin: initialFilters.checkin,
-    children: initialFilters.children,
-    checkout: initialFilters.checkout,
-    lang: locale
-  });
   const closeHref = buildRoomsHref({
     adults: initialFilters.adults,
     checkin: initialFilters.checkin,
@@ -261,32 +192,6 @@ export function RoomsCatalogPage({
     checkout: initialFilters.checkout,
     lang: locale
   });
-  const [shareState, setShareState] = useState<"idle" | "copied" | "shared">("idle");
-
-  const handleShare = async () => {
-    const shareUrl = new URL(appendLocaleQuery(shareHref, locale), window.location.origin).toString();
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: document.title,
-          url: shareUrl
-        });
-        setShareState("shared");
-        return;
-      } catch {
-        // Fall back to clipboard below.
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setShareState("copied");
-      window.setTimeout(() => setShareState("idle"), 1400);
-    } catch {
-      setShareState("idle");
-    }
-  };
 
   return (
     <div className="rooms-page">
@@ -298,38 +203,11 @@ export function RoomsCatalogPage({
 
         <div className="section-shell rooms-hero__shell">
           <div className="rooms-panel">
-            <div className="rooms-panel__topbar">
-              <nav className="rooms-panel__tabs" aria-label={locale === "en" ? "Room page sections" : "Các mục trang phòng"}>
-                {tabs.map((tab) => (
-                  <Link className={`rooms-panel__tab${tab.href === "#rooms" ? " rooms-panel__tab--active" : ""}`} href={tab.href} key={tab.href}>
-                    {tab.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="rooms-panel__summary">
-                <span className="rooms-panel__price-prefix">
-                  {lowestPublicPrice != null ? formatRoomPricePrefix(locale, lowestPublicPrice) : locale === "en" ? "CTA only" : "Chỉ hiện CTA"}
-                </span>
-                <Link className="button button--solid rooms-panel__book" href="#rooms">
-                  {locale === "en" ? "Choose room" : "Chọn phòng"}
-                </Link>
-                <button className="rooms-panel__share" onClick={handleShare} type="button">
-                  <ShareIcon />
-                  <span>{shareState === "copied" ? (locale === "en" ? "Copied" : "Đã sao chép") : shareState === "shared" ? (locale === "en" ? "Shared" : "Đã chia sẻ") : locale === "en" ? "Share" : "Chia sẻ"}</span>
-                </button>
-              </div>
-            </div>
-
             <div className="rooms-panel__headline">
               <div>
                 <p className="rooms-panel__eyebrow">{locale === "en" ? "Room selection" : "Chọn phòng"}</p>
                 <h1 className="rooms-panel__title">{locale === "en" ? "Choose your room" : "Chọn phòng của bạn"}</h1>
               </div>
-              <button className="rooms-panel__share rooms-panel__share--desktop" onClick={handleShare} type="button">
-                <ShareIcon />
-                <span>{locale === "en" ? "Share" : "Chia sẻ"}</span>
-              </button>
             </div>
 
             <AvailabilityCheckBar
@@ -346,18 +224,6 @@ export function RoomsCatalogPage({
 
       <section className="rooms-section rooms-section--cards section" id="rooms">
         <div className="section-shell">
-          <div className="rooms-section__head">
-            <div>
-              <p className="rooms-section__eyebrow">{locale === "en" ? "Rooms" : "Phòng"}</p>
-              <h2 className="rooms-section__title">{locale === "en" ? "Room types ready to compare" : "Các hạng phòng để so sánh"}</h2>
-            </div>
-            <p className="rooms-section__description">
-              {locale === "en"
-                ? "The page stays manual-first: filters set the dates, the grid shows public room types, and the canvas opens in place."
-                : "Trang giữ đúng tinh thần manual-first: bộ lọc chốt ngày, lưới hiển thị các hạng phòng public, và popup mở ngay tại chỗ."}
-            </p>
-          </div>
-
           <div className="rooms-grid">
             {roomEntries.map((room) => (
               <RoomCard activeSlug={initialRoomSlug} filters={initialFilters} key={room.slug} locale={locale} room={room} />
@@ -444,33 +310,7 @@ export function RoomsCatalogPage({
         </div>
       </section>
 
-      <section className="rooms-section section" id="vi-tri">
-        <div className="section-shell rooms-location">
-          <div className="rooms-location__copy">
-            <p className="rooms-section__eyebrow">{locale === "en" ? "Location" : "Vị trí"}</p>
-            <h2 className="rooms-section__title">{sections.location.title}</h2>
-            <p className="rooms-section__description">{sections.location.description}</p>
-
-            <div className="rooms-location__card">
-              <p className="rooms-location__label">{locale === "en" ? "Address" : "Địa chỉ"}</p>
-              <p className="rooms-location__value">
-                {locale === "en"
-                  ? "Marina complex, Phu Quoc, An Giang"
-                  : "Khu nghỉ dưỡng phức hợp Marina, Phú Quốc, An Giang"}
-              </p>
-              <p className="rooms-location__note">
-                {locale === "en"
-                  ? "The public page can keep the address tidy while staff handle the operational map and room allocation behind the scenes."
-                  : "Trang công khai giữ địa chỉ gọn gàng, còn team vận hành lo bản đồ và phân phòng ở phía sau."}
-              </p>
-            </div>
-          </div>
-
-          <div className="rooms-location__visual">
-            <Image alt="" aria-hidden="true" className="rooms-location__image" fill sizes="(max-width: 720px) 100vw, 520px" src="/home/pool3.jpg" />
-          </div>
-        </div>
-      </section>
+      <LocationSection locale={locale} />
 
       <section className="rooms-section section" id="chinh-sach">
         <div className="section-shell">

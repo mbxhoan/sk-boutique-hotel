@@ -1,6 +1,7 @@
 import { AnalyticsLink } from "@/components/analytics-link";
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
 import { HeroCarousel } from "@/components/hero-carousel";
+import { LocationSection } from "@/components/location-section";
 import { RoomAmenitiesSection } from "@/components/room-amenities-section";
 import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
 import type { Locale } from "@/lib/locale";
@@ -640,6 +641,7 @@ export function CmsPageRenderer({
           </Fragment>
         ))}
       </div>
+      <LocationSection locale={locale} />
     </div>
   );
 }

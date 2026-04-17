@@ -246,6 +246,7 @@ export function AvailabilityCheckBar({
 }: AvailabilityCheckBarProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [activePanel, setActivePanel] = useState<"dates" | "guests" | null>(null);
+  const [dateSelectionMode, setDateSelectionMode] = useState<"start" | "end">("start");
   const [monthOffset, setMonthOffset] = useState(0);
   const [checkin, setCheckin] = useState(() => parseDateInput(initialCheckin) ?? toStartOfDay(new Date()));
   const [checkout, setCheckout] = useState(() => parseDateInput(initialCheckout) ?? addDays(toStartOfDay(new Date()), 1));
@@ -303,15 +304,10 @@ export function AvailabilityCheckBar({
   const updateRange = (day: Date) => {
     const normalized = toStartOfDay(day);
 
-    if (normalized <= checkin) {
+    if (dateSelectionMode === "start" || normalized <= checkin) {
       setCheckin(normalized);
       setCheckout(addDays(normalized, 1));
-      return;
-    }
-
-    if (activePanel !== "dates") {
-      setCheckin(normalized);
-      setCheckout(addDays(normalized, 1));
+      setDateSelectionMode("end");
       return;
     }
 
@@ -323,6 +319,7 @@ export function AvailabilityCheckBar({
     setCheckin(today);
     setCheckout(addDays(today, 1));
     setMonthOffset(0);
+    setDateSelectionMode("start");
   };
 
   const renderMonth = (month: Date, navigation: { next?: boolean; prev?: boolean }) => {
@@ -396,6 +393,7 @@ export function AvailabilityCheckBar({
             className="availability-check__field"
             onClick={() => {
               setActivePanel((current) => (current === "dates" ? null : "dates"));
+              setDateSelectionMode("start");
               setMonthOffset(0);
             }}
             type="button"
