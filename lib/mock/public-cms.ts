@@ -1363,7 +1363,7 @@ const roomDetails: CmsPageCopy[] = [
         },
         bullets: [
           text("Sức chứa 4 Người lớn & 1 Trẻ em.", "Capacity for 4 adults and 1 child."),
-          text("Giường đôi và view linh hoạt.", "Double bed and flexible views."),
+          text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
           text("Bilingual room content.", "Bilingual room content.")
         ],
         frame: {
@@ -1406,7 +1406,7 @@ const roomDetails: CmsPageCopy[] = [
             ),
             bullets: [
               text("4 Người lớn & 1 Trẻ em là sức chứa chính.", "Capacity for 4 adults and 1 child."),
-              text("Giường đôi và view linh hoạt.", "Double bed and flexible views."),
+              text("Giường đôi và view sân vườn & hồ bơi.", "Double bed and garden & pool views."),
               text("Dễ map vào CMS later.", "Easy to map into CMS later.")
             ]
           },

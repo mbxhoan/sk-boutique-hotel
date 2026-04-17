@@ -677,3 +677,27 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/site-header.tsx`
   - `lib/site-content.ts`
   - `app/globals.css`
+
+### Entry 061
+- `time`: 2026-04-17T14:08:12+07:00
+- `prompt_summary`: Ẩn menu Chi nhánh và route /chi-nhanh, bỏ block kiểm tra phòng ở homepage, đưa Vị trí và Tiện ích xuống mọi trang public trước footer, tạm ẩn Liên hệ/Tuyển dụng/Hỗ trợ trong menu Về SK, bỏ nút chuyển ảnh trực tiếp trên card phòng, và chỉnh canvas chi tiết phòng để cuộn cả khối với width gọn hơn.
+- `commit_message`: `fix(public-site): centralize shared sections and refine room canvas`
+- `main_files`:
+  - `app/(marketing)/layout.tsx`
+  - `components/marketing-bottom-sections.tsx`
+  - `components/public-cms.tsx`
+  - `components/page-template.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/location-section.tsx`
+  - `components/facilities-section.tsx`
+  - `app/(marketing)/chi-nhanh/page.tsx`
+  - `app/(marketing)/chi-nhanh/[slug]/page.tsx`
+  - `app/globals.css`
+  - `lib/site-content.ts`
+
+### Entry 062
+- `time`: 2026-04-17T14:28:29+07:00
+- `prompt_summary`: Sửa lỗi cuộn canvas phòng để overlay đứng yên và chính khung chi tiết phòng tự cuộn bên trong, tránh tình trạng nội dung bị lệch như ảnh chụp.
+- `commit_message`: `fix(room-canvas): keep modal scroll within dialog`
+- `main_files`:
+  - `app/globals.css`

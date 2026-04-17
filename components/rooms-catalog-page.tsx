@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
-import { LocationSection } from "@/components/location-section";
 import { RoomCanvasModal } from "@/components/room-canvas-modal";
 import type { Locale } from "@/lib/locale";
 import { buildRoomDetailHref, buildRoomsHref, type RoomsSearchState } from "@/lib/room-routes";
@@ -91,16 +90,6 @@ function RoomCard({
           <Image alt={room.title[locale]} className="rooms-card__image" fill sizes="(max-width: 720px) 92vw, (max-width: 1080px) 44vw, 28vw" src={room.gallery[0]} />
 
           <span className="rooms-card__badge">{room.galleryBadge[locale]}</span>
-          <span className="rooms-card__nav rooms-card__nav--prev" aria-hidden="true">
-            <svg fill="none" height="18" viewBox="0 0 18 18" width="18">
-              <path d="M11.25 4.75L6.75 9L11.25 13.25" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
-            </svg>
-          </span>
-          <span className="rooms-card__nav rooms-card__nav--next" aria-hidden="true">
-            <svg fill="none" height="18" viewBox="0 0 18 18" width="18">
-              <path d="M6.75 4.75L11.25 9L6.75 13.25" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
-            </svg>
-          </span>
         </div>
 
         <div className="rooms-card__body">
@@ -273,44 +262,6 @@ export function RoomsCatalogPage({
           <GalleryStrip locale={locale} />
         </div>
       </section>
-
-      <section className="rooms-section section" id="tien-ich">
-        <div className="section-shell">
-          <div className="rooms-section__head">
-            <div>
-              <p className="rooms-section__eyebrow">{locale === "en" ? "Amenities" : "Tiện ích"}</p>
-              <h2 className="rooms-section__title">{locale === "en" ? "Hotel comforts that feel calm" : "Tiện ích làm nên nhịp nghỉ dịu"}</h2>
-            </div>
-            <p className="rooms-section__description">
-              {locale === "en"
-                ? "The room detail modal surfaces practical amenities, breakfast choices, and flexible cancellation in one place."
-                : "Popup chi tiết phòng gom tiện nghi thực tế, lựa chọn bữa ăn và tuỳ chọn hủy bỏ vào cùng một chỗ."}
-            </p>
-          </div>
-
-          <div className="rooms-amenities">
-            {[
-              locale === "en" ? "Wi-Fi miễn phí" : "Wi-Fi miễn phí",
-              locale === "en" ? "Minibar" : "Minibar",
-              locale === "en" ? "Flat-screen TV" : "TV màn hình phẳng",
-              locale === "en" ? "Private bathroom" : "Phòng tắm riêng",
-              locale === "en" ? "Tea / coffee maker" : "Máy pha trà / cà phê",
-              locale === "en" ? "Hair dryer" : "Máy sấy tóc"
-            ].map((item) => (
-              <div className="rooms-amenities__item" key={item}>
-                <span className="rooms-amenities__icon" aria-hidden="true">
-                  <svg fill="none" height="16" viewBox="0 0 16 16" width="16">
-                    <path d="M12.5 4.75L6.75 11.25L3.5 8.25" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-                  </svg>
-                </span>
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <LocationSection locale={locale} />
 
       <section className="rooms-section section" id="chinh-sach">
         <div className="section-shell">

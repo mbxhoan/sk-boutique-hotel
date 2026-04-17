@@ -13,7 +13,7 @@ type LocationSectionProps = {
 };
 
 function mapEmbedUrl() {
-  return `https://www.google.com/maps?q=${encodeURIComponent(siteInfo.address)}&output=embed`;
+  return `https://www.google.com/maps?q=${encodeURIComponent(siteInfo.gg_map_address)}&output=embed`;
 }
 
 export function LocationSection({ className, id = "vi-tri", locale }: LocationSectionProps) {

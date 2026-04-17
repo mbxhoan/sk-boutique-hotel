@@ -136,7 +136,6 @@ export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Phòng", href: "/rooms" },
   { label: "Tin tức", href: "/tin-tuc" },
-  { label: "Chi nhánh", href: "/chi-nhanh" },
   { label: "Thương hiệu", href: "/thuong-hieu" },
   { label: "Về chúng tôi", href: "/ve-chung-toi" },
   { label: "Liên hệ", href: "/lien-he" },
@@ -151,10 +150,6 @@ export const headerMenu: HeaderMenuConfig = {
       label: { vi: "Phòng", en: "Rooms" }
     },
     {
-      href: "/chi-nhanh",
-      label: { vi: "Chi nhánh", en: "Branches" }
-    },
-    {
       href: "#vi-tri",
       label: { vi: "Vị trí", en: "Location" }
     },
@@ -162,10 +157,7 @@ export const headerMenu: HeaderMenuConfig = {
       href: "#about-sk",
       label: { vi: "Về SK", en: "About SK" },
       children: [
-        { href: "/ve-chung-toi", label: { vi: "Về chúng tôi", en: "About us" } },
-        { href: "/lien-he", label: { vi: "Liên hệ", en: "Contact" } },
-        { href: "/tuyen-dung", label: { vi: "Tuyển dụng", en: "Careers" } },
-        { href: "/ho-tro", label: { vi: "Hỗ trợ", en: "Support" } }
+        { href: "/ve-chung-toi", label: { vi: "Về chúng tôi", en: "About us" } }
       ]
     }
   ],
@@ -191,6 +183,7 @@ export const socialLinks = [
 ];
 
 export const siteInfo = {
+  gg_map_address: "SK boutique hotel",
   address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
   phone: "+84 908 233 583",
   zalo: "0908 233 583",
