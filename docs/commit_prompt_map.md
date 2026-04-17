@@ -738,3 +738,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/site-footer.tsx`
   - `app/(marketing)/about-us/page.tsx`
   - `app/(marketing)/ve-chung-toi/page.tsx`
+
+### Entry 067
+- `time`: 2026-04-17T15:18:40+07:00
+- `prompt_summary`: Chuyển CTA đặt phòng trên topbar từ điều hướng sang popup chọn ngày và khách dùng lại flow availability, rồi dẫn tiếp sang trang chọn phòng.
+- `commit_message`: `feat(header-booking): open room search modal from topbar cta`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `components/booking-search-modal.tsx`
+  - `components/availability-check-bar.tsx`
+  - `app/globals.css`

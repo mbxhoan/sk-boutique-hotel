@@ -4818,6 +4818,87 @@ textarea {
   font-weight: 700;
 }
 
+.availability-check--stacked .availability-check__fields {
+  grid-template-columns: 1fr;
+}
+
+.availability-check--stacked .availability-check__submit {
+  width: 100%;
+  min-width: 100%;
+}
+
+.booking-search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.8rem, 2vw, 1.4rem);
+}
+
+.booking-search-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(10, 14, 24, 0.48);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.booking-search-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 44rem);
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid rgba(0, 12, 30, 0.12);
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 242, 234, 0.97)),
+    var(--surface-container-lowest);
+  box-shadow: 0 26px 70px rgba(0, 12, 30, 0.28);
+}
+
+.booking-search-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.95rem;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.08);
+}
+
+.booking-search-modal__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.booking-search-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+  border: 1px solid rgba(0, 12, 30, 0.08);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.booking-search-modal__body {
+  padding-top: 1rem;
+}
+
+.booking-search-modal__check .availability-check__fields {
+  gap: 0.75rem;
+}
+
 .location-band {
   padding-block: clamp(0.8rem, 2.2vw, 1.4rem);
 }
@@ -6390,6 +6471,17 @@ textarea {
 
   .availability-check__submit {
     min-width: 100%;
+  }
+
+  .booking-search-modal {
+    align-items: flex-end;
+    padding: 0.55rem;
+  }
+
+  .booking-search-modal__dialog {
+    width: 100%;
+    max-width: none;
+    border-radius: 1rem 1rem 0.9rem 0.9rem;
   }
 
   .rooms-hero__media {

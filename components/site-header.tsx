@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { AnalyticsLink } from "@/components/analytics-link";
+import { BookingSearchModal } from "@/components/booking-search-modal";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -95,11 +95,13 @@ export function SiteHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openDrawerGroup, setOpenDrawerGroup] = useState<string | null | undefined>(undefined);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   useEffect(() => {
     setDrawerOpen(false);
     setOpenDropdown(null);
     setOpenDrawerGroup(undefined);
+    setBookingModalOpen(false);
   }, [pathname, locale]);
 
   useEffect(() => {
@@ -205,16 +207,9 @@ export function SiteHeader() {
             {localeLabel(localeToggle)}
           </Link>
 
-          <AnalyticsLink
-            className="button button--solid site-header__cta"
-            eventType="cta_click"
-            href={headerMenu.cta.href}
-            locale={locale}
-            metadata={{ source: "site_header" }}
-            pagePath={pathname}
-          >
+          <button className="button button--solid site-header__cta" onClick={() => setBookingModalOpen(true)} type="button">
             {localize(locale, headerMenu.cta.label)}
-          </AnalyticsLink>
+          </button>
 
           <button
             aria-controls="site-header-drawer"
@@ -268,17 +263,17 @@ export function SiteHeader() {
                 {localeLabel(localeToggle)}
               </Link>
 
-              <div className="site-header__cta-wrap" onClickCapture={() => setDrawerOpen(false)}>
-                <AnalyticsLink
+              <div className="site-header__cta-wrap">
+                <button
                   className="button button--solid site-header__cta site-header__cta--drawer"
-                  eventType="cta_click"
-                  href={headerMenu.cta.href}
-                  locale={locale}
-                  metadata={{ source: "site_header_drawer" }}
-                  pagePath={pathname}
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    setBookingModalOpen(true);
+                  }}
+                  type="button"
                 >
                   {localize(locale, headerMenu.cta.label)}
-                </AnalyticsLink>
+                </button>
               </div>
             </div>
 
@@ -349,6 +344,8 @@ export function SiteHeader() {
           </aside>
         </div>
       ) : null}
+
+      <BookingSearchModal locale={locale} onClose={() => setBookingModalOpen(false)} open={bookingModalOpen} />
     </header>
   );
 }

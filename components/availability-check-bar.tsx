@@ -8,6 +8,7 @@ import { buildRoomsHref } from "@/lib/room-routes";
 
 type AvailabilityCheckBarProps = {
   className?: string;
+  layout?: "inline" | "stacked";
   initialAdults?: number;
   initialCheckin?: string;
   initialChildren?: number;
@@ -237,6 +238,7 @@ function CalendarDay({
 
 export function AvailabilityCheckBar({
   className,
+  layout = "inline",
   initialAdults = 2,
   initialCheckin,
   initialChildren = 0,
@@ -382,7 +384,7 @@ export function AvailabilityCheckBar({
 
   return (
     <div
-      className={`availability-check availability-check--${variant}${className ? ` ${className}` : ""}`}
+      className={`availability-check availability-check--${variant} availability-check--${layout}${className ? ` ${className}` : ""}`}
       ref={rootRef}
     >
       <div className="availability-check__fields">
