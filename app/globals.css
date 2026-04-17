@@ -6058,6 +6058,198 @@ textarea {
   min-width: 10rem;
 }
 
+.payment-band {
+  padding-block: clamp(0.8rem, 2vw, 1.6rem);
+}
+
+.payment-band__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: clamp(1rem, 2.2vw, 1.45rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  box-shadow: var(--shadow-soft);
+}
+
+.payment-band__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.payment-band__heading-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--gold-strong);
+}
+
+.payment-band__brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.payment-band__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.payment-band__brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.95rem;
+  height: 1.95rem;
+  padding: 0 0.34rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.6rem;
+}
+
+.payment-band__brand-label {
+  letter-spacing: 0.04em;
+}
+
+.payment-band__brand--diners {
+  background: #0f6eb5;
+  color: #fff;
+}
+
+.payment-band__brand--mastercard {
+  background: linear-gradient(135deg, #ea4d3d 0%, #f6a21d 100%);
+  color: #fff;
+}
+
+.payment-band__brand--amex {
+  background: #1f72cd;
+  color: #fff;
+}
+
+.payment-band__brand--jcb {
+  background: #ffffff;
+  border-color: rgba(0, 12, 30, 0.1);
+  color: var(--ink);
+}
+
+.payment-band__brand--visa {
+  background: #1b4ea8;
+  color: #fff;
+}
+
+.payment-band__brand--maestro {
+  background: linear-gradient(135deg, #243b92 0%, #e54844 100%);
+  color: #fff;
+}
+
+.payment-band__brand--cash {
+  background: rgba(30, 146, 68, 0.08);
+  border-color: rgba(30, 146, 68, 0.3);
+  color: #1e9244;
+}
+
+.payment-band__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+.payment-band__summary {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+}
+
+.rooms-image-carousel {
+  padding-top: clamp(0.6rem, 1.6vw, 1.2rem);
+}
+
+.rooms-image-carousel__frame {
+  position: relative;
+  height: clamp(16rem, 34vw, 30rem);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  background: #0b1320;
+  box-shadow: var(--shadow-soft);
+}
+
+.rooms-image-carousel__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.rooms-image-carousel__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.65s ease,
+    visibility 0.65s ease;
+}
+
+.rooms-image-carousel__slide--active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.rooms-image-carousel__image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.rooms-image-carousel__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(251, 249, 245, 0.9);
+  color: var(--ink);
+  box-shadow: 0 16px 30px rgba(0, 12, 30, 0.18);
+  transform: translateY(-50%);
+}
+
+.rooms-image-carousel__nav--prev {
+  left: 1rem;
+}
+
+.rooms-image-carousel__nav--next {
+  right: 1rem;
+}
+
 @media (min-width: 960px) {
   .rooms-panel__share {
     display: none;
@@ -6132,6 +6324,10 @@ textarea {
     padding: 0.8rem 0.95rem;
   }
 
+  .payment-band__card {
+    padding: 0.9rem 0.95rem;
+  }
+
   .rooms-panel__summary {
     gap: 0.55rem;
   }
@@ -6181,6 +6377,11 @@ textarea {
 
   .room-canvas__option-price {
     align-self: flex-end;
+  }
+
+  .rooms-image-carousel__frame {
+    height: clamp(14rem, 52vw, 22rem);
+    border-radius: 0.75rem;
   }
 }
 
@@ -6295,5 +6496,34 @@ textarea {
 
   .room-canvas__room-title {
     font-size: clamp(1.65rem, 9vw, 2.45rem);
+  }
+
+  .payment-band__brand {
+    min-height: 2.15rem;
+    padding-inline: 0.7rem;
+    font-size: 0.65rem;
+  }
+
+  .payment-band__brand-mark {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.56rem;
+  }
+
+  .rooms-image-carousel__frame {
+    height: clamp(12.5rem, 60vw, 18rem);
+  }
+
+  .rooms-image-carousel__nav {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .rooms-image-carousel__nav--prev {
+    left: 0.55rem;
+  }
+
+  .rooms-image-carousel__nav--next {
+    right: 0.55rem;
   }
 }

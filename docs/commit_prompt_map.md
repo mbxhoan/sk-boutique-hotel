@@ -701,3 +701,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(room-canvas): keep modal scroll within dialog`
 - `main_files`:
   - `app/globals.css`
+
+### Entry 063
+- `time`: 2026-04-17T14:40:23+07:00
+- `prompt_summary`: Thêm section payment dùng chung nằm trên footer mọi trang public, tạm ẩn ba section editorial trên trang phòng, và bổ sung carousel ảnh tự chạy 3s bên dưới danh sách phòng với responsive desktop/tablet/mobile.
+- `commit_message`: `feat(public-site): add shared payment band and room image carousel`
+- `main_files`:
+  - `components/payment-section.tsx`
+  - `components/marketing-bottom-sections.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `app/globals.css`

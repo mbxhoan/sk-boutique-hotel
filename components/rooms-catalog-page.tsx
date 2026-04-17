@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
 import { RoomCanvasModal } from "@/components/room-canvas-modal";
+import { RoomsImageCarousel } from "@/components/rooms-image-carousel";
 import type { Locale } from "@/lib/locale";
 import { buildRoomDetailHref, buildRoomsHref, type RoomsSearchState } from "@/lib/room-routes";
 import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
@@ -26,40 +27,6 @@ function formatCompactPrice(locale: Locale, price: number | null) {
   }
 
   return formatRoomCurrency(locale, price);
-}
-
-function buildSections(locale: Locale) {
-  return locale === "en"
-    ? {
-        about: {
-          description:
-            "Boutique stays feel right when the room story is clear, the language is calm, and the booking flow stays manual-first.",
-          title: "Why this room page feels editorial"
-        },
-        collection: {
-          description: "A small visual collection with room and hotel scenes to keep the page premium and calm.",
-          title: "Room collection"
-        },
-        policies: {
-          bullets: ["Hold expiry defaults to 30 minutes.", "Payment is manual in phase 1.", "Booking confirmation follows staff verification."],
-          title: "Phase 1 policies"
-        }
-      }
-    : {
-        about: {
-          description:
-            "Một trang phòng sẽ hợp hơn khi câu chuyện hạng phòng rõ ràng, ngôn ngữ chậm rãi, và luồng đặt giữ vẫn manual-first.",
-          title: "Vì sao trang phòng này đi theo editorial"
-        },
-        collection: {
-          description: "Một bộ ảnh nhỏ đủ để giữ nhịp sang, nhẹ và không làm người xem rối mắt.",
-          title: "Bộ sưu tập phòng"
-        },
-        policies: {
-          bullets: ["Hold tự hết hạn sau 30 phút.", "Thanh toán giai đoạn này là thủ công.", "Xác nhận booking chỉ gửi sau khi staff kiểm tra."],
-          title: "Chính sách phase 1"
-        }
-      };
 }
 
 function RoomCard({
@@ -144,22 +111,6 @@ function RoomCard({
   );
 }
 
-function GalleryStrip({ locale }: { locale: Locale }) {
-  const images = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
-
-  return (
-    <div className="rooms-collection__strip">
-      {images.map((image, index) => (
-        <article className="rooms-collection__tile" key={`${image}-${index}`}>
-          <Image alt="" aria-hidden="true" className="rooms-collection__tile-image" fill sizes="(max-width: 720px) 92vw, 320px" src={image} />
-          <div className="rooms-collection__tile-overlay" />
-          <p className="rooms-collection__tile-title">{locale === "en" ? ["Signature suite", "Water detail", "Quiet light"][index] : ["Phòng signature", "Chi tiết nước", "Ánh sáng dịu"][index]}</p>
-        </article>
-      ))}
-    </div>
-  );
-}
-
 export function RoomsCatalogPage({
   initialFilters,
   initialRoomSlug,
@@ -173,7 +124,6 @@ export function RoomsCatalogPage({
     [roomAvailabilityByTypeId, roomTypes]
   );
   const activeRoom = roomEntries.find((room) => room.slug === initialRoomSlug) ?? null;
-  const sections = buildSections(locale);
   const closeHref = buildRoomsHref({
     adults: initialFilters.adults,
     checkin: initialFilters.checkin,
@@ -221,71 +171,7 @@ export function RoomsCatalogPage({
         </div>
       </section>
 
-      <section className="rooms-section section" id="ve-khach-san">
-        <div className="section-shell rooms-story">
-          <div className="rooms-story__copy">
-            <p className="rooms-story__eyebrow">{locale === "en" ? "About the hotel" : "Về khách sạn"}</p>
-            <h2 className="rooms-story__title">{sections.about.title}</h2>
-            <p className="rooms-story__description">{sections.about.description}</p>
-
-            <div className="rooms-story__stats">
-              {[
-                locale === "en" ? ["Room types", String(roomEntries.length)] : ["Hạng phòng", String(roomEntries.length)],
-                locale === "en" ? ["Hold SLA", "30 min"] : ["SLA giữ phòng", "30 phút"],
-                locale === "en" ? ["Payment", "Manual"] : ["Thanh toán", "Thủ công"]
-              ].map(([label, value]) => (
-                <article className="rooms-story__stat" key={label}>
-                  <p className="rooms-story__stat-label">{label}</p>
-                  <p className="rooms-story__stat-value">{value}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div className="rooms-story__visual">
-            <Image alt="" aria-hidden="true" className="rooms-story__image" fill sizes="(max-width: 720px) 100vw, 560px" src="/home/block.jpg" />
-            <div className="rooms-story__visual-overlay" />
-          </div>
-        </div>
-      </section>
-
-      <section className="rooms-section section" id="bo-suu-tap">
-        <div className="section-shell">
-          <div className="rooms-section__head">
-            <div>
-              <p className="rooms-section__eyebrow">{locale === "en" ? "Collection" : "Bộ sưu tập"}</p>
-              <h2 className="rooms-section__title">{sections.collection.title}</h2>
-            </div>
-            <p className="rooms-section__description">{sections.collection.description}</p>
-          </div>
-
-          <GalleryStrip locale={locale} />
-        </div>
-      </section>
-
-      <section className="rooms-section section" id="chinh-sach">
-        <div className="section-shell">
-          <div className="rooms-section__head">
-            <div>
-              <p className="rooms-section__eyebrow">{locale === "en" ? "Policies" : "Chính sách"}</p>
-              <h2 className="rooms-section__title">{sections.policies.title}</h2>
-            </div>
-            <p className="rooms-section__description">
-              {locale === "en"
-                ? "Manual verification stays visible so the public booking flow never pretends to be instant."
-                : "Luồng xác minh thủ công luôn được giữ rõ, để khách không lầm tưởng đây là booking tự động tức thì."}
-            </p>
-          </div>
-
-          <div className="rooms-policy">
-            {sections.policies.bullets.map((bullet) => (
-              <article className="rooms-policy__item" key={bullet}>
-                <p className="rooms-policy__text">{bullet}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <RoomsImageCarousel locale={locale} />
 
       <RoomCanvasModal
         locale={locale}
