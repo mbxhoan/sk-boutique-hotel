@@ -20,7 +20,7 @@ import type {
   CmsStatsSection
 } from "@/lib/mock/public-cms";
 import { PortalBadge, PortalBulletList, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 
 const actionVariantMap: Record<CmsActionTone, "solid" | "ghost" | "text"> = {
   solid: "solid",
@@ -616,19 +616,22 @@ export function CmsSectionRenderer({
 
 export function CmsPageRenderer({
   className,
+  afterFirstSection,
   locale,
   page
 }: {
   className?: string;
+  afterFirstSection?: ReactNode;
   locale: Locale;
   page: CmsPageCopy;
 }) {
   return (
     <div className={`cms-page cms-page--${page.kind}${className ? ` ${className}` : ""}`}>
       <div className="cms-page__sections">
-        {page.sections.map((section) => (
+        {page.sections.map((section, index) => (
           <Fragment key={section.id}>
             <CmsSectionRenderer locale={locale} section={section} />
+            {index === 0 ? afterFirstSection : null}
           </Fragment>
         ))}
       </div>

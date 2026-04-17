@@ -748,3 +748,22 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/booking-search-modal.tsx`
   - `components/availability-check-bar.tsx`
   - `app/globals.css`
+
+### Entry 068
+- `time`: 2026-04-17T15:31:12+07:00
+- `prompt_summary`: Sửa popup đặt phòng topbar bị lệch lên đầu bằng portal/body mount và khôi phục lại khối kiểm tra phòng ngay dưới hero carousel trên homepage.
+- `commit_message`: `fix(header-booking): center booking modal and restore home availability`
+- `main_files`:
+  - `components/booking-search-modal.tsx`
+  - `components/public-cms.tsx`
+  - `components/marketing-home.tsx`
+  - `components/home-availability-section.tsx`
+  - `app/globals.css`
+
+### Entry 069
+- `time`: 2026-04-17T15:44:20+07:00
+- `prompt_summary`: Sửa menu responsive mobile/tablet để drawer không bị page lấn lên bằng cách mount qua portal và cho drawer phủ full viewport trên breakpoint nhỏ.
+- `commit_message`: `fix(header-menu): make responsive drawer overlay full viewport`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`

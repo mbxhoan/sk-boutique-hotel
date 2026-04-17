@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
 import type { Locale } from "@/lib/locale";
@@ -42,11 +43,11 @@ export function BookingSearchModal({ locale, onClose, open }: BookingSearchModal
     };
   }, [onClose, open]);
 
-  if (!open) {
+  if (!open || typeof document === "undefined") {
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="booking-search-modal" role="presentation">
       <button aria-label={locale === "en" ? "Close booking dialog" : "Đóng cửa sổ đặt phòng"} className="booking-search-modal__backdrop" onClick={onClose} type="button" />
 
@@ -74,6 +75,7 @@ export function BookingSearchModal({ locale, onClose, open }: BookingSearchModal
           <AvailabilityCheckBar className="booking-search-modal__check" layout="stacked" locale={locale} variant="page" />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

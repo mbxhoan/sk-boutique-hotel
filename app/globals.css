@@ -1601,6 +1601,22 @@ textarea {
   .site-header__menu-toggle {
     display: inline-flex;
   }
+
+  .site-header__drawer {
+    display: block;
+  }
+
+  .site-header__drawer-backdrop {
+    position: absolute;
+    inset: 0;
+  }
+
+  .site-header__drawer-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: none;
+  }
 }
 
 @media (min-width: 1181px) {
@@ -4850,6 +4866,8 @@ textarea {
   position: relative;
   z-index: 1;
   width: min(100%, 44rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
   padding: clamp(1rem, 2vw, 1.35rem);
   border: 1px solid rgba(0, 12, 30, 0.12);
   border-radius: 1rem;
@@ -6481,6 +6499,7 @@ textarea {
   .booking-search-modal__dialog {
     width: 100%;
     max-width: none;
+    max-height: calc(100dvh - 1.1rem);
     border-radius: 1rem 1rem 0.9rem 0.9rem;
   }
 

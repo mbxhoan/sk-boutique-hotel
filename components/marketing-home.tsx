@@ -3,6 +3,7 @@ import type { CmsPageCopy } from "@/lib/mock/public-cms";
 
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { CmsPageRenderer } from "@/components/public-cms";
+import { HomeAvailabilitySection } from "@/components/home-availability-section";
 
 type MarketingHomeProps = {
   locale: Locale;
@@ -13,7 +14,11 @@ export function MarketingHome({ locale, page }: MarketingHomeProps) {
   return (
     <>
       <PageViewTracker eventType="page_view" locale={locale} pagePath="/" entityType="homepage" />
-      <CmsPageRenderer locale={locale} page={page} />
+      <CmsPageRenderer
+        afterFirstSection={<HomeAvailabilitySection locale={locale} />}
+        locale={locale}
+        page={page}
+      />
     </>
   );
 }

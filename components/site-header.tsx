@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { BookingSearchModal } from "@/components/booking-search-modal";
 import { LogoMark } from "@/components/logo-mark";
@@ -96,6 +97,7 @@ export function SiteHeader() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openDrawerGroup, setOpenDrawerGroup] = useState<string | null | undefined>(undefined);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -103,6 +105,10 @@ export function SiteHeader() {
     setOpenDrawerGroup(undefined);
     setBookingModalOpen(false);
   }, [pathname, locale]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (drawerOpen) {
@@ -225,125 +231,124 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {drawerOpen ? (
-        <div className="site-header__drawer" role="presentation">
-          <button
-            aria-label={locale === "en" ? "Close menu" : "Đóng menu"}
-            className="site-header__drawer-backdrop"
-            onClick={() => setDrawerOpen(false)}
-            type="button"
-          />
-
-          <aside
-            aria-label={locale === "en" ? "Mobile menu" : "Menu di động"}
-            aria-modal="true"
-            className="site-header__drawer-panel"
-            id="site-header-drawer"
-            role="dialog"
-          >
-            <div className="site-header__drawer-head">
-              <LogoMark className="site-header__drawer-logo" href={appendLocaleQuery("/", locale)} priority />
+      {isMounted && drawerOpen
+        ? createPortal(
+            <div className="site-header__drawer" role="presentation">
               <button
                 aria-label={locale === "en" ? "Close menu" : "Đóng menu"}
-                className="site-header__drawer-close"
+                className="site-header__drawer-backdrop"
                 onClick={() => setDrawerOpen(false)}
                 type="button"
+              />
+
+              <aside
+                aria-label={locale === "en" ? "Mobile menu" : "Menu di động"}
+                aria-modal="true"
+                className="site-header__drawer-panel"
+                id="site-header-drawer"
+                role="dialog"
               >
-                <CloseIcon />
-              </button>
-            </div>
+                <div className="site-header__drawer-head">
+                  <LogoMark className="site-header__drawer-logo" href={appendLocaleQuery("/", locale)} priority />
+                  <button
+                    aria-label={locale === "en" ? "Close menu" : "Đóng menu"}
+                    className="site-header__drawer-close"
+                    onClick={() => setDrawerOpen(false)}
+                    type="button"
+                  >
+                    <CloseIcon />
+                  </button>
+                </div>
 
-            <div className="site-header__drawer-actions">
-              <Link
-                aria-label={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
-                className="site-header__locale site-header__locale--drawer"
-                href={appendLocaleQuery(pathname, localeToggle)}
-                onClick={() => setDrawerOpen(false)}
-              >
-                {localeLabel(localeToggle)}
-              </Link>
+                <div className="site-header__drawer-actions">
+                  <Link
+                    aria-label={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
+                    className="site-header__locale site-header__locale--drawer"
+                    href={appendLocaleQuery(pathname, localeToggle)}
+                    onClick={() => setDrawerOpen(false)}
+                  >
+                    {localeLabel(localeToggle)}
+                  </Link>
 
-              <div className="site-header__cta-wrap">
-                <button
-                  className="button button--solid site-header__cta site-header__cta--drawer"
-                  onClick={() => {
-                    setDrawerOpen(false);
-                    setBookingModalOpen(true);
-                  }}
-                  type="button"
-                >
-                  {localize(locale, headerMenu.cta.label)}
-                </button>
-              </div>
-            </div>
-
-            <nav aria-label={locale === "en" ? "Mobile navigation" : "Điều hướng di động"} className="site-header__drawer-nav">
-              {headerMenu.items.map((item) => {
-                const active = isMenuItemActive(pathname, item);
-                const label = localize(locale, item.label);
-
-                if (item.children?.length) {
-                  const drawerGroupId = item.label.vi;
-                  const isDrawerGroupOpen = openDrawerGroup === undefined ? active : openDrawerGroup === drawerGroupId;
-
-                  return (
-                    <details
-                      className="site-header__drawer-group"
-                      key={drawerGroupId}
-                      open={isDrawerGroupOpen}
+                  <div className="site-header__cta-wrap">
+                    <button
+                      className="button button--solid site-header__cta site-header__cta--drawer"
+                      onClick={() => {
+                        setDrawerOpen(false);
+                        setBookingModalOpen(true);
+                      }}
+                      type="button"
                     >
-                      <summary
-                        className={`site-header__drawer-link site-header__drawer-link--summary${active ? " site-header__drawer-link--active" : ""}`}
-                        aria-label={label}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          setOpenDrawerGroup((current) => {
-                            const currentIsOpen = current === undefined ? active : current === drawerGroupId;
+                      {localize(locale, headerMenu.cta.label)}
+                    </button>
+                  </div>
+                </div>
 
-                            return currentIsOpen ? null : drawerGroupId;
-                          });
-                        }}
-                      >
-                        <span>{label}</span>
-                        <ChevronIcon />
-                      </summary>
-                      <div className="site-header__drawer-submenu">
-                        {item.children.map((child) => {
-                          const childActive = isRouteMatch(pathname, child.href);
+                <nav aria-label={locale === "en" ? "Mobile navigation" : "Điều hướng di động"} className="site-header__drawer-nav">
+                  {headerMenu.items.map((item) => {
+                    const active = isMenuItemActive(pathname, item);
+                    const label = localize(locale, item.label);
 
-                          return (
-                            <Link
-                              aria-current={childActive ? "page" : undefined}
-                              className={`site-header__drawer-sublink${childActive ? " site-header__drawer-sublink--active" : ""}`}
-                              href={resolveHeaderHref(child.href, locale, currentHref)}
-                              key={child.href}
-                              onClick={() => setDrawerOpen(false)}
-                            >
-                              {localize(locale, child.label)}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </details>
-                  );
-                }
+                    if (item.children?.length) {
+                      const drawerGroupId = item.label.vi;
+                      const isDrawerGroupOpen = openDrawerGroup === undefined ? active : openDrawerGroup === drawerGroupId;
 
-                return (
-                  <HeaderNavLink
-                    active={active}
-                    currentHref={currentHref}
-                    href={item.href}
-                    key={item.href}
-                    label={item.label}
-                    locale={locale}
-                    onNavigate={() => setDrawerOpen(false)}
-                  />
-                );
-              })}
-            </nav>
-          </aside>
-        </div>
-      ) : null}
+                      return (
+                        <details className="site-header__drawer-group" key={drawerGroupId} open={isDrawerGroupOpen}>
+                          <summary
+                            className={`site-header__drawer-link site-header__drawer-link--summary${active ? " site-header__drawer-link--active" : ""}`}
+                            aria-label={label}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setOpenDrawerGroup((current) => {
+                                const currentIsOpen = current === undefined ? active : current === drawerGroupId;
+
+                                return currentIsOpen ? null : drawerGroupId;
+                              });
+                            }}
+                          >
+                            <span>{label}</span>
+                            <ChevronIcon />
+                          </summary>
+                          <div className="site-header__drawer-submenu">
+                            {item.children.map((child) => {
+                              const childActive = isRouteMatch(pathname, child.href);
+
+                              return (
+                                <Link
+                                  aria-current={childActive ? "page" : undefined}
+                                  className={`site-header__drawer-sublink${childActive ? " site-header__drawer-sublink--active" : ""}`}
+                                  href={resolveHeaderHref(child.href, locale, currentHref)}
+                                  key={child.href}
+                                  onClick={() => setDrawerOpen(false)}
+                                >
+                                  {localize(locale, child.label)}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </details>
+                      );
+                    }
+
+                    return (
+                      <HeaderNavLink
+                        active={active}
+                        currentHref={currentHref}
+                        href={item.href}
+                        key={item.href}
+                        label={item.label}
+                        locale={locale}
+                        onNavigate={() => setDrawerOpen(false)}
+                      />
+                    );
+                  })}
+                </nav>
+              </aside>
+            </div>,
+            document.body
+          )
+        : null}
 
       <BookingSearchModal locale={locale} onClose={() => setBookingModalOpen(false)} open={bookingModalOpen} />
     </header>
