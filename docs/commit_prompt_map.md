@@ -712,3 +712,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/rooms-image-carousel.tsx`
   - `components/rooms-catalog-page.tsx`
   - `app/globals.css`
+
+### Entry 064
+- `time`: 2026-04-17T14:54:45+07:00
+- `prompt_summary`: Mở rộng carousel ảnh phòng thành full-width tràn ngang viewport và chỉnh lại tỉ lệ khung để khớp mockup slider panorama trên desktop, tablet, và mobile.
+- `commit_message`: `fix(room-gallery): expand room carousel to full width`
+- `main_files`:
+  - `components/rooms-image-carousel.tsx`
+  - `app/globals.css`

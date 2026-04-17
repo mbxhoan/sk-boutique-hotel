@@ -6185,15 +6185,25 @@ textarea {
 }
 
 .rooms-image-carousel {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
   padding-top: clamp(0.6rem, 1.6vw, 1.2rem);
+}
+
+.rooms-image-carousel > .section-shell {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(1rem, 2vw, 1.6rem);
 }
 
 .rooms-image-carousel__frame {
   position: relative;
-  height: clamp(16rem, 34vw, 30rem);
+  aspect-ratio: 1280 / 500;
+  min-height: clamp(12.5rem, 32vw, 31rem);
+  height: auto;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   background: #0b1320;
   box-shadow: var(--shadow-soft);
 }
@@ -6380,8 +6390,8 @@ textarea {
   }
 
   .rooms-image-carousel__frame {
-    height: clamp(14rem, 52vw, 22rem);
-    border-radius: 0.75rem;
+    min-height: clamp(12rem, 46vw, 22rem);
+    border-radius: 0.85rem;
   }
 }
 
@@ -6511,7 +6521,7 @@ textarea {
   }
 
   .rooms-image-carousel__frame {
-    height: clamp(12.5rem, 60vw, 18rem);
+    min-height: clamp(11.5rem, 58vw, 17rem);
   }
 
   .rooms-image-carousel__nav {
