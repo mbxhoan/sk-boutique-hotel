@@ -42,7 +42,7 @@ const footerNavGroups: FooterGroup[] = [
   {
     title: t("Thông tin", "Information"),
     links: [
-      { href: "/ve-chung-toi", label: t("Về chúng tôi", "About us") },
+      { href: "/about-us", label: t("Về chúng tôi", "About us") },
       { href: "/lien-he", label: t("Liên hệ", "Contact") },
       { href: "/tuyen-dung", label: t("Tuyển dụng", "Careers") },
       { href: "/ho-tro", label: t("Hỗ trợ", "Support") }

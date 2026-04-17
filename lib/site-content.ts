@@ -137,7 +137,7 @@ export const navItems: LinkItem[] = [
   { label: "Phòng", href: "/rooms" },
   { label: "Tin tức", href: "/tin-tuc" },
   { label: "Thương hiệu", href: "/thuong-hieu" },
-  { label: "Về chúng tôi", href: "/ve-chung-toi" },
+  { label: "Về chúng tôi", href: "/about-us" },
   { label: "Liên hệ", href: "/lien-he" },
   { label: "Tuyển dụng", href: "/tuyen-dung" },
   { label: "Hỗ trợ", href: "/ho-tro" }
@@ -157,7 +157,7 @@ export const headerMenu: HeaderMenuConfig = {
       href: "#about-sk",
       label: { vi: "Về SK", en: "About SK" },
       children: [
-        { href: "/ve-chung-toi", label: { vi: "Về chúng tôi", en: "About us" } }
+        { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } }
       ]
     }
   ],
@@ -314,8 +314,8 @@ export const pages: PageContent[] = [
             kicker: "VỀ CHÚNG TÔI",
             title: "Câu chuyện thương hiệu và mốc thời gian",
             description: "Giữ tinh thần của một resort editorial, có timeline và values.",
-            meta: "Route: /ve-chung-toi",
-            href: "/ve-chung-toi"
+            meta: "Route: /about-us",
+            href: "/about-us"
           },
           {
             kicker: "LIÊN HỆ",
@@ -786,7 +786,7 @@ export const pages: PageContent[] = [
     }
   },
   {
-    slug: "/ve-chung-toi",
+    slug: "/about-us",
     title: "Về chúng tôi",
     description: "Trang về chúng tôi với câu chuyện thương hiệu, mốc thời gian và giá trị cốt lõi.",
     hero: {
@@ -1029,7 +1029,7 @@ export const pages: PageContent[] = [
       description:
         "Template này giúp bạn giới thiệu văn hóa, cơ hội nghề nghiệp và quy trình ứng tuyển trong cùng một phong cách với phần còn lại của site.",
       primaryCta: { label: "Ứng tuyển", href: "/lien-he" },
-      secondaryCta: { label: "Về chúng tôi", href: "/ve-chung-toi" },
+      secondaryCta: { label: "Về chúng tôi", href: "/about-us" },
       visual: {
         label: "TEAM / CULTURE",
         title: "Đội ngũ và môi trường làm việc",
@@ -1252,7 +1252,7 @@ export function findPageBySlug(slug: string) {
 
 export function getStaticRouteParams() {
   return pages
-    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh")
+    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh" && page.slug !== "/about-us")
     .map((page) => ({
       slug: page.slug.replace(/^\//, "")
     }));

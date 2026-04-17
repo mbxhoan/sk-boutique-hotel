@@ -728,3 +728,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/payment-section.tsx`
   - `app/globals.css`
+
+### Entry 066
+- `time`: 2026-04-17T15:07:22+07:00
+- `prompt_summary`: Đổi slug trang Về chúng tôi sang chuẩn tiếng Anh `/about-us`, giữ redirect legacy từ `/ve-chung-toi`, và đồng bộ lại menu/footer cùng các CTA nội bộ.
+- `commit_message`: `fix(slugs): migrate about us route to english slug`
+- `main_files`:
+  - `lib/site-content.ts`
+  - `components/site-footer.tsx`
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/ve-chung-toi/page.tsx`
