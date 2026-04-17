@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { appendLocaleQuery, type Locale } from "@/lib/locale";
+import { normalizeRoomHref } from "@/lib/room-routes";
 import type { AnalyticsEventType } from "@/lib/supabase/database.types";
 
 type AnalyticsLinkProps = {
@@ -57,7 +58,7 @@ export function AnalyticsLink({
   source = "website"
 }: AnalyticsLinkProps) {
   const pathname = usePathname();
-  const resolvedHref = appendLocaleQuery(href, locale);
+  const resolvedHref = appendLocaleQuery(normalizeRoomHref(href, locale), locale);
 
   return (
     <Link

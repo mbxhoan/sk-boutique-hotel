@@ -4,6 +4,7 @@ import {
   roomCollectionPageCopy
 } from "@/lib/mock/public-cms";
 import type { CmsCollectionItem, CmsPageCopy } from "@/lib/mock/public-cms";
+import { buildRoomDetailHref } from "@/lib/room-routes";
 import type { RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, formatCurrencyText, text } from "@/lib/supabase/content";
 import { queryWithFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
@@ -25,7 +26,7 @@ function toRoomCard(roomType: RoomTypeRow): CmsCollectionItem {
     : text("Ẩn giá công khai", "Price hidden");
 
   return {
-    href: `/phong/${roomType.slug}`,
+    href: buildRoomDetailHref(roomType.slug),
     eyebrow: text("Phòng", "Room"),
     title: text(roomType.name_vi, roomType.name_en),
     description: text(pickRoomDescription(roomType), pickRoomDescriptionEn(roomType)),

@@ -9,7 +9,7 @@ type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function LegacyRoomDetailPage({ params, searchParams }: PageProps) {
+export default async function RoomDetailRedirectPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
 

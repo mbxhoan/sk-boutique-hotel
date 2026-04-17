@@ -134,7 +134,7 @@ export type PageContent = {
 
 export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
-  { label: "Phòng", href: "/phong" },
+  { label: "Phòng", href: "/rooms" },
   { label: "Tin tức", href: "/tin-tuc" },
   { label: "Chi nhánh", href: "/chi-nhanh" },
   { label: "Thương hiệu", href: "/thuong-hieu" },
@@ -147,7 +147,7 @@ export const navItems: LinkItem[] = [
 export const headerMenu: HeaderMenuConfig = {
   items: [
     {
-      href: "/phong",
+      href: "/rooms",
       label: { vi: "Phòng", en: "Rooms" }
     },
     {

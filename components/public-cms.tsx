@@ -1,4 +1,5 @@
 import { AnalyticsLink } from "@/components/analytics-link";
+import { AvailabilityCheckBar } from "@/components/availability-check-bar";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { RoomAmenitiesSection } from "@/components/room-amenities-section";
 import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
@@ -20,6 +21,7 @@ import type {
   CmsStatsSection
 } from "@/lib/mock/public-cms";
 import { PortalBadge, PortalBulletList, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
+import { Fragment } from "react";
 
 const actionVariantMap: Record<CmsActionTone, "solid" | "ghost" | "text"> = {
   solid: "solid",
@@ -626,7 +628,16 @@ export function CmsPageRenderer({
     <div className={`cms-page cms-page--${page.kind}${className ? ` ${className}` : ""}`}>
       <div className="cms-page__sections">
         {page.sections.map((section) => (
-          <CmsSectionRenderer key={section.id} locale={locale} section={section} />
+          <Fragment key={section.id}>
+            <CmsSectionRenderer locale={locale} section={section} />
+            {page.kind === "home" && section.kind === "hero" && section.id === "hero" ? (
+              <section className="section home-availability">
+                <div className="section-shell home-availability__shell">
+                  <AvailabilityCheckBar locale={locale} variant="hero" />
+                </div>
+              </section>
+            ) : null}
+          </Fragment>
         ))}
       </div>
     </div>

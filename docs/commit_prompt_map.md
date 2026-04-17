@@ -643,3 +643,24 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `public/hero/hero-2.png`
   - `public/hero/hero-3.png`
   - `supabase/seed-content-pages.sql`
+
+### Entry 059
+- `time`: 2026-04-17T13:01:25+07:00
+- `prompt_summary`: Thêm khối kiểm tra phòng dưới hero trang chủ, đổi route phòng sang `/rooms`, refactor trang chọn phòng theo mockup, và mở chi tiết hạng phòng bằng modal canvas ngay trong trang.
+- `commit_message`: `feat(rooms): add availability search, rooms listing, and room canvas modal`
+- `main_files`:
+  - `app/(marketing)/rooms/page.tsx`
+  - `app/(marketing)/rooms/[slug]/page.tsx`
+  - `app/(marketing)/phong/page.tsx`
+  - `app/(marketing)/phong/[slug]/page.tsx`
+  - `components/availability-check-bar.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/public-cms.tsx`
+  - `components/analytics-link.tsx`
+  - `components/site-footer.tsx`
+  - `lib/room-routes.ts`
+  - `lib/rooms/catalog.ts`
+  - `lib/site-content.ts`
+  - `lib/supabase/queries/room-types.ts`
+  - `app/globals.css`

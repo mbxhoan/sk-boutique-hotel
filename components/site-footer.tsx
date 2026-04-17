@@ -34,7 +34,7 @@ const footerNavGroups: FooterGroup[] = [
   {
     title: t("Nội dung", "Content"),
     links: [
-      { href: "/phong", label: t("Phòng", "Rooms") },
+      { href: "/rooms", label: t("Phòng", "Rooms") },
       { href: "/tin-tuc", label: t("Tin tức", "News") },
       { href: "/thuong-hieu", label: t("Thương hiệu", "Brand") }
     ]
