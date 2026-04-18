@@ -882,3 +882,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/room-canvas-modal.tsx`
   - `lib/supabase/workflows.ts`
+
+### Entry 081
+- `time`: 2026-04-18T17:13:09+07:00
+- `prompt_summary`: Nới chiều cao khung ảnh trong popup chi tiết phòng để khung hình gần tỉ lệ 16:9 hơn, giảm việc ảnh bị crop mất nội dung trên desktop và mobile.
+- `commit_message`: `fix(room-canvas): raise gallery frame to 16:9`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 082
+- `time`: 2026-04-18T17:15:20+07:00
+- `prompt_summary`: Làm cho card canvas phòng đóng ngay lập tức khi bấm nút đóng hoặc bấm ra ngoài, thay vì chờ navigation route cập nhật xong mới unmount.
+- `commit_message`: `fix(room-canvas): close modal immediately on backdrop click`
+- `main_files`:
+  - `components/rooms-catalog-page.tsx`

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
@@ -125,7 +125,8 @@ export function RoomsCatalogPage({
     () => roomTypes.map((roomType) => buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0)),
     [roomAvailabilityByTypeId, roomTypes]
   );
-  const activeRoom = roomEntries.find((room) => room.slug === initialRoomSlug) ?? null;
+  const [visibleRoomSlug, setVisibleRoomSlug] = useState<string | null>(initialRoomSlug ?? null);
+  const activeRoom = roomEntries.find((room) => room.slug === visibleRoomSlug) ?? null;
   const guestCount = Math.max(1, (initialFilters.adults ?? 2) + (initialFilters.children ?? 0));
   const closeHref = buildRoomsHref({
     adults: initialFilters.adults,
@@ -134,6 +135,10 @@ export function RoomsCatalogPage({
     checkout: initialFilters.checkout,
     lang: locale
   });
+
+  useEffect(() => {
+    setVisibleRoomSlug(initialRoomSlug ?? null);
+  }, [initialRoomSlug]);
 
   return (
     <div className="rooms-page">
@@ -185,6 +190,7 @@ export function RoomsCatalogPage({
         }}
         locale={locale}
         onClose={() => {
+          setVisibleRoomSlug(null);
           router.replace(closeHref, { scroll: false });
         }}
         open={Boolean(activeRoom)}

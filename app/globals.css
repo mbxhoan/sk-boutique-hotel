@@ -6123,7 +6123,8 @@ textarea {
 
 .room-canvas__media {
   position: relative;
-  min-height: clamp(15rem, 30vw, 21rem);
+  aspect-ratio: 16 / 9;
+  min-height: clamp(17rem, 28vw, 31.5rem);
   background: linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(0, 12, 30, 0.1));
 }
 
@@ -7124,7 +7125,8 @@ textarea {
   }
 
   .room-canvas__media {
-    min-height: 13.75rem;
+    aspect-ratio: 16 / 9;
+    min-height: clamp(14rem, 52vw, 22rem);
   }
 
   .room-canvas__media-nav {
