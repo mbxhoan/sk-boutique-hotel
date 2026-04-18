@@ -1,5 +1,6 @@
 import { findNewsPageBySlug, getNewsStaticParams, homePageCopy, newsCollectionPageCopy } from "@/lib/mock/public-cms";
 import type { CmsPageCopy } from "@/lib/mock/public-cms";
+import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
 import { findPageBySlug, getStaticRouteParams } from "@/lib/site-content";
 import type { PageContent } from "@/lib/site-content";
 import { queryWithFallback } from "@/lib/supabase/queries/shared";
@@ -47,7 +48,7 @@ async function listContentPageParams(pageType: ContentPageType, fallback: { slug
 
       return data.map((row) => ({
         slug: row.slug.replace(/^\/+/, "")
-      }));
+      })).filter((item) => !isTemporarilyHiddenHref(`/${item.slug}`));
     },
     fallback
   );

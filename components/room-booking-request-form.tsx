@@ -13,6 +13,7 @@ type RoomBookingRequestFormProps = {
   branchId: string;
   guestCount: number;
   locale: Locale;
+  availableRooms: number;
   roomTypeId: string;
   stayEndAt: string;
   stayStartAt: string;
@@ -57,6 +58,10 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
     return localize(locale, "Không thể gửi yêu cầu booking.", "Unable to submit the booking request.");
   }
 
+  if (message.includes("no rooms are available for the selected stay window")) {
+    return localize(locale, "Hết phòng trong khoảng thời gian bạn chọn.", "No rooms are available for the selected stay window.");
+  }
+
   if (message.includes("unauthorized booking request")) {
     return localize(locale, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", "Your session has expired. Please sign in again.");
   }
@@ -66,6 +71,7 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
 
 export function RoomBookingRequestForm({
   branchId,
+  availableRooms,
   guestCount,
   locale,
   roomTypeId,
@@ -394,14 +400,26 @@ export function RoomBookingRequestForm({
       ) : null}
 
       <div className="room-booking-panel__actions">
-        <button className="button button--solid" disabled={isSubmitting} type="submit">
+        <button className="button button--solid" disabled={isSubmitting || availableRooms <= 0} type="submit">
           {isSubmitting
             ? localize(locale, "Đang gửi...", "Sending...")
-            : memberProfile
-              ? localize(locale, "Gửi yêu cầu", "Send request")
-              : localize(locale, "Gửi yêu cầu & đăng nhập", "Send request & sign in")}
+            : availableRooms <= 0
+              ? localize(locale, "Hết phòng", "Sold out")
+              : memberProfile
+                ? localize(locale, "Gửi yêu cầu", "Send request")
+                : localize(locale, "Gửi yêu cầu & đăng nhập", "Send request & sign in")}
         </button>
       </div>
+
+      {availableRooms <= 0 ? (
+        <p className="room-booking-panel__error">
+          {localize(
+            locale,
+            "Không còn phòng trống cho khoảng thời gian này. Hãy chọn ngày khác.",
+            "No rooms are available for this stay window. Please choose different dates."
+          )}
+        </p>
+      ) : null}
 
       {error ? <p className="room-booking-panel__error">{error}</p> : null}
     </form>

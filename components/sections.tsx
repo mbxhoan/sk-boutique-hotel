@@ -4,6 +4,7 @@ import { AnalyticsLink } from "@/components/analytics-link";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery, translate } from "@/lib/locale";
+import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
 import type {
   CardSectionData,
   ClosingSectionData,
@@ -46,6 +47,10 @@ export function ButtonLink({
   locale = "vi",
   variant = "solid"
 }: ButtonLinkProps) {
+  if (isTemporarilyHiddenHref(href)) {
+    return null;
+  }
+
   return (
     <AnalyticsLink
       className={`button button--${variant}${className ? ` ${className}` : ""}`}
@@ -231,6 +236,7 @@ export function CardSection({ section, locale = "vi" }: { section: CardSectionDa
             );
 
             return card.href ? (
+              isTemporarilyHiddenHref(card.href) ? null : (
               <Link
                 className={cardClasses}
                 href={appendLocaleQuery(card.href, locale)}
@@ -238,6 +244,7 @@ export function CardSection({ section, locale = "vi" }: { section: CardSectionDa
               >
                 {cardBody}
               </Link>
+              )
             ) : (
               <article className={cardClasses} key={`${card.kicker}-${card.title}`}>
                 {cardBody}

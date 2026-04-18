@@ -147,6 +147,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const totalPrice = room.priceVisible ? basePrice + breakfastOption.delta + cancellationOption.delta : null;
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
+  const isSoldOut = room.availableRooms <= 0;
 
   return (
     <div className="room-canvas" role="presentation">
@@ -345,8 +346,17 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
 
             <div className="room-canvas__footer-actions">
               <p className="room-canvas__availability">{room.availabilityLabel[locale]}</p>
-              <button className="button button--solid room-canvas__cta" onClick={() => setBookingOpen(true)} type="button">
-                {locale === "en" ? "Book now" : "Đặt phòng"}
+              <button
+                className="button button--solid room-canvas__cta"
+                disabled={isSoldOut}
+                onClick={() => {
+                  if (!isSoldOut) {
+                    setBookingOpen(true);
+                  }
+                }}
+                type="button"
+              >
+                {isSoldOut ? (locale === "en" ? "Sold out" : "Hết phòng") : locale === "en" ? "Book now" : "Đặt phòng"}
               </button>
             </div>
           </div>
@@ -377,6 +387,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
 
               <RoomBookingRequestForm
                 branchId={bookingContext.branchId}
+                availableRooms={room.availableRooms}
                 guestCount={bookingContext.guestCount}
                 locale={locale}
                 roomTypeId={room.roomTypeId}

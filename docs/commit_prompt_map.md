@@ -932,3 +932,28 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `feat(room-facilities): rebalance amenities and room info columns`
 - `main_files`:
   - `components/facilities-section.tsx`
+
+### Entry 087
+- `time`: 2026-04-18T23:19:57+07:00
+- `prompt_summary`: Tạm ẩn các static pages/urls (/thuong-hieu, /uu-dai, /dich-vu, /lien-he, /ho-tro, /tuyen-dung), gom /ve-chung-toi về /about-us, gộp /phong sang /rooms, và ẩn internal routes /tin-tuc cùng /tin-tuc/[slug].
+- `commit_message`: `fix(routes): hide legacy public pages and news routes`
+- `main_files`:
+  - `lib/hidden-routes.ts`
+  - `lib/site-content.ts`
+  - `components/site-footer.tsx`
+  - `components/sections.tsx`
+  - `components/analytics-link.tsx`
+  - `lib/supabase/queries/content-pages.ts`
+  - `app/(marketing)/[slug]/page.tsx`
+  - `app/(marketing)/tin-tuc/page.tsx`
+  - `app/(marketing)/tin-tuc/[slug]/page.tsx`
+
+### Entry 088
+- `time`: 2026-04-18T23:49:18+07:00
+- `prompt_summary`: Sửa logic sold out của trang `/rooms` để chỉ báo hết phòng khi khoảng ngày đang xem thực sự không còn phòng trống, và chặn gửi yêu cầu booking nếu user cố submit khi đã sold out.
+- `commit_message`: `fix(rooms-availability): count availability by stay window and block sold-out bookings`
+- `main_files`:
+  - `app/(marketing)/rooms/page.tsx`
+  - `lib/supabase/workflows.ts`
+  - `components/room-booking-request-form.tsx`
+  - `components/room-canvas-modal.tsx`

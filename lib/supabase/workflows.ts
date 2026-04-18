@@ -2,7 +2,8 @@ import type {
   AvailabilityRequestRow,
   ReservationRow,
   ReservationStatus,
-  RoomHoldRow
+  RoomHoldRow,
+  RoomRow
 } from "@/lib/supabase/database.types";
 import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
 import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
@@ -97,8 +98,30 @@ function normalizeTimestamptzInput(value: string) {
   return `${value}:00+07:00`;
 }
 
+async function assertRoomsAvailable(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+  input: Pick<AvailabilityRequestInput, "branchId" | "roomTypeId" | "stayEndAt" | "stayStartAt">
+) {
+  const { data, error } = await supabase.rpc("find_available_rooms", {
+    p_branch_id: input.branchId,
+    p_limit: 1,
+    p_room_type_id: input.roomTypeId,
+    p_stay_end_at: normalizeTimestamptzInput(input.stayEndAt),
+    p_stay_start_at: normalizeTimestamptzInput(input.stayStartAt)
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!((data ?? []) as RoomRow[]).length) {
+    throw new Error("No rooms are available for the selected stay window.");
+  }
+}
+
 export async function submitAvailabilityRequest(input: AvailabilityRequestInput) {
   const supabase = createSupabaseServiceClient();
+  await assertRoomsAvailable(supabase, input);
   const { data, error } = await supabase.rpc("submit_availability_request", {
     p_branch_id: input.branchId,
     p_contact_email: input.contactEmail,

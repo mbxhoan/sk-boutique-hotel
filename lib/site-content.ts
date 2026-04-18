@@ -1,4 +1,5 @@
 import type { LocalizedText } from "@/lib/mock/i18n";
+import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
 
 export type LinkItem = {
   label: string;
@@ -135,12 +136,7 @@ export type PageContent = {
 export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Phòng", href: "/rooms" },
-  { label: "Tin tức", href: "/tin-tuc" },
-  { label: "Thương hiệu", href: "/thuong-hieu" },
   { label: "Về chúng tôi", href: "/about-us" },
-  { label: "Liên hệ", href: "/lien-he" },
-  { label: "Tuyển dụng", href: "/tuyen-dung" },
-  { label: "Hỗ trợ", href: "/ho-tro" }
 ];
 
 export const headerMenu: HeaderMenuConfig = {
@@ -1256,7 +1252,13 @@ export function findPageBySlug(slug: string) {
 
 export function getStaticRouteParams() {
   return pages
-    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh" && page.slug !== "/about-us")
+    .filter(
+      (page) =>
+        page.slug !== "/" &&
+        page.slug !== "/chi-nhanh" &&
+        page.slug !== "/about-us" &&
+        !isTemporarilyHiddenHref(page.slug)
+    )
     .map((page) => ({
       slug: page.slug.replace(/^\//, "")
     }));

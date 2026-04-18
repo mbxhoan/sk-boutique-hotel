@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { PageTemplate } from "@/components/page-template";
+import { isTemporarilyHiddenSlug } from "@/lib/hidden-routes";
 import { resolveLocale, translate } from "@/lib/locale";
 import { getContentStaticRouteParams, loadStaticPageBySlug } from "@/lib/supabase/queries/content-pages";
 
@@ -23,6 +24,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+
+  if (isTemporarilyHiddenSlug(slug)) {
+    return {};
+  }
+
   const page = await loadStaticPageBySlug(slug);
 
   if (!page) {
@@ -39,6 +45,11 @@ export default async function StaticPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+
+  if (isTemporarilyHiddenSlug(slug)) {
+    notFound();
+  }
+
   const page = await loadStaticPageBySlug(slug);
 
   if (!page) {

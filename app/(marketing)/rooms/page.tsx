@@ -5,8 +5,8 @@ import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
 import { listBranches } from "@/lib/supabase/queries/branches";
+import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
-import { listRoomsByRoomTypeId } from "@/lib/supabase/queries/rooms";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -50,20 +50,8 @@ export default async function RoomsPage({ searchParams }: PageProps) {
   const roomTypes = await listRoomTypes();
   const activeRoomType = resolvedSearchParams.room
     ? roomTypes.find((roomType) => roomType.slug === resolvedSearchParams.room)
-    : null;
+  : null;
   const defaultBranchId = branches[0]?.id ?? null;
-
-  const roomAvailabilityByTypeId = Object.fromEntries(
-    await Promise.all(
-      roomTypes.map(async (roomType) => {
-        const rooms = await listRoomsByRoomTypeId(roomType.id);
-        const availableRooms = rooms.filter((room) => room.status === "available").length;
-
-        return [roomType.id, availableRooms] as const;
-      })
-    )
-  );
-
   const defaultFilters = getDefaultFilters();
   const initialFilters = {
     adults: resolvedSearchParams.adults ?? defaultFilters.adults,
@@ -73,6 +61,19 @@ export default async function RoomsPage({ searchParams }: PageProps) {
     lang: resolvedSearchParams.lang,
     room: resolvedSearchParams.room
   };
+
+  const availableRooms = defaultBranchId
+    ? await findAvailableRooms({
+        branchId: defaultBranchId,
+        stayEndAt: initialFilters.checkout,
+        stayStartAt: initialFilters.checkin
+      })
+    : [];
+  const roomAvailabilityByTypeId = availableRooms.reduce<Record<string, number>>((accumulator, room) => {
+    accumulator[room.room_type_id] = (accumulator[room.room_type_id] ?? 0) + 1;
+
+    return accumulator;
+  }, {});
 
   return (
     <>
