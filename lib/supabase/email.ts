@@ -2,7 +2,7 @@ import type { AvailabilityRequestRow, BranchRow, RoomTypeRow } from "@/lib/supab
 import {
   getSupabaseEmailAdminRecipient,
   getSupabaseEmailFromAddress,
-  getSupabaseEmailFunctionName,
+  getSupabaseEmailFunctionNames,
   hasSupabaseServiceConfig
 } from "@/lib/supabase/env";
 import { listBranches } from "@/lib/supabase/queries/branches";
@@ -152,15 +152,25 @@ export async function sendEmail(input: SendEmailInput) {
     html: input.html.trim()
   };
 
-  const { data, error } = await supabase.functions.invoke(getSupabaseEmailFunctionName(), {
-    body: payload
-  });
+  let lastError: unknown = null;
 
-  if (error) {
-    throw error;
+  for (const functionName of getSupabaseEmailFunctionNames()) {
+    const { data, error } = await supabase.functions.invoke(functionName, {
+      body: payload
+    });
+
+    if (!error) {
+      return data;
+    }
+
+    lastError = error;
+
+    if ((error as { context?: Response | null }).context?.status !== 404) {
+      throw error;
+    }
   }
 
-  return data;
+  throw lastError instanceof Error ? lastError : new Error("Unable to invoke Supabase email function.");
 }
 
 export async function sendAvailabilityRequestEmails(request: AvailabilityRequestRow) {

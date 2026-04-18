@@ -9,8 +9,8 @@ import {
 const brand = {
   hotelName: "SK Boutique Hotel",
   brandLine: "Boutique Hotel",
-  contactPhone: "0900 000 000",
-  contactEmail: "hello@skboutiquehotel.com"
+  contactPhone: "0908 233 583",
+  contactEmail: "admin@skbh.vn"
 };
 
 const requestCustomer = createBookingRequestCustomerEmail(brand, {

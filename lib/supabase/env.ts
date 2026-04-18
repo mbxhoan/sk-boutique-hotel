@@ -65,6 +65,13 @@ export function getSupabaseEmailFunctionName() {
   return getFirstDefinedEnv(emailFunctionNameKeys) ?? "send-email";
 }
 
+export function getSupabaseEmailFunctionNames() {
+  const configuredName = getFirstDefinedEnv(emailFunctionNameKeys);
+  const names = [configuredName ?? "send-email", "resend-email"];
+
+  return Array.from(new Set(names.filter((name) => name.trim().length > 0)));
+}
+
 export function getSupabaseEmailFromAddress() {
   return getFirstDefinedEnv(emailFromAddressKeys) ?? "admin@bkhanhxinh.com";
 }

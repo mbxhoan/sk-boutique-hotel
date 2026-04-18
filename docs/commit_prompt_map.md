@@ -833,3 +833,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(admin)/admin/page.tsx`
   - `components/admin-workflow-dashboard.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 077
+- `time`: 2026-04-18T13:40:26+07:00
+- `prompt_summary`: Sửa lỗi test mail 404 do app gọi sai slug Edge Function, thêm fallback thử `resend-email` khi `send-email` không tồn tại, và chặn lỗi server action để admin portal không văng 500 khi test thất bại.
+- `commit_message`: `fix(email-test): fallback edge function slug and prevent admin crash`
+- `main_files`:
+  - `lib/supabase/env.ts`
+  - `lib/supabase/email.ts`
+  - `app/(admin)/admin/actions.ts`

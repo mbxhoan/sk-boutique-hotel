@@ -165,12 +165,20 @@ export async function sendEmailTestAction(formData: FormData) {
   const recipientEmail = readOptionalString(formData, "recipientEmail") ?? getSupabaseEmailAdminRecipient();
   const email = buildEmailTemplateTestEmail(templateKey);
 
-  await sendEmail({
-    from: getSupabaseEmailFromAddress(),
-    html: email.html,
-    subject: email.subject,
-    to: recipientEmail
-  });
+  try {
+    await sendEmail({
+      from: getSupabaseEmailFromAddress(),
+      html: email.html,
+      subject: email.subject,
+      to: recipientEmail
+    });
+  } catch (error) {
+    console.warn("[email-test] Failed to send test email", {
+      error,
+      recipientEmail,
+      templateKey
+    });
+  }
 
   revalidatePath("/admin");
 }
