@@ -8,6 +8,7 @@ import { listReservations } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowMemberHistoryData,
@@ -108,6 +109,15 @@ function toPaymentProofView(
 export async function loadMemberHistoryDashboard(authUserId: string): Promise<WorkflowMemberHistoryData | null> {
   return queryWithServiceFallback(
     async () => {
+      const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+
+      if (releaseResults.some((result) => result.status === "rejected")) {
+        console.warn("[workflow] Failed to release expired holds/reservations before loading member history", {
+          holds: releaseResults[0].status === "fulfilled",
+          reservations: releaseResults[1].status === "fulfilled"
+        });
+      }
+
       const customer = await getCustomerByAuthUserId(authUserId);
 
       if (!customer) {

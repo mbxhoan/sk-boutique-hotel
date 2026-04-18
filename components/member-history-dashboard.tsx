@@ -1,6 +1,7 @@
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { submitPaymentProofAction } from "@/app/actions/payments";
+import { MemberLiveUpdates } from "@/components/member-live-updates";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import type { WorkflowMemberHistoryData, WorkflowPaymentRequest } from "@/lib/supabase/workflow.types";
 
@@ -154,6 +155,20 @@ export function MemberHistoryDashboard({ data, locale }: MemberHistoryDashboardP
 
   return (
     <div className="portal-content">
+      <section className="portal-section" id="live-updates">
+        <PortalSectionHeading
+          description={{
+            en: "Realtime notifications keep your booking history up to date while staff work in the admin portal.",
+            vi: "Thông báo realtime giúp lịch sử booking cập nhật khi staff thao tác trong admin portal."
+          }}
+          eyebrow={{ en: "Realtime", vi: "Realtime" }}
+          locale={locale}
+          title={{ en: "Live updates", vi: "Cập nhật trực tiếp" }}
+        />
+
+        <MemberLiveUpdates customerId={data.customer.id} locale={locale} />
+      </section>
+
       <section className="portal-section" id="summary">
         <PortalSectionHeading
           description={{

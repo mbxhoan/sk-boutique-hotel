@@ -14,6 +14,7 @@ import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from
 import { type RoomTypeRow } from "@/lib/supabase/database.types";
 
 type RoomsCatalogPageProps = {
+  defaultBranchId: string | null;
   initialFilters: RoomsSearchState;
   initialRoomSlug?: string | null;
   locale: Locale;
@@ -112,6 +113,7 @@ function RoomCard({
 }
 
 export function RoomsCatalogPage({
+  defaultBranchId,
   initialFilters,
   initialRoomSlug,
   locale,
@@ -124,6 +126,7 @@ export function RoomsCatalogPage({
     [roomAvailabilityByTypeId, roomTypes]
   );
   const activeRoom = roomEntries.find((room) => room.slug === initialRoomSlug) ?? null;
+  const guestCount = Math.max(1, (initialFilters.adults ?? 2) + (initialFilters.children ?? 0));
   const closeHref = buildRoomsHref({
     adults: initialFilters.adults,
     checkin: initialFilters.checkin,
@@ -174,6 +177,12 @@ export function RoomsCatalogPage({
       {/* <RoomsImageCarousel locale={locale} /> */}
 
       <RoomCanvasModal
+        bookingContext={{
+          branchId: defaultBranchId ?? "",
+          guestCount,
+          stayEndAt: initialFilters.checkout ?? "",
+          stayStartAt: initialFilters.checkin ?? ""
+        }}
         locale={locale}
         onClose={() => {
           router.replace(closeHref, { scroll: false });

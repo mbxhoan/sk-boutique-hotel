@@ -850,3 +850,27 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `lib/supabase/email.ts`
   - `README.md`
+
+### Entry 079
+- `time`: 2026-04-18T15:16:49+07:00
+- `prompt_summary`: Thiết lập luồng booking phase 1 theo hướng manual-first: đăng ký/đăng nhập member với mật khẩu mặc định, tạo request booking từ public room canvas, gửi mail xác nhận cho khách và admin, bổ sung realtime notifications cho admin/member portal, quản lý lịch sử booking của khách, và thêm cơ chế hết hạn reservation sau 30 phút để admin tạo booking/xử lý cọc theo workflow vận hành.
+- `commit_message`: `feat(booking-platform): add member auth, booking workflow, and realtime notifications`
+- `main_files`:
+  - `components/member-auth-form.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `components/admin-live-updates.tsx`
+  - `components/member-live-updates.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/(marketing)/layout.tsx`
+  - `app/(member-auth)/member/sign-in/page.tsx`
+  - `app/(member-auth)/member/sign-up/page.tsx`
+  - `app/api/member/bootstrap/route.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `lib/supabase/workflows.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/database.types.ts`
+  - `supabase/migrations/20260418093000_phase_g_reservation_expiry.sql`
+  - `README.md`

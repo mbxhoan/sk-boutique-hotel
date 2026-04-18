@@ -184,7 +184,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
   const { data: reservation, error: reservationError } = await supabase
     .from("reservations")
     .select(
-      "id, booking_code, branch_id, customer_id, primary_room_type_id, stay_start_at, stay_end_at, guest_count, status, base_price, weekend_surcharge, manual_override_price, nightly_rate, total_amount, deposit_amount, source, notes, confirmed_at, cancelled_at, completed_at, created_by, updated_by, created_at, updated_at"
+      "id, booking_code, branch_id, customer_id, primary_room_type_id, stay_start_at, stay_end_at, guest_count, status, base_price, weekend_surcharge, manual_override_price, nightly_rate, total_amount, deposit_amount, expires_at, source, notes, confirmed_at, cancelled_at, completed_at, created_by, updated_by, created_at, updated_at"
     )
     .eq("id", input.reservationId)
     .maybeSingle();

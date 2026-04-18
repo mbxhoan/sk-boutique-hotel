@@ -10,7 +10,7 @@ const brand = {
   hotelName: "SK Boutique Hotel",
   brandLine: "Boutique Hotel",
   contactPhone: "0908 233 583",
-  contactEmail: "admin@skbh.vn"
+  contactEmail: "skhotel.phuquoc@gmail.com"
 };
 
 const requestCustomer = createBookingRequestCustomerEmail(brand, {

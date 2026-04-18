@@ -22,6 +22,7 @@ import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { countRoomHolds, countExpiringRoomHolds, listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { countReservations, listReservations } from "@/lib/supabase/queries/reservations";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowAuditLog,
@@ -296,6 +297,15 @@ function getVietnamStartOfDayIso(date = new Date()) {
 }
 
 export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = {}): Promise<WorkflowDashboardData> {
+  const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+
+  if (releaseResults.some((result) => result.status === "rejected")) {
+    console.warn("[workflow] Failed to release expired holds/reservations before loading admin dashboard", {
+      holds: releaseResults[0].status === "fulfilled",
+      reservations: releaseResults[1].status === "fulfilled"
+    });
+  }
+
   const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs, bankAccounts, paymentRequests, paymentProofs] = await Promise.all([
     listBranches(),
     listRoomTypes(),

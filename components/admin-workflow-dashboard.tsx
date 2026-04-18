@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
+import { AdminLiveUpdates } from "@/components/admin-live-updates";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import {
   createPaymentRequestAction,
@@ -131,6 +132,7 @@ function badgeToneForReservation(status: WorkflowReservation["status"]) {
       return "accent" as const;
     case "pending_deposit":
     case "draft":
+    case "expired":
       return "soft" as const;
     default:
       return "neutral" as const;
@@ -730,6 +732,20 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
 
   return (
     <div className="portal-content">
+      <section className="portal-section" id="live-updates">
+        <PortalSectionHeading
+          description={{
+            en: "Realtime admin notifications keep the workflow console fresh as requests arrive.",
+            vi: "Thông báo realtime giúp bảng vận hành luôn cập nhật khi có request mới."
+          }}
+          eyebrow={{ en: "Realtime", vi: "Realtime" }}
+          locale={locale}
+          title={{ en: "Live updates", vi: "Cập nhật trực tiếp" }}
+        />
+
+        <AdminLiveUpdates locale={locale} />
+      </section>
+
       {!canOperate ? (
         <PortalCard className="portal-panel" tone="soft">
           <p className="portal-panel__eyebrow">{locale === "en" ? "Service unavailable" : "Chưa nối Supabase service role"}</p>
@@ -800,7 +816,7 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
               <form action={releaseExpiredHoldsAction}>
                 <input name="asOf" type="hidden" value="" />
                 <button className="button button--text-light" type="submit">
-                  {locale === "en" ? "Release expired holds" : "Release holds hết hạn"}
+                  {locale === "en" ? "Release expired holds & bookings" : "Dọn holds & booking hết hạn"}
                 </button>
               </form>
             ) : null

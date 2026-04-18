@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 import { LogoMark } from "@/components/logo-mark";
 import { PortalBadge, PortalCard, PortalBulletList } from "@/components/portal-ui";
@@ -25,9 +26,17 @@ function buildSectionHref(pathname: string, search: string, href: string) {
 export function MemberShell({ children }: MemberShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const search = searchParams.toString();
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
+
+  async function handleSignOut() {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.push(appendLocaleQuery("/member/sign-in", locale));
+    router.refresh();
+  }
 
   return (
     <div className="portal-shell portal-shell--member">
@@ -79,6 +88,9 @@ export function MemberShell({ children }: MemberShellProps) {
             >
               {localize(locale, memberDashboardCopy.shell.actions.primary.label)}
             </Link>
+            <button className="button button--text-light portal-shell__sign-out" onClick={handleSignOut} type="button">
+              {locale === "en" ? "Sign out" : "Đăng xuất"}
+            </button>
             <Link className="button button--text-light" href={appendLocaleQuery(pathname, localeToggle)}>
               {localeLabel(localeToggle)}
             </Link>

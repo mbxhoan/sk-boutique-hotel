@@ -799,6 +799,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -827,6 +828,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -853,6 +855,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -995,7 +998,7 @@ export interface Database {
       payment_proof_status: "uploaded" | "verified" | "rejected";
       payment_request_status: "sent" | "pending_verification" | "verified" | "rejected" | "expired" | "cancelled";
       reservation_room_item_status: "active" | "released" | "cancelled";
-      reservation_status: "draft" | "pending_deposit" | "confirmed" | "cancelled" | "completed";
+      reservation_status: "draft" | "pending_deposit" | "confirmed" | "cancelled" | "completed" | "expired";
       room_hold_status: "active" | "converted" | "released" | "expired" | "cancelled";
       room_status: "available" | "held" | "booked" | "blocked" | "maintenance";
     };
@@ -1009,6 +1012,7 @@ export interface Database {
           p_created_by?: string | null;
           p_customer_id?: string | null;
           p_deposit_amount?: number | null;
+          p_expires_at?: string | null;
           p_guest_count?: number | null;
           p_hold_id?: string | null;
           p_manual_override_price?: number | null;
@@ -1083,6 +1087,20 @@ export interface Database {
           released_at: string | null;
           room_id: string;
           status: Database["public"]["Enums"]["room_hold_status"];
+        }[];
+      };
+      release_expired_reservations: {
+        Args: {
+          p_as_of?: string | null;
+        };
+        Returns: {
+          booking_code: string;
+          branch_id: string;
+          customer_id: string;
+          expires_at: string;
+          released_at: string | null;
+          reservation_id: string;
+          status: Database["public"]["Enums"]["reservation_status"];
         }[];
       };
       submit_availability_request: {

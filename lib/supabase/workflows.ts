@@ -4,6 +4,7 @@ import type {
   ReservationStatus,
   RoomHoldRow
 } from "@/lib/supabase/database.types";
+import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
 import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -64,6 +65,10 @@ export type ReleaseExpiredHoldsInput = {
   asOf?: string;
 };
 
+export type ReleaseExpiredReservationsInput = {
+  asOf?: string;
+};
+
 export type ReleasedHoldRow = {
   branch_id: string;
   expires_at: string;
@@ -72,6 +77,16 @@ export type ReleasedHoldRow = {
   released_at: string | null;
   room_id: string;
   status: RoomHoldRow["status"];
+};
+
+export type ReleasedReservationRow = {
+  booking_code: string;
+  branch_id: string;
+  customer_id: string;
+  expires_at: string;
+  released_at: string | null;
+  reservation_id: string;
+  status: ReservationStatus;
 };
 
 function normalizeTimestamptzInput(value: string) {
@@ -169,6 +184,10 @@ export async function createReservation(input: CreateReservationInput) {
 }
 
 export async function releaseExpiredHolds(input: ReleaseExpiredHoldsInput = {}) {
+  if (!hasSupabaseServiceConfig()) {
+    return [];
+  }
+
   const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase.rpc("release_expired_holds", {
     p_as_of: input.asOf ? normalizeTimestamptzInput(input.asOf) : new Date().toISOString()
@@ -179,4 +198,21 @@ export async function releaseExpiredHolds(input: ReleaseExpiredHoldsInput = {}) 
   }
 
   return (data ?? []) as ReleasedHoldRow[];
+}
+
+export async function releaseExpiredReservations(input: ReleaseExpiredReservationsInput = {}) {
+  if (!hasSupabaseServiceConfig()) {
+    return [];
+  }
+
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase.rpc("release_expired_reservations", {
+    p_as_of: input.asOf ? normalizeTimestamptzInput(input.asOf) : new Date().toISOString()
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as ReleasedReservationRow[];
 }

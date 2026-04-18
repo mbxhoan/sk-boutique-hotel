@@ -159,6 +159,10 @@ export const headerMenu: HeaderMenuConfig = {
       children: [
         { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } }
       ]
+    },
+    {
+      href: "/member",
+      label: { vi: "Thành viên", en: "Member" }
     }
   ],
   cta: {

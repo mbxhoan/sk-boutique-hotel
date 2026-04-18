@@ -6488,6 +6488,172 @@ textarea {
   min-width: 10rem;
 }
 
+.room-booking-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  margin-top: 0.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  box-shadow: var(--shadow-soft);
+}
+
+.room-booking-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.08);
+}
+
+.room-booking-panel__eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--gold-strong);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.room-booking-panel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.room-booking-panel__description {
+  max-width: 40rem;
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.room-booking-panel__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(0, 12, 30, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.room-booking-panel__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.65rem;
+  background: rgba(197, 160, 89, 0.08);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.room-booking-panel__summary strong {
+  font-weight: 700;
+}
+
+.room-booking-panel__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.room-booking-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.room-booking-panel__field {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--ink-soft);
+}
+
+.room-booking-panel__field span {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.room-booking-panel__field--full {
+  grid-column: 1 / -1;
+}
+
+.room-booking-panel__input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(0, 12, 30, 0.12);
+  border-radius: 0.85rem;
+  background: var(--surface-container-lowest);
+  color: var(--ink);
+  outline: none;
+  box-shadow: var(--shadow-soft);
+}
+
+.room-booking-panel__input::placeholder {
+  color: var(--muted);
+}
+
+.room-booking-panel__input:focus {
+  border-color: rgba(197, 160, 89, 0.7);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+}
+
+.room-booking-panel__input--textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.room-booking-panel__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.room-booking-panel__consent input {
+  margin-top: 0.22rem;
+  accent-color: var(--gold-strong);
+}
+
+.room-booking-panel__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.room-booking-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.room-booking-panel__error {
+  margin: 0;
+  color: #9d4a40;
+  font-size: 0.9rem;
+}
+
 .payment-band {
   padding-block: clamp(0.8rem, 2vw, 1.6rem);
 }
@@ -6789,6 +6955,18 @@ textarea {
     align-items: flex-start;
   }
 
+  .room-booking-panel__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-booking-panel__actions {
+    justify-content: stretch;
+  }
+
+  .room-booking-panel__actions .button {
+    width: 100%;
+  }
+
   .rooms-section__description,
   .rooms-story__description {
     max-width: none;
@@ -6964,6 +7142,20 @@ textarea {
 
   .room-canvas__room-title {
     font-size: clamp(1.65rem, 9vw, 2.45rem);
+  }
+
+  .room-booking-panel {
+    padding: 0.9rem;
+  }
+
+  .room-booking-panel__head,
+  .room-booking-panel__summary {
+    gap: 0.75rem;
+  }
+
+  .room-booking-panel__summary {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .payment-band__brand {

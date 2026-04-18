@@ -1,15 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
-import { appendLocaleQuery } from "@/lib/locale";
 import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
+import { RoomBookingRequestForm } from "@/components/room-booking-request-form";
 
 type RoomCanvasModalProps = {
   locale: Locale;
+  bookingContext: {
+    branchId: string;
+    guestCount: number;
+    stayEndAt: string;
+    stayStartAt: string;
+  };
   onClose: () => void;
   open: boolean;
   room: RoomCatalogEntry | null;
@@ -78,10 +83,11 @@ function roomAmenities(locale: Locale) {
       ];
 }
 
-export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModalProps) {
+export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }: RoomCanvasModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [breakfastIndex, setBreakfastIndex] = useState(0);
   const [cancellationIndex, setCancellationIndex] = useState(0);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     if (!open || !room) {
@@ -94,6 +100,7 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
 
     setBreakfastIndex(breakfastSelected >= 0 ? breakfastSelected : 0);
     setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
+    setBookingOpen(false);
   }, [open, room]);
 
   useEffect(() => {
@@ -326,11 +333,46 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
 
             <div className="room-canvas__footer-actions">
               <p className="room-canvas__availability">{room.availabilityLabel[locale]}</p>
-              <Link className="button button--solid room-canvas__cta" href={appendLocaleQuery("/lien-he", locale)}>
+              <button className="button button--solid room-canvas__cta" onClick={() => setBookingOpen(true)} type="button">
                 {locale === "en" ? "Book now" : "Đặt phòng"}
-              </Link>
+              </button>
             </div>
           </div>
+
+          {bookingOpen ? (
+            <div className="room-booking-panel">
+              <div className="room-booking-panel__head">
+                <div>
+                  <p className="room-booking-panel__eyebrow">{locale === "en" ? "Booking request" : "Yêu cầu đặt phòng"}</p>
+                  <h4 className="room-booking-panel__title">
+                    {locale === "en" ? "Enter guest details" : "Nhập thông tin khách"}
+                  </h4>
+                  <p className="room-booking-panel__description">
+                    {locale === "en"
+                      ? "We will sign you in automatically and send the request to the admin portal."
+                      : "Chúng tôi sẽ tự động đăng nhập và gửi yêu cầu sang admin portal."}
+                  </p>
+                </div>
+                <button className="room-booking-panel__close" onClick={() => setBookingOpen(false)} type="button">
+                  {locale === "en" ? "Hide" : "Ẩn"}
+                </button>
+              </div>
+
+              <div className="room-booking-panel__summary">
+                <span>{room.title[locale]}</span>
+                <strong>{room.bookingCtaLabel[locale]}</strong>
+              </div>
+
+              <RoomBookingRequestForm
+                branchId={bookingContext.branchId}
+                guestCount={bookingContext.guestCount}
+                locale={locale}
+                roomTypeId={room.roomTypeId}
+                stayEndAt={bookingContext.stayEndAt}
+                stayStartAt={bookingContext.stayStartAt}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
     </div>

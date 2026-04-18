@@ -5,6 +5,7 @@ Frontend tĩnh cho website `SK Boutique Hotel`, dựng bằng **Next.js App Rout
 ## What's New
 
 - Đã thêm lớp gửi email qua Supabase Edge Function `send-email`, dùng lại được cho mail khách hàng và thông báo admin trong các workflow đặt phòng / để lại thông tin.
+- Đã thêm luồng member auth, booking request từ popup phòng, admin/member realtime updates, và portal member có lịch sử cùng logout.
 
 ## Email Config
 
@@ -28,10 +29,9 @@ Mở `http://localhost:3000`.
 
 - `/` - Marketing home shell
 - `/thuong-hieu` - Thương hiệu
-- `/chi-nhanh` - Chi nhánh
-- `/uu-dai` - Ưu đãi
-- `/dich-vu` - Dịch vụ
-- `/ve-chung-toi` - Về chúng tôi
+- `/rooms` - Chọn phòng / danh sách phòng
+- `/about-us` - Về chúng tôi
+- `/chi-nhanh` - Legacy redirect từ slug cũ
 - `/lien-he` - Liên hệ
 - `/tuyen-dung` - Tuyển dụng
 - `/ho-tro` - Hỗ trợ

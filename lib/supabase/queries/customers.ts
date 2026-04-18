@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/locale";
 import { defaultLocale } from "@/lib/locale";
-import type { CustomerRow } from "@/lib/supabase/database.types";
+import type { CustomerInsert, CustomerRow } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { queryWithFallback, queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
@@ -8,12 +8,12 @@ export type CustomerProfileInput = {
   authUserId: string;
   email: string;
   fullName: string;
-  marketingConsent?: boolean;
+  marketingConsent?: boolean | null;
   marketingConsentSource?: string | null;
-  notes?: string;
+  notes?: string | null;
   phone?: string | null;
-  preferredLocale?: Locale;
-  source?: string;
+  preferredLocale?: Locale | null;
+  source?: string | null;
 };
 
 export async function getCustomerByAuthUserId(authUserId: string) {
@@ -66,19 +66,27 @@ export async function listCustomersByIds(customerIds: string[]) {
 
 export async function upsertCustomerProfile(input: CustomerProfileInput) {
   const supabase = await createSupabaseServerClient();
-  const marketingConsent = input.marketingConsent ?? false;
-  const payload = {
+  let payload: CustomerInsert = {
     auth_user_id: input.authUserId,
     email: input.email,
     full_name: input.fullName,
     phone: input.phone ?? null,
-    preferred_locale: input.preferredLocale ?? defaultLocale,
-    marketing_consent: marketingConsent,
-    marketing_consent_at: marketingConsent ? new Date().toISOString() : null,
-    marketing_consent_source: input.marketingConsentSource ?? (marketingConsent ? "public_form" : null),
-    source: input.source ?? "member_portal",
-    notes: input.notes ?? ""
+    preferred_locale: input.preferredLocale ?? defaultLocale
   };
+
+  if (typeof input.marketingConsent === "boolean") {
+    payload.marketing_consent = input.marketingConsent;
+    payload.marketing_consent_at = input.marketingConsent ? new Date().toISOString() : null;
+    payload.marketing_consent_source = input.marketingConsentSource ?? (input.marketingConsent ? "public_form" : null);
+  }
+
+  if (typeof input.source === "string" && input.source.length > 0) {
+    payload.source = input.source;
+  }
+
+  if (typeof input.notes === "string") {
+    payload.notes = input.notes;
+  }
 
   const { data, error } = await supabase
     .from("customers")

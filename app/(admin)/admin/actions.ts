@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 
 import { sendEmail } from "@/lib/supabase/email";
-import { createReservation, holdRoom, releaseExpiredHolds, submitAvailabilityRequest } from "@/lib/supabase/workflows";
+import {
+  createReservation,
+  holdRoom,
+  releaseExpiredHolds,
+  releaseExpiredReservations,
+  submitAvailabilityRequest
+} from "@/lib/supabase/workflows";
 import {
   createPaymentRequestAction as submitCreatePaymentRequestAction,
   submitPaymentProofAction as submitPaymentProofActionImpl,
@@ -145,9 +151,9 @@ export async function createReservationAction(formData: FormData) {
 }
 
 export async function releaseExpiredHoldsAction(formData: FormData) {
-  await releaseExpiredHolds({
-    asOf: readOptionalString(formData, "asOf") ?? undefined
-  });
+  const asOf = readOptionalString(formData, "asOf") ?? undefined;
+
+  await Promise.allSettled([releaseExpiredHolds({ asOf }), releaseExpiredReservations({ asOf })]);
 
   revalidatePath("/admin");
 }

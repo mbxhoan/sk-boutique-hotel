@@ -29,6 +29,7 @@ export type RoomCatalogEntry = {
   }[];
   originalPrice: number | null;
   priceVisible: boolean;
+  roomTypeId: string;
   slug: string;
   sizeLabel: LocalizedText | null;
   summary: LocalizedText;
@@ -166,6 +167,7 @@ export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: num
     metaFacts: buildMetaFacts(roomType),
     originalPrice,
     priceVisible: roomType.show_public_price,
+    roomTypeId: roomType.id,
     slug: roomType.slug,
     sizeLabel: formatAreaText(roomType.size_sqm),
     summary: text(

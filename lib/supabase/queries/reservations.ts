@@ -5,8 +5,8 @@ const reservationSelect = `
   id, booking_code, availability_request_id, hold_id, customer_id, branch_id,
   primary_room_type_id, stay_start_at, stay_end_at, guest_count, status,
   base_price, weekend_surcharge, manual_override_price, nightly_rate,
-  total_amount, deposit_amount, source, notes, confirmed_at, cancelled_at,
-  completed_at, created_by, updated_by, created_at, updated_at
+  total_amount, deposit_amount, expires_at, source, notes, confirmed_at,
+  cancelled_at, completed_at, created_by, updated_by, created_at, updated_at
 `;
 
 type ReservationQueryOptions = {

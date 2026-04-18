@@ -4,6 +4,7 @@ import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
+import { listBranches } from "@/lib/supabase/queries/branches";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { listRoomsByRoomTypeId } from "@/lib/supabase/queries/rooms";
 
@@ -45,10 +46,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function RoomsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const branches = await listBranches();
   const roomTypes = await listRoomTypes();
   const activeRoomType = resolvedSearchParams.room
     ? roomTypes.find((roomType) => roomType.slug === resolvedSearchParams.room)
     : null;
+  const defaultBranchId = branches[0]?.id ?? null;
 
   const roomAvailabilityByTypeId = Object.fromEntries(
     await Promise.all(
@@ -84,6 +87,7 @@ export default async function RoomsPage({ searchParams }: PageProps) {
         />
       ) : null}
       <RoomsCatalogPage
+        defaultBranchId={defaultBranchId}
         initialFilters={initialFilters}
         initialRoomSlug={activeRoomType?.slug ?? null}
         locale={locale}
