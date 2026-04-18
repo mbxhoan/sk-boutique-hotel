@@ -803,3 +803,21 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/globals.css`
   - `components/about-us-page.tsx`
+
+### Entry 074
+- `time`: 2026-04-18T11:55:41+07:00
+- `prompt_summary`: Thiết lập lớp gửi email dùng Supabase Edge Function `send-email`, thêm cấu hình mặc định cho sender/admin recipient, và nối vào workflow availability request để có thể gửi mail khách hàng lẫn thông báo admin theo source công khai.
+- `commit_message`: `feat(email): wire supabase edge function for transactional notifications`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `lib/supabase/env.ts`
+  - `lib/supabase/workflows.ts`
+  - `README.md`
+
+### Entry 075
+- `time`: 2026-04-18T11:58:55+07:00
+- `prompt_summary`: Siết lại tích hợp email theo đúng contract Edge Function mẫu, chỉ gửi body gồm `from`, `to`, `subject`, `html` để khớp với code `send-email` đang chạy.
+- `commit_message`: `fix(email): align payload with edge function contract`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `README.md`

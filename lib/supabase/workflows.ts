@@ -4,6 +4,7 @@ import type {
   ReservationStatus,
   RoomHoldRow
 } from "@/lib/supabase/database.types";
+import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type AvailabilityRequestInput = {
@@ -103,7 +104,11 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
     throw error;
   }
 
-  return data as AvailabilityRequestRow;
+  const request = data as AvailabilityRequestRow;
+
+  await sendAvailabilityRequestEmails(request);
+
+  return request;
 }
 
 export async function holdRoom(input: HoldRoomInput) {
