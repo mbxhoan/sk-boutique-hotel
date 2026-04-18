@@ -286,7 +286,7 @@ const roomItems: CmsCollectionItem[] = [
       "Không gian rộng rãi, lý tưởng cho gia đình, kết hợp sự tiện nghi và riêng tư với tầm nhìn sân vườn & hồ bơi.",
       "Spacious and refined, perfect for families seeking comfort, privacy, and serene garden & pool views."
     ),
-    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 2.400.000", "From 2,400,000")],
+    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 1,700,000", "From 1,700,000")],
     "paper",
     "/home/bed1.jpg",
     text("Family Room", "Family Room")
@@ -299,7 +299,7 @@ const roomItems: CmsCollectionItem[] = [
       "Thiết kế tinh gọn, ấm cúng, phù hợp cho cặp đôi hoặc khách công tác, mang lại trải nghiệm nghỉ dưỡng nhẹ nhàng.",
       "A cozy, well-designed retreat ideal for couples or solo travelers looking for a calm, elegant stay."
     ),
-    [text("3 khách", "3 guests"), text("25 m²", "25 sqm"), text("From 3.800.000", "From 3,800,000")],
+    [text("3 khách", "3 guests"), text("25 m²", "25 sqm"), text("Từ 650,000đ", "From 650,000")],
     "gold",
     "/home/bed1.jpg",
     text("Superior Room", "Superior Room")
@@ -312,7 +312,7 @@ const roomItems: CmsCollectionItem[] = [
       "Lựa chọn linh hoạt cho nhóm bạn hoặc gia đình nhỏ, cân bằng giữa không gian, tiện nghi và chi phí.",
       "Flexible and comfortable, designed for small groups with a balance of space, functionality, and value."
     ),
-    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1.900.000", "From 1,900,000")],
+    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1,300,000", "From 1,300,000")],
     "ink",
     "/home/bed1.jpg",
     text("Quadruple Room", "Quadruple Room")
@@ -604,14 +604,14 @@ const homePageSections: CmsSection[] = [
         value: text("03", "03"),
         label: text("Hạng phòng", "Room types"),
         detail: text(
-          "Hạng phòng public đủ để staff map sang physical rooms sau này.",
-          "Public room types are ready for later mapping to physical rooms."
+          "Hạng phòng đa dạng phù hợp mọi nhu cầu.",
+          "Diverse room types suitable for all needs."
         ),
         tone: "paper"
       },
       {
-        value: text("20 phút", "20 min"),
-        label: text("Trung tâm", "City center"),
+        value: text("20", "20"),
+        label: text("Phút", "Minutes"),
         detail: text(
           "Khoảng 20 phút để vào trung tâm thành phố.",
           "About 20 minutes to the city center."

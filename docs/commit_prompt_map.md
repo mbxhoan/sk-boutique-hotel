@@ -905,3 +905,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/api/member/profile/route.ts`
   - `components/room-booking-request-form.tsx`
   - `app/globals.css`
+
+### Entry 084
+- `time`: 2026-04-18T22:12:12+07:00
+- `prompt_summary`: Cập nhật seed Supabase theo thông tin thực tế của SK Boutique Hotel Phú Quốc: branch/contact, 7 tầng, 19 phòng, 3 hạng phòng, VIP Family Room tầng 2, và route nội dung phòng chuyển sang chuẩn `/rooms`.
+- `commit_message`: `fix(seed): align hotel branch and room inventory with Phu Quoc data`
+- `main_files`:
+  - `supabase/seed.sql`
