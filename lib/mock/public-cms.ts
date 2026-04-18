@@ -640,48 +640,49 @@ const homePageSections: CmsSection[] = [
     ),
     items: homeRoomItems
   },
-  {
-    id: "amenities",
-    kind: "amenities",
-    eyebrow: text("Tiện nghi", "Amenities"),
-    title: text("Tiện nghi khách sạn", "Hotel amenities"),
-    description: text(
-      "Những tiện nghi và thông tin vận hành quan trọng được trình bày rõ ràng theo từng nhóm.",
-      "Key room amenities and operational details are grouped clearly for fast reading."
-    ),
-    groups: [
-      {
-        title: text("Tiện nghi khách sạn", "Hotel amenities"),
-        items: [
-          amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
-          amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
-          amenityWaterItem("Hồ bơi ngoài trời", "Outdoor pool"),
-          amenityCheckItem("Cửa sổ", "Windows"),
-          amenityCheckItem("Ban công", "Balcony"),
-          amenityCheckItem("Kê nệm phụ", "Extra mattress"),
-          amenityCheckItem("Bồn tắm", "Bathtub"),
-          amenityCheckItem("Bàn làm việc", "Desk"),
-          amenityCheckItem("Tủ lạnh", "Fridge"),
-          amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
-          amenityCheckItem("Máy sấy tóc", "Hair dryer"),
-          amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
-        ]
-      },
-      {
-        title: text("Thông tin khác", "Other information"),
-        items: [
-          // amenityCheckItem("Không hút thuốc", "No smoking"),
-          // amenityCheckItem("Không cho thú cưng", "No pets"),
-          amenityTextItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
-          amenityTextItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
-          amenityTextItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
-          amenityCheckItem("Không phụ thu cuối tuần", "No weekend surcharge"),
-          amenityCheckItem("Cho check-in sớm", "Early check-in available"),
-          amenityCheckItem("Không thu phí check-in sớm", "No early check-in fee")
-        ]
-      }
-    ]
-  },
+  /* tạm ẩn phần Tiện nghi vì đã có phần Tiện nghi cố định trên trang */
+  // {
+  //   id: "amenities",
+  //   kind: "amenities",
+  //   eyebrow: text("Tiện nghi", "Amenities"),
+  //   title: text("Tiện nghi khách sạn", "Hotel amenities"),
+  //   description: text(
+  //     "Những tiện nghi và thông tin vận hành quan trọng được trình bày rõ ràng theo từng nhóm.",
+  //     "Key room amenities and operational details are grouped clearly for fast reading."
+  //   ),
+  //   groups: [
+  //     {
+  //       title: text("Tiện nghi khách sạn", "Hotel amenities"),
+  //       items: [
+  //         amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
+  //         amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
+  //         amenityWaterItem("Hồ bơi ngoài trời", "Outdoor pool"),
+  //         amenityCheckItem("Cửa sổ", "Windows"),
+  //         amenityCheckItem("Ban công", "Balcony"),
+  //         amenityCheckItem("Kê nệm phụ", "Extra mattress"),
+  //         amenityCheckItem("Bồn tắm", "Bathtub"),
+  //         amenityCheckItem("Bàn làm việc", "Desk"),
+  //         amenityCheckItem("Tủ lạnh", "Fridge"),
+  //         amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
+  //         amenityCheckItem("Máy sấy tóc", "Hair dryer"),
+  //         amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
+  //       ]
+  //     },
+  //     {
+  //       title: text("Thông tin khác", "Other information"),
+  //       items: [
+  //         // amenityCheckItem("Không hút thuốc", "No smoking"),
+  //         // amenityCheckItem("Không cho thú cưng", "No pets"),
+  //         amenityTextItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
+  //         amenityTextItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
+  //         amenityTextItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
+  //         amenityCheckItem("Không phụ thu cuối tuần", "No weekend surcharge"),
+  //         amenityCheckItem("Cho check-in sớm", "Early check-in available"),
+  //         amenityCheckItem("Không thu phí check-in sớm", "No early check-in fee")
+  //       ]
+  //     }
+  //   ]
+  // },
   // {
   //   id: "next-step",
   //   kind: "band",
