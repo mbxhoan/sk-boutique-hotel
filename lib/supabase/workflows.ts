@@ -121,7 +121,14 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
 
   const request = data as AvailabilityRequestRow;
 
-  await sendAvailabilityRequestEmails(request);
+  try {
+    await sendAvailabilityRequestEmails(request);
+  } catch (emailError) {
+    console.warn("[email] Failed to send availability request notifications", {
+      error: emailError,
+      requestCode: request.request_code
+    });
+  }
 
   return request;
 }

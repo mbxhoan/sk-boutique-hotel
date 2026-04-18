@@ -326,7 +326,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
               inputMode="email"
               name="email"
               onChange={(event) => setEmail(event.target.value)}
-              placeholder={locale === "en" ? "you@example.com" : "you@example.com"}
+              placeholder={locale === "en" ? "example@gmail.com" : "example@gmail.com"}
               required
               type="email"
               value={email}
@@ -342,7 +342,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
               inputMode="tel"
               name="phone"
               onChange={(event) => setPhone(event.target.value)}
-              placeholder={locale === "en" ? "+84 ..." : "09..."}
+              placeholder={locale === "en" ? "+84 ..." : "090..."}
               required={isSignUp}
               type="tel"
               value={phone}

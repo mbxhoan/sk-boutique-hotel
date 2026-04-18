@@ -874,3 +874,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/database.types.ts`
   - `supabase/migrations/20260418093000_phase_g_reservation_expiry.sql`
   - `README.md`
+
+### Entry 080
+- `time`: 2026-04-18T16:46:43+07:00
+- `prompt_summary`: Khi bấm đặt phòng thì panel thông tin khách trong room canvas phải tự cuộn vào view; đồng thời sửa lỗi request booking bị 400 bằng cách không để bước gửi email làm hỏng luồng tạo availability request.
+- `commit_message`: `fix(booking-request): auto-scroll booking panel and tolerate email failures`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `lib/supabase/workflows.ts`

@@ -235,7 +235,7 @@ export function RoomBookingRequestForm({
             inputMode="email"
             name="email"
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
+            placeholder="example@gmail.com"
             required
             type="email"
             value={email}
@@ -250,7 +250,7 @@ export function RoomBookingRequestForm({
             inputMode="tel"
             name="phone"
             onChange={(event) => setPhone(event.target.value)}
-            placeholder={localize(locale, "09...", "+84 ...")}
+            placeholder={localize(locale, "090...", "+84 ...")}
             required
             type="tel"
             value={phone}

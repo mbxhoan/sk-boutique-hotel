@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
@@ -88,6 +88,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const [breakfastIndex, setBreakfastIndex] = useState(0);
   const [cancellationIndex, setCancellationIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const bookingPanelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!open || !room) {
@@ -124,6 +125,17 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
       window.removeEventListener("keydown", onEscape);
     };
   }, [onClose, open]);
+
+  useEffect(() => {
+    if (!bookingOpen) {
+      return;
+    }
+
+    bookingPanelRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, [bookingOpen]);
 
   if (!open || !room) {
     return null;
@@ -340,17 +352,17 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
           </div>
 
           {bookingOpen ? (
-            <div className="room-booking-panel">
+            <div className="room-booking-panel" ref={bookingPanelRef}>
               <div className="room-booking-panel__head">
                 <div>
                   <p className="room-booking-panel__eyebrow">{locale === "en" ? "Booking request" : "Yêu cầu đặt phòng"}</p>
                   <h4 className="room-booking-panel__title">
-                    {locale === "en" ? "Enter guest details" : "Nhập thông tin khách"}
+                    {locale === "en" ? "Leave your information" : "Nhập thông tin"}
                   </h4>
                   <p className="room-booking-panel__description">
                     {locale === "en"
-                      ? "We will sign you in automatically and send the request to the admin portal."
-                      : "Chúng tôi sẽ tự động đăng nhập và gửi yêu cầu sang admin portal."}
+                      ? "SK Boutique Hotel will get back to you as soon as possible."
+                      : "SK Boutique Hotel sẽ phản hồi bạn trong thời gian sớm nhất."}
                   </p>
                 </div>
                 <button className="room-booking-panel__close" onClick={() => setBookingOpen(false)} type="button">

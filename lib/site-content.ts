@@ -985,7 +985,7 @@ export const pages: PageContent[] = [
       formTitle: "Gửi tin nhắn",
       formFields: [
         { label: "Họ và tên", placeholder: "Nhập tên của bạn", type: "text" },
-        { label: "Email", placeholder: "you@example.com", type: "email" },
+        { label: "Email", placeholder: "example@gmail.com", type: "email" },
         { label: "Số điện thoại", placeholder: "+84 9x xxx xxxx", type: "tel" },
         { label: "Nội dung", placeholder: "Hãy cho chúng tôi biết bạn cần gì", type: "textarea" }
       ]
