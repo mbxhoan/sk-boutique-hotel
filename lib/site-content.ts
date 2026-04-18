@@ -187,7 +187,7 @@ export const socialLinks = [
 ];
 
 export const siteInfo = {
-  gg_map_address: "SK boutique hotel",
+  gg_map_address: "SK Boutique Hotel Phú Quốc",
   address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
   phone: "+84 908 233 583",
   zalo: "0908 233 583",
