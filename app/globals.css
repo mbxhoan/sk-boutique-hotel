@@ -2461,11 +2461,12 @@ textarea {
 }
 
 .portal-shell--member {
+  grid-template-columns: minmax(0, 1fr);
   background:
-    radial-gradient(circle at top left, rgba(197, 160, 89, 0.16), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(86, 112, 146, 0.16), transparent 28%),
-    linear-gradient(180deg, #09111d 0%, #050913 100%);
-  color: var(--portal-text);
+    radial-gradient(circle at 12% 0%, rgba(197, 160, 89, 0.12), transparent 24%),
+    radial-gradient(circle at 100% 10%, rgba(0, 12, 30, 0.06), transparent 22%),
+    linear-gradient(180deg, #fbf9f5 0%, #f5f3ef 100%);
+  color: var(--ink);
 }
 
 .portal-shell--admin {
@@ -2669,6 +2670,144 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.portal-shell--member .portal-shell__sidebar {
+  position: relative;
+  top: auto;
+  border-color: var(--border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portal-shell--member .portal-shell__topbar {
+  border-color: var(--border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portal-shell--member .portal-shell__nav-group + .portal-shell__nav-group {
+  border-top-color: rgba(0, 12, 30, 0.06);
+}
+
+.portal-shell--member .portal-shell__nav-link {
+  border-color: rgba(0, 12, 30, 0.04);
+  background: rgba(0, 12, 30, 0.035);
+  color: var(--muted);
+}
+
+.portal-shell--member .portal-shell__nav-link:hover {
+  border-color: rgba(197, 160, 89, 0.24);
+  background: rgba(197, 160, 89, 0.08);
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-shell__nav-link--active {
+  border-color: rgba(197, 160, 89, 0.42);
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-shell__sidebar-card {
+  border-color: var(--border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-badge--neutral,
+.portal-shell--member .portal-badge--soft {
+  background: rgba(0, 12, 30, 0.05);
+  border-color: rgba(0, 12, 30, 0.04);
+  color: var(--ink-soft);
+}
+
+.portal-shell--member .portal-badge--accent {
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.96), rgba(171, 132, 60, 0.88));
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-card,
+.portal-shell--member .portal-stat,
+.portal-shell--member .portal-panel {
+  border-color: var(--border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.portal-shell--member .portal-card--soft,
+.portal-shell--member .portal-stat--soft,
+.portal-shell--member .portal-panel--soft {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.94)),
+    var(--surface-container-lowest);
+}
+
+.portal-shell--member .portal-card--accent,
+.portal-shell--member .portal-stat--accent,
+.portal-shell--member .portal-panel--accent {
+  background:
+    linear-gradient(160deg, rgba(197, 160, 89, 0.16), rgba(255, 255, 255, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96));
+}
+
+.portal-shell--member .portal-shell__eyebrow,
+.portal-shell--member .portal-section-heading__eyebrow,
+.portal-shell--member .portal-panel__eyebrow,
+.portal-shell--member .portal-stat__label,
+.portal-shell--member .portal-item-card__code,
+.portal-shell--member .portal-timeline__time {
+  color: var(--gold-strong);
+}
+
+.portal-shell--member .portal-shell__description,
+.portal-shell--member .portal-section-heading__description,
+.portal-shell--member .portal-stat__detail,
+.portal-shell--member .portal-item-card__detail,
+.portal-shell--member .portal-item-card__note,
+.portal-shell--member .portal-panel__note-copy,
+.portal-shell--member .portal-timeline__detail,
+.portal-shell--member .portal-description,
+.portal-shell--member .portal-profile-list__label {
+  color: var(--muted);
+}
+
+.portal-shell--member .portal-shell__title,
+.portal-shell--member .portal-section-heading__title,
+.portal-shell--member .portal-item-card__title,
+.portal-shell--member .portal-profile-list__value,
+.portal-shell--member .portal-timeline__title,
+.portal-shell--member .portal-stat__value {
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-profile-list__item,
+.portal-shell--member .portal-timeline__item {
+  border-bottom-color: rgba(0, 12, 30, 0.08);
+}
+
+.portal-shell--member .portal-field__control {
+  border-color: rgba(0, 12, 30, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+}
+
+.portal-shell--member .portal-workflow-card__pricing {
+  background: rgba(0, 12, 30, 0.03);
 }
 
 .portal-management-page {
@@ -6571,6 +6710,67 @@ textarea {
   font-weight: 700;
 }
 
+.room-booking-panel__member-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.96)),
+    var(--surface-container-lowest);
+  box-shadow: var(--shadow-soft);
+}
+
+.room-booking-panel__member-name {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.room-booking-panel__member-note {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.room-booking-panel__member-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.room-booking-panel__member-meta div {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.72rem 0.8rem;
+  border-radius: 0.7rem;
+  background: rgba(0, 12, 30, 0.03);
+}
+
+.room-booking-panel__member-meta dt {
+  color: var(--gold-strong);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.room-booking-panel__member-meta dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .room-booking-panel__form {
   display: flex;
   flex-direction: column;
@@ -7158,6 +7358,14 @@ textarea {
   .room-booking-panel__summary {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .room-booking-panel__member-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .room-booking-panel__member-card {
+    gap: 0.9rem;
   }
 
   .payment-band__brand {

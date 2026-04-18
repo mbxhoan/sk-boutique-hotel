@@ -896,3 +896,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(room-canvas): close modal immediately on backdrop click`
 - `main_files`:
   - `components/rooms-catalog-page.tsx`
+
+### Entry 083
+- `time`: 2026-04-18T21:55:25+07:00
+- `prompt_summary`: Đưa member portal về cùng template sáng, premium như website public thay vì kiểu admin portal; đồng thời nếu khách đã đăng nhập thì không cần nhập lại họ tên, email, số điện thoại khi đặt phòng.
+- `commit_message`: `feat(member-portal): match site template and reuse signed-in profile`
+- `main_files`:
+  - `app/api/member/profile/route.ts`
+  - `components/room-booking-request-form.tsx`
+  - `app/globals.css`

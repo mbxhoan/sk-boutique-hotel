@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { Locale } from "@/lib/locale";
@@ -16,6 +16,14 @@ type RoomBookingRequestFormProps = {
   roomTypeId: string;
   stayEndAt: string;
   stayStartAt: string;
+};
+
+type MemberProfile = {
+  authUserId: string;
+  email: string;
+  fullName: string;
+  phone: string | null;
+  preferredLocale: Locale;
 };
 
 function localize(locale: Locale, vi: string, en: string) {
@@ -70,8 +78,65 @@ export function RoomBookingRequestForm({
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(false);
+  const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingMemberProfile, setIsLoadingMemberProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMemberProfile() {
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data } = await supabase.auth.getUser();
+
+        if (!data.user) {
+          if (!cancelled) {
+            setIsLoadingMemberProfile(false);
+          }
+
+          return;
+        }
+
+        const response = await fetch("/api/member/profile", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          if (!cancelled) {
+            setIsLoadingMemberProfile(false);
+          }
+
+          return;
+        }
+
+        const payload = (await response.json().catch(() => null)) as { profile?: MemberProfile | null } | null;
+        const profile = payload?.profile ?? null;
+
+        if (!cancelled && profile) {
+          setMemberProfile(profile);
+          setFullName(profile.fullName);
+          setEmail(profile.email);
+          setPhone(profile.phone ?? "");
+        }
+      } catch {
+        // Keep the guest flow if the profile lookup fails.
+      } finally {
+        if (!cancelled) {
+          setIsLoadingMemberProfile(false);
+        }
+      }
+    }
+
+    void loadMemberProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function bootstrapMemberProfile(authUserId: string, contactName: string, contactEmail: string, contactPhone: string) {
     const response = await fetch("/api/member/bootstrap", {
@@ -130,62 +195,65 @@ export function RoomBookingRequestForm({
     setIsSubmitting(true);
 
     try {
-      const trimmedFullName = fullName.trim();
-      const trimmedEmail = email.trim();
-      const trimmedPhone = phone.trim();
+      const trimmedFullName = (memberProfile?.fullName ?? fullName).trim();
+      const trimmedEmail = (memberProfile?.email ?? email).trim();
+      const trimmedPhone = (memberProfile?.phone ?? phone).trim();
+      const isMemberProfileReady = Boolean(memberProfile);
 
-      if (!trimmedFullName || !trimmedEmail || !trimmedPhone) {
+      if (!isMemberProfileReady && (!trimmedFullName || !trimmedEmail || !trimmedPhone)) {
         throw new Error(localize(locale, "Vui lòng nhập họ tên, email và số điện thoại.", "Please enter your full name, email, and phone number."));
       }
 
       const supabase = createSupabaseBrowserClient();
 
-      let authUserId: string | null = null;
+      let authUserId: string | null = memberProfile?.authUserId ?? null;
 
-      const { data: currentUserData } = await supabase.auth.getUser();
-      if (currentUserData.user?.email?.toLowerCase() === trimmedEmail.toLowerCase()) {
-        authUserId = currentUserData.user.id;
-      } else {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: trimmedEmail,
-          password: DEFAULT_MEMBER_PASSWORD
-        });
-
-        if (signInError) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      if (!authUserId) {
+        const { data: currentUserData } = await supabase.auth.getUser();
+        if (currentUserData.user?.email?.toLowerCase() === trimmedEmail.toLowerCase()) {
+          authUserId = currentUserData.user.id;
+        } else {
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: trimmedEmail,
-            password: DEFAULT_MEMBER_PASSWORD,
-            options: {
-              data: {
-                full_name: trimmedFullName,
-                locale,
-                phone: trimmedPhone
-              }
-            }
+            password: DEFAULT_MEMBER_PASSWORD
           });
 
-          if (signUpError) {
-            const message = signUpError.message.toLowerCase();
-
-            if (message.includes("already registered") || message.includes("already exists")) {
-              const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword({
-                email: trimmedEmail,
-                password: DEFAULT_MEMBER_PASSWORD
-              });
-
-              if (fallbackSignInError) {
-                throw fallbackSignInError;
+          if (signInError) {
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+              email: trimmedEmail,
+              password: DEFAULT_MEMBER_PASSWORD,
+              options: {
+                data: {
+                  full_name: trimmedFullName,
+                  locale,
+                  phone: trimmedPhone
+                }
               }
+            });
 
-              authUserId = fallbackSignInData.user?.id ?? null;
+            if (signUpError) {
+              const message = signUpError.message.toLowerCase();
+
+              if (message.includes("already registered") || message.includes("already exists")) {
+                const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword({
+                  email: trimmedEmail,
+                  password: DEFAULT_MEMBER_PASSWORD
+                });
+
+                if (fallbackSignInError) {
+                  throw fallbackSignInError;
+                }
+
+                authUserId = fallbackSignInData.user?.id ?? null;
+              } else {
+                throw signUpError;
+              }
             } else {
-              throw signUpError;
+              authUserId = signUpData.user?.id ?? null;
             }
           } else {
-            authUserId = signUpData.user?.id ?? null;
+            authUserId = signInData.user?.id ?? null;
           }
-        } else {
-          authUserId = signInData.user?.id ?? null;
         }
       }
 
@@ -198,7 +266,9 @@ export function RoomBookingRequestForm({
         throw new Error(localize(locale, "Không thể xác thực tài khoản.", "Unable to authenticate the account."));
       }
 
-      await bootstrapMemberProfile(authUserId, trimmedFullName, trimmedEmail, trimmedPhone);
+      if (!isMemberProfileReady) {
+        await bootstrapMemberProfile(authUserId, trimmedFullName, trimmedEmail, trimmedPhone);
+      }
       await submitBookingRequest(authUserId, trimmedFullName, trimmedEmail, trimmedPhone);
 
       router.push(appendLocaleQuery("/member", locale));
@@ -212,51 +282,83 @@ export function RoomBookingRequestForm({
 
   return (
     <form className="room-booking-panel__form" onSubmit={handleSubmit}>
-      <div className="room-booking-panel__grid">
-        <label className="room-booking-panel__field">
-          <span>{localize(locale, "Họ và tên", "Full name")}</span>
-          <input
-            autoComplete="name"
-            className="room-booking-panel__input"
-            name="fullName"
-            onChange={(event) => setFullName(event.target.value)}
-            placeholder={localize(locale, "Nhập họ và tên", "Enter full name")}
-            required
-            type="text"
-            value={fullName}
-          />
-        </label>
+      {memberProfile ? (
+        <div className="room-booking-panel__member-card">
+          <div>
+            <p className="room-booking-panel__eyebrow">{localize(locale, "Hồ sơ đã đăng nhập", "Signed-in profile")}</p>
+            <p className="room-booking-panel__member-name">{memberProfile.fullName}</p>
+            <p className="room-booking-panel__member-note">
+              {localize(
+                locale,
+                "Hệ thống sẽ dùng hồ sơ này để gửi yêu cầu booking.",
+                "The system will use this profile to send the booking request."
+              )}
+            </p>
+          </div>
+          <dl className="room-booking-panel__member-meta">
+            <div>
+              <dt>{localize(locale, "Email", "Email")}</dt>
+              <dd>{memberProfile.email}</dd>
+            </div>
+            <div>
+              <dt>{localize(locale, "Số điện thoại", "Phone")}</dt>
+              <dd>{memberProfile.phone ?? "—"}</dd>
+            </div>
+          </dl>
+        </div>
+      ) : null}
 
-        <label className="room-booking-panel__field">
-          <span>{localize(locale, "Email", "Email")}</span>
-          <input
-            autoComplete="email"
-            className="room-booking-panel__input"
-            inputMode="email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="example@gmail.com"
-            required
-            type="email"
-            value={email}
-          />
-        </label>
+      {!memberProfile && !isLoadingMemberProfile ? (
+        <div className="room-booking-panel__grid">
+          <label className="room-booking-panel__field">
+            <span>{localize(locale, "Họ và tên", "Full name")}</span>
+            <input
+              autoComplete="name"
+              className="room-booking-panel__input"
+              name="fullName"
+              onChange={(event) => setFullName(event.target.value)}
+              placeholder={localize(locale, "Nhập họ và tên", "Enter full name")}
+              required
+              type="text"
+              value={fullName}
+            />
+          </label>
 
-        <label className="room-booking-panel__field">
-          <span>{localize(locale, "Số điện thoại", "Phone")}</span>
-          <input
-            autoComplete="tel"
-            className="room-booking-panel__input"
-            inputMode="tel"
-            name="phone"
-            onChange={(event) => setPhone(event.target.value)}
-            placeholder={localize(locale, "090...", "+84 ...")}
-            required
-            type="tel"
-            value={phone}
-          />
-        </label>
-      </div>
+          <label className="room-booking-panel__field">
+            <span>{localize(locale, "Email", "Email")}</span>
+            <input
+              autoComplete="email"
+              className="room-booking-panel__input"
+              inputMode="email"
+              name="email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="example@gmail.com"
+              required
+              type="email"
+              value={email}
+            />
+          </label>
+
+          <label className="room-booking-panel__field">
+            <span>{localize(locale, "Số điện thoại", "Phone")}</span>
+            <input
+              autoComplete="tel"
+              className="room-booking-panel__input"
+              inputMode="tel"
+              name="phone"
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder={localize(locale, "090...", "+84 ...")}
+              required
+              type="tel"
+              value={phone}
+            />
+          </label>
+        </div>
+      ) : null}
+
+      {!memberProfile && isLoadingMemberProfile ? (
+        <p className="room-booking-panel__hint">{localize(locale, "Đang nhận diện hồ sơ đã đăng nhập...", "Detecting your signed-in profile...")}</p>
+      ) : null}
 
       <label className="room-booking-panel__field room-booking-panel__field--full">
         <span>{localize(locale, "Ghi chú", "Note")}</span>
@@ -281,17 +383,23 @@ export function RoomBookingRequestForm({
         </span>
       </label>
 
-      <p className="room-booking-panel__hint">
-        {localize(
-          locale,
-          `Tài khoản sẽ được tạo hoặc đăng nhập bằng mật khẩu mặc định ${DEFAULT_MEMBER_PASSWORD}.`,
-          `The account will be created or signed in with the default password ${DEFAULT_MEMBER_PASSWORD}.`
-        )}
-      </p>
+      {!memberProfile ? (
+        <p className="room-booking-panel__hint">
+          {localize(
+            locale,
+            `Tài khoản sẽ được tạo hoặc đăng nhập bằng mật khẩu mặc định ${DEFAULT_MEMBER_PASSWORD}.`,
+            `The account will be created or signed in with the default password ${DEFAULT_MEMBER_PASSWORD}.`
+          )}
+        </p>
+      ) : null}
 
       <div className="room-booking-panel__actions">
         <button className="button button--solid" disabled={isSubmitting} type="submit">
-          {isSubmitting ? localize(locale, "Đang gửi...", "Sending...") : localize(locale, "Gửi yêu cầu & đăng nhập", "Send request & sign in")}
+          {isSubmitting
+            ? localize(locale, "Đang gửi...", "Sending...")
+            : memberProfile
+              ? localize(locale, "Gửi yêu cầu", "Send request")
+              : localize(locale, "Gửi yêu cầu & đăng nhập", "Send request & sign in")}
         </button>
       </div>
 
