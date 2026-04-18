@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { Locale } from "@/lib/locale";
 import { getSupabaseUser } from "@/lib/supabase/auth";
 import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
+import { jsonApiErrorResponse } from "@/lib/server/api-error";
 
 function readProfileFallback(user: Awaited<ReturnType<typeof getSupabaseUser>>) {
   const metadata = (user?.user_metadata as Record<string, unknown> | null | undefined) ?? {};
@@ -27,7 +28,13 @@ export async function GET() {
     const user = await getSupabaseUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+      return jsonApiErrorResponse({
+        context: {},
+        error: new Error("Unauthorized."),
+        fallbackMessage: "Unable to load member profile",
+        scope: "api/member/profile",
+        status: 401
+      });
     }
 
     const customer = await getCustomerByAuthUserId(user.id);
@@ -48,8 +55,12 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to load member profile.";
-
-    return NextResponse.json({ error: message }, { status: 400 });
+    return jsonApiErrorResponse({
+      context: {},
+      error,
+      fallbackMessage: "Unable to load member profile",
+      scope: "api/member/profile",
+      status: 400
+    });
   }
 }

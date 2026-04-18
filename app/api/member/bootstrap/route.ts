@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { Locale } from "@/lib/locale";
 import { getSupabaseSession } from "@/lib/supabase/auth";
 import { upsertCustomerProfile } from "@/lib/supabase/queries/customers";
+import { jsonApiErrorResponse } from "@/lib/server/api-error";
 
 type BootstrapBody = {
   authUserId?: string;
@@ -49,7 +50,16 @@ export async function POST(request: Request) {
     const session = await getSupabaseSession().catch(() => null);
 
     if (!session?.user || session.user.id !== profile.authUserId) {
-      return NextResponse.json({ error: "Unauthorized bootstrap request." }, { status: 401 });
+      return jsonApiErrorResponse({
+        context: {
+          authUserId: profile.authUserId,
+          email: profile.email
+        },
+        error: new Error("Unauthorized bootstrap request."),
+        fallbackMessage: "Unable to bootstrap member profile",
+        scope: "api/member/bootstrap",
+        status: 401
+      });
     }
 
     const customer = await upsertCustomerProfile({
@@ -63,8 +73,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ customer }, { status: 200 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to bootstrap member profile.";
-
-    return NextResponse.json({ error: message }, { status: 400 });
+    return jsonApiErrorResponse({
+      context: {},
+      error,
+      fallbackMessage: "Unable to bootstrap member profile",
+      scope: "api/member/bootstrap",
+      status: 400
+    });
   }
 }

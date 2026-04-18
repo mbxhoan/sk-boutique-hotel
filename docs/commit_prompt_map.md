@@ -964,3 +964,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(booking-request): normalize date-only stay windows`
 - `main_files`:
   - `lib/supabase/workflows.ts`
+
+### Entry 090
+- `time`: 2026-04-19T00:00:00+07:00
+- `prompt_summary`: Chuẩn hóa response lỗi để trả message rõ ràng hơn cho API booking/member, đồng thời log lỗi server-side với context để admin theo dõi và debug.
+- `commit_message`: `feat(error-handling): standardize API error responses and server logging`
+- `main_files`:
+  - `lib/server/api-error.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `app/api/member/profile/route.ts`
+  - `app/api/member/bootstrap/route.ts`
+  - `components/room-booking-request-form.tsx`

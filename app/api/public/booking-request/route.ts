@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { Locale } from "@/lib/locale";
 import { getSupabaseSession } from "@/lib/supabase/auth";
+import { jsonApiErrorResponse } from "@/lib/server/api-error";
 import { submitAvailabilityRequest } from "@/lib/supabase/workflows";
 
 type BookingRequestBody = {
@@ -81,13 +82,28 @@ function readBody(body: BookingRequestBody) {
 }
 
 export async function POST(request: Request) {
+  let body: BookingRequestBody | null = null;
+
   try {
-    const body = (await request.json()) as BookingRequestBody;
+    body = (await request.json()) as BookingRequestBody;
     const input = readBody(body);
     const session = await getSupabaseSession().catch(() => null);
 
     if (!session?.user || session.user.id !== input.createdBy) {
-      return NextResponse.json({ error: "Unauthorized booking request." }, { status: 401 });
+      return jsonApiErrorResponse({
+        context: {
+          branchId: input.branchId,
+          createdBy: input.createdBy,
+          roomTypeId: input.roomTypeId,
+          source: input.source,
+          stayEndAt: input.stayEndAt,
+          stayStartAt: input.stayStartAt
+        },
+        error: new Error("Unauthorized booking request."),
+        fallbackMessage: "Unable to submit booking request",
+        scope: "api/public/booking-request",
+        status: 401
+      });
     }
 
     const bookingRequest = await submitAvailabilityRequest(input);
@@ -103,8 +119,23 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to create booking request.";
+    const input = body
+      ? {
+          branchId: body.branchId ?? null,
+          createdBy: body.createdBy ?? null,
+          roomTypeId: body.roomTypeId ?? null,
+          source: body.source ?? null,
+          stayEndAt: body.stayEndAt ?? null,
+          stayStartAt: body.stayStartAt ?? null
+        }
+      : {};
 
-    return NextResponse.json({ error: message }, { status: 400 });
+    return jsonApiErrorResponse({
+      context: input,
+      error,
+      fallbackMessage: "Unable to create booking request",
+      scope: "api/public/booking-request",
+      status: 400
+    });
   }
 }

@@ -31,6 +31,21 @@ function localize(locale: Locale, vi: string, en: string) {
   return locale === "en" ? en : vi;
 }
 
+function appendErrorDetail(locale: Locale, prefixVi: string, prefixEn: string, message: string) {
+  const detail = message
+    .replace(/^unable to create booking request[:\s-]*/i, "")
+    .replace(/^unable to submit the booking request[:\s-]*/i, "")
+    .replace(/^unable to bootstrap member profile[:\s-]*/i, "")
+    .replace(/^unable to create the member profile[:\s-]*/i, "")
+    .trim();
+
+  if (!detail) {
+    return localize(locale, prefixVi, prefixEn);
+  }
+
+  return localize(locale, `${prefixVi}: ${detail}`, `${prefixEn}: ${detail}`);
+}
+
 function resolveBookingRequestError(locale: Locale, error: unknown) {
   const message = error instanceof Error ? error.message.toLowerCase() : "";
 
@@ -54,12 +69,16 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
     return localize(locale, "Không thể tạo hồ sơ thành viên.", "Unable to create the member profile.");
   }
 
-  if (message.includes("unable to submit the booking request") || message.includes("unable to create booking request")) {
-    return localize(locale, "Không thể gửi yêu cầu booking.", "Unable to submit the booking request.");
-  }
-
   if (message.includes("no rooms are available for the selected stay window")) {
     return localize(locale, "Hết phòng trong khoảng thời gian bạn chọn.", "No rooms are available for the selected stay window.");
+  }
+
+  if (message.includes("unable to submit the booking request") || message.includes("unable to create booking request")) {
+    return appendErrorDetail(locale, "Không thể gửi yêu cầu booking", "Unable to submit the booking request", error instanceof Error ? error.message : "");
+  }
+
+  if (message.includes("unable to bootstrap member profile") || message.includes("unable to create the member profile")) {
+    return appendErrorDetail(locale, "Không thể tạo hồ sơ thành viên", "Unable to create the member profile", error instanceof Error ? error.message : "");
   }
 
   if (message.includes("unauthorized booking request")) {
