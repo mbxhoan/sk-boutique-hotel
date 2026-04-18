@@ -72,8 +72,8 @@ export const marketingHomeCopy = {
       en: "SK Boutique Hotel is being built as a premium front-end foundation, ready for Supabase later while staying detached from the real database in this phase."
     },
     eyebrow: {
-      vi: "Boutique hotel foundation",
-      en: "Boutique hotel foundation"
+      vi: "SK Boutique Hotel",
+      en: "SK Boutique Hotel"
     },
     primaryCta: {
       href: "/lien-he",
@@ -96,14 +96,14 @@ export const marketingHomeCopy = {
   },
   metrics: [
     {
-      value: "VI/EN",
+      value: "24/7",
       label: {
-        vi: "Song ngữ",
-        en: "Bilingual"
+        vi: "Hỗ trợ",
+        en: "Support"
       },
       detail: {
-        vi: "Copy tách riêng để sau này map sang CMS mà không phải sửa cấu trúc shell.",
-        en: "Copy is isolated so it can map cleanly to a CMS later without reshaping the shell."
+        vi: "Luôn hỗ trợ 24/7 cho khách đặt phòng, giữ phòng và yêu cầu sau lưu trú.",
+        en: "Always available 24/7 for bookings, hold requests, and post-stay support."
       }
     },
     {

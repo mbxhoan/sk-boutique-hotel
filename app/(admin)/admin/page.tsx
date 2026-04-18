@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AdminDashboard } from "@/components/admin-dashboard";
 import { resolveLocale } from "@/lib/locale";
 import { adminDashboardCopy } from "@/lib/mock/admin-dashboard";
-import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
+import { getSupabaseEmailAdminRecipient, hasSupabaseServiceConfig } from "@/lib/supabase/env";
 import { loadAdminWorkflowDashboard } from "@/lib/supabase/queries/operations";
 
 type PageProps = {
@@ -44,5 +44,12 @@ export default async function AdminPage({ searchParams }: PageProps) {
     stayStartAt: resolvedSearchParams.stayStartAt
   });
 
-  return <AdminDashboard canOperate={hasSupabaseServiceConfig()} data={dashboard} locale={locale} />;
+  return (
+    <AdminDashboard
+      canOperate={hasSupabaseServiceConfig()}
+      data={dashboard}
+      locale={locale}
+      testEmailDefaultRecipient={getSupabaseEmailAdminRecipient()}
+    />
+  );
 }

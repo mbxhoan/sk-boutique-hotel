@@ -1,4 +1,7 @@
 import { AnalyticsLink } from "@/components/analytics-link";
+import { HeroCarousel } from "@/components/hero-carousel";
+import { RoomAmenitiesSection } from "@/components/room-amenities-section";
+import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type {
@@ -17,6 +20,7 @@ import type {
   CmsStatsSection
 } from "@/lib/mock/public-cms";
 import { PortalBadge, PortalBulletList, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
+import { Fragment, type ReactNode } from "react";
 
 const actionVariantMap: Record<CmsActionTone, "solid" | "ghost" | "text"> = {
   solid: "solid",
@@ -79,9 +83,26 @@ function CmsPreviewFrame({
   locale: Locale;
   size?: "hero" | "section";
 }) {
+  const hasImage = Boolean(frame.image);
+
   return (
-    <div className={`visual-panel visual-panel--${frame.tone ?? "ink"} visual-panel--${size}`}>
+    <div
+      className={`visual-panel visual-panel--${frame.tone ?? "ink"} visual-panel--${size}${
+        hasImage ? " visual-panel--image" : ""
+      }`}
+    >
       <span className="visual-panel__grain" aria-hidden="true" />
+
+      {frame.image ? (
+        <div className="visual-panel__image-wrap">
+          <img
+            alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
+            className="visual-panel__image"
+            loading="lazy"
+            src={frame.image}
+          />
+        </div>
+      ) : null}
 
       <div className="visual-panel__top">
         <p className="visual-panel__label">{localize(locale, frame.label)}</p>
@@ -106,6 +127,32 @@ function CmsPreviewFrame({
   );
 }
 
+function CmsAboutVisualCard({
+  frame,
+  locale,
+  variant
+}: {
+  frame: CmsMediaFrame;
+  locale: Locale;
+  variant: "back" | "front";
+}) {
+  return (
+    <article className={`cms-about-card cms-about-card--${variant}`}>
+      <img
+        alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
+        className="cms-about-card__image"
+        loading="lazy"
+        src={frame.image}
+      />
+      <span className="cms-about-card__overlay" aria-hidden="true" />
+      <div className="cms-about-card__content">
+        <h3 className="cms-about-card__title">{localize(locale, frame.title)}</h3>
+        <p className="cms-about-card__description">{localize(locale, frame.description)}</p>
+      </div>
+    </article>
+  );
+}
+
 function CmsHeroSectionRenderer({
   locale,
   section
@@ -113,6 +160,11 @@ function CmsHeroSectionRenderer({
   locale: Locale;
   section: CmsHeroSection;
 }) {
+  /* Carousel layout — used on homepage */
+  if (section.layout === "carousel" && section.slides?.length) {
+    return <HeroCarousel locale={locale} slides={section.slides} />;
+  }
+
   const centeredLayout = section.layout === "centered";
 
   if (centeredLayout) {
@@ -239,10 +291,63 @@ function CmsFeatureSectionRenderer({
   locale: Locale;
   section: CmsFeatureSection;
 }) {
+  const isAboutSection = section.id === "about";
+
+  if (isAboutSection) {
+    return (
+      <section
+        className={`section cms-section cms-section--feature${isAboutSection ? " cms-section--feature-about" : ""}`}
+        id={section.id}
+      >
+        <div className={`section-shell cms-feature__shell${isAboutSection ? " cms-feature__shell--about" : ""}`}>
+          <div className="cms-feature__grid cms-feature__grid--about">
+            <div className="cms-feature__content cms-feature__content--about">
+              <div className="cms-feature__copy cms-feature__copy--about">
+                <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
+                <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
+                <p className="cms-feature__description">{localize(locale, section.description)}</p>
+
+                <div className="cms-feature__body cms-feature__body--about">
+                  {section.body.map((paragraph) => (
+                    <p className="cms-feature__paragraph" key={paragraph.vi}>
+                      {localize(locale, paragraph)}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="portal-stat-grid cms-feature__metrics">
+                {section.metrics.map((item, index) => (
+                  <PortalStatCard
+                    detail={item.detail}
+                    label={item.label}
+                    locale={locale}
+                    key={`${item.label.vi}-${index}`}
+                    tone={toneToCardTone(item.tone)}
+                    value={item.value}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="cms-feature__visual cms-feature__visual--about" aria-hidden="true">
+              <div className="cms-about-visual__stack">
+                <CmsAboutVisualCard frame={section.frames[1]} locale={locale} variant="front" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="section cms-section cms-section--feature" id={section.id}>
-      <div className="section-shell cms-feature__shell">
-        <div className="cms-feature__grid">
+    <section
+      className={`section cms-section cms-section--feature${isAboutSection ? " cms-section--feature-about" : ""}`}
+      id={section.id}
+    >
+      <div className={`section-shell cms-feature__shell${isAboutSection ? " cms-feature__shell--about" : ""}`}>
+        <div className={`cms-feature__grid${isAboutSection ? " cms-feature__grid--about" : ""}`}>
           <div className="cms-feature__copy">
             <PortalBadge tone="accent">{localize(locale, section.eyebrow)}</PortalBadge>
             <h2 className="cms-feature__title">{localize(locale, section.title)}</h2>
@@ -293,6 +398,42 @@ function CmsCollectionCard({
   item: CmsCollectionItem;
   locale: Locale;
 }) {
+  if (item.image) {
+    const image = (
+      <PortalCard className="cms-collection-card cms-collection-card--image" tone={toneToCardTone(item.tone)}>
+        <div className="cms-collection-card__visual">
+          <img
+            alt={item.imageAlt ? localize(locale, item.imageAlt) : localize(locale, item.title)}
+            className="cms-collection-card__image"
+            loading="lazy"
+            src={item.image}
+          />
+        </div>
+
+        <div className="cms-collection-card__body cms-collection-card__body--image">
+          <h3 className="cms-collection-card__title">{localize(locale, item.title)}</h3>
+          <p className="cms-collection-card__description">{localize(locale, item.description)}</p>
+        </div>
+      </PortalCard>
+    );
+
+    return item.href ? (
+      <AnalyticsLink
+        className="cms-collection-card__link"
+        entityId={item.href}
+        entityType="cms_collection_item"
+        eventType="cta_click"
+        href={item.href}
+        locale={locale}
+        metadata={{ title: item.title.vi }}
+      >
+        {image}
+      </AnalyticsLink>
+    ) : (
+      image
+    );
+  }
+
   const card = (
     <PortalCard className="cms-collection-card" tone={toneToCardTone(item.tone)}>
       <div className="cms-collection-card__top">
@@ -341,6 +482,18 @@ function CmsCardsSectionRenderer({
   locale: Locale;
   section: CmsCardsSection;
 }) {
+  if (section.id === "destinations") {
+    return (
+      <SelectedRoomsCarousel
+        description={section.description}
+        eyebrow={section.eyebrow}
+        items={section.items}
+        locale={locale}
+        title={section.title}
+      />
+    );
+  }
+
   return (
     <section className="section cms-section cms-section--cards" id={section.id}>
       <div className="section-shell">
@@ -452,6 +605,8 @@ export function CmsSectionRenderer({
       return <CmsFeatureSectionRenderer locale={locale} section={section} />;
     case "cards":
       return <CmsCardsSectionRenderer locale={locale} section={section} />;
+    case "amenities":
+      return <RoomAmenitiesSection locale={locale} section={section} />;
     case "band":
       return <CmsBandSectionRenderer locale={locale} section={section} />;
     case "locale-zones":
@@ -461,18 +616,23 @@ export function CmsSectionRenderer({
 
 export function CmsPageRenderer({
   className,
+  afterFirstSection,
   locale,
   page
 }: {
   className?: string;
+  afterFirstSection?: ReactNode;
   locale: Locale;
   page: CmsPageCopy;
 }) {
   return (
     <div className={`cms-page cms-page--${page.kind}${className ? ` ${className}` : ""}`}>
       <div className="cms-page__sections">
-        {page.sections.map((section) => (
-          <CmsSectionRenderer key={section.id} locale={locale} section={section} />
+        {page.sections.map((section, index) => (
+          <Fragment key={section.id}>
+            <CmsSectionRenderer locale={locale} section={section} />
+            {index === 0 ? afterFirstSection : null}
+          </Fragment>
         ))}
       </div>
     </div>

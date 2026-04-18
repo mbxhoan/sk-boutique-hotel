@@ -1,0 +1,338 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+import type { Locale } from "@/lib/locale";
+import { appendLocaleQuery } from "@/lib/locale";
+import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
+
+type RoomCanvasModalProps = {
+  locale: Locale;
+  onClose: () => void;
+  open: boolean;
+  room: RoomCatalogEntry | null;
+};
+
+function CloseIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <path d="M4.5 4.5L13.5 13.5M13.5 4.5L4.5 13.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function ArrowIcon({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg aria-hidden="true" fill="none" height="20" viewBox="0 0 20 20" width="20">
+      <path
+        d={direction === "left" ? "M12.5 4.75L7.25 10L12.5 15.25" : "M7.5 4.75L12.75 10L7.5 15.25"}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function RadioIcon({ checked }: { checked?: boolean }) {
+  return (
+    <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <circle cx="9" cy="9" r="6.5" stroke="currentColor" strokeWidth="1.4" />
+      {checked ? <circle cx="9" cy="9" fill="currentColor" r="3.2" /> : null}
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 16 16" width="16">
+      <path d="M12.5 4.75L6.75 11.25L3.5 8.25" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function roomAmenities(locale: Locale) {
+  return locale === "en"
+    ? [
+        "Alarm clock",
+        "Safe",
+        "Coffee / tea maker",
+        "Hair dryer",
+        "Minibar",
+        "Flat-screen TV",
+        "Fridge",
+        "Wi-Fi"
+      ]
+    : [
+        "Đồng hồ báo thức",
+        "Két an toàn",
+        "Máy pha trà/cà phê",
+        "Máy sấy tóc",
+        "Minibar",
+        "TV màn hình phẳng",
+        "Tủ lạnh",
+        "Wi-Fi"
+      ];
+}
+
+export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModalProps) {
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [breakfastIndex, setBreakfastIndex] = useState(0);
+  const [cancellationIndex, setCancellationIndex] = useState(0);
+
+  useEffect(() => {
+    if (!open || !room) {
+      return;
+    }
+
+    setActiveImageIndex(0);
+    const breakfastSelected = room.breakfastOptions.findIndex((option) => option.selected);
+    const cancellationSelected = room.cancellationOptions.findIndex((option) => option.selected);
+
+    setBreakfastIndex(breakfastSelected >= 0 ? breakfastSelected : 0);
+    setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
+  }, [open, room]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [onClose, open]);
+
+  if (!open || !room) {
+    return null;
+  }
+
+  const breakfastOption = room.breakfastOptions[breakfastIndex] ?? room.breakfastOptions[0];
+  const cancellationOption = room.cancellationOptions[cancellationIndex] ?? room.cancellationOptions[0];
+  const basePrice = room.currentPrice ?? 0;
+  const totalPrice = room.priceVisible ? basePrice + breakfastOption.delta + cancellationOption.delta : null;
+  const originalPrice = room.originalPrice;
+  const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
+
+  return (
+    <div className="room-canvas" role="presentation">
+      <button aria-label={locale === "en" ? "Close room canvas" : "Đóng popup phòng"} className="room-canvas__backdrop" onClick={onClose} type="button" />
+
+      <section
+        aria-label={locale === "en" ? "Room details" : "Chi tiết phòng"}
+        aria-modal="true"
+        className="room-canvas__dialog"
+        role="dialog"
+      >
+        <div className="room-canvas__head">
+          <span className="room-canvas__head-spacer" aria-hidden="true" />
+          <h3 className="room-canvas__head-title">{room.title[locale]}</h3>
+          <button aria-label={locale === "en" ? "Close" : "Đóng"} className="room-canvas__close" onClick={onClose} type="button">
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="room-canvas__media">
+          <Image alt={room.title[locale]} className="room-canvas__image" fill priority sizes="(max-width: 960px) 100vw, 900px" src={currentImage} />
+
+          <button
+            aria-label={locale === "en" ? "Previous photo" : "Ảnh trước"}
+            className="room-canvas__media-nav room-canvas__media-nav--prev"
+            onClick={() => setActiveImageIndex((current) => (current - 1 + room.gallery.length) % room.gallery.length)}
+            type="button"
+          >
+            <ArrowIcon direction="left" />
+          </button>
+
+          <button
+            aria-label={locale === "en" ? "Next photo" : "Ảnh tiếp theo"}
+            className="room-canvas__media-nav room-canvas__media-nav--next"
+            onClick={() => setActiveImageIndex((current) => (current + 1) % room.gallery.length)}
+            type="button"
+          >
+            <ArrowIcon direction="right" />
+          </button>
+
+          <span className="room-canvas__badge">{`${activeImageIndex + 1}/${room.gallery.length}`}</span>
+        </div>
+
+        <div className="room-canvas__thumbs" aria-label={locale === "en" ? "Gallery thumbnails" : "Ảnh thu nhỏ"}>
+          {room.gallery.map((image, index) => (
+            <button
+              aria-label={locale === "en" ? `Select photo ${index + 1}` : `Chọn ảnh ${index + 1}`}
+              className={`room-canvas__thumb${index === activeImageIndex ? " room-canvas__thumb--active" : ""}`}
+              key={`${room.slug}-${image}-${index}`}
+              onClick={() => setActiveImageIndex(index)}
+              type="button"
+            >
+              <Image alt="" aria-hidden="true" className="room-canvas__thumb-image" fill sizes="96px" src={image} />
+            </button>
+          ))}
+        </div>
+
+        <div className="room-canvas__body">
+          <div className="room-canvas__intro">
+            <div className="room-canvas__intro-copy">
+              <h3 className="room-canvas__room-title">{room.title[locale]}</h3>
+              <p className="room-canvas__room-summary">
+                {room.summary[locale]}
+                <span className="room-canvas__room-fact">
+                  {room.sizeLabel ? ` • ${room.sizeLabel[locale]}` : ""}
+                </span>
+              </p>
+            </div>
+
+            {room.highlights.length ? (
+              <div className="room-canvas__chips">
+                {room.highlights.slice(0, 4).map((highlight) => (
+                  <span className="room-canvas__chip" key={highlight.vi}>
+                    {highlight[locale]}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="room-canvas__facts">
+            {room.metaFacts.map((fact) => (
+              <div className="room-canvas__fact" key={fact.label.vi}>
+                <span className="room-canvas__fact-label">{fact.label[locale]}</span>
+                <strong className="room-canvas__fact-value">{fact.value[locale]}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="room-canvas__amenities">
+            <h4 className="room-canvas__section-title">{locale === "en" ? "Room amenities" : "Tiện nghi phòng"}</h4>
+
+            <div className="room-canvas__amenity-badges">
+              {roomAmenities(locale).slice(0, 4).map((amenity) => (
+                <span className="room-canvas__amenity-badge" key={amenity}>
+                  {amenity}
+                </span>
+              ))}
+            </div>
+
+            <div className="room-canvas__amenity-grid">
+              {roomAmenities(locale).map((amenity) => (
+                <div className="room-canvas__amenity" key={amenity}>
+                  <span className="room-canvas__amenity-icon">
+                    <CheckIcon />
+                  </span>
+                  <span>{amenity}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="room-canvas__options">
+            <div className="room-canvas__option-group">
+              <h4 className="room-canvas__section-title">{locale === "en" ? "Room options" : "Tùy chọn phòng"}</h4>
+              <p className="room-canvas__section-subtitle">{locale === "en" ? "Meal choice" : "Lựa chọn bữa ăn"}</p>
+
+              <div className="room-canvas__option-list">
+                {room.breakfastOptions.map((option, index) => {
+                  const isSelected = index === breakfastIndex;
+                  const priceDelta = option.delta ? formatRoomCurrency(locale, option.delta) : null;
+
+                  return (
+                    <button
+                      className={`room-canvas__option${isSelected ? " room-canvas__option--selected" : ""}`}
+                      key={option.label.vi}
+                      onClick={() => setBreakfastIndex(index)}
+                      type="button"
+                    >
+                      <span className="room-canvas__option-copy">
+                        <span className="room-canvas__option-radio">
+                          <RadioIcon checked={isSelected} />
+                        </span>
+                        <span>
+                          <strong>{option.label[locale]}</strong>
+                          {option.note ? <span className="room-canvas__option-note">{option.note[locale]}</span> : null}
+                        </span>
+                      </span>
+
+                      {priceDelta ? <span className="room-canvas__option-price">+{priceDelta}</span> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="room-canvas__option-group">
+              <p className="room-canvas__section-subtitle">{locale === "en" ? "Cancellation choice" : "Tùy chọn hủy bỏ"}</p>
+
+              <div className="room-canvas__option-list">
+                {room.cancellationOptions.map((option, index) => {
+                  const isSelected = index === cancellationIndex;
+                  const priceDelta = option.delta ? formatRoomCurrency(locale, option.delta) : null;
+
+                  return (
+                    <button
+                      className={`room-canvas__option${isSelected ? " room-canvas__option--selected" : ""}`}
+                      key={option.label.vi}
+                      onClick={() => setCancellationIndex(index)}
+                      type="button"
+                    >
+                      <span className="room-canvas__option-copy">
+                        <span className="room-canvas__option-radio">
+                          <RadioIcon checked={isSelected} />
+                        </span>
+                        <span>
+                          <strong>{option.label[locale]}</strong>
+                          {option.note ? <span className="room-canvas__option-note">{option.note[locale]}</span> : null}
+                        </span>
+                      </span>
+
+                      {priceDelta ? <span className="room-canvas__option-price">+{priceDelta}</span> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="room-canvas__footer">
+            <div className="room-canvas__price-block">
+              {room.priceVisible ? (
+                <>
+                  {originalPrice ? <span className="room-canvas__original-price">{formatRoomCurrency(locale, originalPrice)}</span> : null}
+                  <div className="room-canvas__price-row">
+                    <strong className="room-canvas__price">{formatRoomCurrency(locale, totalPrice)}</strong>
+                    {room.discountPercent ? <span className="room-canvas__discount">-{room.discountPercent}%</span> : null}
+                  </div>
+                </>
+              ) : (
+                <div className="room-canvas__price-row">
+                  <strong className="room-canvas__price">{locale === "en" ? "Price hidden" : "Ẩn giá công khai"}</strong>
+                </div>
+              )}
+            </div>
+
+            <div className="room-canvas__footer-actions">
+              <p className="room-canvas__availability">{room.availabilityLabel[locale]}</p>
+              <Link className="button button--solid room-canvas__cta" href={appendLocaleQuery("/lien-he", locale)}>
+                {locale === "en" ? "Book now" : "Đặt phòng"}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

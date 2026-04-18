@@ -1,6 +1,19 @@
+import type { LocalizedText } from "@/lib/mock/i18n";
+
 export type LinkItem = {
   label: string;
   href: string;
+};
+
+export type HeaderMenuItem = {
+  children?: HeaderMenuItem[];
+  href: string;
+  label: LocalizedText;
+};
+
+export type HeaderMenuConfig = {
+  cta: HeaderMenuItem;
+  items: HeaderMenuItem[];
 };
 
 export type MetricItem = {
@@ -121,17 +134,38 @@ export type PageContent = {
 
 export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
-  { label: "Phòng", href: "/phong" },
+  { label: "Phòng", href: "/rooms" },
   { label: "Tin tức", href: "/tin-tuc" },
-  { label: "Chi nhánh", href: "/chi-nhanh" },
   { label: "Thương hiệu", href: "/thuong-hieu" },
-  { label: "Ưu đãi", href: "/uu-dai" },
-  { label: "Dịch vụ", href: "/dich-vu" },
-  { label: "Về chúng tôi", href: "/ve-chung-toi" },
+  { label: "Về chúng tôi", href: "/about-us" },
   { label: "Liên hệ", href: "/lien-he" },
   { label: "Tuyển dụng", href: "/tuyen-dung" },
   { label: "Hỗ trợ", href: "/ho-tro" }
 ];
+
+export const headerMenu: HeaderMenuConfig = {
+  items: [
+    {
+      href: "/rooms",
+      label: { vi: "Phòng", en: "Rooms" }
+    },
+    {
+      href: "#vi-tri",
+      label: { vi: "Vị trí", en: "Location" }
+    },
+    {
+      href: "#about-sk",
+      label: { vi: "Về SK", en: "About SK" },
+      children: [
+        { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } }
+      ]
+    }
+  ],
+  cta: {
+    href: "/rooms",
+    label: { vi: "Đặt phòng", en: "Book now" }
+  }
+};
 
 export const footerLinks = navItems;
 
@@ -149,9 +183,12 @@ export const socialLinks = [
 ];
 
 export const siteInfo = {
-  address: "Địa chỉ mẫu, Quận trung tâm, TP.HCM",
-  phone: "+84 28 0000 2020",
-  email: "hello@skboutiquehotel.example",
+  gg_map_address: "SK boutique hotel",
+  address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
+  phone: "+84 908 233 583",
+  zalo: "0908 233 583",
+  facebook: "https://www.facebook.com/p/SK-Boutique-Hotel-100088332707267/",
+  email: "skhotel.phuquoc@gmail.com",
   hours: "08:00 - 22:00",
   legal: "© 2026 SK Boutique Hotel. Front-end foundation manual-first, sẵn sàng cho Supabase sau này."
 } as const;
@@ -277,8 +314,8 @@ export const pages: PageContent[] = [
             kicker: "VỀ CHÚNG TÔI",
             title: "Câu chuyện thương hiệu và mốc thời gian",
             description: "Giữ tinh thần của một resort editorial, có timeline và values.",
-            meta: "Route: /ve-chung-toi",
-            href: "/ve-chung-toi"
+            meta: "Route: /about-us",
+            href: "/about-us"
           },
           {
             kicker: "LIÊN HỆ",
@@ -749,7 +786,7 @@ export const pages: PageContent[] = [
     }
   },
   {
-    slug: "/ve-chung-toi",
+    slug: "/about-us",
     title: "Về chúng tôi",
     description: "Trang về chúng tôi với câu chuyện thương hiệu, mốc thời gian và giá trị cốt lõi.",
     hero: {
@@ -934,9 +971,11 @@ export const pages: PageContent[] = [
       title: "Một form mẫu ngắn gọn để khách đặt câu hỏi.",
       description: "Đây là nơi bạn nối form thật khi sẵn sàng.",
       details: [
-        { label: "Hotline", value: "+84 28 0000 2020", href: "tel:+842800002020" },
-        { label: "Email", value: "hello@skboutiquehotel.example", href: "mailto:hello@skboutiquehotel.example" },
-        { label: "Địa điểm", value: "Địa chỉ mẫu, Quận trung tâm, TP.HCM" },
+        { label: "Hotline", value: siteInfo.phone, href: "tel:+84908233583" },
+        { label: "Zalo", value: siteInfo.zalo, href: "https://zalo.me/0908233583" },
+        { label: "Facebook", value: "SK Boutique Hotel", href: siteInfo.facebook },
+        { label: "Email", value: siteInfo.email, href: `mailto:${siteInfo.email}` },
+        { label: "Địa điểm", value: siteInfo.address },
         { label: "Giờ làm việc", value: "08:00 - 22:00" }
       ],
       formTitle: "Gửi tin nhắn",
@@ -990,7 +1029,7 @@ export const pages: PageContent[] = [
       description:
         "Template này giúp bạn giới thiệu văn hóa, cơ hội nghề nghiệp và quy trình ứng tuyển trong cùng một phong cách với phần còn lại của site.",
       primaryCta: { label: "Ứng tuyển", href: "/lien-he" },
-      secondaryCta: { label: "Về chúng tôi", href: "/ve-chung-toi" },
+      secondaryCta: { label: "Về chúng tôi", href: "/about-us" },
       visual: {
         label: "TEAM / CULTURE",
         title: "Đội ngũ và môi trường làm việc",
@@ -1177,13 +1216,13 @@ export const pages: PageContent[] = [
             kicker: "HOTLINE",
             title: "Gọi nhanh",
             description: "Phù hợp với khách cần phản hồi ngay hoặc thay đổi gấp.",
-            meta: "+84 28 0000 2020"
+            meta: siteInfo.phone
           },
           {
             kicker: "EMAIL",
             title: "Gửi yêu cầu",
             description: "Dùng cho các câu hỏi chi tiết, đặt phòng, hoặc hỗ trợ sau lưu trú.",
-            meta: "hello@skboutiquehotel.example"
+            meta: siteInfo.email
           },
           {
             kicker: "CHAT",
@@ -1213,7 +1252,7 @@ export function findPageBySlug(slug: string) {
 
 export function getStaticRouteParams() {
   return pages
-    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh")
+    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh" && page.slug !== "/about-us")
     .map((page) => ({
       slug: page.slug.replace(/^\//, "")
     }));

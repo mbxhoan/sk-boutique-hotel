@@ -2,12 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 
+import { sendEmail } from "@/lib/supabase/email";
 import { createReservation, holdRoom, releaseExpiredHolds, submitAvailabilityRequest } from "@/lib/supabase/workflows";
 import {
   createPaymentRequestAction as submitCreatePaymentRequestAction,
   submitPaymentProofAction as submitPaymentProofActionImpl,
   verifyPaymentRequestAction as verifyPaymentRequestActionImpl
 } from "@/app/actions/payments";
+import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/lib/supabase/env";
+import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -45,6 +48,10 @@ function readOptionalNumber(formData: FormData, key: string) {
   }
 
   return parsed;
+}
+
+function readTemplateKey(formData: FormData, key: string) {
+  return readRequiredString(formData, key) as EmailTemplateTestKey;
 }
 
 function calculateNights(stayStartAt: string, stayEndAt: string) {
@@ -151,4 +158,27 @@ export async function submitPaymentProofAction(formData: FormData) {
 
 export async function verifyPaymentRequestAction(formData: FormData) {
   return verifyPaymentRequestActionImpl(formData);
+}
+
+export async function sendEmailTestAction(formData: FormData) {
+  const templateKey = readTemplateKey(formData, "templateKey");
+  const recipientEmail = readOptionalString(formData, "recipientEmail") ?? getSupabaseEmailAdminRecipient();
+  const email = buildEmailTemplateTestEmail(templateKey);
+
+  try {
+    await sendEmail({
+      from: getSupabaseEmailFromAddress(),
+      html: email.html,
+      subject: email.subject,
+      to: recipientEmail
+    });
+  } catch (error) {
+    console.warn("[email-test] Failed to send test email", {
+      error,
+      recipientEmail,
+      templateKey
+    });
+  }
+
+  revalidatePath("/admin");
 }

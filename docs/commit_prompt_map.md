@@ -218,8 +218,6 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `time`: 2026-04-12T01:12:00+07:00
 - `prompt_summary`: Sửa Supabase browser client để đọc env public bằng access trực tiếp, tránh Next.js bỏ qua biến khi bundle client.
 - `commit_message`: `fix(supabase): inline public envs for browser client`
-- `main_files`:
-  - `lib/supabase/browser.ts`
 
 ### Entry 015
 - `time`: 2026-04-12T01:30:00+07:00
@@ -381,3 +379,474 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(admin)/admin/roles/page.tsx`
   - `app/(admin)/admin/content-pages/page.tsx`
   - `app/globals.css`
+
+### Entry 030
+- `time`: 2026-04-13T17:11:04+07:00
+- `prompt_summary`: Turn the section below About us into a curated showcase of three selected room types, each with an image, title, and short description like the reference layout.
+- `commit_message`: `feat(homepage-showcase): add selected room cards below about section`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 031
+- `time`: 2026-04-13T17:14:20+07:00
+- `prompt_summary`: Replace the two collage frames in the About section with real images so the feature block reads like a visual editorial collage instead of mock panels.
+- `commit_message`: `feat(homepage-collage): swap feature frames to real images`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 032
+- `time`: 2026-04-13T17:20:19+07:00
+- `prompt_summary`: Replace the 30m hold SLA stat with a more content-led metric and add a soft warm-gray overlay layer to the about collage images so text reads more clearly over the visuals.
+- `commit_message`: `fix(homepage-collage): soften feature images and update metric copy`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 033
+- `time`: 2026-04-13T17:28:24+07:00
+- `prompt_summary`: Redesign the public site header into a premium boutique menu with compact top-level nav, dropdowns for Discover/About SK, a tablet/mobile drawer, and a stronger booking CTA.
+- `commit_message`: `feat(header-nav): redesign public menu for boutique hotel navigation`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`
+
+### Entry 034
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Áp overlay riêng cho 2 ảnh collage trong feature hero để chữ đọc rõ hơn và giữ cảm giác boutique ấm, mềm.
+- `commit_message`: `style(cms-feature): add warm overlays to collage frames`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 035
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Dời overlay của 2 ảnh collage xuống phần đáy để highlight cụm text ngay khu vực được khoanh đỏ.
+- `commit_message`: `style(cms-feature): move collage overlays to bottom bands`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 036
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Thay ô VI/EN trên homepage bằng metric hỗ trợ 24/7 để phần stat đọc đúng nội dung dịch vụ.
+- `commit_message`: `feat(homepage-metrics): swap bilingual stat for 24-7 support`
+- `main_files`:
+  - `lib/mock/marketing-home.ts`
+
+### Entry 037
+- `time`: 2026-04-14T10:15:53+07:00
+- `prompt_summary`: Làm section About-us của homepage thành collage editorial có backdrop mờ phía sau, giống ảnh minh hoạ user gửi.
+- `commit_message`: `feat(home-about): add editorial collage backdrop`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 038
+- `time`: 2026-04-14T10:41:12+07:00
+- `prompt_summary`: Chỉnh about-us ở homepage theo ảnh minh hoạ với 2 card overlay chồng lớp, backdrop blur và bỏ stat row để section giống mẫu hơn.
+- `commit_message`: `feat(home-about): add layered overlay collage for about section`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 039
+- `time`: 2026-04-14T11:05:54+07:00
+- `prompt_summary`: Thêm lại stat row bên dưới about us trên homepage, đổi thứ tự nội dung thành 03 hạng phòng, 20 phút để vào trung tâm, và 24/7 hỗ trợ.
+- `commit_message`: `feat(home-about): restore stats strip under about collage`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 040
+- `time`: 2026-04-14T11:25:08+07:00
+- `prompt_summary`: Buộc dropdown menu header desktop chỉ cho phép mở một menu tại một thời điểm để mở menu mới thì menu cũ tự đóng.
+- `commit_message`: `fix(header-dropdown): keep only one desktop dropdown open`
+- `main_files`:
+  - `components/site-header.tsx`
+
+### Entry 041
+- `time`: 2026-04-14T11:25:08+07:00
+- `prompt_summary`: Bỏ vết cắt ngang còn lộ trong about us bằng cách làm mềm shell overlay và tắt lớp chân trời cứng phía sau section.
+- `commit_message`: `fix(home-about): soften shell overlay to remove horizontal seam`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 042
+- `time`: 2026-04-14T11:32:06+07:00
+- `prompt_summary`: Bỏ toàn bộ nền riêng của about us để section dùng nền page mặc định, tránh mọi vết cắt ngang còn lộ phía sau stats/collage.
+- `commit_message`: `fix(home-about): remove custom about background layers`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 043
+- `time`: 2026-04-14T11:52:00+07:00
+- `prompt_summary`: Sửa responsive mobile/iPad cho menu drawer và about us: submenu chỉ mở một mục, about section chuyển sang layout gọn hơn ở tablet/mobile, bỏ chồng overlay gây lỗi giao diện.
+- `commit_message`: `fix(responsive-header-about): stabilize mobile menu and about layout`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`
+
+### Entry 044
+- `time`: 2026-04-14T12:03:00+07:00
+- `prompt_summary`: Rút about visual về một ảnh duy nhất thay vì hai ảnh chồng nhau, đồng thời giảm chiều cao responsive để không tạo khoảng trống vô ích trên tablet/mobile.
+- `commit_message`: `fix(home-about): reduce visual stack to a single image`
+- `main_files`:
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+
+### Entry 045
+- `time`: 2026-04-14T12:24:00+07:00
+- `prompt_summary`: Chuyển Selected rooms thành slider carousel responsive theo layout minh hoạ, với card overlay dạng premium, arrows/dots, và hiển thị 1 ảnh mỗi card trên mobile.
+- `commit_message`: `feat(home-selected-rooms): add responsive room carousel`
+- `main_files`:
+  - `components/selected-rooms-carousel.tsx`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 047
+- `time`: 2026-04-14T12:48:00+07:00
+- `prompt_summary`: Đồng bộ seed hạng phòng theo nội dung mới nhất: Family Room, Superior Room, Quadruple Room, cùng số khách, diện tích, giường và mô tả mới.
+- `commit_message`: `fix(room-types): sync latest room type seed data`
+- `main_files`:
+  - `supabase/seed.sql`
+  - `lib/mock/public-cms.ts`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 049
+- `time`: 2026-04-15T00:10:00+07:00
+- `prompt_summary`: Bổ sung images.qualities cho Next/Image để dập warning quality 85 và chuẩn bị tương thích Next.js 16.
+- `commit_message`: `fix(next-image): configure allowed image qualities`
+- `main_files`:
+  - `next.config.ts`
+
+### Entry 050
+- `time`: 2026-04-15T00:35:00+07:00
+- `prompt_summary`: Redesign footer content theo boutique luxury style với brand intro, navigation nhóm, và contact info trên nền tối sang, responsive 3 cột sang 1 cột mobile.
+- `commit_message`: `feat(footer): redesign boutique luxury footer`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
+### Entry 051
+- `time`: 2026-04-15T01:20:00+07:00
+- `prompt_summary`: Thêm section tiện nghi sau mục hạng phòng trên trang chủ với 2 panel boutique, nội dung song ngữ, và responsive mượt trên desktop/tablet/mobile.
+- `commit_message`: `feat(home-amenities): add responsive room amenities section`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `components/public-cms.tsx`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 052
+- `time`: 2026-04-15T01:45:00+07:00
+- `prompt_summary`: Thu gọn typography và width của section tiện nghi, đồng thời đổi các trạng thái yes/no sang dấu check và câu chữ tích cực hơn cho các chính sách không phụ thu.
+- `commit_message`: `fix(home-amenities): tighten copy and checkmark states`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 053
+- `time`: 2026-04-15T02:05:00+07:00
+- `prompt_summary`: Thêm hồ bơi ngoài trời vào amenities với icon nước, tạm ẩn các mục Ưu đãi/Dịch vụ/Khám phá khỏi menu, và đồng bộ seed/config lẫn ghi chú nơi thay ảnh.
+- `commit_message`: `fix(home-nav-amenities): hide menu items and add pool amenity`
+- `main_files`:
+  - `components/room-amenities-section.tsx`
+  - `components/site-footer.tsx`
+  - `lib/site-content.ts`
+  - `lib/mock/public-cms.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 054
+- `time`: 2026-04-15T02:25:00+07:00
+- `prompt_summary`: Cập nhật thông tin liên hệ SK Boutique Hotel, đưa Facebook/Zalo vào footer, và chỉnh dòng hồ bơi ngoài trời để có icon nước bên trái nhưng vẫn giữ dấu check bên phải.
+- `commit_message`: `fix(contact-amenities): refresh contact details and pool icon`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `components/room-amenities-section.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 055
+- `time`: 2026-04-15T14:42:07+07:00
+- `prompt_summary`: Chuyển mục mạng xã hội ở footer sang icon button clickable theo mẫu, gọn hơn và có hover/focus rõ ràng.
+- `commit_message`: `feat(footer): add clickable social icon links`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
+### Entry 056
+- `time`: 2026-04-15T14:42:07+07:00
+- `prompt_summary`: Đồng bộ thẻ room carousel theo số dòng cố định, và đẩy nút hero carousel ra mép để không che chữ tiêu đề trên desktop/mobile.
+- `commit_message`: `fix(home-carousels): align room cards and move hero arrows out`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 057
+- `time`: 2026-04-15T15:24:20+07:00
+- `prompt_summary`: Giữ hero carousel arrows ở vị trí tự nhiên hơn với nền trong suốt, đồng thời thu hẹp title room card để Family Room cũng có thể wrap thành 2 dòng như các card còn lại.
+- `commit_message`: `fix(home-carousels): soften hero arrows and tighten room titles`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 058
+- `time`: 2026-04-15T16:27:04+07:00
+- `prompt_summary`: Thay icon social footer bằng file SVG brand thật từ public/logos cho Facebook và Zalo, giữ click behavior nhưng làm icon nhìn đẹp hơn.
+- `commit_message`: `feat(footer): use branded svg social icons`
+- `main_files`:
+  - `components/site-footer.tsx`
+  - `app/globals.css`
+
+### Entry 048
+- `time`: 2026-04-14T13:05:00+07:00
+- `prompt_summary`: Sửa Selected rooms carousel vẫn bị lệch trái bằng cách căn track của carousel ra giữa trong chính viewport flex track.
+- `commit_message`: `fix(home-selected-rooms): center carousel track content`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 046
+- `time`: 2026-04-14T12:31:00+07:00
+- `prompt_summary`: Căn lại carousel Selected rooms vào giữa khung section để không bị bám mép trái trên desktop, đồng thời giữ scroll-snap responsive cho tablet/mobile.
+- `commit_message`: `fix(home-selected-rooms): center carousel track`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 030
+- `time`: 2026-04-13T13:21:00+07:00
+- `prompt_summary`: Chuyển hero section trang chính từ visual-panel tĩnh sang carousel slider nhiều ảnh, mỗi slide có ảnh nền, nội dung VI/EN riêng và CTA riêng.
+- `commit_message`: `feat(homepage): add hero carousel slider with 3 slides and bilingual content`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `components/hero-carousel.tsx`
+  - `components/public-cms.tsx`
+  - `app/globals.css`
+  - `public/hero/hero-1.png`
+  - `public/hero/hero-2.png`
+  - `public/hero/hero-3.png`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 059
+- `time`: 2026-04-17T13:01:25+07:00
+- `prompt_summary`: Thêm khối kiểm tra phòng dưới hero trang chủ, đổi route phòng sang `/rooms`, refactor trang chọn phòng theo mockup, và mở chi tiết hạng phòng bằng modal canvas ngay trong trang.
+- `commit_message`: `feat(rooms): add availability search, rooms listing, and room canvas modal`
+- `main_files`:
+  - `app/(marketing)/rooms/page.tsx`
+  - `app/(marketing)/rooms/[slug]/page.tsx`
+  - `app/(marketing)/phong/page.tsx`
+  - `app/(marketing)/phong/[slug]/page.tsx`
+  - `components/availability-check-bar.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/public-cms.tsx`
+  - `components/analytics-link.tsx`
+  - `components/site-footer.tsx`
+  - `lib/room-routes.ts`
+  - `lib/rooms/catalog.ts`
+  - `lib/site-content.ts`
+  - `lib/supabase/queries/room-types.ts`
+  - `app/globals.css`
+
+### Entry 060
+- `time`: 2026-04-17T13:33:16+07:00
+- `prompt_summary`: Sửa lỗi calendar không đổi được ngày bắt đầu, tăng độ ưu tiên popup ngày, bỏ thanh topbar phụ ở trang phòng, và thêm mục Vị trí dùng chung để scroll tới section map ở mọi trang public.
+- `commit_message`: `fix(public-site): restore date selection and shared location anchor`
+- `main_files`:
+  - `components/availability-check-bar.tsx`
+  - `components/location-section.tsx`
+  - `components/public-cms.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/site-header.tsx`
+  - `lib/site-content.ts`
+  - `app/globals.css`
+
+### Entry 061
+- `time`: 2026-04-17T14:08:12+07:00
+- `prompt_summary`: Ẩn menu Chi nhánh và route /chi-nhanh, bỏ block kiểm tra phòng ở homepage, đưa Vị trí và Tiện ích xuống mọi trang public trước footer, tạm ẩn Liên hệ/Tuyển dụng/Hỗ trợ trong menu Về SK, bỏ nút chuyển ảnh trực tiếp trên card phòng, và chỉnh canvas chi tiết phòng để cuộn cả khối với width gọn hơn.
+- `commit_message`: `fix(public-site): centralize shared sections and refine room canvas`
+- `main_files`:
+  - `app/(marketing)/layout.tsx`
+  - `components/marketing-bottom-sections.tsx`
+  - `components/public-cms.tsx`
+  - `components/page-template.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/location-section.tsx`
+  - `components/facilities-section.tsx`
+  - `app/(marketing)/chi-nhanh/page.tsx`
+  - `app/(marketing)/chi-nhanh/[slug]/page.tsx`
+  - `app/globals.css`
+  - `lib/site-content.ts`
+
+### Entry 062
+- `time`: 2026-04-17T14:28:29+07:00
+- `prompt_summary`: Sửa lỗi cuộn canvas phòng để overlay đứng yên và chính khung chi tiết phòng tự cuộn bên trong, tránh tình trạng nội dung bị lệch như ảnh chụp.
+- `commit_message`: `fix(room-canvas): keep modal scroll within dialog`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 063
+- `time`: 2026-04-17T14:40:23+07:00
+- `prompt_summary`: Thêm section payment dùng chung nằm trên footer mọi trang public, tạm ẩn ba section editorial trên trang phòng, và bổ sung carousel ảnh tự chạy 3s bên dưới danh sách phòng với responsive desktop/tablet/mobile.
+- `commit_message`: `feat(public-site): add shared payment band and room image carousel`
+- `main_files`:
+  - `components/payment-section.tsx`
+  - `components/marketing-bottom-sections.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `app/globals.css`
+
+### Entry 064
+- `time`: 2026-04-17T14:54:45+07:00
+- `prompt_summary`: Mở rộng carousel ảnh phòng thành full-width tràn ngang viewport và chỉnh lại tỉ lệ khung để khớp mockup slider panorama trên desktop, tablet, và mobile.
+- `commit_message`: `fix(room-gallery): expand room carousel to full width`
+- `main_files`:
+  - `components/rooms-image-carousel.tsx`
+  - `app/globals.css`
+
+### Entry 065
+- `time`: 2026-04-17T14:57:50+07:00
+- `prompt_summary`: Rút payment band còn 3 phương thức chính Mastercard, Visa, và tiền mặt, dùng đúng các logo SVG trong public/logos cho section thanh toán dùng chung.
+- `commit_message`: `fix(payment-band): simplify payment methods to three logos`
+- `main_files`:
+  - `components/payment-section.tsx`
+  - `app/globals.css`
+
+### Entry 066
+- `time`: 2026-04-17T15:07:22+07:00
+- `prompt_summary`: Đổi slug trang Về chúng tôi sang chuẩn tiếng Anh `/about-us`, giữ redirect legacy từ `/ve-chung-toi`, và đồng bộ lại menu/footer cùng các CTA nội bộ.
+- `commit_message`: `fix(slugs): migrate about us route to english slug`
+- `main_files`:
+  - `lib/site-content.ts`
+  - `components/site-footer.tsx`
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/ve-chung-toi/page.tsx`
+
+### Entry 067
+- `time`: 2026-04-17T15:18:40+07:00
+- `prompt_summary`: Chuyển CTA đặt phòng trên topbar từ điều hướng sang popup chọn ngày và khách dùng lại flow availability, rồi dẫn tiếp sang trang chọn phòng.
+- `commit_message`: `feat(header-booking): open room search modal from topbar cta`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `components/booking-search-modal.tsx`
+  - `components/availability-check-bar.tsx`
+  - `app/globals.css`
+
+### Entry 068
+- `time`: 2026-04-17T15:31:12+07:00
+- `prompt_summary`: Sửa popup đặt phòng topbar bị lệch lên đầu bằng portal/body mount và khôi phục lại khối kiểm tra phòng ngay dưới hero carousel trên homepage.
+- `commit_message`: `fix(header-booking): center booking modal and restore home availability`
+- `main_files`:
+  - `components/booking-search-modal.tsx`
+  - `components/public-cms.tsx`
+  - `components/marketing-home.tsx`
+  - `components/home-availability-section.tsx`
+  - `app/globals.css`
+
+### Entry 069
+- `time`: 2026-04-17T15:44:20+07:00
+- `prompt_summary`: Sửa menu responsive mobile/tablet để drawer không bị page lấn lên bằng cách mount qua portal và cho drawer phủ full viewport trên breakpoint nhỏ.
+- `commit_message`: `fix(header-menu): make responsive drawer overlay full viewport`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`
+
+### Entry 070
+- `time`: 2026-04-17T15:59:40+07:00
+- `prompt_summary`: Làm nhỏ chữ phần tiện nghi khách sạn trên tablet/iphone để label và check icon giữ cùng một dòng, đồng thời sửa popup chọn phòng cho dropdown hiển thị gọn trong modal như mockup.
+- `commit_message`: `fix(booking-ui): tighten facilities rows and room popup dropdowns`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 071
+- `time`: 2026-04-17T16:18:43+07:00
+- `prompt_summary`: Chốt CTA đặt phòng trên topbar về thẳng `/rooms`, làm gọn lại trang about-us theo hướng ảnh-led với slider khách hàng từ `/public/customers`, ẩn các nút tuyển dụng/contact dư thừa, và thêm cờ vào nút đổi ngôn ngữ.
+- `commit_message`: `feat(public-site): simplify about-us and restore rooms booking cta`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `components/site-footer.tsx`
+  - `components/about-us-page.tsx`
+  - `components/about-us-customer-carousel.tsx`
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/globals.css`
+  - `lib/site-content.ts`
+
+### Entry 072
+- `time`: 2026-04-17T17:20:27+07:00
+- `prompt_summary`: Rút lại khoảng thở bên trái của tiện ích khách sạn trên mobile/tablet, chuyển đổi ngôn ngữ trên topbar mobile về chế độ chỉ còn cờ, và làm menu dropdown responsive gọn hơn thay vì phủ kín cả page.
+- `commit_message`: `fix(public-mobile): compact amenities and header drawer`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`
+
+### Entry 073
+- `time`: 2026-04-17T17:33:00+07:00
+- `prompt_summary`: Làm lại mobile drawer thành full-screen, kéo phần đầu trang chọn phòng lên gần header hơn trên mobile, siết spacing của phần tiện ích khách sạn, và tinh gọn about-us theo hướng image-led với gallery ảnh khách hàng.
+- `commit_message`: `fix(public-site): tighten mobile layouts and refresh about-us imagery`
+- `main_files`:
+  - `app/globals.css`
+  - `components/about-us-page.tsx`
+
+### Entry 074
+- `time`: 2026-04-18T11:55:41+07:00
+- `prompt_summary`: Thiết lập lớp gửi email dùng Supabase Edge Function `send-email`, thêm cấu hình mặc định cho sender/admin recipient, và nối vào workflow availability request để có thể gửi mail khách hàng lẫn thông báo admin theo source công khai.
+- `commit_message`: `feat(email): wire supabase edge function for transactional notifications`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `lib/supabase/env.ts`
+  - `lib/supabase/workflows.ts`
+  - `README.md`
+
+### Entry 075
+- `time`: 2026-04-18T11:58:55+07:00
+- `prompt_summary`: Siết lại tích hợp email theo đúng contract Edge Function mẫu, chỉ gửi body gồm `from`, `to`, `subject`, `html` để khớp với code `send-email` đang chạy.
+- `commit_message`: `fix(email): align payload with edge function contract`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `README.md`
+
+### Entry 076
+- `time`: 2026-04-18T13:31:17+07:00
+- `prompt_summary`: Đối chiếu 5 email template HTML với workflow hiện có của app, bổ sung một email test sender trong admin portal để gửi thử template tới hộp thư được chọn.
+- `commit_message`: `feat(admin-email): add template test sender to admin portal`
+- `main_files`:
+  - `lib/email/templates.ts`
+  - `lib/email/test-presets.ts`
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/admin/page.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 077
+- `time`: 2026-04-18T13:40:26+07:00
+- `prompt_summary`: Sửa lỗi test mail 404 do app gọi sai slug Edge Function, thêm fallback thử `resend-email` khi `send-email` không tồn tại, và chặn lỗi server action để admin portal không văng 500 khi test thất bại.
+- `commit_message`: `fix(email-test): fallback edge function slug and prevent admin crash`
+- `main_files`:
+  - `lib/supabase/env.ts`
+  - `lib/supabase/email.ts`
+  - `app/(admin)/admin/actions.ts`
+
+### Entry 078
+- `time`: 2026-04-18T14:11:52+07:00
+- `prompt_summary`: Gắn `from_name` vào header người gửi để mail hiển thị đúng thương hiệu SK Boutique Hotel trong inbox, giữ nguyên contract Edge Function hiện tại.
+- `commit_message`: `fix(email): render branded from header for outbound mail`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `README.md`
