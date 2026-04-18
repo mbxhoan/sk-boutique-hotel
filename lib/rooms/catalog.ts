@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/locale";
+import { translate } from "@/lib/locale";
 import type { LocalizedText } from "@/lib/mock/i18n";
 import type { RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, localizedArray, text } from "@/lib/supabase/content";
@@ -134,7 +135,7 @@ function buildMetaFacts(roomType: RoomTypeRow) {
     },
     {
       label: text("Giường", "Bed"),
-      value: text(roomType.bed_type || "-", roomType.bed_type || "-")
+      value: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-"))
     }
   ];
 }
@@ -151,7 +152,7 @@ export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: num
   return {
     availabilityLabel: buildAvailabilityLabel(availableRooms),
     availableRooms,
-    bedLabel: text(roomType.bed_type || "-", roomType.bed_type || "-"),
+    bedLabel: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
     bookingCtaLabel: text("Xem lựa chọn và đặt phòng", "View options and book"),
     breakfastOptions: breakfast,
     cancellationOptions: cancellation,

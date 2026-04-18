@@ -12,7 +12,7 @@ export type CmsAction = {
 };
 
 export type CmsMediaFrame = {
-  chips?: string[];
+  chips?: Array<string | LocalizedText>;
   description: LocalizedText;
   image?: string;
   imageAlt?: LocalizedText;

@@ -109,8 +109,8 @@ function CmsPreviewFrame({
         {frame.chips?.length ? (
           <div className="visual-panel__chips" aria-label="Tags">
             {frame.chips.map((chip) => (
-              <span className="visual-panel__chip" key={chip}>
-                {chip}
+              <span className="visual-panel__chip" key={typeof chip === "string" ? chip : `${chip.vi}-${chip.en}`}>
+                {typeof chip === "string" ? chip : localize(locale, chip)}
               </span>
             ))}
           </div>

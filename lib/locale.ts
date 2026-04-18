@@ -59,6 +59,13 @@ const translations: Record<string, string> = {
   "Một khách sạn boutique cần nói ít nhưng đúng.": "A boutique hotel should say little, but say it well.",
   "Bảng màu": "Palette",
   "Navy, gold, and warm paper tone.": "Navy, gold, and a warm paper tone.",
+  "Giường đôi": "Double bed",
+  "Giường đơn": "Single bed",
+  "Giường king": "King bed",
+  "Giường queen": "Queen bed",
+  "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509":
+    "Marina Integrated Resort, Bim Group, MP-135, Marina Square, Duong Bao Hamlet, Phu Quoc, An Giang 92509",
+  "SK Boutique Hotel Phú Quốc": "SK Boutique Hotel Phu Quoc",
   "Mỗi địa điểm nên nhìn cùng một ngôn ngữ, nhưng khác câu chuyện.": "Every location should speak the same language, but tell a different story.",
   "Gói phòng, voucher và chiến dịch theo mùa": "Room packages, vouchers, and seasonal campaigns",
   "Card khuyến mãi dạng cao cấp, hợp với ảnh và headline lớn.": "A premium promo card style that works with bold imagery and headlines.",

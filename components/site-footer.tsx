@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { LogoMark } from "@/components/logo-mark";
-import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
+import { appendLocaleQuery, resolveLocale, translate } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { siteInfo } from "@/lib/site-content";
 import type { LocalizedText } from "@/lib/mock/i18n";
@@ -94,7 +94,7 @@ export function SiteFooter() {
             <dl className="site-footer__details">
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Address" : "Địa chỉ"}</dt>
-                <dd>{siteInfo.address}</dd>
+                <dd>{translate(locale, siteInfo.address)}</dd>
               </div>
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Phone" : "Điện thoại"}</dt>

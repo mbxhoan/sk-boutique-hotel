@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import type { Locale } from "@/lib/locale";
-import { appendLocaleQuery } from "@/lib/locale";
+import { appendLocaleQuery, translate } from "@/lib/locale";
 import { siteInfo } from "@/lib/site-content";
 
 type LocationSectionProps = {
@@ -12,8 +12,8 @@ type LocationSectionProps = {
   locale: Locale;
 };
 
-function mapEmbedUrl() {
-  return `https://www.google.com/maps?q=${encodeURIComponent(siteInfo.gg_map_address)}&output=embed`;
+function mapEmbedUrl(locale: Locale) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(translate(locale, siteInfo.address))}&output=embed`;
 }
 
 export function LocationSection({ className, id = "vi-tri", locale }: LocationSectionProps) {
@@ -33,7 +33,7 @@ export function LocationSection({ className, id = "vi-tri", locale }: LocationSe
 
           <div className="location-band__address">
             <p className="location-band__address-label">{locale === "en" ? "Address" : "Địa chỉ"}</p>
-            <p className="location-band__address-value">{siteInfo.address}</p>
+          <p className="location-band__address-value">{translate(locale, siteInfo.address)}</p>
           </div>
 
           <Link className="button button--solid location-band__cta" href={appendLocaleQuery("/rooms#rooms", locale)}>
@@ -46,7 +46,7 @@ export function LocationSection({ className, id = "vi-tri", locale }: LocationSe
             className="location-band__frame"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            src={mapEmbedUrl()}
+            src={mapEmbedUrl(locale)}
             title={locale === "en" ? "Hotel location map" : "Bản đồ vị trí khách sạn"}
           />
         </div>

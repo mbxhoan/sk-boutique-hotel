@@ -912,3 +912,23 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(seed): align hotel branch and room inventory with Phu Quoc data`
 - `main_files`:
   - `supabase/seed.sql`
+
+### Entry 085
+- `time`: 2026-04-18T23:01:44+07:00
+- `prompt_summary`: Sửa bản EN để không lọt "Giường đôi" trong room cards/detail, localize lại địa chỉ và Google Maps cho English view, và liệt kê toàn bộ link/route hiện có để chọn nhóm cần tắt sau này.
+- `commit_message`: `fix(i18n): localize room labels and location strings`
+- `main_files`:
+  - `lib/locale.ts`
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `components/location-section.tsx`
+  - `components/site-footer.tsx`
+  - `lib/rooms/catalog.ts`
+  - `lib/supabase/queries/room-types.ts`
+
+### Entry 086
+- `time`: 2026-04-18T23:08:22+07:00
+- `prompt_summary`: Chuyển loại giường và view phòng sang cột thông tin khác, đồng thời thêm ăn sáng miễn phí và giặt ủi trong ngày vào phần tiện nghi khách sạn.
+- `commit_message`: `feat(room-facilities): rebalance amenities and room info columns`
+- `main_files`:
+  - `components/facilities-section.tsx`
