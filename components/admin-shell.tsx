@@ -257,12 +257,12 @@ export function AdminShell({ children }: AdminShellProps) {
           ))}
         </nav>
 
-        <PortalCard className="portal-shell__sidebar-card" tone="soft">
+        {/* <PortalCard className="portal-shell__sidebar-card" tone="soft">
           <p className="portal-shell__sidebar-card-title">
             {locale === "en" ? "Operational cautions" : "Ghi chú vận hành"}
           </p>
           <PortalBulletList items={adminDashboardCopy.shell.bullets} locale={locale} />
-        </PortalCard>
+        </PortalCard> */}
       </aside>
 
       <div className="portal-shell__surface">
