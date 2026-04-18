@@ -842,3 +842,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/env.ts`
   - `lib/supabase/email.ts`
   - `app/(admin)/admin/actions.ts`
+
+### Entry 078
+- `time`: 2026-04-18T14:11:52+07:00
+- `prompt_summary`: Gắn `from_name` vào header người gửi để mail hiển thị đúng thương hiệu SK Boutique Hotel trong inbox, giữ nguyên contract Edge Function hiện tại.
+- `commit_message`: `fix(email): render branded from header for outbound mail`
+- `main_files`:
+  - `lib/supabase/email.ts`
+  - `README.md`

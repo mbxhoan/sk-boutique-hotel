@@ -2,6 +2,7 @@ import type { AvailabilityRequestRow, BranchRow, RoomTypeRow } from "@/lib/supab
 import {
   getSupabaseEmailAdminRecipient,
   getSupabaseEmailFromAddress,
+  getSupabaseEmailFromName,
   getSupabaseEmailFunctionNames,
   hasSupabaseServiceConfig
 } from "@/lib/supabase/env";
@@ -139,14 +140,22 @@ async function buildAvailabilityRequestContext(request: AvailabilityRequestRow) 
   return { branch, roomType };
 }
 
+function buildFromHeader(fromAddress?: string) {
+  const resolvedAddress = fromAddress?.trim() || getSupabaseEmailFromAddress().trim();
+  const fromName = getSupabaseEmailFromName().trim();
+
+  return fromName ? `${fromName} <${resolvedAddress}>` : resolvedAddress;
+}
+
 export async function sendEmail(input: SendEmailInput) {
   if (!hasSupabaseServiceConfig()) {
     return null;
   }
 
   const supabase = createSupabaseServiceClient();
+  const fromHeader = input.from.includes("<") ? input.from.trim() : buildFromHeader(input.from);
   const payload = {
-    from: input.from.trim(),
+    from: fromHeader,
     to: input.to.trim(),
     subject: input.subject.trim(),
     html: input.html.trim()
