@@ -787,3 +787,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(marketing)/about-us/page.tsx`
   - `app/globals.css`
   - `lib/site-content.ts`
+
+### Entry 072
+- `time`: 2026-04-17T17:20:27+07:00
+- `prompt_summary`: Rút lại khoảng thở bên trái của tiện ích khách sạn trên mobile/tablet, chuyển đổi ngôn ngữ trên topbar mobile về chế độ chỉ còn cờ, và làm menu dropdown responsive gọn hơn thay vì phủ kín cả page.
+- `commit_message`: `fix(public-mobile): compact amenities and header drawer`
+- `main_files`:
+  - `components/site-header.tsx`
+  - `app/globals.css`
+
+### Entry 073
+- `time`: 2026-04-17T17:33:00+07:00
+- `prompt_summary`: Làm lại mobile drawer thành full-screen, kéo phần đầu trang chọn phòng lên gần header hơn trên mobile, siết spacing của phần tiện ích khách sạn, và tinh gọn about-us theo hướng image-led với gallery ảnh khách hàng.
+- `commit_message`: `fix(public-site): tighten mobile layouts and refresh about-us imagery`
+- `main_files`:
+  - `app/globals.css`
+  - `components/about-us-page.tsx`

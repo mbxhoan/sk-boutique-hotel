@@ -43,49 +43,49 @@ const aboutCopy = {
   },
   carousel: {
     eyebrow: text("KHÁCH HÀNG", "OUR GUESTS"),
-    title: text("Mỗi kỳ nghỉ, một dấu ấn riêng.", "Every stay leaves its own impression."),
+    title: text("Một vài khung hình thật.", "A few real moments."),
     description: text(
-      "Những khoảnh khắc tự nhiên luôn là lời giới thiệu chân thành nhất.",
-      "Genuine moments are always the most sincere introduction."
+      "Slider ảnh khách hàng để bạn thay bằng bộ ảnh thật sau này, không cần đổi cấu trúc trang.",
+      "A guest-photo slider you can replace later without changing the page structure."
     )
   },
-  stories: {
-    eyebrow: text("GIÁ TRỊ CỐT LÕI", "CORE VALUES"),
-    title: text("Những giá trị làm nên trải nghiệm tại SK.", "The values behind every stay at SK."),
+  gallery: {
+    eyebrow: text("ẢNH KHÁCH HÀNG", "GUEST IMAGES"),
+    title: text("Những khung hình đang nói thay nội dung.", "Images that carry the story for now."),
     description: text(
-      "Tinh tế, ấm áp và vừa đủ để bạn muốn quay lại.",
-      "Refined, warm, and thoughtful enough to bring you back."
+      "Tạm thời ưu tiên ảnh và khoảng thở; phần chữ bạn có thể thay sau khi nội dung đã chốt.",
+      "Images and breathing room come first for now; you can replace the copy once the content is finalized."
     )
   }
 } as const;
 
-const storyCards = [
+const galleryCards = [
   {
-    eyebrow: text("KHỞI NGUỒN", "OUR BEGINNING"),
-    title: text("Bắt đầu từ sự chỉn chu.", "Built on thoughtful care."),
+    eyebrow: text("KHUNG HÌNH 01", "FRAME 01"),
+    title: text("Khoảnh khắc đầu tiên.", "The first moment."),
     description: text(
-      "Một nơi ở dễ chịu bắt đầu từ những chi tiết được chăm chút đúng mức.",
-      "A comfortable stay begins with details that are carefully considered."
+      "Ảnh placeholder từ thư mục /public/customers.",
+      "Placeholder imagery from /public/customers."
     ),
     image: customerImages[1],
-    imageAlt: text("Khách lưu trú trong một khoảnh khắc nhẹ nhàng", "A guest in a quiet, refined moment")
+    imageAlt: text("Khách hàng trong một khoảnh khắc nhẹ nhàng", "A guest in a quiet, refined moment")
   },
   {
-    eyebrow: text("TRẢI NGHIỆM", "THE EXPERIENCE"),
-    title: text("Nhẹ nhàng và trọn vẹn.", "Effortless and complete."),
+    eyebrow: text("KHUNG HÌNH 02", "FRAME 02"),
+    title: text("Nhịp ở lại chậm hơn.", "A slower stay rhythm."),
     description: text(
-      "Từ không gian đến dịch vụ, mọi thứ được sắp đặt để bạn cảm thấy thoải mái hơn.",
-      "From the space to the service, everything is shaped to make your stay feel easier and more comfortable."
+      "Dùng để thay ảnh sảnh, phòng hoặc hoạt động lưu trú sau này.",
+      "Use this for lobby, room, or stay-life imagery later."
     ),
     image: customerImages[3],
-    imageAlt: text("Khoảnh khắc khách hàng tại khách sạn", "A customer moment at the hotel")
+    imageAlt: text("Khoảnh khắc khách hàng tại khách sạn", "A guest moment at the hotel")
   },
   {
-    eyebrow: text("GIÁ TRỊ", "OUR VALUES"),
-    title: text("Tinh tế, ấm áp, đáng nhớ.", "Refined, warm, memorable."),
+    eyebrow: text("KHUNG HÌNH 03", "FRAME 03"),
+    title: text("Không gian và cảm xúc.", "Space and feeling."),
     description: text(
-      "SK theo đuổi sự cân bằng giữa thẩm mỹ, riêng tư và cảm giác gần gũi.",
-      "SK brings together aesthetics, privacy, and a welcoming sense of comfort."
+      "Một ô hình tạm để bạn thay ảnh khách hàng bằng asset chính thức.",
+      "A temporary frame for swapping in official guest imagery later."
     ),
     image: customerImages[5],
     imageAlt: text("Khách lưu trú thư giãn trong không gian boutique", "A guest relaxing in a boutique setting")
@@ -116,7 +116,7 @@ function AboutUsStoryCard({
   card,
   locale
 }: {
-  card: (typeof storyCards)[number];
+  card: (typeof galleryCards)[number];
   locale: Locale;
 }) {
   return (
@@ -209,14 +209,14 @@ export function AboutUsPage({ locale }: { locale: Locale }) {
       <section className="section about-us-stories-section">
         <div className="section-shell">
           <LocalizedSectionHeading
-            description={aboutCopy.stories.description}
-            eyebrow={aboutCopy.stories.eyebrow}
+            description={aboutCopy.gallery.description}
+            eyebrow={aboutCopy.gallery.eyebrow}
             locale={locale}
-            title={aboutCopy.stories.title}
+            title={aboutCopy.gallery.title}
           />
 
           <div className="about-us-story-grid">
-            {storyCards.map((card) => (
+            {galleryCards.map((card) => (
               <AboutUsStoryCard card={card} key={card.eyebrow.vi} locale={locale} />
             ))}
           </div>

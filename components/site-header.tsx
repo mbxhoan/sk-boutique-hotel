@@ -228,7 +228,7 @@ export function SiteHeader() {
         <div className="site-header__actions">
           <LocaleToggleLink
             ariaLabel={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
-            className="site-header__locale"
+            className="site-header__locale site-header__locale--compact"
             href={appendLocaleQuery(pathname, localeToggle)}
             locale={localeToggle}
           />
