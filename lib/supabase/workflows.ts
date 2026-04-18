@@ -91,11 +91,23 @@ export type ReleasedReservationRow = {
 };
 
 function normalizeTimestamptzInput(value: string) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return `${value}T00:00:00+07:00`;
+  }
+
   if (/[zZ]$/.test(value) || /[+-]\d{2}:\d{2}$/.test(value)) {
     return value;
   }
 
-  return `${value}:00+07:00`;
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
+    return `${value}:00+07:00`;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(value)) {
+    return `${value}+07:00`;
+  }
+
+  return value;
 }
 
 async function assertRoomsAvailable(
@@ -111,7 +123,7 @@ async function assertRoomsAvailable(
   });
 
   if (error) {
-    throw error;
+    throw new Error(error.message ?? "Unable to check room availability.");
   }
 
   if (!((data ?? []) as RoomRow[]).length) {
@@ -139,7 +151,7 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
   });
 
   if (error) {
-    throw error;
+    throw new Error(error.message ?? "Unable to create booking request.");
   }
 
   const request = data as AvailabilityRequestRow;

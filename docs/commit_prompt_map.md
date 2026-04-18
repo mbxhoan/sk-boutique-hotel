@@ -957,3 +957,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/workflows.ts`
   - `components/room-booking-request-form.tsx`
   - `components/room-canvas-modal.tsx`
+
+### Entry 089
+- `time`: 2026-04-18T23:49:18+07:00
+- `prompt_summary`: Gửi booking request bị lỗi với payload ngày dạng `YYYY-MM-DD`; cần sửa normalize timestamptz cho date-only input và trả lỗi rõ ràng hơn từ workflow.
+- `commit_message`: `fix(booking-request): normalize date-only stay windows`
+- `main_files`:
+  - `lib/supabase/workflows.ts`
