@@ -833,7 +833,7 @@ textarea {
 .about-us-story-card__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.3vw, 1.9rem);
+  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;

@@ -11,8 +11,8 @@ const text = (vi: string, en: string): LocalizedText => ({ vi, en });
 export const aboutUsSeo = {
   title: text("Về chúng tôi", "About us"),
   description: text(
-    "Trang giới thiệu rút gọn, ưu tiên ảnh khách hàng, nhịp không gian và những câu chữ ngắn để bạn thay sau này.",
-    "A trimmed about page that prioritizes customer imagery, spatial rhythm, and short copy you can replace later."
+    "Khám phá câu chuyện, giá trị và những khoảnh khắc lưu trú tại SK Boutique Hotel.",
+    "Discover the story, values, and stay moments at SK Boutique Hotel."
   )
 };
 
@@ -28,7 +28,7 @@ const customerImages = [
 
 const aboutCopy = {
   hero: {
-    eyebrow: text("ABOUT SK", "ABOUT SK"),
+    eyebrow: text("VỀ SK", "ABOUT SK"),
     title: text("Ở lại theo cách tinh tế hơn.", "Stay in a more refined way."),
     description: text(
       "Không gian boutique ấm áp, riêng tư và dễ chịu cho những kỳ nghỉ đáng nhớ.",
@@ -36,59 +36,80 @@ const aboutCopy = {
     ),
     bullets: [
       text("Không gian hiện đại, cảm giác gần gũi.", "Modern space, welcoming feel."),
-      text("Vị trí thuận tiện để nghỉ ngơi và khám phá.", "A convenient place to rest and explore."),
+      text("Vị trí thuận tiện để nghỉ ngơi và khám phá.", "A convenient place to rest and explore.")
     ],
-    primaryCta: text("Khám phá phòng", "Explore rooms"),
-    secondaryCta: text("Liên hệ", "Contact")
+    primaryCta: text("Khám phá phòng", "Explore Rooms"),
+    secondaryCta: text("Liên hệ", "Contact Us"),
+    imageAlt: text(
+      "Khoảnh khắc khách hàng tại SK Boutique Hotel",
+      "A guest moment at SK Boutique Hotel"
+    ),
+    captionEyebrow: text("KHOẢNH KHẮC TẠI SK", "MOMENTS AT SK"),
+    captionTitle: text(
+      "Những trải nghiệm thật luôn kể câu chuyện hay nhất.",
+      "Real experiences always tell the best story."
+    )
   },
   carousel: {
     eyebrow: text("KHÁCH HÀNG", "OUR GUESTS"),
-    title: text("Một vài khung hình thật.", "A few real moments."),
+    title: text("Mỗi kỳ nghỉ, một dấu ấn riêng.", "Every stay leaves its own impression."),
     description: text(
-      "Slider ảnh khách hàng để bạn thay bằng bộ ảnh thật sau này, không cần đổi cấu trúc trang.",
-      "A guest-photo slider you can replace later without changing the page structure."
+      "Những khoảnh khắc tự nhiên luôn là lời giới thiệu chân thành nhất.",
+      "Genuine moments are always the most sincere introduction."
     )
   },
   gallery: {
-    eyebrow: text("ẢNH KHÁCH HÀNG", "GUEST IMAGES"),
-    title: text("Những khung hình đang nói thay nội dung.", "Images that carry the story for now."),
+    eyebrow: text("GIÁ TRỊ CỐT LÕI", "CORE VALUES"),
+    title: text(
+      "Giá trị làm nên trải nghiệm.",
+      "The values behind every stay."
+    ),
     description: text(
-      "Tạm thời ưu tiên ảnh và khoảng thở; phần chữ bạn có thể thay sau khi nội dung đã chốt.",
-      "Images and breathing room come first for now; you can replace the copy once the content is finalized."
+      "Tinh tế, ấm áp và vừa đủ để bạn muốn quay lại.",
+      "Refined, warm, and thoughtful enough to bring you back."
     )
   }
 } as const;
 
 const galleryCards = [
   {
-    eyebrow: text("KHUNG HÌNH 01", "FRAME 01"),
-    title: text("Khoảnh khắc đầu tiên.", "The first moment."),
+    eyebrow: text("KHỞI NGUỒN", "OUR BEGINNING"),
+    title: text("Bắt đầu từ sự chỉn chu.", "Built on thoughtful care."),
     description: text(
-      "Ảnh placeholder từ thư mục /public/customers.",
-      "Placeholder imagery from /public/customers."
+      "Một nơi ở dễ chịu bắt đầu từ những chi tiết được chăm chút đúng mức.",
+      "A comfortable stay begins with details that are carefully considered."
     ),
     image: customerImages[1],
-    imageAlt: text("Khách hàng trong một khoảnh khắc nhẹ nhàng", "A guest in a quiet, refined moment")
+    imageAlt: text(
+      "Khách hàng tại SK Boutique Hotel",
+      "Guests at SK Boutique Hotel"
+    )
   },
   {
-    eyebrow: text("KHUNG HÌNH 02", "FRAME 02"),
-    title: text("Nhịp ở lại chậm hơn.", "A slower stay rhythm."),
+    eyebrow: text("TRẢI NGHIỆM", "THE EXPERIENCE"),
+    title: text("Nhẹ nhàng và trọn vẹn.", "Effortless and complete."),
     description: text(
-      "Dùng để thay ảnh sảnh, phòng hoặc hoạt động lưu trú sau này.",
-      "Use this for lobby, room, or stay-life imagery later."
+      "Từ không gian đến dịch vụ, mọi thứ được sắp đặt để bạn cảm thấy thoải mái hơn.",
+      "From the space to the service, everything is shaped to make your stay feel easier and more comfortable."
     ),
     image: customerImages[3],
-    imageAlt: text("Khoảnh khắc khách hàng tại khách sạn", "A guest moment at the hotel")
+    imageAlt: text(
+      "Khoảnh khắc lưu trú tại khách sạn",
+      "A stay moment at the hotel"
+    )
   },
   {
-    eyebrow: text("KHUNG HÌNH 03", "FRAME 03"),
-    title: text("Không gian và cảm xúc.", "Space and feeling."),
+    eyebrow: text("GIÁ TRỊ", "OUR VALUES"),
+    title: text("Tinh tế, ấm áp, đáng nhớ.", "Refined, warm, memorable."),
     description: text(
-      "Một ô hình tạm để bạn thay ảnh khách hàng bằng asset chính thức.",
-      "A temporary frame for swapping in official guest imagery later."
+      "SK theo đuổi sự cân bằng giữa thẩm mỹ, riêng tư và cảm giác gần gũi.",
+      "SK brings together aesthetics, privacy, and a welcoming sense of comfort."
     ),
     image: customerImages[5],
-    imageAlt: text("Khách lưu trú thư giãn trong không gian boutique", "A guest relaxing in a boutique setting")
+    imageAlt: text(
+      "Khách lưu trú trong không gian boutique",
+      "Guests enjoying a boutique stay"
+    )
   }
 ] as const;
 
@@ -134,7 +155,7 @@ function AboutUsStoryCard({
 
       <div className="about-us-story-card__body">
         <p className="about-us-story-card__eyebrow">{localize(locale, card.eyebrow)}</p>
-        <h3 className="about-us-story-card__title">{localize(locale, card.title)}</h3>
+        <h4 className="about-us-story-card__title">{localize(locale, card.title)}</h4>
         <p className="about-us-story-card__description">{localize(locale, card.description)}</p>
       </div>
     </article>
@@ -173,7 +194,7 @@ export function AboutUsPage({ locale }: { locale: Locale }) {
           <div className="hero__visual about-us-hero__visual">
             <div className="about-us-hero__media">
               <Image
-                alt={localize(locale, aboutCopy.carousel.title)}
+                alt={localize(locale, aboutCopy.hero.imageAlt)}
                 className="about-us-hero__media-image"
                 fill
                 priority
@@ -181,11 +202,11 @@ export function AboutUsPage({ locale }: { locale: Locale }) {
                 src={customerImages[0]}
               />
               <div className="about-us-hero__caption">
-                <p className="about-us-hero__caption-eyebrow">{locale === "en" ? "MOMENTS AT SK" : "KHOẢNH KHẮC TẠI SK"}</p>
+                <p className="about-us-hero__caption-eyebrow">
+                  {localize(locale, aboutCopy.hero.captionEyebrow)}
+                </p>
                 <p className="about-us-hero__caption-title">
-                  {locale === "en"
-                    ? "Real experiences always tell the best story."
-                    : "Những trải nghiệm thật luôn kể câu chuyện hay nhất."}
+                  {localize(locale, aboutCopy.hero.captionTitle)}
                 </p>
               </div>
             </div>
