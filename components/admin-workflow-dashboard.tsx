@@ -8,9 +8,11 @@ import {
   createReservationAction,
   createRoomHoldAction,
   releaseExpiredHoldsAction,
+  sendEmailTestAction,
   verifyPaymentRequestAction
 } from "@/app/(admin)/admin/actions";
 import { adminDashboardCopy } from "@/lib/mock/admin-dashboard";
+import { emailTemplateTestOptions } from "@/lib/email/test-presets";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowDashboardData,
@@ -27,6 +29,7 @@ type AdminWorkflowDashboardProps = {
   canOperate: boolean;
   data: WorkflowDashboardData;
   locale: Locale;
+  testEmailDefaultRecipient: string;
 };
 
 function buildMap<T extends { id: string }>(items: T[]) {
@@ -673,7 +676,54 @@ function AuditCard({
   );
 }
 
-export function AdminWorkflowDashboard({ canOperate, data, locale }: AdminWorkflowDashboardProps) {
+function EmailTestCard({
+  locale,
+  defaultRecipient
+}: {
+  defaultRecipient: string;
+  locale: Locale;
+}) {
+  return (
+    <PortalCard className="portal-panel" tone="soft">
+      <p className="portal-panel__eyebrow">{locale === "en" ? "Email test" : "Email test"}</p>
+      <p className="portal-panel__note-copy">
+        {locale === "en"
+          ? "Send one of the live templates to a mailbox for rendering checks."
+          : "Gửi một trong các template thật tới mailbox để kiểm tra hiển thị."}
+      </p>
+
+      <form className="portal-form" action={sendEmailTestAction}>
+        <label className="portal-field">
+          <span className="portal-field__label">{locale === "en" ? "Template" : "Template"}</span>
+          <select className="portal-field__control" name="templateKey" defaultValue="booking_request_customer">
+            {emailTemplateTestOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="portal-field">
+          <span className="portal-field__label">{locale === "en" ? "Recipient email" : "Email nhận test"}</span>
+          <input
+            className="portal-field__control"
+            defaultValue={defaultRecipient}
+            name="recipientEmail"
+            placeholder={defaultRecipient}
+            type="email"
+          />
+        </label>
+
+        <button className="button button--solid" type="submit">
+          {locale === "en" ? "Send test email" : "Gửi test email"}
+        </button>
+      </form>
+    </PortalCard>
+  );
+}
+
+export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefaultRecipient }: AdminWorkflowDashboardProps) {
   const { bankAccountsByBranch, roomTypeMap } = buildLookupMaps(data);
   const selectedRequest = data.selected_request;
   const selectedRoomType = selectedRequest ? roomTypeMap[selectedRequest.room_type_id] : null;
@@ -845,6 +895,32 @@ export function AdminWorkflowDashboard({ canOperate, data, locale }: AdminWorkfl
             />
           )}
         </div>
+      </section>
+
+      <section className="portal-section" id="email-tests">
+        <PortalSectionHeading
+          description={{
+            en: "Send a live render test to check the email layout before using it in workflow automation.",
+            vi: "Gửi test thật để kiểm tra layout email trước khi đưa vào workflow tự động."
+          }}
+          eyebrow={{ en: "Email test", vi: "Email test" }}
+          locale={locale}
+          title={{ en: "Template test sender", vi: "Gửi test template" }}
+        />
+
+        {canOperate ? (
+          <EmailTestCard defaultRecipient={testEmailDefaultRecipient} locale={locale} />
+        ) : (
+          <SectionEmptyState
+            description={
+              locale === "en"
+                ? "Email test is available once Supabase service role is configured."
+                : "Email test sẽ mở khi Supabase service role đã được cấu hình."
+            }
+            locale={locale}
+            title={locale === "en" ? "Email test disabled" : "Email test chưa bật"}
+          />
+        )}
       </section>
 
       <section className="portal-section" id="branches">

@@ -821,3 +821,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `lib/supabase/email.ts`
   - `README.md`
+
+### Entry 076
+- `time`: 2026-04-18T13:31:17+07:00
+- `prompt_summary`: Đối chiếu 5 email template HTML với workflow hiện có của app, bổ sung một email test sender trong admin portal để gửi thử template tới hộp thư được chọn.
+- `commit_message`: `feat(admin-email): add template test sender to admin portal`
+- `main_files`:
+  - `lib/email/templates.ts`
+  - `lib/email/test-presets.ts`
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/admin/page.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `docs/commit_prompt_map.md`
