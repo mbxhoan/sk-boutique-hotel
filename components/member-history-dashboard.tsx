@@ -155,7 +155,7 @@ export function MemberHistoryDashboard({ data, locale }: MemberHistoryDashboardP
 
   return (
     <div className="portal-content">
-      <section className="portal-section" id="live-updates">
+      <section className="portal-section" id="notifications">
         <PortalSectionHeading
           description={{
             en: "Realtime notifications keep your booking history up to date while staff work in the admin portal.",

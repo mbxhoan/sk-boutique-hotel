@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { MemberHistoryDashboard } from "@/components/member-history-dashboard";
 import { MemberDashboard } from "@/components/member-dashboard";
+import { MemberPortalSidebar } from "@/components/member-portal-sidebar";
 import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { memberDashboardCopy } from "@/lib/mock/member-dashboard";
 import { getSupabaseSession } from "@/lib/supabase/auth";
@@ -41,8 +42,11 @@ export default async function MemberPage({ searchParams }: PageProps) {
   if (data) {
     return (
       <section className="section">
-        <div className="section-shell">
-          <MemberHistoryDashboard data={data} locale={locale} />
+        <div className="section-shell member-portal-layout">
+          <MemberPortalSidebar locale={locale} />
+          <div className="member-portal-layout__content">
+            <MemberHistoryDashboard data={data} locale={locale} />
+          </div>
         </div>
       </section>
     );
@@ -50,8 +54,11 @@ export default async function MemberPage({ searchParams }: PageProps) {
 
   return (
     <section className="section">
-      <div className="section-shell">
-        <MemberDashboard locale={locale} />
+      <div className="section-shell member-portal-layout">
+        <MemberPortalSidebar locale={locale} />
+        <div className="member-portal-layout__content">
+          <MemberDashboard locale={locale} />
+        </div>
       </div>
     </section>
   );

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminSignInForm } from "@/components/admin-sign-in-form";
-import { PortalBadge } from "@/components/portal-ui";
+import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import { resolveLocale } from "@/lib/locale";
 import { canAccessAdminPortal, getSupabaseUser } from "@/lib/supabase/auth";
@@ -27,6 +27,10 @@ const pageCopy = {
   title: {
     vi: "Truy cập admin portal",
     en: "Access the admin portal"
+  } satisfies LocalizedText,
+  memberWarning: {
+    vi: "Tài khoản hiện tại không có quyền admin. Hãy đăng xuất hoặc dùng tài khoản quản trị để vào portal này.",
+    en: "The current account does not have admin access. Sign out or use an admin account to enter this portal."
   } satisfies LocalizedText
 } as const;
 
@@ -65,10 +69,6 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
     redirect("/admin");
   }
 
-  if (user) {
-    redirect("/member");
-  }
-
   return (
     <main className="admin-auth-page">
       <section className="admin-auth-card">
@@ -91,6 +91,12 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         </div>
         <h1 className="admin-auth-card__title">{localize(locale, pageCopy.title)}</h1>
         <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p>
+        {user ? (
+          <PortalCard className="admin-auth-card__notice" tone="soft">
+            <p className="admin-auth-card__notice-title">{locale === "en" ? "Signed in with a member account" : "Đang đăng nhập bằng tài khoản member"}</p>
+            <p className="admin-auth-card__notice-copy">{localize(locale, pageCopy.memberWarning)}</p>
+          </PortalCard>
+        ) : null}
         <AdminSignInForm locale={locale} />
       </section>
     </main>

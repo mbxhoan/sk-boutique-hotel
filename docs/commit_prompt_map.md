@@ -983,3 +983,16 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/(member)/layout.tsx`
   - `app/(member)/member/page.tsx`
+
+### Entry 092
+- `time`: 2026-04-19T10:34:00+07:00
+- `prompt_summary`: Thiết kế member portal với sidebar anchor menu cho Đặt phòng / Lịch sử / Thông tin / Thông báo, và sửa trang admin sign-in để tài khoản member không bị redirect ngược về member portal khi truy cập /admin.
+- `commit_message`: `feat(member-portal): add anchored sidebar and keep admin sign-in on admin portal`
+- `main_files`:
+  - `app/(member)/member/page.tsx`
+  - `components/member-portal-sidebar.tsx`
+  - `components/member-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `app/admin/sign-in/page.tsx`
+  - `app/globals.css`
+  - `lib/mock/member-dashboard.ts`

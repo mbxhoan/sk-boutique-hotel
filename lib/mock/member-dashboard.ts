@@ -60,6 +60,11 @@ export type MemberDashboardCopy = {
       eyebrow: LocalizedText;
       title: LocalizedText;
     };
+    notifications: {
+      description: LocalizedText;
+      eyebrow: LocalizedText;
+      title: LocalizedText;
+    };
     profile: {
       description: LocalizedText;
       eyebrow: LocalizedText;
@@ -81,17 +86,10 @@ export type MemberDashboardCopy = {
 export const memberDashboardCopy = {
   nav: [
     {
-      href: "#summary",
-      label: {
-        vi: "Tổng quan",
-        en: "Summary"
-      }
-    },
-    {
       href: "#requests",
       label: {
-        vi: "Yêu cầu",
-        en: "Requests"
+        vi: "Đặt phòng",
+        en: "Booking"
       }
     },
     {
@@ -104,8 +102,15 @@ export const memberDashboardCopy = {
     {
       href: "#profile",
       label: {
-        vi: "Hồ sơ",
+        vi: "Thông tin",
         en: "Profile"
+      }
+    },
+    {
+      href: "#notifications",
+      label: {
+        vi: "Thông báo",
+        en: "Notifications"
       }
     }
   ],
@@ -230,6 +235,20 @@ export const memberDashboardCopy = {
       title: {
         vi: "Mẫu dữ liệu thành viên",
         en: "Member data snapshot"
+      }
+    },
+    notifications: {
+      description: {
+        vi: "Thông báo realtime giúp khách nhìn thấy trạng thái mới của request, hold, booking và proof.",
+        en: "Realtime notifications show guests the latest state changes for requests, holds, bookings, and proof."
+      },
+      eyebrow: {
+        vi: "Thông báo",
+        en: "Notifications"
+      },
+      title: {
+        vi: "Cập nhật gần nhất",
+        en: "Latest updates"
       }
     },
     requests: {
