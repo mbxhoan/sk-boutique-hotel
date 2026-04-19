@@ -975,3 +975,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/api/member/profile/route.ts`
   - `app/api/member/bootstrap/route.ts`
   - `components/room-booking-request-form.tsx`
+
+### Entry 091
+- `time`: 2026-04-19T00:44:11+07:00
+- `prompt_summary`: Đổi trang member sang template web công khai, dùng lại topbar menu và footer thay vì member dashboard shell riêng, đồng thời giữ member dashboard content bên trong.
+- `commit_message`: `feat(member-site): reuse public header and footer for member pages`
+- `main_files`:
+  - `app/(member)/layout.tsx`
+  - `app/(member)/member/page.tsx`

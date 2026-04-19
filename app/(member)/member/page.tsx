@@ -39,8 +39,20 @@ export default async function MemberPage({ searchParams }: PageProps) {
   const data = await loadMemberHistoryDashboard(session.user.id);
 
   if (data) {
-    return <MemberHistoryDashboard data={data} locale={locale} />;
+    return (
+      <section className="section">
+        <div className="section-shell">
+          <MemberHistoryDashboard data={data} locale={locale} />
+        </div>
+      </section>
+    );
   }
 
-  return <MemberDashboard locale={locale} />;
+  return (
+    <section className="section">
+      <div className="section-shell">
+        <MemberDashboard locale={locale} />
+      </div>
+    </section>
+  );
 }
