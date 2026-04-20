@@ -37,6 +37,33 @@ export async function getCustomerByAuthUserId(authUserId: string) {
   );
 }
 
+export async function getCustomerByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    return null as CustomerRow | null;
+  }
+
+  return queryWithFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        )
+        .ilike("email", normalizedEmail)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as CustomerRow | null;
+    },
+    null as CustomerRow | null
+  );
+}
+
 export async function listCustomersByIds(customerIds: string[]) {
   const uniqueIds = [...new Set(customerIds.filter(Boolean))];
 

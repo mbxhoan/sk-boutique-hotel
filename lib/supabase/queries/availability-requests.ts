@@ -13,6 +13,7 @@ const availabilityRequestSelect = `
 
 type AvailabilityRequestQueryOptions = {
   branchId?: string;
+  contactEmail?: string;
   customerId?: string;
   limit?: number;
   roomTypeId?: string;
@@ -26,6 +27,10 @@ export async function listAvailabilityRequests(options: AvailabilityRequestQuery
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.contactEmail) {
+        query = query.ilike("contact_email", options.contactEmail);
       }
 
       if (options.customerId) {
@@ -84,6 +89,10 @@ export async function countAvailabilityRequests(options: AvailabilityRequestQuer
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.contactEmail) {
+        query = query.ilike("contact_email", options.contactEmail);
       }
 
       if (options.customerId) {

@@ -30,8 +30,8 @@ export function MemberPortalSidebar({ locale }: MemberPortalSidebarProps) {
 
         <div className="member-portal-sidebar__intro">
           <PortalBadge tone="accent">{localize(locale, memberDashboardCopy.shell.badge)}</PortalBadge>
-          <h1 className="member-portal-sidebar__title">{localize(locale, memberDashboardCopy.shell.title)}</h1>
-          <p className="member-portal-sidebar__description">{localize(locale, memberDashboardCopy.shell.description)}</p>
+          {/* <h1 className="member-portal-sidebar__title">{localize(locale, memberDashboardCopy.shell.title)}</h1> */}
+          {/* <p className="member-portal-sidebar__description">{localize(locale, memberDashboardCopy.shell.description)}</p> */}
         </div>
 
         <nav aria-label={locale === "en" ? "Member navigation" : "Điều hướng thành viên"} className="member-portal-sidebar__nav">
@@ -48,7 +48,7 @@ export function MemberPortalSidebar({ locale }: MemberPortalSidebarProps) {
           </Link>
         </div>
 
-        <PortalBulletList className="member-portal-sidebar__bullets" items={memberDashboardCopy.shell.bullets} locale={locale} />
+        {/* <PortalBulletList className="member-portal-sidebar__bullets" items={memberDashboardCopy.shell.bullets} locale={locale} /> */}
       </PortalCard>
     </aside>
   );

@@ -1,5 +1,5 @@
 import type { BranchRow, PaymentProofRow, PaymentRequestRow, ReservationRow, RoomTypeRow } from "@/lib/supabase/database.types";
-import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
+import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { listPaymentProofs } from "@/lib/supabase/queries/payment-proofs";
@@ -17,6 +17,7 @@ import type {
   WorkflowReservation,
   WorkflowRoomTypeOption
 } from "@/lib/supabase/workflow.types";
+import type { CustomerRow } from "@/lib/supabase/database.types";
 
 function buildMap<T extends { id: string }>(items: T[]) {
   return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
@@ -106,7 +107,11 @@ function toPaymentProofView(
   };
 }
 
-export async function loadMemberHistoryDashboard(authUserId: string): Promise<WorkflowMemberHistoryData | null> {
+export async function loadMemberHistoryDashboard(authUserId: string, authUserEmail: string | null = null): Promise<WorkflowMemberHistoryData | null> {
+  return loadMemberHistoryDashboardByUser(authUserId, authUserEmail);
+}
+
+export async function loadMemberHistoryDashboardByUser(authUserId: string, authUserEmail: string | null): Promise<WorkflowMemberHistoryData | null> {
   return queryWithServiceFallback(
     async () => {
       const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
@@ -118,20 +123,51 @@ export async function loadMemberHistoryDashboard(authUserId: string): Promise<Wo
         });
       }
 
-      const customer = await getCustomerByAuthUserId(authUserId);
+      const customer =
+        (await getCustomerByAuthUserId(authUserId)) ??
+        (authUserEmail ? await getCustomerByEmail(authUserEmail) : null) ??
+        (authUserEmail
+          ? ({
+              auth_user_id: authUserId,
+              created_at: new Date().toISOString(),
+              email: authUserEmail,
+              full_name: authUserEmail.split("@")[0] || authUserEmail,
+              id: authUserId,
+              last_seen_at: null,
+              marketing_consent: false,
+              marketing_consent_at: null,
+              marketing_consent_source: null,
+              notes: "",
+              phone: null,
+              preferred_locale: "vi",
+              source: "member_portal",
+              updated_at: new Date().toISOString()
+            } satisfies CustomerRow)
+          : null);
 
       if (!customer) {
         return null;
       }
 
-      const [branches, roomTypes, availabilityRequests, reservations, paymentRequests, paymentProofs] = await Promise.all([
+      const [branches, roomTypes, customerAvailabilityRequests, emailAvailabilityRequests, reservations, paymentRequests, paymentProofs] = await Promise.all([
         listBranches(),
         listRoomTypes(),
         listAvailabilityRequests({ customerId: customer.id, limit: 8 }),
+        authUserEmail ? listAvailabilityRequests({ contactEmail: authUserEmail, limit: 8 }) : Promise.resolve([] as WorkflowAvailabilityRequest[]),
         listReservations({ customerId: customer.id, limit: 8 }),
         listPaymentRequests({ customerId: customer.id, limit: 8 }),
         listPaymentProofs({ customerId: customer.id, limit: 16 })
       ]);
+
+      const availabilityRequests = (() => {
+        const merged = new Map<string, WorkflowAvailabilityRequest>();
+
+        for (const request of [...customerAvailabilityRequests, ...emailAvailabilityRequests]) {
+          merged.set(request.id, request as WorkflowAvailabilityRequest);
+        }
+
+        return [...merged.values()];
+      })();
 
       const branchMap = buildMap(branches);
       const roomTypeMap = buildMap(roomTypes);

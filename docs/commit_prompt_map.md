@@ -996,3 +996,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/admin/sign-in/page.tsx`
   - `app/globals.css`
   - `lib/mock/member-dashboard.ts`
+
+### Entry 093
+- `time`: 2026-04-19T10:54:00+07:00
+- `prompt_summary`: Bổ sung data thật cho member portal thay vì placeholder, và thêm CRUD thực cho admin portal content_pages để quản lý bài viết/trang web hiện có từ Supabase.
+- `commit_message`: `feat(cms-member-data): wire real member history and content page CRUD`
+- `main_files`:
+  - `app/(member)/member/page.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `app/(admin)/admin/content-pages/page.tsx`
+  - `app/(admin)/admin/content-pages/actions.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/availability-requests.ts`
+  - `lib/supabase/queries/content-pages.ts`
+  - `app/globals.css`

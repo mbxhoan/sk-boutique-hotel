@@ -37,7 +37,7 @@ export default async function MemberPage({ searchParams }: PageProps) {
     redirect(appendLocaleQuery("/member/sign-in", locale));
   }
 
-  const data = await loadMemberHistoryDashboard(session.user.id);
+  const data = await loadMemberHistoryDashboard(session.user.id, session.user.email ?? null);
 
   if (data) {
     return (
