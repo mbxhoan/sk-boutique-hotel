@@ -18,11 +18,17 @@ type AdminShellProps = {
 };
 
 function buildSectionHref(pathname: string, search: string, href: string) {
+  const locale = resolveLocale(new URLSearchParams(search).get("lang"));
+
   if (!href.startsWith("#")) {
-    return appendLocaleQuery(href, resolveLocale(new URLSearchParams(search).get("lang")));
+    return appendLocaleQuery(href, locale);
   }
 
-  return `${pathname}${search ? `?${search}` : ""}${href}`;
+  if (pathname === "/admin") {
+    return `${pathname}${search ? `?${search}` : ""}${href}`;
+  }
+
+  return `${appendLocaleQuery("/admin", locale)}${href}`;
 }
 
 function ShellIcon({

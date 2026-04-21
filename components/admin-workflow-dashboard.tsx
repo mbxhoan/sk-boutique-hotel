@@ -2,13 +2,13 @@ import Link from "next/link";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
-import { AdminLiveUpdates } from "@/components/admin-live-updates";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import {
   createPaymentRequestAction,
   createReservationAction,
   createRoomHoldAction,
   releaseExpiredHoldsAction,
+  updateAvailabilityRequestStatusAction,
   sendEmailTestAction,
   verifyPaymentRequestAction
 } from "@/app/(admin)/admin/actions";
@@ -198,6 +198,44 @@ function statusLabel(locale: Locale, status: string) {
   return labels[locale][status] ?? status;
 }
 
+const availabilityRequestStatusTransitions = [
+  {
+    value: "new",
+    label: {
+      en: "Mark new",
+      vi: "Đánh dấu mới"
+    }
+  },
+  {
+    value: "in_review",
+    label: {
+      en: "Mark in review",
+      vi: "Đang xử lý"
+    }
+  },
+  {
+    value: "quoted",
+    label: {
+      en: "Mark quoted",
+      vi: "Đã báo giá"
+    }
+  },
+  {
+    value: "closed",
+    label: {
+      en: "Close request",
+      vi: "Đóng request"
+    }
+  },
+  {
+    value: "rejected",
+    label: {
+      en: "Reject request",
+      vi: "Từ chối request"
+    }
+  }
+] as const;
+
 function buildAdminHref(locale: Locale, requestId: string) {
   return appendLocaleQuery(`/admin?request=${requestId}`, locale);
 }
@@ -250,7 +288,19 @@ function RequestSummaryCard({
           </dd>
         </div>
       </dl>
-      <p className="portal-item-card__detail">{request.contact_email}</p>
+      <p className="portal-item-card__detail">
+        <a className="button button--text-light" href={`mailto:${request.contact_email}`}>
+          {request.contact_email}
+        </a>
+      </p>
+      {request.contact_phone ? (
+        <p className="portal-item-card__note">
+          <a className="button button--text-light" href={`tel:${request.contact_phone}`}>
+            {request.contact_phone}
+          </a>
+        </p>
+      ) : null}
+      {request.note ? <p className="portal-item-card__note">{request.note}</p> : null}
       <Link className="button button--text-light" href={buildAdminHref(locale, request.id)}>
         {locale === "en" ? "Load suggestions" : "Tải gợi ý"}
       </Link>
@@ -284,6 +334,7 @@ function RequestDetailPanel({
   const pricing = getRoomTypePricing(roomType);
   const nights = calculateNights(request.stay_start_at, request.stay_end_at);
   const totalAmount = getReservationTotal(roomType ?? undefined, request.stay_start_at, request.stay_end_at);
+  const alternativeStatuses = availabilityRequestStatusTransitions.filter((option) => option.value !== request.status);
 
   return (
     <PortalCard className="portal-panel" tone="accent">
@@ -314,7 +365,59 @@ function RequestDetailPanel({
           <dt className="portal-profile-list__label">{locale === "en" ? "Contact" : "Liên hệ"}</dt>
           <dd className="portal-profile-list__value">{request.contact_email}</dd>
         </div>
+        {request.contact_phone ? (
+          <div className="portal-profile-list__item">
+            <dt className="portal-profile-list__label">{locale === "en" ? "Phone" : "Số điện thoại"}</dt>
+            <dd className="portal-profile-list__value">
+              <a className="button button--text-light" href={`tel:${request.contact_phone}`}>
+                {request.contact_phone}
+              </a>
+            </dd>
+          </div>
+        ) : null}
       </dl>
+
+      {request.note ? <p className="portal-item-card__note">{request.note}</p> : null}
+
+      <div className="portal-workflow-card__status-strip">
+        <div className="portal-workflow-card__status-current">
+          <p className="portal-panel__eyebrow">{locale === "en" ? "Current status" : "Trạng thái hiện tại"}</p>
+          <PortalBadge tone={badgeToneForRequest(request.status)}>{statusLabel(locale, request.status)}</PortalBadge>
+        </div>
+        {canOperate ? (
+          <form className="portal-form portal-workflow-card__status-form" action={updateAvailabilityRequestStatusAction}>
+            <input name="availabilityRequestId" type="hidden" value={request.id} />
+            <input name="actorRole" type="hidden" value="staff" />
+            {alternativeStatuses.length ? (
+              <label className="portal-field">
+                <span className="portal-field__label">{locale === "en" ? "Change to" : "Đổi sang"}</span>
+                <select className="portal-field__control" name="status" defaultValue={alternativeStatuses[0].value}>
+                  {alternativeStatuses.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label[locale]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+            <button className="button button--solid" type="submit" disabled={!alternativeStatuses.length}>
+              {locale === "en" ? "Update status" : "Cập nhật trạng thái"}
+            </button>
+          </form>
+        ) : null}
+      </div>
+
+      <p className="portal-panel__eyebrow">{locale === "en" ? "Guest contact" : "Liên hệ khách"}</p>
+      <div className="portal-workflow-card__contact-actions">
+        <a className="button button--text-light" href={`mailto:${request.contact_email}`}>
+          {locale === "en" ? "Email guest" : "Email khách"}
+        </a>
+        {request.contact_phone ? (
+          <a className="button button--text-light" href={`tel:${request.contact_phone}`}>
+            {locale === "en" ? "Call guest" : "Gọi khách"}
+          </a>
+        ) : null}
+      </div>
 
       <p className="portal-panel__note-copy">
         {locale === "en"
@@ -732,20 +835,6 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
 
   return (
     <div className="portal-content">
-      <section className="portal-section" id="live-updates">
-        <PortalSectionHeading
-          description={{
-            en: "Realtime admin notifications keep the workflow console fresh as requests arrive.",
-            vi: "Thông báo realtime giúp bảng vận hành luôn cập nhật khi có request mới."
-          }}
-          eyebrow={{ en: "Realtime", vi: "Realtime" }}
-          locale={locale}
-          title={{ en: "Live updates", vi: "Cập nhật trực tiếp" }}
-        />
-
-        <AdminLiveUpdates locale={locale} />
-      </section>
-
       {!canOperate ? (
         <PortalCard className="portal-panel" tone="soft">
           <p className="portal-panel__eyebrow">{locale === "en" ? "Service unavailable" : "Chưa nối Supabase service role"}</p>

@@ -366,13 +366,25 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     toPaymentRequestView(request, branchMap, roomTypeMap, latestPaymentProofMap, reservationMap, customerMap)
   );
 
+  const explicitSelectionContext =
+    selection.branchId && selection.roomTypeId && selection.stayStartAt && selection.stayEndAt
+      ? {
+          branchId: selection.branchId,
+          roomTypeId: selection.roomTypeId,
+          stayEndAt: selection.stayEndAt,
+          stayStartAt: selection.stayStartAt
+        }
+      : null;
+
   const selectedRequest = selection.requestId
     ? availabilityRequests.find((request) => request.id === selection.requestId) ??
       (await getAvailabilityRequestById(selection.requestId).then((row) =>
         row ? toAvailabilityRequestView(row, branchMap, roomTypeMap) : null
       )) ??
-      null
-    : null;
+      (explicitSelectionContext ? null : availabilityRequests[0] ?? null)
+    : explicitSelectionContext
+      ? null
+      : availabilityRequests[0] ?? null;
 
   const selectedContext = selectedRequest
     ? {
@@ -381,14 +393,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
         stayEndAt: selectedRequest.stay_end_at,
         stayStartAt: selectedRequest.stay_start_at
       }
-    : selection.branchId && selection.roomTypeId && selection.stayStartAt && selection.stayEndAt
-      ? {
-          branchId: selection.branchId,
-          roomTypeId: selection.roomTypeId,
-          stayEndAt: selection.stayEndAt,
-          stayStartAt: selection.stayStartAt
-        }
-      : null;
+    : explicitSelectionContext;
 
   const suggestions = selectedContext
     ? (await findAvailableRooms({

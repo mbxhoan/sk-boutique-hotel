@@ -419,9 +419,15 @@ export function RoomBookingRequestForm({
       ) : null}
 
       <div className="room-booking-panel__actions">
-        <button className="button button--solid" disabled={isSubmitting || availableRooms <= 0} type="submit">
+        <button
+          className="button button--solid"
+          disabled={isSubmitting || isLoadingMemberProfile || availableRooms <= 0}
+          type="submit"
+        >
           {isSubmitting
             ? localize(locale, "Đang gửi...", "Sending...")
+            : isLoadingMemberProfile
+              ? localize(locale, "Đang nhận diện...", "Detecting profile...")
             : availableRooms <= 0
               ? localize(locale, "Hết phòng", "Sold out")
               : memberProfile

@@ -529,8 +529,9 @@ textarea {
 }
 
 .button--text-light {
+  background: linear-gradient(135deg, #b94f0c 0%, #c25210 100%);
   color: var(--surface);
-  box-shadow: inset 0 -1px 0 rgba(251, 249, 245, 0.56);
+  /* box-shadow: inset 0 -1px 0 rgba(251, 249, 245, 0.56); */
 }
 
 .button--text-light:hover {
@@ -2206,7 +2207,7 @@ textarea {
 .portal-stat-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .portal-card-grid {
@@ -2396,6 +2397,30 @@ textarea {
 .portal-workflow-card__pricing strong {
   justify-self: end;
   font-weight: 700;
+}
+
+.portal-workflow-card__status-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.portal-workflow-card__status-current {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.portal-workflow-card__status-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  flex: 1 1 18rem;
+}
+
+.portal-workflow-card__status-form .portal-field {
+  min-width: 0;
 }
 
 .portal-form {
@@ -4978,6 +5003,10 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  .portal-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
   .portal-shell {
     padding: 0.75rem;
   }

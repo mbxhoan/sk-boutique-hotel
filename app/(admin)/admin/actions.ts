@@ -8,7 +8,8 @@ import {
   holdRoom,
   releaseExpiredHolds,
   releaseExpiredReservations,
-  submitAvailabilityRequest
+  submitAvailabilityRequest,
+  updateAvailabilityRequestStatus
 } from "@/lib/supabase/workflows";
 import {
   createPaymentRequestAction as submitCreatePaymentRequestAction,
@@ -17,6 +18,7 @@ import {
 } from "@/app/actions/payments";
 import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/lib/supabase/env";
 import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
+import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -72,6 +74,9 @@ function calculateNights(stayStartAt: string, stayEndAt: string) {
   return Math.max(1, Math.round(diffMs / 86_400_000));
 }
 
+const availabilityRequestStatusOptions = ["new", "in_review", "quoted", "closed", "rejected"] as const;
+type AvailabilityRequestStatusOption = (typeof availabilityRequestStatusOptions)[number];
+
 export async function submitAvailabilityRequestAction(formData: FormData) {
   await submitAvailabilityRequest({
     branchId: readRequiredString(formData, "branchId"),
@@ -90,6 +95,28 @@ export async function submitAvailabilityRequestAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+}
+
+export async function updateAvailabilityRequestStatusAction(formData: FormData) {
+  const status = readRequiredString(formData, "status");
+
+  if (!availabilityRequestStatusOptions.includes(status as AvailabilityRequestStatusOption)) {
+    throw new Error(`Unsupported availability request status: ${status}`);
+  }
+
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+
+  await updateAvailabilityRequestStatus({
+    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+    availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
+    note: readOptionalString(formData, "note"),
+    status: status as AvailabilityRequestStatusOption
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/member");
 }
 
 export async function createPaymentRequestAction(formData: FormData) {

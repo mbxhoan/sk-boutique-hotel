@@ -1,10 +1,12 @@
 import type {
   AvailabilityRequestRow,
+  AvailabilityRequestStatus,
   ReservationRow,
   ReservationStatus,
   RoomHoldRow,
   RoomRow
 } from "@/lib/supabase/database.types";
+import { logAuditEvent } from "@/lib/supabase/audit";
 import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
 import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -166,6 +168,83 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
   }
 
   return request;
+}
+
+export type UpdateAvailabilityRequestStatusInput = {
+  actorRole?: string | null;
+  actorUserId?: string | null;
+  availabilityRequestId: string;
+  note?: string | null;
+  status: AvailabilityRequestStatus;
+};
+
+export async function updateAvailabilityRequestStatus(input: UpdateAvailabilityRequestStatusInput) {
+  const supabase = createSupabaseServiceClient();
+  const { data: request, error: requestError } = await supabase
+    .from("availability_requests")
+    .select("id, request_code, branch_id, customer_id, status, handled_by, handled_at, closed_at")
+    .eq("id", input.availabilityRequestId)
+    .maybeSingle();
+
+  if (requestError) {
+    throw new Error(requestError.message ?? "Unable to load availability request.");
+  }
+
+  if (!request) {
+    throw new Error("Availability request not found.");
+  }
+
+  const now = new Date().toISOString();
+  const updates: Partial<
+    Pick<AvailabilityRequestRow, "closed_at" | "handled_at" | "handled_by" | "status" | "updated_by">
+  > = {
+    status: input.status,
+    updated_by: input.actorUserId ?? null
+  };
+
+  if (input.status === "new") {
+    updates.handled_by = null;
+    updates.handled_at = null;
+    updates.closed_at = null;
+  } else if (input.status === "closed" || input.status === "rejected") {
+    updates.handled_by = input.actorUserId ?? request.handled_by ?? null;
+    updates.handled_at = request.handled_at ?? now;
+    updates.closed_at = now;
+  } else {
+    updates.handled_by = input.actorUserId ?? request.handled_by ?? null;
+    updates.handled_at = now;
+    updates.closed_at = null;
+  }
+
+  const { data: updated, error: updateError } = await supabase
+    .from("availability_requests")
+    .update(updates)
+    .eq("id", input.availabilityRequestId)
+    .select("id, request_code, branch_id, customer_id, status, handled_by, handled_at, closed_at")
+    .maybeSingle();
+
+  if (updateError) {
+    throw new Error(updateError.message ?? "Unable to update availability request status.");
+  }
+
+  await logAuditEvent({
+    action: `availability_request.status.${input.status}`,
+    actorRole: input.actorRole ?? null,
+    actorUserId: input.actorUserId ?? null,
+    availabilityRequestId: request.id,
+    branchId: request.branch_id,
+    customerId: request.customer_id,
+    entityId: request.id,
+    entityType: "availability_request",
+    metadata: {
+      next_status: input.status,
+      note: input.note ?? null,
+      previous_status: request.status
+    },
+    summary: `Availability request ${request.request_code} moved from ${request.status} to ${input.status}`
+  });
+
+  return (updated ?? request) as AvailabilityRequestRow;
 }
 
 export async function holdRoom(input: HoldRoomInput) {

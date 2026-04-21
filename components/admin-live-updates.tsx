@@ -11,6 +11,54 @@ type AdminLiveUpdatesProps = {
   locale: Locale;
 };
 
+function labelForTable(locale: Locale, table: string, eventType: "INSERT" | "UPDATE" | "DELETE") {
+  const tableLabels: Record<string, string> =
+    locale === "en"
+      ? {
+          availability_requests: "Availability request",
+          audit_logs: "Audit event",
+          payment_proofs: "Payment proof",
+          payment_requests: "Payment request",
+          reservations: "Reservation",
+          room_holds: "Room hold"
+        }
+      : {
+          availability_requests: "Yêu cầu xem phòng",
+          audit_logs: "Audit event",
+          payment_proofs: "Proof thanh toán",
+          payment_requests: "Payment request",
+          reservations: "Booking",
+          room_holds: "Hold phòng"
+        };
+
+  const statusLabel =
+    eventType === "INSERT"
+      ? locale === "en"
+        ? "created"
+        : "đã tạo"
+      : eventType === "UPDATE"
+        ? locale === "en"
+          ? "updated"
+          : "đã cập nhật"
+        : locale === "en"
+          ? "removed"
+          : "đã xoá";
+
+  return `${tableLabels[table] ?? table} ${statusLabel}`;
+}
+
+function summarizeRealtimeRow(row: unknown) {
+  if (!row || typeof row !== "object") {
+    return null;
+  }
+
+  const record = row as Record<string, unknown>;
+  const candidate =
+    record.request_code ?? record.hold_code ?? record.booking_code ?? record.payment_code ?? record.summary ?? null;
+
+  return typeof candidate === "string" && candidate.trim().length > 0 ? candidate.trim() : null;
+}
+
 export function AdminLiveUpdates({ locale }: AdminLiveUpdatesProps) {
   const router = useRouter();
   const [count, setCount] = useState(0);
@@ -18,16 +66,42 @@ export function AdminLiveUpdates({ locale }: AdminLiveUpdatesProps) {
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
-    const channel = supabase
-      .channel("admin-live-updates")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "audit_logs" }, ({ new: row }) => {
-        const summary = typeof row?.summary === "string" ? row.summary : null;
+    const trackedTables = [
+      "availability_requests",
+      "room_holds",
+      "reservations",
+      "payment_requests",
+      "payment_proofs",
+      "audit_logs"
+    ] as const;
+    const channel = supabase.channel("admin-live-updates");
 
-        setCount((current) => current + 1);
-        setLatestMessage(summary ?? (locale === "en" ? "New audit event" : "Có audit event mới"));
-        router.refresh();
-      })
-      .subscribe();
+    for (const table of trackedTables) {
+      for (const event of ["INSERT", "UPDATE", "DELETE"] as const) {
+        if (table === "audit_logs" && event !== "INSERT") {
+          continue;
+        }
+
+        channel.on(
+          "postgres_changes",
+          {
+            event,
+            schema: "public",
+            table
+          },
+          ({ eventType, new: newRow, old: oldRow }) => {
+            const row = newRow ?? oldRow;
+            const summary = summarizeRealtimeRow(row);
+
+            setCount((current) => current + 1);
+            setLatestMessage(`${labelForTable(locale, table, eventType as "INSERT" | "UPDATE" | "DELETE")}${summary ? ` • ${summary}` : ""}`);
+            router.refresh();
+          }
+        );
+      }
+    }
+
+    channel.subscribe();
 
     return () => {
       void supabase.removeChannel(channel);

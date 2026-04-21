@@ -1053,3 +1053,26 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/selected-rooms-carousel.tsx`
   - `components/public-cms.tsx`
+
+### Entry 097
+- `time`: 2026-04-21T16:26:58+07:00
+- `prompt_summary`: Tiếp tục phần booking workflow dang dở: khóa nút gửi khi profile member đang được nhận diện, làm request/admin queue hiển thị rõ hơn, auto-select request để staff thấy contact/status/hold/reservation/payment, đẩy realtime cho admin/member, và bỏ fallback placeholder ở member portal để ưu tiên dữ liệu thật.
+- `commit_message`: `feat(workflow-ui): surface request inbox and lock booking submit while loading`
+- `main_files`:
+  - `components/room-booking-request-form.tsx`
+  - `components/admin-shell.tsx`
+  - `components/admin-live-updates.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/workflows.ts`
+  - `app/(admin)/admin/actions.ts`
+  - `app/(member)/member/page.tsx`
+  - `lib/mock/admin-dashboard.ts`
+
+### Entry 098
+- `time`: 2026-04-21T17:02:20+07:00
+- `prompt_summary`: Xoá khối realtime riêng trong admin portal, thu overview về lưới 5 ô trên một hàng, và gom phần booking/status thành một khối gọn với chỉ trạng thái hiện tại và các trạng thái hợp lệ để staff đổi.
+- `commit_message`: `refactor(admin-portal): compact workflow overview and remove realtime panel`
+- `main_files`:
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/globals.css`

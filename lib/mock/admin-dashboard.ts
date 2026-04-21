@@ -162,7 +162,7 @@ export const adminDashboardCopy = {
     },
     {
       icon: "operations",
-      href: "#operations",
+      href: "#requests",
       label: {
         vi: "Vận hành",
         en: "Operations"
@@ -202,7 +202,7 @@ export const adminDashboardCopy = {
         },
         {
           icon: "operations",
-          href: "#operations",
+          href: "#requests",
           label: {
             vi: "Vận hành",
             en: "Operations"
@@ -386,7 +386,7 @@ export const adminDashboardCopy = {
   shell: {
     actions: {
       primary: {
-        href: "#operations",
+        href: "#requests",
         label: {
           vi: "Mở queue",
           en: "Open queue"
