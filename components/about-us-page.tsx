@@ -16,16 +16,6 @@ export const aboutUsSeo = {
   )
 };
 
-const customerImages = [
-  "/customers/customers1.jpg",
-  "/customers/customers2.jpg",
-  "/customers/customers3.jpg",
-  "/customers/customers4.jpg",
-  "/customers/customers5.jpg",
-  "/customers/customers6.jpg",
-  "/customers/customers22.jpg"
-] as const;
-
 const aboutCopy = {
   hero: {
     eyebrow: text("VỀ SK", "ABOUT SK"),
@@ -71,47 +61,52 @@ const aboutCopy = {
   }
 } as const;
 
-const galleryCards = [
-  {
-    eyebrow: text("KHỞI NGUỒN", "OUR BEGINNING"),
-    title: text("Bắt đầu từ sự chỉn chu.", "Built on thoughtful care."),
-    description: text(
-      "Một nơi ở dễ chịu bắt đầu từ những chi tiết được chăm chút đúng mức.",
-      "A comfortable stay begins with details that are carefully considered."
-    ),
-    image: customerImages[1],
-    imageAlt: text(
-      "Khách hàng tại SK Boutique Hotel",
-      "Guests at SK Boutique Hotel"
-    )
-  },
-  {
-    eyebrow: text("TRẢI NGHIỆM", "THE EXPERIENCE"),
-    title: text("Nhẹ nhàng và trọn vẹn.", "Effortless and complete."),
-    description: text(
-      "Từ không gian đến dịch vụ, mọi thứ được sắp đặt để bạn cảm thấy thoải mái hơn.",
-      "From the space to the service, everything is shaped to make your stay feel easier and more comfortable."
-    ),
-    image: customerImages[3],
-    imageAlt: text(
-      "Khoảnh khắc lưu trú tại khách sạn",
-      "A stay moment at the hotel"
-    )
-  },
-  {
-    eyebrow: text("GIÁ TRỊ", "OUR VALUES"),
-    title: text("Tinh tế, ấm áp, đáng nhớ.", "Refined, warm, memorable."),
-    description: text(
-      "SK theo đuổi sự cân bằng giữa thẩm mỹ, riêng tư và cảm giác gần gũi.",
-      "SK brings together aesthetics, privacy, and a welcoming sense of comfort."
-    ),
-    image: customerImages[5],
-    imageAlt: text(
-      "Khách lưu trú trong không gian boutique",
-      "Guests enjoying a boutique stay"
-    )
-  }
-] as const;
+const fallbackCustomerImages = [
+  "/customers/customers1.jpg",
+  "/customers/customers2.jpg",
+  "/customers/customers3.jpg",
+  "/customers/customers4.jpg",
+  "/customers/customers5.jpg",
+  "/customers/customers6.jpg",
+  "/customers/customers22.jpg"
+];
+
+function buildGalleryCards(customerImages: string[]) {
+  const images = customerImages.length ? customerImages : fallbackCustomerImages;
+
+  return [
+    {
+      eyebrow: text("KHỞI NGUỒN", "OUR BEGINNING"),
+      title: text("Bắt đầu từ sự chỉn chu.", "Built on thoughtful care."),
+      description: text(
+        "Một nơi ở dễ chịu bắt đầu từ những chi tiết được chăm chút đúng mức.",
+        "A comfortable stay begins with details that are carefully considered."
+      ),
+      image: images[1] ?? images[0],
+      imageAlt: text("Khách hàng tại SK Boutique Hotel", "Guests at SK Boutique Hotel")
+    },
+    {
+      eyebrow: text("TRẢI NGHIỆM", "THE EXPERIENCE"),
+      title: text("Nhẹ nhàng và trọn vẹn.", "Effortless and complete."),
+      description: text(
+        "Từ không gian đến dịch vụ, mọi thứ được sắp đặt để bạn cảm thấy thoải mái hơn.",
+        "From the space to the service, everything is shaped to make your stay feel easier and more comfortable."
+      ),
+      image: images[3] ?? images[images.length - 1] ?? images[0],
+      imageAlt: text("Khoảnh khắc lưu trú tại khách sạn", "A stay moment at the hotel")
+    },
+    {
+      eyebrow: text("GIÁ TRỊ", "OUR VALUES"),
+      title: text("Tinh tế, ấm áp, đáng nhớ.", "Refined, warm, memorable."),
+      description: text(
+        "SK theo đuổi sự cân bằng giữa thẩm mỹ, riêng tư và cảm giác gần gũi.",
+        "SK brings together aesthetics, privacy, and a welcoming sense of comfort."
+      ),
+      image: images[5] ?? images[images.length - 1] ?? images[0],
+      imageAlt: text("Khách lưu trú trong không gian boutique", "Guests enjoying a boutique stay")
+    }
+  ] as const;
+}
 
 function LocalizedSectionHeading({
   description,
@@ -137,7 +132,7 @@ function AboutUsStoryCard({
   card,
   locale
 }: {
-  card: (typeof galleryCards)[number];
+  card: ReturnType<typeof buildGalleryCards>[number];
   locale: Locale;
 }) {
   return (
@@ -162,7 +157,15 @@ function AboutUsStoryCard({
   );
 }
 
-export function AboutUsPage({ locale }: { locale: Locale }) {
+export function AboutUsPage({
+  customerImages,
+  locale
+}: {
+  customerImages: string[];
+  locale: Locale;
+}) {
+  const galleryCards = buildGalleryCards(customerImages);
+
   return (
     <>
       <section className="hero hero--split about-us-hero">
@@ -199,7 +202,7 @@ export function AboutUsPage({ locale }: { locale: Locale }) {
                 fill
                 priority
                 sizes="(min-width: 1080px) 48vw, 100vw"
-                src={customerImages[0]}
+                src={customerImages[0] ?? customerImages[customerImages.length - 1] ?? "/customers/customers1.jpg"}
               />
               <div className="about-us-hero__caption">
                 <p className="about-us-hero__caption-eyebrow">
@@ -246,3 +249,5 @@ export function AboutUsPage({ locale }: { locale: Locale }) {
     </>
   );
 }
+
+export const AboutUsPageContent = AboutUsPage;

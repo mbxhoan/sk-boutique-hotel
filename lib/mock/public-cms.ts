@@ -1,6 +1,9 @@
-import type { LocalizedText } from "@/lib/mock/i18n";
+import type { LocalizedText } from "./i18n.ts";
+import { buildMediaReference } from "../media/library.ts";
 
 const text = (vi: string, en: string): LocalizedText => ({ vi, en });
+const media = (collectionSlug: string, assetSlug: string, fallbackUrl: string) =>
+  buildMediaReference(collectionSlug, assetSlug, fallbackUrl);
 
 export type CmsTone = "ink" | "paper" | "gold";
 export type CmsActionTone = "solid" | "ghost" | "text";
@@ -212,7 +215,7 @@ const featureFrameLeft: CmsMediaFrame = {
     "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
     "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/home/block.jpg",
+  image: media("about-visuals", "about-visual-1", "/home/block.jpg"),
   imageAlt: text("Phòng khách boutique sáng và tinh tế", "A bright and refined boutique room"),
   label: text("SK stay story", "SK stay story"),
   note: text(
@@ -229,7 +232,7 @@ const featureFrameRight: CmsMediaFrame = {
     "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
     "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/home/block.jpg",
+  image: media("about-visuals", "about-visual-2", "/home/block.jpg"),
   imageAlt: text("Không gian boutique với nhịp thị giác ấm", "A warm boutique space with layered visual rhythm"),
   label: text("Visual detail", "Visual detail"),
   note: text(
@@ -321,7 +324,11 @@ const roomItems: CmsCollectionItem[] = [
 
 const homeRoomItems: CmsCollectionItem[] = roomItems.map((item, index) => ({
   ...item,
-  image: ["/home/bed1.jpg", "/home/bed1.jpg", "/home/bed1.jpg"][index],
+  image: [
+    media("room-family", "cover-1", "/home/bed1.jpg"),
+    media("room-superior", "cover-1", "/home/bed1.jpg"),
+    media("room-quadruple", "cover-1", "/home/bed1.jpg")
+  ][index],
   imageAlt: item.title,
 }));
 
@@ -506,7 +513,7 @@ const homePageSections: CmsSection[] = [
     },
     slides: [
       {
-        image: "/hero/hero-1.png",
+        image: media("home-hero", "slide-1", "/hero/hero-1.png"),
         eyebrow: text("SK Boutique Hotel", "SK Boutique Hotel"),
         title: text(
           "Chào mừng đến SK Boutique Hotel",
@@ -530,7 +537,7 @@ const homePageSections: CmsSection[] = [
         }
       },
       {
-        image: "/hero/hero-2.png",
+        image: media("home-hero", "slide-2", "/hero/hero-2.png"),
         eyebrow: text("Phòng nghỉ", "Our Rooms"),
         title: text(
           "Phòng nghỉ sang trọng, thanh lịch",
@@ -554,7 +561,7 @@ const homePageSections: CmsSection[] = [
         }
       },
       {
-        image: "/hero/hero-3.png",
+        image: media("home-hero", "slide-3", "/hero/hero-3.png"),
         eyebrow: text("Trải nghiệm", "Experience"),
         title: text(
           "Thư giãn đẳng cấp, tầm nhìn tuyệt đẹp",

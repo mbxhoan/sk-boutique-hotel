@@ -348,6 +348,126 @@ export interface Database {
         } & RowTimestampFields>;
         Relationships: [];
       };
+      media_collections: {
+        Row: {
+          created_at: string;
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
+      media_assets: {
+        Row: {
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_at: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_at: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields>;
+        Relationships: [
+          {
+            foreignKeyName: "media_assets_collection_slug_fkey";
+            columns: ["collection_slug"];
+            isOneToOne: false;
+            referencedRelation: "media_collections";
+            referencedColumns: ["slug"];
+          }
+        ];
+      };
       customers: {
         Row: {
           auth_user_id: string | null;

@@ -28,7 +28,7 @@ function buildSectionHref(pathname: string, search: string, href: string) {
 function ShellIcon({
   name
 }: {
-  name: "audit" | "branches" | "collapse" | "content" | "dashboard" | "expand" | "operations" | "roles" | "users";
+  name: "audit" | "branches" | "collapse" | "content" | "dashboard" | "expand" | "media" | "operations" | "roles" | "users";
 }) {
   if (name === "collapse" || name === "expand") {
     return (
@@ -130,6 +130,27 @@ function ShellIcon({
         />
         <path d="M11 3.75V6.5h2.75" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
         <path d="M6.25 9h5.5M6.25 11.5h5.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (name === "media") {
+    return (
+      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+        <path
+          d="M4 4.5h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z"
+          stroke="currentColor"
+          strokeLinejoin="round"
+          strokeWidth="1.2"
+        />
+        <path
+          d="m5.25 11 2.1-2.4a.9.9 0 0 1 1.35-.02l1.1 1.2 1.05-1.15a.9.9 0 0 1 1.37.08l1.48 2.29"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.2"
+        />
+        <circle cx="7.3" cy="6.8" fill="currentColor" r="0.95" />
       </svg>
     );
   }

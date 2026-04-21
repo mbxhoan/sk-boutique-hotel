@@ -2,6 +2,7 @@ import { AnalyticsLink } from "@/components/analytics-link";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { RoomAmenitiesSection } from "@/components/room-amenities-section";
 import { SelectedRoomsCarousel } from "@/components/selected-rooms-carousel";
+import { resolveMediaSource, type MediaLookup } from "@/lib/media/library";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type {
@@ -21,6 +22,7 @@ import type {
 } from "@/lib/mock/public-cms";
 import { PortalBadge, PortalBulletList, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import { Fragment, type ReactNode } from "react";
+import { loadMediaLookup } from "@/lib/supabase/queries/media";
 
 const actionVariantMap: Record<CmsActionTone, "solid" | "ghost" | "text"> = {
   solid: "solid",
@@ -77,13 +79,16 @@ function CmsActionLink({
 function CmsPreviewFrame({
   frame,
   locale,
+  mediaLookup,
   size = "section"
 }: {
   frame: CmsMediaFrame;
   locale: Locale;
+  mediaLookup: MediaLookup;
   size?: "hero" | "section";
 }) {
-  const hasImage = Boolean(frame.image);
+  const imageSrc = resolveMediaSource(frame.image, mediaLookup);
+  const hasImage = Boolean(imageSrc);
 
   return (
     <div
@@ -93,13 +98,13 @@ function CmsPreviewFrame({
     >
       <span className="visual-panel__grain" aria-hidden="true" />
 
-      {frame.image ? (
+      {imageSrc ? (
         <div className="visual-panel__image-wrap">
           <img
             alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
             className="visual-panel__image"
             loading="lazy"
-            src={frame.image}
+            src={imageSrc}
           />
         </div>
       ) : null}
@@ -130,20 +135,26 @@ function CmsPreviewFrame({
 function CmsAboutVisualCard({
   frame,
   locale,
+  mediaLookup,
   variant
 }: {
   frame: CmsMediaFrame;
   locale: Locale;
+  mediaLookup: MediaLookup;
   variant: "back" | "front";
 }) {
+  const imageSrc = resolveMediaSource(frame.image, mediaLookup);
+
   return (
     <article className={`cms-about-card cms-about-card--${variant}`}>
-      <img
-        alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
-        className="cms-about-card__image"
-        loading="lazy"
-        src={frame.image}
-      />
+      {imageSrc ? (
+        <img
+          alt={frame.imageAlt ? localize(locale, frame.imageAlt) : localize(locale, frame.title)}
+          className="cms-about-card__image"
+          loading="lazy"
+          src={imageSrc}
+        />
+      ) : null}
       <span className="cms-about-card__overlay" aria-hidden="true" />
       <div className="cms-about-card__content">
         <h3 className="cms-about-card__title">{localize(locale, frame.title)}</h3>
@@ -155,14 +166,24 @@ function CmsAboutVisualCard({
 
 function CmsHeroSectionRenderer({
   locale,
+  mediaLookup,
   section
 }: {
   locale: Locale;
+  mediaLookup: MediaLookup;
   section: CmsHeroSection;
 }) {
   /* Carousel layout — used on homepage */
   if (section.layout === "carousel" && section.slides?.length) {
-    return <HeroCarousel locale={locale} slides={section.slides} />;
+    return (
+      <HeroCarousel
+        locale={locale}
+        slides={section.slides.map((slide) => ({
+          ...slide,
+          image: resolveMediaSource(slide.image, mediaLookup) ?? slide.image
+        }))}
+      />
+    );
   }
 
   const centeredLayout = section.layout === "centered";
@@ -184,7 +205,7 @@ function CmsHeroSectionRenderer({
             </div>
 
             <div className="cms-hero__banner">
-              <CmsPreviewFrame frame={section.frame} locale={locale} size="hero" />
+              <CmsPreviewFrame frame={section.frame} locale={locale} mediaLookup={mediaLookup} size="hero" />
             </div>
 
             <PortalBulletList className="cms-hero__bullets cms-hero__bullets--centered" items={section.bullets} locale={locale} />
@@ -212,7 +233,7 @@ function CmsHeroSectionRenderer({
           </div>
 
           <div className="cms-hero__visual">
-            <CmsPreviewFrame frame={section.frame} locale={locale} size="hero" />
+            <CmsPreviewFrame frame={section.frame} locale={locale} mediaLookup={mediaLookup} size="hero" />
           </div>
         </div>
       </div>
@@ -256,9 +277,11 @@ function CmsStatsSectionRenderer({
 
 function CmsSplitSectionRenderer({
   locale,
+  mediaLookup,
   section
 }: {
   locale: Locale;
+  mediaLookup: MediaLookup;
   section: CmsSplitSection;
 }) {
   return (
@@ -277,7 +300,7 @@ function CmsSplitSectionRenderer({
         </div>
 
         <div className="cms-split__visual">
-          <CmsPreviewFrame frame={section.frame} locale={locale} size="section" />
+          <CmsPreviewFrame frame={section.frame} locale={locale} mediaLookup={mediaLookup} size="section" />
         </div>
       </div>
     </section>
@@ -286,9 +309,11 @@ function CmsSplitSectionRenderer({
 
 function CmsFeatureSectionRenderer({
   locale,
+  mediaLookup,
   section
 }: {
   locale: Locale;
+  mediaLookup: MediaLookup;
   section: CmsFeatureSection;
 }) {
   const isAboutSection = section.id === "about";
@@ -332,7 +357,7 @@ function CmsFeatureSectionRenderer({
 
             <div className="cms-feature__visual cms-feature__visual--about" aria-hidden="true">
               <div className="cms-about-visual__stack">
-                <CmsAboutVisualCard frame={section.frames[1]} locale={locale} variant="front" />
+                <CmsAboutVisualCard frame={section.frames[1]} locale={locale} mediaLookup={mediaLookup} variant="front" />
               </div>
             </div>
           </div>
@@ -365,10 +390,10 @@ function CmsFeatureSectionRenderer({
           <div className="cms-feature__visual" aria-hidden="true">
             <div className="cms-feature__stack">
               <div className="cms-feature__frame cms-feature__frame--back">
-                <CmsPreviewFrame frame={section.frames[0]} locale={locale} size="section" />
+                <CmsPreviewFrame frame={section.frames[0]} locale={locale} mediaLookup={mediaLookup} size="section" />
               </div>
               <div className="cms-feature__frame cms-feature__frame--front">
-                <CmsPreviewFrame frame={section.frames[1]} locale={locale} size="section" />
+                <CmsPreviewFrame frame={section.frames[1]} locale={locale} mediaLookup={mediaLookup} size="section" />
               </div>
             </div>
           </div>
@@ -393,12 +418,16 @@ function CmsFeatureSectionRenderer({
 
 function CmsCollectionCard({
   item,
+  mediaLookup,
   locale
 }: {
   item: CmsCollectionItem;
+  mediaLookup: MediaLookup;
   locale: Locale;
 }) {
-  if (item.image) {
+  const imageSrc = resolveMediaSource(item.image, mediaLookup);
+
+  if (imageSrc) {
     const image = (
       <PortalCard className="cms-collection-card cms-collection-card--image" tone={toneToCardTone(item.tone)}>
         <div className="cms-collection-card__visual">
@@ -406,7 +435,7 @@ function CmsCollectionCard({
             alt={item.imageAlt ? localize(locale, item.imageAlt) : localize(locale, item.title)}
             className="cms-collection-card__image"
             loading="lazy"
-            src={item.image}
+            src={imageSrc}
           />
         </div>
 
@@ -477,9 +506,11 @@ function CmsCollectionCard({
 
 function CmsCardsSectionRenderer({
   locale,
+  mediaLookup,
   section
 }: {
   locale: Locale;
+  mediaLookup: MediaLookup;
   section: CmsCardsSection;
 }) {
   if (section.id === "destinations") {
@@ -489,6 +520,7 @@ function CmsCardsSectionRenderer({
         eyebrow={section.eyebrow}
         items={section.items}
         locale={locale}
+        mediaLookup={mediaLookup}
         title={section.title}
       />
     );
@@ -506,7 +538,7 @@ function CmsCardsSectionRenderer({
 
         <div className="portal-card-grid cms-card-grid">
           {section.items.map((item) => (
-            <CmsCollectionCard item={item} key={`${item.href}-${item.title.vi}`} locale={locale} />
+            <CmsCollectionCard item={item} key={`${item.href}-${item.title.vi}`} locale={locale} mediaLookup={mediaLookup} />
           ))}
         </div>
       </div>
@@ -588,23 +620,25 @@ function CmsLocaleZonesSectionRenderer({
 }
 
 export function CmsSectionRenderer({
+  mediaLookup,
   locale,
   section
 }: {
+  mediaLookup: MediaLookup;
   locale: Locale;
   section: CmsSection;
 }) {
   switch (section.kind) {
     case "hero":
-      return <CmsHeroSectionRenderer locale={locale} section={section} />;
+      return <CmsHeroSectionRenderer locale={locale} mediaLookup={mediaLookup} section={section} />;
     case "stats":
       return <CmsStatsSectionRenderer locale={locale} section={section} />;
     case "split":
-      return <CmsSplitSectionRenderer locale={locale} section={section} />;
+      return <CmsSplitSectionRenderer locale={locale} mediaLookup={mediaLookup} section={section} />;
     case "feature":
-      return <CmsFeatureSectionRenderer locale={locale} section={section} />;
+      return <CmsFeatureSectionRenderer locale={locale} mediaLookup={mediaLookup} section={section} />;
     case "cards":
-      return <CmsCardsSectionRenderer locale={locale} section={section} />;
+      return <CmsCardsSectionRenderer locale={locale} mediaLookup={mediaLookup} section={section} />;
     case "amenities":
       return <RoomAmenitiesSection locale={locale} section={section} />;
     case "band":
@@ -614,7 +648,7 @@ export function CmsSectionRenderer({
   }
 }
 
-export function CmsPageRenderer({
+export async function CmsPageRenderer({
   className,
   afterFirstSection,
   locale,
@@ -625,12 +659,14 @@ export function CmsPageRenderer({
   locale: Locale;
   page: CmsPageCopy;
 }) {
+  const mediaLookup = await loadMediaLookup();
+
   return (
     <div className={`cms-page cms-page--${page.kind}${className ? ` ${className}` : ""}`}>
       <div className="cms-page__sections">
         {page.sections.map((section, index) => (
           <Fragment key={section.id}>
-            <CmsSectionRenderer locale={locale} section={section} />
+            <CmsSectionRenderer locale={locale} mediaLookup={mediaLookup} section={section} />
             {index === 0 ? afterFirstSection : null}
           </Fragment>
         ))}

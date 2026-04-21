@@ -69,7 +69,11 @@ function pickDescriptionEn(roomType: RoomTypeRow) {
   return roomType.summary_en || roomType.description_en || roomType.story_en || roomType.name_en;
 }
 
-function buildGallery(roomType: RoomTypeRow) {
+function buildGallery(roomType: RoomTypeRow, overrideGallery?: string[]) {
+  if (overrideGallery?.length) {
+    return overrideGallery;
+  }
+
   return galleryByRoomSlug[roomType.slug] ?? ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"];
 }
 
@@ -140,7 +144,11 @@ function buildMetaFacts(roomType: RoomTypeRow) {
   ];
 }
 
-export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: number): RoomCatalogEntry {
+export function buildRoomCatalogEntry(
+  roomType: RoomTypeRow,
+  availableRooms: number,
+  overrideGallery?: string[]
+): RoomCatalogEntry {
   const currentPrice = roomType.manual_override_price ?? roomType.base_price;
   const originalPrice = roomType.manual_override_price != null ? roomType.base_price : null;
   const discountPercent =
@@ -148,6 +156,7 @@ export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: num
       ? Math.max(0, Math.round((1 - currentPrice / originalPrice) * 100))
       : null;
   const { breakfast, cancellation } = buildPriceOptions(roomType);
+  const gallery = buildGallery(roomType, overrideGallery);
 
   return {
     availabilityLabel: buildAvailabilityLabel(availableRooms),
@@ -159,10 +168,10 @@ export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: num
     currentPrice,
     description: text(pickDescription(roomType), pickDescriptionEn(roomType)),
     discountPercent,
-    gallery: buildGallery(roomType),
+    gallery,
     galleryBadge: text(
-      `Xem ${buildGallery(roomType).length} ảnh`,
-      `View ${buildGallery(roomType).length} photos`
+      `Xem ${gallery.length} ảnh`,
+      `View ${gallery.length} photos`
     ),
     highlights: localizedArray(roomType.highlights_vi, roomType.highlights_en),
     metaFacts: buildMetaFacts(roomType),

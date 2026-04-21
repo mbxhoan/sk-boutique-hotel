@@ -4,6 +4,7 @@ import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
+import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
@@ -29,6 +30,14 @@ function getDefaultFilters() {
     checkout: dateKey(tomorrow)
   };
 }
+
+const roomsHeroFallback = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
+const roomsCarouselFallback = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
+const roomGalleryFallbacks: Record<string, string[]> = {
+  "family-room": ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg", "/home/bed1.jpg"],
+  "quadruple-room": ["/home/pool3.jpg", "/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"],
+  "superior-room": ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg", "/home/bed1.jpg"]
+};
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
@@ -74,6 +83,13 @@ export default async function RoomsPage({ searchParams }: PageProps) {
 
     return accumulator;
   }, {});
+  const [roomsHeroImage, roomCarouselImages, familyGallery, superiorGallery, quadrupleGallery] = await Promise.all([
+    loadMediaCollectionImageUrls("rooms-hero", roomsHeroFallback, 1).then((images) => images[0] ?? roomsHeroFallback[0]),
+    loadMediaCollectionImageUrls("rooms-gallery", roomsCarouselFallback, 12),
+    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 4),
+    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 4),
+    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 4)
+  ]);
 
   return (
     <>
@@ -92,8 +108,15 @@ export default async function RoomsPage({ searchParams }: PageProps) {
         initialFilters={initialFilters}
         initialRoomSlug={activeRoomType?.slug ?? null}
         locale={locale}
+        roomCarouselImages={roomCarouselImages}
+        roomGalleriesBySlug={{
+          "family-room": familyGallery,
+          "quadruple-room": quadrupleGallery,
+          "superior-room": superiorGallery
+        }}
         roomAvailabilityByTypeId={roomAvailabilityByTypeId}
         roomTypes={roomTypes}
+        roomsHeroImage={roomsHeroImage}
       />
     </>
   );

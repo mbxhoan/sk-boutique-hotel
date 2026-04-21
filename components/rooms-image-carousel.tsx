@@ -25,9 +25,7 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-const defaultImages = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
-
-export function RoomsImageCarousel({ autoPlayInterval = 3000, images = defaultImages, locale = "vi" }: RoomsImageCarouselProps) {
+export function RoomsImageCarousel({ autoPlayInterval = 3000, images = [], locale = "vi" }: RoomsImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const total = images.length;
 

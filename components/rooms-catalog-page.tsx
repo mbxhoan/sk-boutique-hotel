@@ -18,8 +18,11 @@ type RoomsCatalogPageProps = {
   initialFilters: RoomsSearchState;
   initialRoomSlug?: string | null;
   locale: Locale;
+  roomCarouselImages: string[];
+  roomGalleriesBySlug: Record<string, string[]>;
   roomAvailabilityByTypeId: Record<string, number>;
   roomTypes: RoomTypeRow[];
+  roomsHeroImage: string;
 };
 
 function formatCompactPrice(locale: Locale, price: number | null) {
@@ -117,13 +120,19 @@ export function RoomsCatalogPage({
   initialFilters,
   initialRoomSlug,
   locale,
+  roomCarouselImages,
+  roomGalleriesBySlug,
   roomAvailabilityByTypeId,
-  roomTypes
+  roomTypes,
+  roomsHeroImage
 }: RoomsCatalogPageProps) {
   const router = useRouter();
   const roomEntries = useMemo(
-    () => roomTypes.map((roomType) => buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0)),
-    [roomAvailabilityByTypeId, roomTypes]
+    () =>
+      roomTypes.map((roomType) =>
+        buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0, roomGalleriesBySlug[roomType.slug])
+      ),
+    [roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
   );
   const [visibleRoomSlug, setVisibleRoomSlug] = useState<string | null>(initialRoomSlug ?? null);
   const activeRoom = roomEntries.find((room) => room.slug === visibleRoomSlug) ?? null;
@@ -144,7 +153,7 @@ export function RoomsCatalogPage({
     <div className="rooms-page">
       <section className="rooms-hero">
         <div className="rooms-hero__media">
-          <Image alt="" aria-hidden="true" className="rooms-hero__image" fill priority sizes="100vw" src="/home/bed1.jpg" />
+          <Image alt="" aria-hidden="true" className="rooms-hero__image" fill priority sizes="100vw" src={roomsHeroImage} />
           <span className="rooms-hero__overlay" aria-hidden="true" />
         </div>
 
@@ -179,7 +188,7 @@ export function RoomsCatalogPage({
         </div>
       </section>
 
-      {/* <RoomsImageCarousel locale={locale} /> */}
+      <RoomsImageCarousel images={roomCarouselImages} locale={locale} />
 
       <RoomCanvasModal
         bookingContext={{

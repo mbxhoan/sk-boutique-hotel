@@ -1012,3 +1012,44 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/availability-requests.ts`
   - `lib/supabase/queries/content-pages.ts`
   - `app/globals.css`
+
+### Entry 094
+- `time`: 2026-04-20T12:13:35+07:00
+- `prompt_summary`: Dựng thư viện media dùng chung cho toàn app, chia collection/asset trong Supabase, cho public pages chọn ảnh từ media thay vì hard-code, và thêm admin CRUD cho media library.
+- `commit_message`: `feat(media-library): add shared media collections and admin CRUD`
+- `main_files`:
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `app/(admin)/admin/media/page.tsx`
+  - `app/(admin)/admin/media/actions.ts`
+  - `components/about-us-page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `components/admin-shell.tsx`
+  - `components/public-cms.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `lib/media/library.ts`
+  - `lib/mock/admin-dashboard.ts`
+  - `lib/mock/public-cms.ts`
+  - `lib/rooms/catalog.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/queries/media.ts`
+  - `app/globals.css`
+  - `supabase/migrations/20260420100000_phase_h_media_library.sql`
+
+### Entry 095
+- `time`: 2026-04-21T14:12:51+07:00
+- `prompt_summary`: Sửa `generate:content-pages-seed` để chạy được bằng Node thuần, loại bỏ alias `@/` khỏi chuỗi import mà seed generator đi qua, rồi sinh lại file `supabase/seed-content-pages.sql`.
+- `commit_message`: `fix(content-pages-seed): replace app aliases with node-safe imports`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `lib/site-content.ts`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 096
+- `time`: 2026-04-21T14:40:20+07:00
+- `prompt_summary`: Sửa lỗi `next/image` nhận nhầm media reference `media://...` khi load trang, bằng cách resolve ảnh CMS collection trước khi render carousel room trên public site.
+- `commit_message`: `fix(media-images): resolve cms media refs before next/image`
+- `main_files`:
+  - `components/selected-rooms-carousel.tsx`
+  - `components/public-cms.tsx`

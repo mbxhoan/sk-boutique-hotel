@@ -1,5 +1,5 @@
-import type { LocalizedText } from "@/lib/mock/i18n";
-import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
+import type { LocalizedText } from "./mock/i18n.ts";
+import { isTemporarilyHiddenHref } from "./hidden-routes.ts";
 
 export type LinkItem = {
   label: string;

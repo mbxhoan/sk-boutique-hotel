@@ -1,7 +1,7 @@
 import type { LocalizedText } from "@/lib/mock/i18n";
 
 export type AdminNavItem = {
-  icon: "audit" | "branches" | "content" | "dashboard" | "operations" | "roles" | "users";
+  icon: "audit" | "branches" | "content" | "dashboard" | "media" | "operations" | "roles" | "users";
   href: string;
   label: LocalizedText;
 };
@@ -262,6 +262,14 @@ export const adminDashboardCopy = {
           label: {
             vi: "Bài viết & trang",
             en: "Pages & posts"
+          }
+        },
+        {
+          icon: "media",
+          href: "/admin/media",
+          label: {
+            vi: "Media",
+            en: "Media"
           }
         }
       ]
