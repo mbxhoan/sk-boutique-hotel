@@ -2,8 +2,9 @@ import Link from "next/link";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
-import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
+import { PortalBadge, PortalCard, PortalHelp, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import {
+  confirmAvailabilityRequestAction,
   createPaymentRequestAction,
   createReservationAction,
   createRoomHoldAction,
@@ -35,17 +36,6 @@ type AdminWorkflowDashboardProps = {
 
 function buildMap<T extends { id: string }>(items: T[]) {
   return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
-}
-
-function groupBankAccountsByBranch(accounts: WorkflowBranchBankAccountOption[]) {
-  return accounts.reduce<Record<string, WorkflowBranchBankAccountOption[]>>((acc, account) => {
-    if (!acc[account.branch_id]) {
-      acc[account.branch_id] = [];
-    }
-
-    acc[account.branch_id].push(account);
-    return acc;
-  }, {});
 }
 
 function formatDateTime(locale: Locale, value: string) {
@@ -242,7 +232,6 @@ function buildAdminHref(locale: Locale, requestId: string) {
 
 function buildLookupMaps(data: WorkflowDashboardData) {
   return {
-    bankAccountsByBranch: groupBankAccountsByBranch(data.branch_bank_account_options),
     roomTypeMap: buildMap(data.room_type_options)
   };
 }
@@ -253,6 +242,289 @@ function SectionEmptyState({ locale, title, description }: { description: string
       <p className="portal-panel__eyebrow">{title}</p>
       <p className="portal-panel__note-copy">{description}</p>
     </PortalCard>
+  );
+}
+
+function RequestInboxTable({
+  locale,
+  requests,
+  selectedRequestId
+}: {
+  locale: Locale;
+  requests: WorkflowAvailabilityRequest[];
+  selectedRequestId: string | null;
+}) {
+  return (
+    <div className="portal-table-shell">
+      <table className="portal-data-table">
+        <thead>
+          <tr>
+            <th>{locale === "en" ? "Request" : "Request"}</th>
+            <th>{locale === "en" ? "Guest" : "Khách"}</th>
+            <th>{locale === "en" ? "Stay" : "Lưu trú"}</th>
+            <th>{locale === "en" ? "Room type" : "Hạng phòng"}</th>
+            <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
+            <th>{locale === "en" ? "Action" : "Xử lý"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((request) => {
+            const selected = selectedRequestId === request.id;
+
+            return (
+              <tr className={selected ? "portal-data-table__row portal-data-table__row--selected" : "portal-data-table__row"} key={request.id}>
+                <td>
+                  <div className="portal-data-table__primary">
+                    <strong className="portal-data-table__title">{request.request_code}</strong>
+                    <p className="portal-data-table__meta">{locale === "en" ? request.branch_name_en : request.branch_name_vi}</p>
+                  </div>
+                </td>
+                <td>
+                  <div className="portal-data-table__primary">
+                    <strong className="portal-data-table__title">{request.contact_name}</strong>
+                    <p className="portal-data-table__meta">
+                      <a className="button button--text-light" href={`mailto:${request.contact_email}`}>
+                        {request.contact_email}
+                      </a>
+                    </p>
+                  </div>
+                </td>
+                <td>
+                  <div className="portal-data-table__primary">
+                    <strong className="portal-data-table__title">{formatDateRange(locale, request.stay_start_at, request.stay_end_at)}</strong>
+                    <p className="portal-data-table__meta">{request.guest_count} guest(s)</p>
+                  </div>
+                </td>
+                <td>
+                  <div className="portal-data-table__primary">
+                    <strong className="portal-data-table__title">
+                      {locale === "en" ? request.room_type_name_en : request.room_type_name_vi}
+                    </strong>
+                    <p className="portal-data-table__meta">{request.note || "—"}</p>
+                  </div>
+                </td>
+                <td>
+                  <div className="portal-data-table__status">
+                    <PortalBadge tone={badgeToneForRequest(request.status)}>{statusLabel(locale, request.status)}</PortalBadge>
+                  </div>
+                </td>
+                <td>
+                  <div className="portal-data-table__actions">
+                    <Link className="button button--text-light" href={buildAdminHref(locale, request.id)}>
+                      {locale === "en" ? "Open" : "Mở"}
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function HoldTable({
+  holds,
+  locale
+}: {
+  holds: WorkflowRoomHold[];
+  locale: Locale;
+}) {
+  return (
+    <div className="portal-table-shell">
+      <table className="portal-data-table">
+        <thead>
+          <tr>
+            <th>{locale === "en" ? "Hold" : "Hold"}</th>
+            <th>{locale === "en" ? "Room" : "Phòng"}</th>
+            <th>{locale === "en" ? "Stay" : "Lưu trú"}</th>
+            <th>{locale === "en" ? "Expires" : "Hết hạn"}</th>
+            <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {holds.map((hold) => (
+            <tr key={hold.id}>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{hold.hold_code}</strong>
+                  <p className="portal-data-table__meta">{locale === "en" ? hold.branch_name_en : hold.branch_name_vi}</p>
+                </div>
+              </td>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{hold.room_code}</strong>
+                  <p className="portal-data-table__meta">
+                    {locale === "en" ? hold.room_type_name_en : hold.room_type_name_vi}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <strong className="portal-data-table__title">{formatDateRange(locale, hold.stay_start_at, hold.stay_end_at)}</strong>
+              </td>
+              <td>
+                <p className="portal-data-table__meta">{formatDateTime(locale, hold.expires_at)}</p>
+              </td>
+              <td>
+                <PortalBadge tone={badgeToneForHold(hold.status)}>{statusLabel(locale, hold.status)}</PortalBadge>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ReservationTable({
+  locale,
+  reservations
+}: {
+  locale: Locale;
+  reservations: WorkflowReservation[];
+}) {
+  return (
+    <div className="portal-table-shell">
+      <table className="portal-data-table">
+        <thead>
+          <tr>
+            <th>{locale === "en" ? "Booking" : "Booking"}</th>
+            <th>{locale === "en" ? "Customer" : "Khách"}</th>
+            <th>{locale === "en" ? "Stay" : "Lưu trú"}</th>
+            <th>{locale === "en" ? "Room" : "Phòng"}</th>
+            <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
+            <th>{locale === "en" ? "Amount" : "Số tiền"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reservations.map((reservation) => (
+            <tr key={reservation.id}>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{reservation.booking_code}</strong>
+                  <p className="portal-data-table__meta">{locale === "en" ? reservation.branch_name_en : reservation.branch_name_vi}</p>
+                </div>
+              </td>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{reservation.customer_name}</strong>
+                  <p className="portal-data-table__meta">{reservation.customer_email}</p>
+                </div>
+              </td>
+              <td>
+                <strong className="portal-data-table__title">
+                  {formatDateRange(locale, reservation.stay_start_at, reservation.stay_end_at)}
+                </strong>
+              </td>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{reservation.room_code}</strong>
+                  <p className="portal-data-table__meta">
+                    {locale === "en" ? reservation.primary_room_type_name_en : reservation.primary_room_type_name_vi}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <PortalBadge tone={badgeToneForReservation(reservation.status)}>{statusLabel(locale, reservation.status)}</PortalBadge>
+              </td>
+              <td>
+                <strong className="portal-data-table__title">{formatMoney(locale, reservation.total_amount)}</strong>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function BranchTable({
+  branches,
+  locale
+}: {
+  branches: WorkflowDashboardData["branch_options"];
+  locale: Locale;
+}) {
+  return (
+    <div className="portal-table-shell">
+      <table className="portal-data-table">
+        <thead>
+          <tr>
+            <th>{locale === "en" ? "Branch" : "Chi nhánh"}</th>
+            <th>{locale === "en" ? "Code" : "Mã"}</th>
+            <th>{locale === "en" ? "Slug" : "Slug"}</th>
+            <th>{locale === "en" ? "Timezone" : "Múi giờ"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {branches.map((branch) => (
+            <tr key={branch.id}>
+              <td>
+                <div className="portal-data-table__primary">
+                  <strong className="portal-data-table__title">{locale === "en" ? branch.name_en : branch.name_vi}</strong>
+                  <p className="portal-data-table__meta">{branch.id}</p>
+                </div>
+              </td>
+              <td>
+                <strong className="portal-data-table__title">{branch.code}</strong>
+              </td>
+              <td>
+                <p className="portal-data-table__meta">{branch.slug}</p>
+              </td>
+              <td>
+                <p className="portal-data-table__meta">{branch.timezone}</p>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AuditTable({
+  events,
+  locale
+}: {
+  events: WorkflowDashboardData["audit_logs"];
+  locale: Locale;
+}) {
+  return (
+    <div className="portal-table-shell">
+      <table className="portal-data-table">
+        <thead>
+          <tr>
+            <th>{locale === "en" ? "Time" : "Thời gian"}</th>
+            <th>{locale === "en" ? "Event" : "Sự kiện"}</th>
+            <th>{locale === "en" ? "Scope" : "Phạm vi"}</th>
+            <th>{locale === "en" ? "Summary" : "Mô tả"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map((event) => (
+            <tr key={event.id}>
+              <td>
+                <p className="portal-data-table__meta">{formatDateTime(locale, event.happened_at)}</p>
+              </td>
+              <td>
+                <strong className="portal-data-table__title">{event.action}</strong>
+              </td>
+              <td>
+                <p className="portal-data-table__meta">
+                  {locale === "en"
+                    ? `${event.entity_label_en}${event.branch_name_en ? ` • ${event.branch_name_en}` : ""}`
+                    : `${event.entity_label_vi}${event.branch_name_vi ? ` • ${event.branch_name_vi}` : ""}`}
+                </p>
+              </td>
+              <td>
+                <p className="portal-data-table__meta">{event.summary}</p>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -305,21 +577,25 @@ function RequestSummaryCard({
         {locale === "en" ? "Load suggestions" : "Tải gợi ý"}
       </Link>
     </PortalCard>
-  );
+      );
 }
 
 function RequestDetailPanel({
   canOperate,
+  branchBankAccounts,
   locale,
   roomType,
+  roomTypes,
   request,
   roomSuggestions
 }: {
   canOperate: boolean;
+  branchBankAccounts: WorkflowBranchBankAccountOption[];
   locale: Locale;
   request: WorkflowAvailabilityRequest | null;
   roomSuggestions: WorkflowRoomSuggestion[];
   roomType: WorkflowRoomTypeOption | null;
+  roomTypes: WorkflowRoomTypeOption[];
 }) {
   if (!request) {
     return (
@@ -415,15 +691,93 @@ function RequestDetailPanel({
         {request.contact_phone ? (
           <a className="button button--text-light" href={`tel:${request.contact_phone}`}>
             {locale === "en" ? "Call guest" : "Gọi khách"}
-          </a>
-        ) : null}
+        </a>
+      ) : null}
       </div>
 
-      <p className="portal-panel__note-copy">
-        {locale === "en"
-          ? "Room suggestions are filtered by the selected branch, room type, and stay window."
-          : "Gợi ý phòng được lọc theo chi nhánh, loại phòng và khung thời gian đã chọn."}
-      </p>
+      <div className="portal-panel__note-copy portal-workflow-card__hint-line">
+        <span>
+          {locale === "en"
+            ? "Room suggestions are filtered by the selected branch, room type, and stay window."
+            : "Gợi ý phòng được lọc theo chi nhánh, loại phòng và khung thời gian đã chọn."}
+        </span>
+        <PortalHelp
+          content={
+            locale === "en"
+              ? "If you change room type or stay window, refresh the request to reload suggestions before confirming."
+              : "Nếu đổi loại phòng hoặc khung lưu trú, hãy tải lại request để gợi ý phòng khớp trước khi xác nhận."
+          }
+          locale={locale}
+        />
+      </div>
+
+      {canOperate ? (
+        <form className="portal-form portal-workflow-card__confirm-form" action={confirmAvailabilityRequestAction}>
+          <input name="actorRole" type="hidden" value="staff" />
+          <input name="availabilityRequestId" type="hidden" value={request.id} />
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Room type" : "Hạng phòng"}</span>
+            <select className="portal-field__control" defaultValue={request.room_type_id} name="roomTypeId">
+              {roomTypes.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {locale === "en" ? option.name_en : option.name_vi}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="portal-grid portal-grid--two">
+            <label className="portal-field">
+              <span className="portal-field__label">{locale === "en" ? "Check-in" : "Check-in"}</span>
+              <input className="portal-field__control" defaultValue={request.stay_start_at.slice(0, 10)} name="stayStartAt" type="date" />
+            </label>
+            <label className="portal-field">
+              <span className="portal-field__label">{locale === "en" ? "Check-out" : "Check-out"}</span>
+              <input className="portal-field__control" defaultValue={request.stay_end_at.slice(0, 10)} name="stayEndAt" type="date" />
+            </label>
+          </div>
+          <div className="portal-grid portal-grid--two">
+            <label className="portal-field">
+              <span className="portal-field__label">{locale === "en" ? "Room" : "Phòng"}</span>
+              <select className="portal-field__control" defaultValue={roomSuggestions[0]?.id ?? ""} name="roomId">
+                {roomSuggestions.length ? (
+                  roomSuggestions.map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.code} • {locale === "en" ? room.room_type_name_en : room.room_type_name_vi}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">{locale === "en" ? "No available room" : "Không có phòng phù hợp"}</option>
+                )}
+              </select>
+            </label>
+            <label className="portal-field">
+              <span className="portal-field__label">{locale === "en" ? "Guests" : "Khách"}</span>
+              <input className="portal-field__control" defaultValue={request.guest_count} min={1} name="guestCount" type="number" />
+            </label>
+          </div>
+          <label className="portal-field">
+            <span className="portal-field__label">
+              {locale === "en" ? "Deposit amount" : "Số tiền cọc"}
+            </span>
+            <input className="portal-field__control" min={0} name="depositAmount" placeholder={locale === "en" ? "Leave blank to use total amount" : "Để trống sẽ dùng tổng tiền"} type="number" />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Notes" : "Ghi chú"}</span>
+            <textarea className="portal-field__control" name="notes" rows={3} defaultValue={request.note} />
+          </label>
+          <button className="button button--solid" type="submit" disabled={!roomSuggestions.length}>
+            {locale === "en" ? "Confirm & send deposit" : "Chốt & gửi cọc"}
+          </button>
+        </form>
+      ) : null}
+
+      {branchBankAccounts.length ? (
+        <p className="portal-panel__note-copy">
+          {locale === "en"
+            ? `Default bank: ${branchBankAccounts.find((item) => item.is_default)?.bank_name ?? branchBankAccounts[0].bank_name}`
+            : `Tài khoản mặc định: ${branchBankAccounts.find((item) => item.is_default)?.bank_name ?? branchBankAccounts[0].bank_name}`}
+        </p>
+      ) : null}
 
       <div className="portal-workflow-card__pricing">
         <span>{locale === "en" ? "Nights" : "Đêm"}</span>
@@ -829,7 +1183,7 @@ function EmailTestCard({
 }
 
 export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefaultRecipient }: AdminWorkflowDashboardProps) {
-  const { bankAccountsByBranch, roomTypeMap } = buildLookupMaps(data);
+  const { roomTypeMap } = buildLookupMaps(data);
   const selectedRequest = data.selected_request;
   const selectedRoomType = selectedRequest ? roomTypeMap[selectedRequest.room_type_id] : null;
 
@@ -850,6 +1204,10 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
         <PortalSectionHeading
           description={adminDashboardCopy.sections.overview.description}
           eyebrow={adminDashboardCopy.sections.overview.eyebrow}
+          help={{
+            en: "These numbers summarize the operational queue. Use them to spot the next bottleneck quickly.",
+            vi: "Các số này tóm tắt queue vận hành. Dùng để nhìn nhanh điểm nghẽn tiếp theo."
+          }}
           locale={locale}
           title={adminDashboardCopy.sections.overview.title}
         />
@@ -870,29 +1228,29 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
 
       <section className="portal-section" id="requests">
         <PortalSectionHeading
-          description={adminDashboardCopy.sections.operations.description}
+          description={{
+            en: "Open a request row to review stays, room suggestions, and staff actions.",
+            vi: "Chọn một request để xem lưu trú, gợi ý phòng và thao tác staff."
+          }}
           eyebrow={{ en: "Requests & holds", vi: "Requests & holds" }}
+          help={{
+            en: "Request inbox stays in a table so staff can scan status, contact, and dates before opening the detail pane.",
+            vi: "Hộp thư request ở dạng bảng để staff quét trạng thái, liên hệ và ngày ở trước khi mở panel chi tiết."
+          }}
           locale={locale}
           title={{ en: "Availability inbox", vi: "Hộp thư availability" }}
         />
 
         <div className="portal-grid portal-grid--two">
-          <div className="portal-card-grid portal-card-grid--two">
-            {data.availability_requests.map((request) => (
-              <RequestSummaryCard
-                key={request.id}
-                locale={locale}
-                request={request}
-                selected={selectedRequest?.id === request.id}
-              />
-            ))}
-          </div>
+          <RequestInboxTable locale={locale} requests={data.availability_requests} selectedRequestId={selectedRequest?.id ?? null} />
 
           <RequestDetailPanel
             canOperate={canOperate}
+            branchBankAccounts={data.branch_bank_account_options}
             locale={locale}
             request={selectedRequest}
             roomSuggestions={data.room_suggestions}
+            roomTypes={data.room_type_options}
             roomType={selectedRoomType ?? null}
           />
         </div>
@@ -910,73 +1268,67 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
               </form>
             ) : null
           }
-          description={adminDashboardCopy.sections.operations.description}
+          description={{
+            en: "Active holds live here until they convert or expire.",
+            vi: "Hold đang mở sẽ nằm ở đây cho tới khi chuyển đổi hoặc hết hạn."
+          }}
           eyebrow={{ en: "Hold queue", vi: "Hold queue" }}
+          help={{
+            en: "A hold is a temporary lock. Staff can convert it to a reservation once customer details are ready.",
+            vi: "Hold là khóa tạm thời. Staff có thể chuyển sang reservation khi thông tin khách đã sẵn sàng."
+          }}
           locale={locale}
           title={{ en: "Active holds", vi: "Hold đang mở" }}
         />
 
-        <div className="portal-card-grid portal-card-grid--two">
-          {data.active_room_holds.length ? (
-            data.active_room_holds.map((hold) => (
-              <HoldCard
-                canOperate={canOperate}
-                key={hold.id}
-                locale={locale}
-                hold={hold}
-                roomType={roomTypeMap[hold.room_type_id] ?? null}
-              />
-            ))
-          ) : (
-            <SectionEmptyState
-              description={locale === "en" ? "No active holds right now." : "Hiện chưa có hold nào đang mở."}
-              locale={locale}
-              title={locale === "en" ? "Hold list" : "Danh sách hold"}
-            />
-          )}
-        </div>
+        {data.active_room_holds.length ? (
+          <HoldTable holds={data.active_room_holds} locale={locale} />
+        ) : (
+          <SectionEmptyState
+            description={locale === "en" ? "No active holds right now." : "Hiện chưa có hold nào đang mở."}
+            locale={locale}
+            title={locale === "en" ? "Hold list" : "Danh sách hold"}
+          />
+        )}
       </section>
 
       <section className="portal-section" id="reservations">
         <PortalSectionHeading
           description={{
-            en: "Manual bookings created from holds stay one room per reservation in phase 1.",
-            vi: "Booking thủ công vẫn giữ nguyên 1 reservation = 1 phòng trong phase 1."
+            en: "Recent reservations stay close to the hold queue for quick follow-up.",
+            vi: "Reservation gần đây nằm cạnh queue hold để xử lý nhanh."
           }}
           eyebrow={{ en: "Reservation queue", vi: "Reservation queue" }}
+          help={{
+            en: "Once a request is confirmed, staff can create or review the reservation and continue the deposit workflow.",
+            vi: "Khi request đã chốt, staff có thể tạo hoặc xem reservation và tiếp tục luồng cọc."
+          }}
           locale={locale}
           title={{ en: "Recent reservations", vi: "Reservation gần đây" }}
         />
 
-        <div className="portal-card-grid portal-card-grid--two">
-            {data.recent_reservations.length ? (
-              data.recent_reservations.map((reservation) => (
-                <ReservationCard
-                  bankAccounts={bankAccountsByBranch[reservation.branch_id] ?? []}
-                  canOperate={canOperate}
-                  key={reservation.id}
-                  locale={locale}
-                  reservation={reservation}
-                  roomType={roomTypeMap[reservation.primary_room_type_id] ?? null}
-                />
-            ))
-          ) : (
-            <SectionEmptyState
-              description={locale === "en" ? "No reservations have been created yet." : "Chưa có reservation nào."}
-              locale={locale}
-              title={locale === "en" ? "Reservation list" : "Danh sách reservation"}
-            />
-          )}
-        </div>
+        {data.recent_reservations.length ? (
+          <ReservationTable locale={locale} reservations={data.recent_reservations} />
+        ) : (
+          <SectionEmptyState
+            description={locale === "en" ? "No reservations have been created yet." : "Chưa có reservation nào."}
+            locale={locale}
+            title={locale === "en" ? "Reservation list" : "Danh sách reservation"}
+          />
+        )}
       </section>
 
       <section className="portal-section" id="payments">
         <PortalSectionHeading
           description={{
-            en: "Deposit requests, public upload links, and manual verification live here.",
-            vi: "Deposit request, public upload link và verify thủ công nằm ở đây."
+            en: "Deposit requests, proof uploads, and manual verification live here.",
+            vi: "Deposit request, proof upload và verify thủ công nằm ở đây."
           }}
           eyebrow={{ en: "Payments", vi: "Thanh toán" }}
+          help={{
+            en: "Send the deposit QR first, then verify the proof and let the reservation move to confirmed.",
+            vi: "Gửi QR cọc trước, sau đó verify proof và chuyển reservation sang confirmed."
+          }}
           locale={locale}
           title={{ en: "Payment queue", vi: "Hàng đợi payment" }}
         />
@@ -1005,10 +1357,14 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
       <section className="portal-section" id="email-tests">
         <PortalSectionHeading
           description={{
-            en: "Send a live render test to check the email layout before using it in workflow automation.",
-            vi: "Gửi test thật để kiểm tra layout email trước khi đưa vào workflow tự động."
+            en: "Render the live templates before they go into production workflows.",
+            vi: "Render template thật trước khi đưa vào workflow sản xuất."
           }}
           eyebrow={{ en: "Email test", vi: "Email test" }}
+          help={{
+            en: "Use this to confirm subject, layout, and spacing against the current mailbox.",
+            vi: "Dùng để kiểm tra subject, layout và khoảng cách trên mailbox hiện tại."
+          }}
           locale={locale}
           title={{ en: "Template test sender", vi: "Gửi test template" }}
         />
@@ -1030,47 +1386,46 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
 
       <section className="portal-section" id="branches">
         <PortalSectionHeading
-          description={adminDashboardCopy.sections.branches.description}
+          description={{
+            en: "Branch settings, bank accounts, and contact details stay grouped here.",
+            vi: "Cấu hình chi nhánh, tài khoản ngân hàng và liên hệ nằm ở đây."
+          }}
           eyebrow={adminDashboardCopy.sections.branches.eyebrow}
+          help={{
+            en: "Branches act as the parent scope for rooms, bank accounts, and public contact details.",
+            vi: "Chi nhánh là scope cha cho phòng, tài khoản ngân hàng và thông tin liên hệ public."
+          }}
           locale={locale}
           title={adminDashboardCopy.sections.branches.title}
         />
 
-        <div className="portal-card-grid portal-card-grid--two">
-          {data.branch_options.map((branch) => (
-            <PortalCard className="portal-panel" key={branch.id} tone="soft">
-              <div className="portal-item-card__top">
-                <h3 className="portal-item-card__title">{locale === "en" ? branch.name_en : branch.name_vi}</h3>
-                <PortalBadge tone="accent">{branch.code}</PortalBadge>
-              </div>
-              <p className="portal-item-card__detail">{branch.timezone}</p>
-              <p className="portal-panel__note-copy">
-                {branch.slug} • {locale === "en" ? "Physical room inventory" : "Kho phòng vật lý"}
-              </p>
-            </PortalCard>
-          ))}
-        </div>
+        <BranchTable branches={data.branch_options} locale={locale} />
       </section>
 
       <section className="portal-section" id="audit">
         <PortalSectionHeading
-          description={adminDashboardCopy.sections.audit.description}
+          description={{
+            en: "Audit entries keep the operational trail visible for every staff action.",
+            vi: "Audit entry giữ vết thao tác vận hành cho mọi hành động staff."
+          }}
           eyebrow={adminDashboardCopy.sections.audit.eyebrow}
+          help={{
+            en: "Use the audit log to verify who changed a request, booking, or payment and when it happened.",
+            vi: "Dùng audit log để biết ai đã đổi request, booking hoặc payment và thời điểm xảy ra."
+          }}
           locale={locale}
           title={adminDashboardCopy.sections.audit.title}
         />
 
-        <div className="portal-card-grid portal-card-grid--audit">
-          {data.audit_logs.length ? (
-            data.audit_logs.map((event) => <AuditCard event={event} key={event.id} locale={locale} />)
-          ) : (
-            <SectionEmptyState
-              description={locale === "en" ? "No audit events were recorded today." : "Hôm nay chưa có audit event."}
-              locale={locale}
-              title={locale === "en" ? "Audit log" : "Audit log"}
-            />
-          )}
-        </div>
+        {data.audit_logs.length ? (
+          <AuditTable events={data.audit_logs} locale={locale} />
+        ) : (
+          <SectionEmptyState
+            description={locale === "en" ? "No audit events were recorded today." : "Hôm nay chưa có audit event."}
+            locale={locale}
+            title={locale === "en" ? "Audit log" : "Audit log"}
+          />
+        )}
       </section>
     </div>
   );

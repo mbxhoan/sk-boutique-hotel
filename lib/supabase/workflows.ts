@@ -8,6 +8,9 @@ import type {
 } from "@/lib/supabase/database.types";
 import { logAuditEvent } from "@/lib/supabase/audit";
 import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
+import { getCustomerByEmail } from "@/lib/supabase/queries/customers";
+import { listRoomTypes } from "@/lib/supabase/queries/room-types";
+import { createPaymentRequest } from "@/lib/supabase/payments";
 import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -72,6 +75,19 @@ export type ReleaseExpiredReservationsInput = {
   asOf?: string;
 };
 
+export type ConfirmAvailabilityRequestInput = {
+  actorRole?: string | null;
+  actorUserId?: string | null;
+  availabilityRequestId: string;
+  depositAmount: number;
+  guestCount?: number;
+  notes?: string;
+  roomId: string;
+  roomTypeId: string;
+  stayEndAt: string;
+  stayStartAt: string;
+};
+
 export type ReleasedHoldRow = {
   branch_id: string;
   expires_at: string;
@@ -110,6 +126,18 @@ function normalizeTimestamptzInput(value: string) {
   }
 
   return value;
+}
+
+function calculateNights(stayStartAt: string, stayEndAt: string) {
+  const start = new Date(stayStartAt);
+  const end = new Date(stayEndAt);
+  const diffMs = end.getTime() - start.getTime();
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.round(diffMs / 86_400_000));
 }
 
 async function assertRoomsAvailable(
@@ -168,6 +196,129 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
   }
 
   return request;
+}
+
+export async function confirmAvailabilityRequest(input: ConfirmAvailabilityRequestInput) {
+  const supabase = createSupabaseServiceClient();
+  const { data: request, error: requestError } = await supabase
+    .from("availability_requests")
+    .select(
+      "id, request_code, branch_id, customer_id, room_type_id, stay_start_at, stay_end_at, guest_count, contact_name, contact_email, contact_phone, note, marketing_consent, preferred_locale, source, status, response_due_at, assigned_to, handled_by, handled_at, closed_at, created_by, updated_by, created_at, updated_at"
+    )
+    .eq("id", input.availabilityRequestId)
+    .maybeSingle();
+
+  if (requestError) {
+    throw new Error(requestError.message ?? "Unable to load availability request.");
+  }
+
+  if (!request) {
+    throw new Error("Availability request not found.");
+  }
+
+  const { data: roomType, error: roomTypeError } = await supabase
+    .from("room_types")
+    .select("id, base_price, manual_override_price, weekend_surcharge")
+    .eq("id", input.roomTypeId)
+    .maybeSingle();
+
+  if (roomTypeError) {
+    throw new Error(roomTypeError.message ?? "Unable to load selected room type.");
+  }
+
+  if (!roomType) {
+    throw new Error("Selected room type was not found.");
+  }
+
+  const customerId = request.customer_id ?? (await getCustomerByEmail(request.contact_email))?.id ?? null;
+
+  if (!customerId) {
+    throw new Error("Unable to resolve customer for this request.");
+  }
+
+  const stayStartAt = normalizeTimestamptzInput(input.stayStartAt);
+  const stayEndAt = normalizeTimestamptzInput(input.stayEndAt);
+  const nights = calculateNights(stayStartAt, stayEndAt);
+  const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
+  const totalAmount = nightlyRate * nights + roomType.weekend_surcharge;
+  const depositAmount = Math.max(0, Number.isFinite(input.depositAmount) ? input.depositAmount : 0);
+  const guestCount = Math.max(1, Number.isFinite(input.guestCount ?? request.guest_count) ? Number(input.guestCount ?? request.guest_count) : 1);
+  const notes = input.notes?.trim() || request.note || "";
+  const now = new Date().toISOString();
+
+  const { error: requestUpdateError } = await supabase
+    .from("availability_requests")
+    .update({
+      customer_id: customerId,
+      guest_count: guestCount,
+      handled_at: now,
+      handled_by: input.actorUserId ?? request.handled_by ?? null,
+      note: notes,
+      room_type_id: input.roomTypeId,
+      stay_end_at: stayEndAt,
+      stay_start_at: stayStartAt,
+      status: "quoted",
+      updated_by: input.actorUserId ?? request.updated_by ?? null
+    })
+    .eq("id", request.id);
+
+  if (requestUpdateError) {
+    throw new Error(requestUpdateError.message ?? "Unable to update availability request before confirmation.");
+  }
+
+  const reservation = await createReservation({
+    actorRole: input.actorRole ?? "staff",
+    availabilityRequestId: request.id,
+    basePrice: roomType.base_price,
+    branchId: request.branch_id,
+    createdBy: input.actorUserId ?? null,
+    customerId,
+    depositAmount,
+    guestCount,
+    manualOverridePrice: roomType.manual_override_price,
+    nightlyRate,
+    notes,
+    primaryRoomTypeId: input.roomTypeId,
+    roomId: input.roomId,
+    status: "pending_deposit",
+    stayEndAt,
+    stayStartAt,
+    totalAmount,
+    weekendSurcharge: roomType.weekend_surcharge
+  });
+
+  const paymentRequest = await createPaymentRequest({
+    amount: depositAmount || totalAmount,
+    createdBy: input.actorUserId ?? null,
+    note: notes,
+    reservationId: reservation.id,
+    source: "admin_console"
+  });
+
+  await logAuditEvent({
+    action: "availability_request.confirmed",
+    actorRole: input.actorRole ?? "staff",
+    actorUserId: input.actorUserId ?? null,
+    availabilityRequestId: request.id,
+    branchId: request.branch_id,
+    customerId,
+    entityId: reservation.id,
+    entityType: "reservation",
+    reservationId: reservation.id,
+    summary: `Availability request ${request.request_code} confirmed and converted to reservation ${reservation.booking_code}.`,
+    metadata: {
+      booking_code: reservation.booking_code,
+      payment_code: paymentRequest.payment_code,
+      room_id: input.roomId,
+      room_type_id: input.roomTypeId
+    }
+  });
+
+  return {
+    availability_request: request,
+    payment_request: paymentRequest,
+    reservation
+  };
 }
 
 export type UpdateAvailabilityRequestStatusInput = {

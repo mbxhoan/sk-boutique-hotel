@@ -121,17 +121,21 @@ function toReservationView(
   branchMap: Record<string, BranchRow>,
   roomMap: Record<string, RoomRow>,
   roomTypeMap: Record<string, RoomTypeRow>,
-  reservationRoomItemMap: Record<string, string>
+  reservationRoomItemMap: Record<string, string>,
+  customerMap: Record<string, { email: string; full_name: string }>
 ): WorkflowReservation {
   const branch = branchMap[reservation.branch_id];
   const roomId = reservationRoomItemMap[reservation.id];
   const room = roomId ? roomMap[roomId] : null;
   const roomType = roomTypeMap[reservation.primary_room_type_id];
+  const customer = customerMap[reservation.customer_id];
 
   return {
     ...reservation,
     branch_name_en: branch?.name_en ?? reservation.branch_id,
     branch_name_vi: branch?.name_vi ?? reservation.branch_id,
+    customer_email: customer?.email ?? reservation.customer_id,
+    customer_name: customer?.full_name ?? reservation.customer_id,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
     room_code: room?.code ?? reservation.id
@@ -354,7 +358,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   const availabilityRequests = requests.map((request) => toAvailabilityRequestView(request, branchMap, roomTypeMap));
   const activeRoomHolds = holds.map((hold) => toRoomHoldView(hold, branchMap, roomMap, roomTypeMap));
   const recentReservations = reservations.map((reservation) =>
-    toReservationView(reservation, branchMap, roomMap, roomTypeMap, reservationRoomItemMap)
+    toReservationView(reservation, branchMap, roomMap, roomTypeMap, reservationRoomItemMap, customerMap)
   );
   const recentAuditLogs = auditLogs.map((log) => toAuditLogView(log, branchMap));
   const branchBankAccountOptions = bankAccounts.map((account) => ({

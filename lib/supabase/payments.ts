@@ -12,7 +12,14 @@ import type {
 } from "@/lib/supabase/database.types";
 import { getPaymentUploadTokenSecret, hasPaymentUploadTokenSecret } from "@/lib/supabase/env";
 import { logAuditEvent } from "@/lib/supabase/audit";
+import { listBranches } from "@/lib/supabase/queries/branches";
+import { listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import {
+  sendBookingConfirmedCustomerEmail,
+  sendDepositRequestCustomerEmail
+} from "@/lib/supabase/email";
 
 export type CreatePaymentRequestInput = {
   amount: number;
@@ -132,6 +139,22 @@ export function buildVietQrImageUrl(paymentRequest: {
 
 function buildConfirmationPdfPath(paymentCode: string) {
   return `booking-confirmations/${paymentCode}.pdf`;
+}
+
+function formatEmailDate(value: string) {
+  return new Intl.DateTimeFormat("vi-VN", {
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh"
+  }).format(new Date(value));
+}
+
+function formatCurrencyVnd(value: number) {
+  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.max(0, value))}đ`;
+}
+
+function buildMemberPortalUrl() {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return new URL("/member#payments", baseUrl).toString();
 }
 
 export async function getPaymentRequestByPaymentCode(paymentCode: string) {
@@ -281,6 +304,52 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
       amount
     }
   });
+
+  const [branchRows, roomTypeRows, customerRows] = await Promise.all([
+    listBranches(),
+    listRoomTypes(),
+    listCustomersByIds([reservation.customer_id])
+  ]);
+  const branch = branchRows.find((item) => item.id === reservation.branch_id) ?? null;
+  const roomType = roomTypeRows.find((item) => item.id === reservation.primary_room_type_id) ?? null;
+  const customer = customerRows[0] ?? null;
+
+  if (customer) {
+    try {
+      await sendDepositRequestCustomerEmail({
+        bookingCode: reservation.booking_code,
+        bookingUrl: buildMemberPortalUrl(),
+        branchName: branch?.name_vi ?? branch?.name_en ?? reservation.branch_id,
+        checkInDate: formatEmailDate(reservation.stay_start_at),
+        checkOutDate: formatEmailDate(reservation.stay_end_at),
+        depositAmount: formatCurrencyVnd(amount),
+        guestEmail: customer.email,
+        guestName: customer.full_name,
+        nights: String(Math.max(1, Math.round((new Date(reservation.stay_end_at).getTime() - new Date(reservation.stay_start_at).getTime()) / 86_400_000))),
+        paymentAccountName: bankAccount.account_name,
+        paymentAccountNumber: bankAccount.account_number,
+        paymentBankName: bankAccount.bank_name,
+        paymentDeadline: formatEmailDate(new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString()),
+        paymentQrUrl: buildVietQrImageUrl({
+          account_name: bankAccount.account_name,
+          account_number: bankAccount.account_number,
+          amount,
+          bank_bin: bankAccount.bank_bin,
+          currency: "VND",
+          payment_code: data.payment_code,
+          transfer_content: transferContent
+        }),
+        paymentTransferNote: transferContent,
+        roomType: roomType?.name_vi ?? roomType?.name_en ?? reservation.primary_room_type_id
+      });
+    } catch (emailError) {
+      console.warn("[email] Failed to send deposit request notification", {
+        error: emailError,
+        paymentCode: data.payment_code,
+        reservationCode: reservation.booking_code
+      });
+    }
+  }
 
   return data as PaymentRequestRow;
 }
@@ -464,6 +533,50 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
 
     if (reservationError) {
       throw reservationError;
+    }
+  }
+
+  if (input.status === "verified") {
+    const { data: reservation, error: reservationLookupError } = await supabase
+      .from("reservations")
+      .select("id, booking_code, branch_id, customer_id, primary_room_type_id, stay_start_at, stay_end_at, total_amount")
+      .eq("id", paymentRequest.reservation_id)
+      .maybeSingle();
+
+    if (reservationLookupError) {
+      throw reservationLookupError;
+    }
+
+    const [branchRows, roomTypeRows, customerRows] = await Promise.all([
+      listBranches(),
+      listRoomTypes(),
+      listCustomersByIds([reservation?.customer_id ?? paymentRequest.customer_id])
+    ]);
+    const branch = branchRows.find((item) => item.id === paymentRequest.branch_id) ?? null;
+    const roomType = roomTypeRows.find((item) => item.id === reservation?.primary_room_type_id) ?? null;
+    const customer = customerRows[0] ?? null;
+
+    if (customer && reservation) {
+      try {
+        await sendBookingConfirmedCustomerEmail({
+          bookingCode: reservation.booking_code,
+          bookingUrl: buildMemberPortalUrl(),
+          branchName: branch?.name_vi ?? branch?.name_en ?? paymentRequest.branch_id,
+          checkInDate: formatEmailDate(reservation.stay_start_at),
+          checkOutDate: formatEmailDate(reservation.stay_end_at),
+          guestEmail: customer.email,
+          guestName: customer.full_name,
+          nights: String(Math.max(1, Math.round((new Date(reservation.stay_end_at).getTime() - new Date(reservation.stay_start_at).getTime()) / 86_400_000))),
+          roomType: roomType?.name_vi ?? roomType?.name_en ?? reservation.primary_room_type_id,
+          totalAmount: formatCurrencyVnd(Number(reservation.total_amount ?? paymentRequest.amount))
+        });
+      } catch (emailError) {
+        console.warn("[email] Failed to send booking confirmed notification", {
+          error: emailError,
+          paymentCode: paymentRequest.payment_code,
+          reservationCode: reservation.booking_code
+        });
+      }
     }
   }
 

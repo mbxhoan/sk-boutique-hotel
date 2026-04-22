@@ -1076,3 +1076,22 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/admin-workflow-dashboard.tsx`
   - `app/globals.css`
+
+### Entry 099
+- `time`: 2026-04-22T00:48:08+07:00
+- `prompt_summary`: Chốt lại booking workflow phase 1 theo hướng request -> admin confirm -> deposit QR -> member upload proof -> admin verify -> auto booking confirmation, đồng thời làm gọn admin portal kiểu SaaS với table cho các list, thêm tooltip `?` cho hướng dẫn, và cập nhật member portal/status label cho rõ hành động thanh toán cọc.
+- `commit_message`: `feat(workflow-admin): streamline booking handoff and admin queues`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/actions/payments.ts`
+  - `app/globals.css`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/portal-ui.tsx`
+  - `README.md`
+  - `lib/supabase/email.ts`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/workflows.ts`

@@ -36,7 +36,9 @@ function buildLatestProofMap(proofs: PaymentProofRow[]) {
 function toReservationView(
   reservation: ReservationRow,
   branchMap: Record<string, BranchRow>,
-  roomTypeMap: Record<string, RoomTypeRow>
+  roomTypeMap: Record<string, RoomTypeRow>,
+  customerName: string,
+  customerEmail: string
 ): WorkflowReservation {
   const branch = branchMap[reservation.branch_id];
   const roomType = roomTypeMap[reservation.primary_room_type_id];
@@ -45,6 +47,8 @@ function toReservationView(
     ...reservation,
     branch_name_en: branch?.name_en ?? reservation.branch_id,
     branch_name_vi: branch?.name_vi ?? reservation.branch_id,
+    customer_email: customerEmail,
+    customer_name: customerName,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
     room_code: reservation.booking_code
@@ -172,7 +176,10 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
       const branchMap = buildMap(branches);
       const roomTypeMap = buildMap(roomTypes);
       const reservationViewMap = Object.fromEntries(
-        reservations.map((reservation) => [reservation.id, toReservationView(reservation, branchMap, roomTypeMap)])
+        reservations.map((reservation) => [
+          reservation.id,
+          toReservationView(reservation, branchMap, roomTypeMap, customer.full_name, customer.email)
+        ])
       ) as Record<string, WorkflowReservation>;
       const latestProofMap = buildLatestProofMap(paymentProofs);
       const paymentRequestMap = Object.fromEntries(paymentRequests.map((request) => [request.id, request])) as Record<

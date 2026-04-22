@@ -80,6 +80,8 @@ export type WorkflowRoomHold = RoomHoldRow & {
 export type WorkflowReservation = ReservationRow & {
   branch_name_en: string;
   branch_name_vi: string;
+  customer_email: string;
+  customer_name: string;
   primary_room_type_name_en: string;
   primary_room_type_name_vi: string;
   room_code: string;

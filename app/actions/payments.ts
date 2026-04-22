@@ -77,6 +77,7 @@ export async function createPaymentRequestAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/member");
 }
 
 function readRequiredNumber(formData: FormData, key: string) {

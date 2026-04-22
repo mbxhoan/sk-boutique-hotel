@@ -133,7 +133,7 @@ function PaymentRequestCard({
           <input name="returnTo" type="hidden" value="/member" />
           <input name="uploadedVia" type="hidden" value="member_portal" />
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Proof image" : "Ảnh proof"}</span>
+            <span className="portal-field__label">{locale === "en" ? "Proof file" : "Tệp proof"}</span>
             <input className="portal-field__control" name="proofFile" type="file" accept="image/*,.pdf" />
           </label>
           <label className="portal-field">
@@ -141,7 +141,7 @@ function PaymentRequestCard({
             <textarea className="portal-field__control" name="note" rows={3} />
           </label>
           <button className="button button--solid" type="submit">
-            {locale === "en" ? "Upload proof" : "Upload proof"}
+            {locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
           </button>
         </form>
       ) : null}

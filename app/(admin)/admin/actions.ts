@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { sendEmail } from "@/lib/supabase/email";
 import {
+  confirmAvailabilityRequest,
   createReservation,
   holdRoom,
   releaseExpiredHolds,
@@ -175,6 +176,28 @@ export async function createReservationAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/member");
+}
+
+export async function confirmAvailabilityRequestAction(formData: FormData) {
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+
+  await confirmAvailabilityRequest({
+    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+    availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
+    depositAmount: readOptionalNumber(formData, "depositAmount") ?? 0,
+    guestCount: readOptionalNumber(formData, "guestCount") ?? 1,
+    notes: readOptionalString(formData, "notes") ?? "",
+    roomId: readRequiredString(formData, "roomId"),
+    roomTypeId: readRequiredString(formData, "roomTypeId"),
+    stayEndAt: readRequiredString(formData, "stayEndAt"),
+    stayStartAt: readRequiredString(formData, "stayStartAt")
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/member");
 }
 
 export async function releaseExpiredHoldsAction(formData: FormData) {
