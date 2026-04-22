@@ -11,6 +11,7 @@ const reservationSelect = `
 
 type ReservationQueryOptions = {
   branchId?: string;
+  availabilityRequestId?: string;
   customerId?: string;
   limit?: number;
   since?: string;
@@ -28,6 +29,10 @@ export async function listReservations(options: ReservationQueryOptions = {}) {
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
       }
 
       if (options.since) {
@@ -67,6 +72,10 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
         query = query.eq("customer_id", options.customerId);
       }
 
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
       if (options.since) {
         query = query.gte("created_at", options.since);
       }
@@ -88,5 +97,24 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
       return count ?? 0;
     },
     0
+  );
+}
+
+export async function getReservationByBookingCode(bookingCode: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("reservations")
+        .select(reservationSelect)
+        .eq("booking_code", bookingCode)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as ReservationRow | null;
+    },
+    null as ReservationRow | null
   );
 }

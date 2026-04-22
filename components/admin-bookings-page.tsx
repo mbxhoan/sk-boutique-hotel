@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
+import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type { WorkflowBookingRow } from "@/lib/supabase/workflow.types";
 
@@ -326,6 +328,10 @@ function statusLabel(locale: Locale, status: WorkflowBookingRow["status"]) {
   return statusLabels[locale][status] ?? status;
 }
 
+function buildBookingDetailHref(locale: Locale, bookingCode: string) {
+  return appendLocaleQuery(`/admin/bookings/${encodeURIComponent(bookingCode)}`, locale);
+}
+
 export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBookingsPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<WorkflowBookingRow["status"] | "all">("all");
@@ -598,10 +604,12 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
                     <tr className="admin-bookings__row" key={booking.id}>
                       {visibleColumns.booking_code ? (
                         <td>
-                          <div className="admin-bookings__primary-value">{booking.booking_code}</div>
-                          <div className={`admin-bookings__source-pill admin-bookings__source-pill--${booking.source === "reservation" ? "reservation" : "request"}`}>
-                            {sourceLabel(locale, booking.source)}
-                          </div>
+                          <Link className="admin-bookings__detail-link" href={buildBookingDetailHref(locale, booking.booking_code)}>
+                            <div className="admin-bookings__primary-value">{booking.booking_code}</div>
+                            <div className={`admin-bookings__source-pill admin-bookings__source-pill--${booking.source === "reservation" ? "reservation" : "request"}`}>
+                              {sourceLabel(locale, booking.source)}
+                            </div>
+                          </Link>
                         </td>
                       ) : null}
                       {visibleColumns.customer ? (
@@ -626,6 +634,13 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
                       {visibleColumns.total ? <td className="admin-bookings__total-cell">{formatMoney(locale, booking.total_amount)}</td> : null}
                       {visibleColumns.actions ? (
                         <td className="admin-bookings__action-cell">
+                          <Link
+                            className="admin-bookings__action-button"
+                            href={buildBookingDetailHref(locale, booking.booking_code)}
+                            title={localize(locale, { vi: "Mở chi tiết", en: "Open details" })}
+                          >
+                            →
+                          </Link>
                           {booking.customer_email.includes("@") ? (
                             <a
                               className="admin-bookings__action-button"

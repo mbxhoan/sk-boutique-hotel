@@ -10,7 +10,9 @@ const roomHoldSelect = `
 
 type RoomHoldQueryOptions = {
   branchId?: string;
+  availabilityRequestId?: string;
   limit?: number;
+  reservationId?: string;
   status?: RoomHoldStatus | RoomHoldStatus[];
 };
 
@@ -21,6 +23,14 @@ export async function listRoomHolds(options: RoomHoldQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
       }
 
       if (options.status) {
@@ -50,6 +60,14 @@ export async function countRoomHolds(options: RoomHoldQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
       }
 
       if (options.status) {

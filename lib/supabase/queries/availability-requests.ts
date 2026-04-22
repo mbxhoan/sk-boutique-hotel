@@ -16,6 +16,7 @@ type AvailabilityRequestQueryOptions = {
   contactEmail?: string;
   customerId?: string;
   limit?: number;
+  requestCode?: string;
   roomTypeId?: string;
   status?: AvailabilityRequestStatus | AvailabilityRequestStatus[];
 };
@@ -35,6 +36,10 @@ export async function listAvailabilityRequests(options: AvailabilityRequestQuery
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.requestCode) {
+        query = query.eq("request_code", options.requestCode);
       }
 
       if (options.roomTypeId) {
@@ -82,6 +87,25 @@ export async function getAvailabilityRequestById(requestId: string) {
   );
 }
 
+export async function getAvailabilityRequestByRequestCode(requestCode: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("availability_requests")
+        .select(availabilityRequestSelect)
+        .eq("request_code", requestCode)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as AvailabilityRequestRow | null;
+    },
+    null as AvailabilityRequestRow | null
+  );
+}
+
 export async function countAvailabilityRequests(options: AvailabilityRequestQueryOptions = {}) {
   return queryWithServiceFallback(
     async (client) => {
@@ -97,6 +121,10 @@ export async function countAvailabilityRequests(options: AvailabilityRequestQuer
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.requestCode) {
+        query = query.eq("request_code", options.requestCode);
       }
 
       if (options.roomTypeId) {

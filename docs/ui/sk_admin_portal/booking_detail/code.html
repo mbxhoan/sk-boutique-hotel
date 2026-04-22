@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Details #BK-1042 - LuxeAdmin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#d2e4ff",
+                        "surface-tint": "#775928",
+                        "secondary-fixed-dim": "#b1c8e9",
+                        "on-primary-container": "#3d2700",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "outline": "#807569",
+                        "inverse-surface": "#213145",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "tertiary-container": "#919394",
+                        "secondary": "#4a607c",
+                        "on-secondary-fixed": "#021c36",
+                        "on-primary-fixed-variant": "#5d4213",
+                        "tertiary": "#5c5f60",
+                        "on-surface": "#0b1c30",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-tertiary-container": "#292c2d",
+                        "on-secondary-fixed-variant": "#324863",
+                        "background": "#f8f9ff",
+                        "primary-fixed-dim": "#e8c086",
+                        "primary-fixed": "#ffdeae",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-surface-variant": "#4e453a",
+                        "on-primary-fixed": "#281800",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-container": "#4b617d",
+                        "surface-variant": "#d3e4fe",
+                        "inverse-primary": "#e8c086",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#775928",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary-container": "#c5dcfd",
+                        "primary-container": "#b08d57",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#d1c5b6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "sidebar-width": "260px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "h3": ["Inter"],
+                        "table-data": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "h1": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h3": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "table-data": ["13px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h2": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h1": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="flex bg-background h-screen overflow-hidden text-on-surface font-body-md antialiased">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[260px] bg-slate-900 dark:bg-black text-[#B08D57] font-['Inter'] text-sm font-medium flex flex-col py-6 z-40 hidden md:flex">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 bg-[#B08D57] rounded flex items-center justify-center text-white font-bold">GH</div>
+<div>
+<h1 class="text-[#B08D57] font-semibold uppercase tracking-widest leading-tight">Grand Horizon</h1>
+<p class="text-xs text-slate-400 font-normal">Luxury Suites</p>
+</div>
+</div>
+<div class="px-6 mb-6">
+<button class="w-full bg-[#B08D57] text-white py-2.5 rounded-DEFAULT font-semibold hover:bg-[#8e7043] transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Booking
+            </button>
+</div>
+<ul class="flex-1 space-y-1 px-4">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT bg-slate-800 text-white border-l-4 border-[#B08D57] transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+                    Reservations
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">bed</span>
+                    Room Map
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">group</span>
+                    Guest Ledger
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    Analytics
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<ul class="mt-auto space-y-1 px-4">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+                    Support
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-DEFAULT text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all duration-150 ease-linear" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-[260px] h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 flex items-center justify-between px-6 h-16 w-full border-b border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm dark:shadow-none font-['Inter'] antialiased">
+<div class="flex items-center gap-4">
+<div class="text-xl font-bold tracking-tight text-slate-900 dark:text-white md:hidden">LuxeAdmin</div>
+<div class="hidden md:flex items-center relative">
+<span class="material-symbols-outlined absolute left-3 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#B08D57] focus:ring-1 focus:ring-[#B08D57] bg-slate-50 w-64" placeholder="Search bookings, guests..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 ease-in-out p-2 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 ease-in-out p-2 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="text-sm font-medium text-slate-600 hover:text-[#B08D57] transition-colors">Help</button>
+<img alt="Administrator profile" class="w-8 h-8 rounded-full border border-slate-200" data-alt="professional corporate headshot of admin user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUBgBshFrnl-mMq4D8xjoubpOhvImJ6W5SL0DTLtgH03wd0cd9ZqcRF33dYl34LPbGMf1Adtfj8xY-6lQMI6p49bFeruifqio1_XYXuB24m_u6RA4w6rMW7VKmTc44OOsGiIdTxekydy2Rq7AvEcjMQlYAIDkCtijCS1n1Kz_OKLf2-wDn7wDJ4I4-f5oEKgLVt6TeTolwdiggvoQJfNUG0JqXgpJkwN1J1xRiQyWADDjks_VPh3Aqhn_Lm0uKHFC6TMMxAUv0AAW0"/>
+</div>
+</header>
+<!-- Main Scrollable Area -->
+<main class="flex-1 overflow-y-auto p-lg lg:p-xl">
+<!-- Breadcrumb -->
+<nav class="mb-6 flex items-center text-sm font-body-sm text-tertiary">
+<a class="hover:text-primary transition-colors" href="#">Bookings</a>
+<span class="material-symbols-outlined text-[16px] mx-2">chevron_right</span>
+<span class="font-medium text-on-surface">#BK-1042</span>
+</nav>
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div class="flex items-center gap-4">
+<h1 class="font-h1 text-h1 text-on-surface">Booking #BK-1042</h1>
+<span class="px-2.5 py-1 bg-green-100 text-green-800 font-label-caps text-label-caps rounded-full flex items-center gap-1 border border-green-200">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>
+                        Confirmed
+                    </span>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button class="px-4 py-2 bg-white border border-outline-variant rounded-DEFAULT font-h3 text-body-md text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                        Edit
+                    </button>
+<button class="px-4 py-2 bg-white border border-outline-variant rounded-DEFAULT font-h3 text-body-md text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">print</span>
+                        Print
+                    </button>
+<button class="px-4 py-2 bg-white border border-outline-variant rounded-DEFAULT font-h3 text-body-md text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+                        Send Email
+                    </button>
+<button class="px-4 py-2 bg-error-container text-on-error-container border border-error-container rounded-DEFAULT font-h3 text-body-md hover:bg-red-200 transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+                        Cancel Booking
+                        <span class="material-symbols-outlined text-[14px] text-on-error-container/70 ml-1 cursor-help" title="User Guideline: Cancellation policies apply.">info</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column (Wider) -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Guest Information Card -->
+<div class="bg-white rounded-lg border border-outline-variant shadow-sm p-6">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+<h2 class="font-h2 text-h2 text-on-surface">Guest Information</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Full Name</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Eleanor Vance</p>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Phone Number</p>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">phone_iphone</span>
+<p class="font-body-md text-body-md">+1 (555) 123-4567</p>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Email Address</p>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">mail</span>
+<p class="font-body-md text-body-md">eleanor.vance@example.com</p>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Address</p>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
+<p class="font-body-md text-body-md">123 Hill House Rd, Boston, MA</p>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-variant">
+<p class="font-label-caps text-label-caps text-tertiary mb-2 uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">star</span>
+                                Special Requests
+                            </p>
+<div class="bg-surface-container-low p-4 rounded-DEFAULT border border-surface-variant text-body-sm font-body-sm text-on-surface">
+                                "Please arrange for extra pillows (feather-free) and a late check-in around 9 PM. We are celebrating an anniversary."
+                            </div>
+</div>
+</div>
+<!-- Stay Details Card -->
+<div class="bg-white rounded-lg border border-outline-variant shadow-sm p-6">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">hotel_class</span>
+</div>
+<h2 class="font-h2 text-h2 text-on-surface">Stay Details</h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+<div class="p-4 bg-surface-container-low rounded-DEFAULT border border-surface-variant text-center">
+<span class="material-symbols-outlined text-secondary mb-2">login</span>
+<p class="font-label-caps text-label-caps text-tertiary uppercase mb-1">Check-in</p>
+<p class="font-h3 text-h3 text-on-surface">Oct 12, 2024</p>
+<p class="font-body-sm text-body-sm text-tertiary">3:00 PM</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-DEFAULT border border-surface-variant text-center">
+<span class="material-symbols-outlined text-secondary mb-2">logout</span>
+<p class="font-label-caps text-label-caps text-tertiary uppercase mb-1">Check-out</p>
+<p class="font-h3 text-h3 text-on-surface">Oct 15, 2024</p>
+<p class="font-body-sm text-body-sm text-tertiary">11:00 AM</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-DEFAULT border border-surface-variant text-center md:col-span-2 flex flex-col items-center justify-center">
+<div class="flex items-baseline gap-2">
+<span class="font-h1 text-[32px] font-bold text-primary-container">3</span>
+<span class="font-h3 text-h3 text-tertiary">Nights</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row gap-6 bg-surface p-4 rounded-DEFAULT border border-outline-variant">
+<div class="flex-1">
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Room Type</p>
+<p class="font-h3 text-h3 text-on-surface">Deluxe Suite</p>
+</div>
+<div class="flex-1">
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Room Number</p>
+<p class="font-h3 text-h3 text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">key</span>
+                                    #102
+                                </p>
+</div>
+<div class="flex-1">
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Guests</p>
+<p class="font-h3 text-h3 text-on-surface">2 Adults, 0 Children</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Sidebar) -->
+<div class="space-y-6">
+<!-- Payment Summary Card -->
+<div class="bg-white rounded-lg border border-outline-variant shadow-sm p-6">
+<div class="flex items-center justify-between mb-6 border-b border-outline-variant pb-4">
+<h2 class="font-h2 text-h2 text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">payments</span>
+                                Payment
+                            </h2>
+<span class="px-2 py-1 bg-green-100 text-green-800 font-label-caps text-[10px] rounded flex items-center gap-1 border border-green-200">
+                                Paid
+                            </span>
+</div>
+<div class="mb-6">
+<p class="font-label-caps text-label-caps text-tertiary mb-1 uppercase">Total Amount</p>
+<p class="font-h1 text-[28px] font-bold text-on-surface">$1,250.00</p>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex justify-between items-center pb-2 border-b border-surface-variant">
+<span class="font-body-sm text-body-sm text-tertiary">Room Charge (3 nights)</span>
+<span class="font-body-md text-body-md text-on-surface">$1,050.00</span>
+</div>
+<div class="flex justify-between items-center pb-2 border-b border-surface-variant">
+<span class="font-body-sm text-body-sm text-tertiary">Taxes &amp; Fees</span>
+<span class="font-body-md text-body-md text-on-surface">$150.00</span>
+</div>
+<div class="flex justify-between items-center pb-2 border-b border-surface-variant">
+<span class="font-body-sm text-body-sm text-tertiary">Amenities</span>
+<span class="font-body-md text-body-md text-on-surface">$50.00</span>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-tertiary mb-2 uppercase">Payment Method</p>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-DEFAULT border border-surface-variant">
+<span class="material-symbols-outlined text-secondary">credit_card</span>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Visa ending in 4242</p>
+<p class="font-body-sm text-[11px] text-tertiary">Processed via Stripe</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Timeline Card -->
+<div class="bg-white rounded-lg border border-outline-variant shadow-sm p-6">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<h2 class="font-h2 text-h2 text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">history</span>
+                                Activity Log
+                            </h2>
+</div>
+<div class="relative pl-4 border-l border-surface-variant space-y-6">
+<!-- Timeline Item 1 -->
+<div class="relative">
+<div class="absolute -left-[21px] w-2.5 h-2.5 bg-primary-container rounded-full ring-4 ring-white"></div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Confirmation Sent</p>
+<p class="font-body-sm text-[12px] text-tertiary mt-0.5">Sep 28, 2024 at 10:15 AM</p>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative">
+<div class="absolute -left-[21px] w-2.5 h-2.5 bg-secondary-container border border-secondary rounded-full ring-4 ring-white"></div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Payment Received</p>
+<p class="font-body-sm text-[12px] text-tertiary mt-0.5">Sep 28, 2024 at 10:12 AM</p>
+<p class="font-body-sm text-body-sm text-secondary mt-1 text-[12px]">Amount: $1,250.00 via Visa</p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative">
+<div class="absolute -left-[21px] w-2.5 h-2.5 bg-surface-variant border border-outline-variant rounded-full ring-4 ring-white"></div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Booking Created</p>
+<p class="font-body-sm text-[12px] text-tertiary mt-0.5">Sep 28, 2024 at 10:05 AM</p>
+<p class="font-body-sm text-body-sm text-secondary mt-1 text-[12px]">Source: Web Portal</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

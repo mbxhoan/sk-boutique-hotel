@@ -1144,3 +1144,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/operations.ts`
   - `lib/supabase/queries/room-holds.ts`
   - `lib/supabase/workflow.types.ts`
+
+### Entry 103
+- `time`: 2026-04-22T15:36:16+07:00
+- `prompt_summary`: Triển khai trang chi tiết cho record đặt phòng trong admin portal, cho phép bấm từ danh sách booking để mở detail view có hồ sơ khách, request gốc, request status, payment deposit, hold, audit timeline và các link điều hướng workflow liên quan.
+- `commit_message`: `feat(admin-bookings): add booking detail page and row links`
+- `main_files`:
+  - `app/(admin)/admin/bookings/[bookingCode]/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-booking-detail-toolbar.tsx`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/reservation-room-items.ts`
+  - `app/globals.css`
+  - `README.md`
