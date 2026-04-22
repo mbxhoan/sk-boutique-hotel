@@ -1158,3 +1158,25 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/reservation-room-items.ts`
   - `app/globals.css`
   - `README.md`
+
+### Entry 104
+- `time`: 2026-04-22T23:10:36+07:00
+- `prompt_summary`: Tiếp tục hoàn thiện booking detail/admin/member theo dữ liệu thật: fixed sidebar admin, bỏ overview thừa ở booking detail, thêm countdown hold, hiển thị customer/account thật, thêm badge tầng có phòng booked, chèn QR VietQR với actions cọc, và làm gọn member/admin portal theo workflow vận hành thực tế.
+- `commit_message`: `feat(operations-ui): streamline booking detail and real data views`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-accounts-page.tsx`
+  - `app/(admin)/admin/accounts/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-shell.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-live-updates.tsx`
+  - `app/(member)/member/page.tsx`
+  - `app/(admin)/admin/actions.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/audit-logs.ts`
+  - `lib/supabase/payments.ts`
+  - `app/globals.css`
+  - `README.md`

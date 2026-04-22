@@ -91,6 +91,36 @@ export async function listCustomersByIds(customerIds: string[]) {
   );
 }
 
+export type CustomerQueryOptions = {
+  limit?: number;
+  since?: string;
+};
+
+export async function listCustomers(options: CustomerQueryOptions = {}) {
+  return queryWithServiceFallback(
+    async (client) => {
+      let query = client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        );
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false }).limit(options.limit ?? 100);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []) as CustomerRow[];
+    },
+    [] as CustomerRow[]
+  );
+}
+
 export async function upsertCustomerProfile(input: CustomerProfileInput) {
   const supabase = await createSupabaseServerClient();
   let payload: CustomerInsert = {

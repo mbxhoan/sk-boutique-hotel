@@ -1,15 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { AdminBookingDetailToolbar } from "@/components/admin-booking-detail-toolbar";
-import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
+import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
-import { updateAvailabilityRequestStatusAction } from "@/app/(admin)/admin/actions";
+import {
+  notifyPaymentRequestMemberAction,
+  resendDepositRequestEmailAction,
+  updateAvailabilityRequestStatusAction
+} from "@/app/(admin)/admin/actions";
 import type { BookingDetailData } from "@/lib/supabase/queries/booking-details";
-import type { WorkflowAvailabilityRequest, WorkflowBookingRow } from "@/lib/supabase/workflow.types";
+import type { WorkflowAvailabilityRequest, WorkflowBookingRow, WorkflowRoomHold } from "@/lib/supabase/workflow.types";
 
 type AdminBookingDetailPageProps = {
   detail: BookingDetailData;
@@ -123,6 +128,26 @@ function renderField(label: string, value: string | number | null | undefined) {
   );
 }
 
+function formatCountdown(locale: Locale, expiresAt: string, now = Date.now()) {
+  const diffMs = new Date(expiresAt).getTime() - now;
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return localize(locale, { vi: "Đã hết hạn", en: "Expired" });
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [
+    hours > 0 ? `${hours}h` : null,
+    `${minutes.toString().padStart(2, "0")}m`,
+    `${seconds.toString().padStart(2, "0")}s`
+  ].filter(Boolean);
+
+  return parts.join(" ");
+}
+
 function formatConsent(locale: Locale, value: boolean | null | undefined) {
   if (value == null) {
     return "—";
@@ -169,9 +194,82 @@ function RequestStatusForm({
   );
 }
 
+function HoldCountdown({ expiresAt, locale }: { expiresAt: string; locale: Locale }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <PortalBadge tone="accent">
+      {localize(locale, { vi: "Còn lại", en: "Left" })} {formatCountdown(locale, expiresAt, now)}
+    </PortalBadge>
+  );
+}
+
+function PaymentRequestActions({
+  locale,
+  paymentRequest
+}: {
+  locale: Locale;
+  paymentRequest: BookingDetailData["payment_requests"][number];
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const payload = [
+      paymentRequest.payment_code,
+      paymentRequest.bank_name,
+      paymentRequest.account_number,
+      paymentRequest.account_name,
+      paymentRequest.transfer_content,
+      formatMoney(locale, paymentRequest.amount)
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className="admin-booking-detail__payment-actions">
+      <button className="button button--text-light" onClick={handleCopy} type="button">
+        {copied ? (locale === "en" ? "Copied" : "Đã sao chép") : locale === "en" ? "Copy transfer info" : "Sao chép thông tin"}
+      </button>
+      <form action={resendDepositRequestEmailAction}>
+        <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+        <button className="button button--solid" type="submit">
+          {locale === "en" ? "Resend email" : "Gửi email"}
+        </button>
+      </form>
+      <form action={notifyPaymentRequestMemberAction}>
+        <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+        <button className="button button--text-light" type="submit">
+          {locale === "en" ? "Notify member" : "Gửi thông báo"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 function BookingPaymentTable({ locale, detail }: { detail: BookingDetailData; locale: Locale }) {
   if (!detail.payment_requests.length) {
-    return <p className="portal-panel__note-copy">{locale === "en" ? "No deposit request has been created for this booking yet." : "Chưa có yêu cầu cọc nào được tạo cho booking này."}</p>;
+    return (
+      <p className="portal-panel__note-copy">
+        {locale === "en" ? "No deposit request has been created for this booking yet." : "Chưa có yêu cầu cọc nào được tạo cho booking này."}
+      </p>
+    );
   }
 
   const primaryRequest = detail.payment_requests[0];
@@ -199,12 +297,17 @@ function BookingPaymentTable({ locale, detail }: { detail: BookingDetailData; lo
             <div className="portal-profile-list__item">
               <dt className="portal-profile-list__label">{locale === "en" ? "Status" : "Trạng thái"}</dt>
               <dd className="portal-profile-list__value">
-                <PortalBadge tone={primaryRequest.status === "verified" ? "accent" : primaryRequest.status === "pending_verification" || primaryRequest.status === "sent" ? "soft" : "neutral"}>
+                <PortalBadge
+                  tone={
+                    primaryRequest.status === "verified" ? "accent" : primaryRequest.status === "pending_verification" || primaryRequest.status === "sent" ? "soft" : "neutral"
+                  }
+                >
                   {primaryRequest.status}
                 </PortalBadge>
               </dd>
             </div>
           </dl>
+          <PaymentRequestActions locale={locale} paymentRequest={primaryRequest} />
         </div>
         <div className="admin-booking-detail__payment-hero-qr">
           {primaryRequest.qr_image_url ? (
@@ -236,7 +339,11 @@ function BookingPaymentTable({ locale, detail }: { detail: BookingDetailData; lo
                   <strong className="portal-data-table__title">{formatMoney(locale, paymentRequest.amount)}</strong>
                 </td>
                 <td>
-                  <PortalBadge tone={paymentRequest.status === "verified" ? "accent" : paymentRequest.status === "pending_verification" || paymentRequest.status === "sent" ? "soft" : "neutral"}>
+                  <PortalBadge
+                    tone={
+                      paymentRequest.status === "verified" ? "accent" : paymentRequest.status === "pending_verification" || paymentRequest.status === "sent" ? "soft" : "neutral"
+                    }
+                  >
                     {paymentRequest.status}
                   </PortalBadge>
                 </td>
@@ -302,7 +409,7 @@ function BookingTimelineTable({ locale, logs }: { locale: Locale; logs: BookingD
   );
 }
 
-function BookingHoldTable({ detail, locale }: { detail: BookingDetailData; locale: Locale }) {
+function BookingHoldTable({ detail, locale, activeHold }: { detail: BookingDetailData; locale: Locale; activeHold?: WorkflowRoomHold | null }) {
   if (!detail.room_holds.length) {
     return <p className="portal-panel__note-copy">{locale === "en" ? "There is no room hold linked to this record." : "Không có hold phòng nào liên kết với record này."}</p>;
   }
@@ -320,7 +427,7 @@ function BookingHoldTable({ detail, locale }: { detail: BookingDetailData; local
         </thead>
         <tbody>
           {detail.room_holds.map((hold) => (
-            <tr key={hold.id}>
+            <tr className={hold.id === activeHold?.id ? "portal-data-table__row--selected" : ""} key={hold.id}>
               <td>
                 <div className="portal-data-table__primary">
                   <strong className="portal-data-table__title">{hold.hold_code}</strong>
@@ -353,12 +460,13 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
   const guestName = detail.customer?.full_name ?? booking.customer_name;
   const guestEmail = detail.customer?.email ?? booking.customer_email;
   const guestPhone = detail.customer?.phone ?? detail.request?.contact_phone ?? null;
+  const activeRoomHold = detail.room_holds.find((hold) => hold.status === "active") ?? detail.room_holds[0] ?? null;
   const workflowHref = detail.request ? appendLocaleQuery(`/admin?request=${detail.request.id}`, locale) : null;
   const backHref = appendLocaleQuery("/admin/bookings", locale);
   const roomTypeLabel = locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi;
   const branchLabel = locale === "en" ? booking.branch_name_en : booking.branch_name_vi;
-  const primaryPayment = detail.payment_requests[0] ?? null;
   const canUpdateRequest = booking.source === "availability_request" && detail.request != null;
+  const showDepositSection = !["confirmed", "completed", "converted"].includes(booking.status);
 
   return (
     <div className="admin-page admin-booking-detail">
@@ -400,83 +508,8 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
         />
       </PortalCard>
 
-      <div className="admin-booking-detail__stats-grid">
-        <PortalStatCard
-          detail={{ vi: "Khách chính của record này", en: "Primary guest on this record" }}
-          label={{ vi: "Khách", en: "Guest" }}
-          locale={locale}
-          tone="default"
-          value={guestName}
-        />
-        <PortalStatCard
-          detail={{ vi: "Chi nhánh booking", en: "Booking branch" }}
-          label={{ vi: "Chi nhánh", en: "Branch" }}
-          locale={locale}
-          tone="default"
-          value={branchLabel}
-        />
-        <PortalStatCard
-          detail={{ vi: "Khoảng lưu trú đang xem", en: "Stay window" }}
-          label={{ vi: "Lưu trú", en: "Stay" }}
-          locale={locale}
-          tone="soft"
-          value={formatDateRange(locale, booking.stay_start_at, booking.stay_end_at)}
-        />
-        <PortalStatCard
-          detail={{ vi: "Hạng phòng đã chọn", en: "Selected room type" }}
-          label={{ vi: "Hạng phòng", en: "Room type" }}
-          locale={locale}
-          tone="accent"
-          value={roomTypeLabel}
-        />
-        <PortalStatCard
-          detail={{ vi: "Tổng booking và đêm lưu trú", en: "Booking total and nights" }}
-          label={{ vi: "Tổng tiền", en: "Total" }}
-          locale={locale}
-          tone="default"
-          value={`${formatMoney(locale, booking.total_amount)} • ${nights} ${localize(locale, { vi: "đêm", en: "night(s)" })}`}
-        />
-      </div>
-
       <div className="admin-booking-detail__layout">
         <div className="admin-booking-detail__main">
-          <PortalSectionHeading
-            description={{
-              vi: "Thông tin liên hệ và hồ sơ member/guest cho record này.",
-              en: "Contact details and member/guest profile for this record."
-            }}
-            eyebrow={{ vi: "Hồ sơ", en: "Profile" }}
-            help={{
-              vi: "Dữ liệu member sẽ ưu tiên customer profile, còn request sẽ fallback sang contact form.",
-              en: "Member data prioritizes the customer profile, while request data falls back to the contact form."
-            }}
-            locale={locale}
-            title={{ vi: "Thông tin khách", en: "Guest information" }}
-          />
-          <PortalCard className="admin-booking-detail__panel">
-            <dl className="portal-profile-list portal-profile-list--dense">
-              {renderField(localize(locale, { vi: "Họ và tên", en: "Full name" }), guestName)}
-              {renderField(localize(locale, { vi: "Email", en: "Email" }), guestEmail)}
-              {renderField(localize(locale, { vi: "Số điện thoại", en: "Phone" }), guestPhone)}
-              {renderField(
-                localize(locale, { vi: "Ngôn ngữ", en: "Language" }),
-                detail.customer?.preferred_locale?.toUpperCase() ?? detail.request?.preferred_locale?.toUpperCase() ?? "—"
-              )}
-              {renderField(
-                localize(locale, { vi: "Marketing consent", en: "Marketing consent" }),
-                formatConsent(locale, detail.customer?.marketing_consent ?? detail.request?.marketing_consent ?? null)
-              )}
-              {renderField(
-                localize(locale, { vi: "Nguồn hồ sơ", en: "Profile source" }),
-                detail.customer?.source ?? detail.request?.source ?? "—"
-              )}
-              {renderField(
-                localize(locale, { vi: "Ghi chú", en: "Notes" }),
-                detail.customer?.notes || detail.request?.note || booking.notes || "—"
-              )}
-            </dl>
-          </PortalCard>
-
           <PortalSectionHeading
             description={{
               vi: "Tóm tắt booking, request và các mốc vận hành liên quan.",
@@ -502,6 +535,7 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
               )}
               {renderField(localize(locale, { vi: "Chi nhánh", en: "Branch" }), branchLabel)}
               {renderField(localize(locale, { vi: "Ngày ở", en: "Stay" }), formatDateRange(locale, booking.stay_start_at, booking.stay_end_at))}
+              {renderField(localize(locale, { vi: "Số đêm", en: "Nights" }), nights)}
               {renderField(localize(locale, { vi: "Loại phòng", en: "Room type" }), roomTypeLabel)}
               {renderField(localize(locale, { vi: "Phòng", en: "Room" }), detail.room_code ?? "—")}
               {renderField(localize(locale, { vi: "Số khách", en: "Guests" }), booking.guest_count)}
@@ -519,20 +553,68 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
 
           <PortalSectionHeading
             description={{
-              vi: "Các yêu cầu cọc gắn với booking này và proof tương ứng.",
-              en: "Deposit requests linked to this booking and their proofs."
+              vi: "Thông tin liên hệ và hồ sơ member/guest cho record này.",
+              en: "Contact details and member/guest profile for this record."
             }}
-            eyebrow={{ vi: "Thanh toán", en: "Payments" }}
+            eyebrow={{ vi: "Hồ sơ", en: "Profile" }}
             help={{
-              vi: "QR cọc và nội dung chuyển tiền lấy từ payment request gần nhất.",
-              en: "The deposit QR and transfer content are taken from the latest payment request."
+              vi: "Dữ liệu member sẽ ưu tiên customer profile, còn request sẽ fallback sang contact form.",
+              en: "Member data prioritizes the customer profile, while request data falls back to the contact form."
             }}
             locale={locale}
-            title={{ vi: "Thanh toán cọc", en: "Deposit payment" }}
+            title={{ vi: "Thông tin khách", en: "Guest information" }}
           />
           <PortalCard className="admin-booking-detail__panel">
-            <BookingPaymentTable detail={detail} locale={locale} />
+            <dl className="portal-profile-list portal-profile-list--dense">
+              {renderField(localize(locale, { vi: "Tài khoản khách", en: "Customer account" }), detail.customer?.auth_user_id ? localize(locale, { vi: "Đã liên kết", en: "Linked" }) : localize(locale, { vi: "Chưa liên kết", en: "Not linked" }))}
+              {renderField(localize(locale, { vi: "Auth user ID", en: "Auth user ID" }), detail.customer?.auth_user_id ?? "—")}
+              {renderField(localize(locale, { vi: "Customer ID", en: "Customer ID" }), detail.customer?.id ?? "—")}
+              {renderField(localize(locale, { vi: "Họ và tên", en: "Full name" }), guestName)}
+              {renderField(localize(locale, { vi: "Email", en: "Email" }), guestEmail)}
+              {renderField(localize(locale, { vi: "Số điện thoại", en: "Phone" }), guestPhone)}
+              {renderField(
+                localize(locale, { vi: "Hoạt động gần nhất", en: "Last seen" }),
+                detail.customer?.last_seen_at ? formatDateTime(locale, detail.customer.last_seen_at) : "—"
+              )}
+              {renderField(
+                localize(locale, { vi: "Ngôn ngữ", en: "Language" }),
+                detail.customer?.preferred_locale?.toUpperCase() ?? detail.request?.preferred_locale?.toUpperCase() ?? "—"
+              )}
+              {renderField(
+                localize(locale, { vi: "Marketing consent", en: "Marketing consent" }),
+                formatConsent(locale, detail.customer?.marketing_consent ?? detail.request?.marketing_consent ?? null)
+              )}
+              {renderField(
+                localize(locale, { vi: "Nguồn hồ sơ", en: "Profile source" }),
+                detail.customer?.source ?? detail.request?.source ?? "—"
+              )}
+              {renderField(
+                localize(locale, { vi: "Ghi chú", en: "Notes" }),
+                detail.customer?.notes || detail.request?.note || booking.notes || "—"
+              )}
+            </dl>
           </PortalCard>
+
+          {showDepositSection ? (
+            <>
+              <PortalSectionHeading
+                description={{
+                  vi: "Các yêu cầu cọc gắn với booking này và proof tương ứng.",
+                  en: "Deposit requests linked to this booking and their proofs."
+                }}
+                eyebrow={{ vi: "Thanh toán", en: "Payments" }}
+                help={{
+                  vi: "QR cọc và nội dung chuyển tiền lấy từ payment request gần nhất.",
+                  en: "The deposit QR and transfer content are taken from the latest payment request."
+                }}
+                locale={locale}
+                title={{ vi: "Thanh toán cọc", en: "Deposit payment" }}
+              />
+              <PortalCard className="admin-booking-detail__panel">
+                <BookingPaymentTable detail={detail} locale={locale} />
+              </PortalCard>
+            </>
+          ) : null}
 
           <PortalSectionHeading
             description={{
@@ -664,7 +746,16 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
             title={{ vi: "Giữ chỗ & phòng", en: "Hold & room" }}
           />
           <PortalCard className="admin-booking-detail__panel">
-            <BookingHoldTable detail={detail} locale={locale} />
+            {activeRoomHold ? (
+              <div className="admin-booking-detail__hold-head">
+                <div>
+                  <p className="portal-panel__eyebrow">{locale === "en" ? "Active hold" : "Hold đang chạy"}</p>
+                  <p className="portal-item-card__title">{activeRoomHold.hold_code}</p>
+                </div>
+                <HoldCountdown expiresAt={activeRoomHold.expires_at} locale={locale} />
+              </div>
+            ) : null}
+            <BookingHoldTable activeHold={activeRoomHold} detail={detail} locale={locale} />
           </PortalCard>
         </aside>
       </div>

@@ -4,6 +4,9 @@ Frontend tĩnh cho website `SK Boutique Hotel`, dựng bằng **Next.js App Rout
 
 ## What's New
 
+- Đã chuẩn hóa booking detail admin thành màn hình thao tác chính: booking summary, guest profile thật, hold countdown, QR cọc VietQR và hành động gửi email/thông báo.
+- Đã thay các khối placeholder member/admin bằng dữ liệu thật từ Supabase cho khách hàng, tài khoản nội bộ, audit logs và request/booking history.
+- Đã bổ sung room floor badges, booking payment actions và sidebar admin dạng sticky để vận hành nhanh hơn.
 - Đã thêm trang chi tiết booking trong admin portal, có link từ danh sách đặt phòng và hiển thị đầy đủ hồ sơ khách, request, thanh toán cọc, hold và timeline xử lý.
 - Đã thêm lớp gửi email qua Supabase Edge Function `send-email`, dùng lại được cho mail khách hàng và thông báo admin trong các workflow đặt phòng / để lại thông tin.
 - Đã thêm luồng member auth, booking request từ popup phòng, admin/member realtime updates, và portal member có lịch sử cùng logout.

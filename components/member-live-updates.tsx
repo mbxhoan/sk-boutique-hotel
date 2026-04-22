@@ -14,9 +14,10 @@ type MemberLiveUpdatesProps = {
 
 function labelForTable(locale: Locale, table: string, eventType: "INSERT" | "UPDATE" | "DELETE") {
   const tableLabels: Record<string, string> =
-    locale === "en"
+      locale === "en"
       ? {
           availability_requests: "Availability request",
+          audit_logs: "Notification",
           payment_proofs: "Payment proof",
           payment_requests: "Payment request",
           reservations: "Reservation",
@@ -24,6 +25,7 @@ function labelForTable(locale: Locale, table: string, eventType: "INSERT" | "UPD
         }
       : {
           availability_requests: "Yêu cầu xem phòng",
+          audit_logs: "Thông báo",
           payment_proofs: "Proof thanh toán",
           payment_requests: "Payment request",
           reservations: "Booking",
@@ -57,7 +59,7 @@ export function MemberLiveUpdates({ customerId, locale }: MemberLiveUpdatesProps
     }
 
     const supabase = createSupabaseBrowserClient();
-    const tables = ["availability_requests", "room_holds", "reservations", "payment_requests", "payment_proofs"] as const;
+    const tables = ["availability_requests", "audit_logs", "room_holds", "reservations", "payment_requests", "payment_proofs"] as const;
     const channel = supabase.channel(`member-live-updates-${customerId}`);
 
     for (const table of tables) {

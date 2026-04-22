@@ -119,6 +119,13 @@ export function AdminRoomsPage({
   const [roomTypeFilter, setRoomTypeFilter] = useState("all");
   const selectedFloor = floors.find((floor) => floor.id === floorId) ?? floors[0] ?? null;
   const normalizedSearch = searchQuery.trim().toLowerCase();
+  const bookedCountByFloor = resolvedRooms.reduce((map, room) => {
+    if (room.status === "booked") {
+      map[room.floor_id] = (map[room.floor_id] ?? 0) + 1;
+    }
+
+    return map;
+  }, {} as Record<string, number>);
 
   useEffect(() => {
     setSearchQuery("");
@@ -202,7 +209,12 @@ export function AdminRoomsPage({
                 href={buildFloorHref(floor)}
                 key={floor.id}
               >
-                {locale === "en" ? floor.name_en || floor.code : floor.name_vi || floor.code}
+                <span>{locale === "en" ? floor.name_en || floor.code : floor.name_vi || floor.code}</span>
+                {bookedCountByFloor[floor.id] ? (
+                  <span className="admin-rooms__floor-tab-count" aria-label={localize(locale, { vi: `${bookedCountByFloor[floor.id]} phòng đang được đặt`, en: `${bookedCountByFloor[floor.id]} booked room(s)` })}>
+                    {bookedCountByFloor[floor.id]}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

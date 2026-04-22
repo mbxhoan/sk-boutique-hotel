@@ -152,7 +152,7 @@ function formatCurrencyVnd(value: number) {
   return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.max(0, value))}đ`;
 }
 
-function buildMemberPortalUrl() {
+export function buildMemberPortalUrl() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return new URL("/member#payments", baseUrl).toString();
 }

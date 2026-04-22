@@ -2,6 +2,7 @@ import type { BranchRow, PaymentProofRow, PaymentRequestRow, ReservationRow, Roo
 import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
+import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
 import { listPaymentProofs } from "@/lib/supabase/queries/payment-proofs";
 import { listPaymentRequests } from "@/lib/supabase/queries/payment-requests";
 import { listReservations } from "@/lib/supabase/queries/reservations";
@@ -11,6 +12,7 @@ import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/paym
 import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
+  WorkflowAuditLog,
   WorkflowMemberHistoryData,
   WorkflowPaymentProof,
   WorkflowPaymentRequest,
@@ -111,6 +113,29 @@ function toPaymentProofView(
   };
 }
 
+function toAuditLogView(log: Awaited<ReturnType<typeof listAuditLogs>>[number], branchMap: Record<string, BranchRow>): WorkflowAuditLog {
+  const branch = log.branch_id ? branchMap[log.branch_id] : null;
+  const entityLabels = {
+    availability_request: { en: "Availability request", vi: "Yêu cầu đặt phòng" },
+    payment_request: { en: "Payment request", vi: "Yêu cầu cọc" },
+    reservation: { en: "Reservation", vi: "Reservation" },
+    room_hold: { en: "Room hold", vi: "Hold phòng" }
+  } as const;
+
+  const entityLabel = entityLabels[log.entity_type as keyof typeof entityLabels] ?? {
+    en: log.entity_type,
+    vi: log.entity_type
+  };
+
+  return {
+    ...log,
+    branch_name_en: branch?.name_en ?? null,
+    branch_name_vi: branch?.name_vi ?? null,
+    entity_label_en: entityLabel.en,
+    entity_label_vi: entityLabel.vi
+  };
+}
+
 export async function loadMemberHistoryDashboard(authUserId: string, authUserEmail: string | null = null): Promise<WorkflowMemberHistoryData | null> {
   return loadMemberHistoryDashboardByUser(authUserId, authUserEmail);
 }
@@ -153,14 +178,16 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
         return null;
       }
 
-      const [branches, roomTypes, customerAvailabilityRequests, emailAvailabilityRequests, reservations, paymentRequests, paymentProofs] = await Promise.all([
+      const [branches, roomTypes, customerAvailabilityRequests, emailAvailabilityRequests, reservations, paymentRequests, paymentProofs, auditLogs] =
+        await Promise.all([
         listBranches(),
         listRoomTypes(),
         listAvailabilityRequests({ customerId: customer.id, limit: 8 }),
         authUserEmail ? listAvailabilityRequests({ contactEmail: authUserEmail, limit: 8 }) : Promise.resolve([] as WorkflowAvailabilityRequest[]),
         listReservations({ customerId: customer.id, limit: 8 }),
         listPaymentRequests({ customerId: customer.id, limit: 8 }),
-        listPaymentProofs({ customerId: customer.id, limit: 16 })
+        listPaymentProofs({ customerId: customer.id, limit: 16 }),
+        listAuditLogs({ customerId: customer.id, limit: 12 })
       ]);
 
       const availabilityRequests = (() => {
@@ -189,6 +216,7 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
 
       return {
         availability_requests: availabilityRequests as WorkflowAvailabilityRequest[],
+        audit_logs: auditLogs.map((log) => toAuditLogView(log, branchMap)),
         branch_options: branches,
         customer,
         payment_proofs: paymentProofs.map((proof) => toPaymentProofView(proof, paymentRequestMap, branchMap, reservationViewMap)),

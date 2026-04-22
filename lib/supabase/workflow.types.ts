@@ -170,6 +170,7 @@ export type WorkflowDashboardData = {
 
 export type WorkflowMemberHistoryData = {
   availability_requests: WorkflowAvailabilityRequest[];
+  audit_logs: WorkflowAuditLog[];
   branch_options: WorkflowBranchOption[];
   customer: CustomerRow;
   payment_proofs: WorkflowPaymentProof[];

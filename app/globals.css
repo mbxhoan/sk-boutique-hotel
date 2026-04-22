@@ -485,6 +485,14 @@ textarea {
   transform: translateY(-1px);
 }
 
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+  transform: none;
+}
+
 .button--solid {
   background: linear-gradient(135deg, var(--gold) 0%, #785a19 100%);
   color: var(--surface);
@@ -8025,12 +8033,16 @@ textarea {
   flex-direction: column;
   gap: 1.2rem;
   min-height: 100dvh;
+  max-height: 100dvh;
   padding: 1.35rem 1.1rem 1.05rem;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   background:
     radial-gradient(circle at top right, rgba(197, 160, 89, 0.06), transparent 18%),
     linear-gradient(180deg, #070c18 0%, #050814 100%);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .admin-shell__brand {
@@ -9324,12 +9336,6 @@ textarea {
   min-height: 2.65rem;
 }
 
-.admin-booking-detail__stats-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.9rem;
-}
-
 .admin-booking-detail__layout {
   display: grid;
   grid-template-columns: minmax(0, 1.48fr) minmax(20rem, 0.92fr);
@@ -9354,6 +9360,18 @@ textarea {
   gap: 0.95rem;
 }
 
+.admin-booking-detail__hold-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin-booking-detail__hold-head .portal-item-card__title {
+  margin: 0.1rem 0 0;
+}
+
 .admin-booking-detail__payment-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 14.5rem;
@@ -9374,6 +9392,17 @@ textarea {
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(197, 160, 89, 0.16);
+}
+
+.admin-booking-detail__payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.admin-booking-detail__payment-actions form {
+  margin: 0;
 }
 
 .admin-booking-detail__payment-qr-image {
@@ -9421,6 +9450,27 @@ textarea {
   color: #2d3849;
   font-size: 0.92rem;
   font-weight: 600;
+}
+
+.admin-rooms__floor-tab span:first-child {
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-rooms__floor-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  margin-left: 0.45rem;
+  padding-inline: 0.22rem;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .admin-rooms__floor-tab:last-child {

@@ -45,6 +45,7 @@ function buildEmptyMemberHistoryData(
 
   return {
     availability_requests: [],
+    audit_logs: [],
     branch_options: [],
     customer,
     payment_proofs: [],

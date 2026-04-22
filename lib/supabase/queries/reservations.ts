@@ -118,3 +118,22 @@ export async function getReservationByBookingCode(bookingCode: string) {
     null as ReservationRow | null
   );
 }
+
+export async function getReservationById(reservationId: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("reservations")
+        .select(reservationSelect)
+        .eq("id", reservationId)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as ReservationRow | null;
+    },
+    null as ReservationRow | null
+  );
+}

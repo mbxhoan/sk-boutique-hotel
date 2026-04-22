@@ -10,6 +10,7 @@ const auditLogSelect = `
 type AuditLogQueryOptions = {
   branchId?: string;
   availabilityRequestId?: string;
+  customerId?: string;
   holdId?: string;
   limit?: number;
   paymentRequestId?: string;
@@ -28,6 +29,10 @@ export async function listAuditLogs(options: AuditLogQueryOptions = {}) {
 
       if (options.availabilityRequestId) {
         query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
       }
 
       if (options.holdId) {
@@ -69,6 +74,10 @@ export async function countAuditLogs(options: AuditLogQueryOptions = {}) {
 
       if (options.availabilityRequestId) {
         query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
       }
 
       if (options.holdId) {

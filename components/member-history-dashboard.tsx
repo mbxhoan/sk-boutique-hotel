@@ -3,7 +3,7 @@ import { appendLocaleQuery } from "@/lib/locale";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { MemberLiveUpdates } from "@/components/member-live-updates";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
-import type { WorkflowMemberHistoryData, WorkflowPaymentRequest } from "@/lib/supabase/workflow.types";
+import type { WorkflowAuditLog, WorkflowMemberHistoryData, WorkflowPaymentRequest } from "@/lib/supabase/workflow.types";
 
 type MemberHistoryDashboardProps = {
   data: WorkflowMemberHistoryData;
@@ -149,6 +149,29 @@ function PaymentRequestCard({
   );
 }
 
+function AuditLogCard({
+  locale,
+  log
+}: {
+  locale: Locale;
+  log: WorkflowAuditLog;
+}) {
+  return (
+    <li className="portal-timeline__item">
+      <span className="portal-timeline__time">{formatDateTime(locale, log.happened_at)}</span>
+      <div className="portal-timeline__copy">
+        <h4 className="portal-timeline__title">{locale === "en" ? log.entity_label_en : log.entity_label_vi}</h4>
+        <p className="portal-timeline__detail">
+          {log.summary}
+          {log.branch_name_vi || log.branch_name_en
+            ? ` • ${locale === "en" ? log.branch_name_en ?? log.branch_name_vi : log.branch_name_vi ?? log.branch_name_en}`
+            : ""}
+        </p>
+      </div>
+    </li>
+  );
+}
+
 export function MemberHistoryDashboard({ data, locale }: MemberHistoryDashboardProps) {
   const pendingPaymentCount = data.payment_requests.filter((request) => request.status !== "verified").length;
   const confirmedReservationCount = data.reservations.filter((reservation) => reservation.status === "confirmed").length;
@@ -167,6 +190,27 @@ export function MemberHistoryDashboard({ data, locale }: MemberHistoryDashboardP
         />
 
         <MemberLiveUpdates customerId={data.customer.id} locale={locale} />
+
+        <PortalCard className="portal-panel" tone="soft">
+          <div className="portal-item-card__top">
+            <p className="portal-panel__eyebrow">{locale === "en" ? "Recent notifications" : "Thông báo gần đây"}</p>
+            <PortalBadge tone="soft">{data.audit_logs.length}</PortalBadge>
+          </div>
+          <h3 className="portal-item-card__title">{locale === "en" ? "What happened most recently" : "Các cập nhật gần đây"}</h3>
+          {data.audit_logs.length ? (
+            <ol className="portal-timeline">
+              {data.audit_logs.slice(0, 6).map((log) => (
+                <AuditLogCard key={log.id} locale={locale} log={log} />
+              ))}
+            </ol>
+          ) : (
+            <p className="portal-panel__note-copy">
+              {locale === "en"
+                ? "Notifications from the admin portal will appear here once staff updates your request, hold, payment, or booking."
+                : "Thông báo từ admin portal sẽ xuất hiện tại đây khi staff cập nhật request, hold, payment hoặc booking của bạn."}
+            </p>
+          )}
+        </PortalCard>
       </section>
 
       <section className="portal-section" id="summary">

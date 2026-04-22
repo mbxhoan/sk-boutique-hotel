@@ -1,7 +1,7 @@
 import type { CustomerRow } from "@/lib/supabase/database.types";
 import { listBranchBankAccounts } from "@/lib/supabase/queries/branch-bank-accounts";
 import { listBranches } from "@/lib/supabase/queries/branches";
-import { listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { getCustomerByEmail, listCustomersByIds } from "@/lib/supabase/queries/customers";
 import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
 import { getAvailabilityRequestById, getAvailabilityRequestByRequestCode } from "@/lib/supabase/queries/availability-requests";
 import { getLatestPaymentProofByRequestId } from "@/lib/supabase/queries/payment-proofs";
@@ -262,8 +262,11 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
   const branchId = reservation?.branch_id ?? request?.branch_id ?? null;
   const customerIds = [reservation?.customer_id, request?.customer_id].filter((value): value is string => Boolean(value));
   const customerRows = await listCustomersByIds(customerIds);
-  const customerMap = buildMap(customerRows);
-  const customer = reservation ? customerMap[reservation.customer_id] ?? null : request?.customer_id ? customerMap[request.customer_id] ?? null : null;
+  const emailCustomer = request?.contact_email ? await getCustomerByEmail(request.contact_email) : null;
+  const customerMap = buildMap([...customerRows, ...(emailCustomer ? [emailCustomer] : [])]);
+  const customer =
+    (reservation ? customerMap[reservation.customer_id] ?? null : request?.customer_id ? customerMap[request.customer_id] ?? null : null) ??
+    emailCustomer;
   const roomItem = reservation ? await getPrimaryReservationRoomItemByReservationId(reservation.id) : null;
   const room = roomItem ? await getRoomById(roomItem.room_id) : null;
 
