@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
-import { saveContentPageAction, deleteContentPageAction } from "@/app/(admin)/admin/content-pages/actions";
+import { saveContentPageAction } from "@/app/(admin)/admin/content-pages/actions";
 import type { ContentPageRow } from "@/lib/supabase/queries/content-pages";
 import type { MediaAssetRowWithUrl, MediaCollectionRow } from "@/lib/supabase/queries/media";
 import { localize } from "@/lib/mock/i18n";
@@ -46,10 +46,6 @@ function pageTypeIcon(pageType: ContentPageRow["page_type"]) {
   return "▣";
 }
 
-function statusTone(isPublished: boolean) {
-  return isPublished ? "accent" as const : "neutral" as const;
-}
-
 function formatJson(value: unknown) {
   return JSON.stringify(value ?? {}, null, 2);
 }
@@ -80,10 +76,15 @@ function PageEditor({
 
         <div className="admin-content__page-actions">
           <PortalBadge tone={page.is_published ? "accent" : "neutral"}>
-            {page.is_published ? "Live" : "Draft"}
+            {page.is_published ? localize(locale, { vi: "Đang xuất bản", en: "Live" }) : localize(locale, { vi: "Bản nháp", en: "Draft" })}
           </PortalBadge>
+          <PortalBadge tone="soft">{pageTypeLabels[locale][page.page_type]}</PortalBadge>
           <div className="admin-content__page-buttons">
-            <Link className="admin-content__page-icon-button" href={appendLocaleQuery(page.slug, locale)}>
+            <Link
+              aria-label={localize(locale, { vi: "Xem trước trang", en: "Preview page" })}
+              className="admin-content__page-icon-button"
+              href={appendLocaleQuery(page.slug, locale)}
+            >
               <span aria-hidden="true">◔</span>
             </Link>
             <span className="admin-content__page-icon-button">
@@ -95,148 +96,48 @@ function PageEditor({
 
       <form className="admin-content__editor-form" action={saveContentPageAction}>
         <input name="id" type="hidden" value={page.id} />
+        <input name="slug" type="hidden" value={page.slug} />
+        <input name="pageType" type="hidden" value={page.page_type} />
 
         <div className="admin-content__form-grid admin-content__form-grid--two">
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Slug" : "Slug"}</span>
-            <input className="portal-field__control" name="slug" defaultValue={page.slug} />
-          </label>
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Page type" : "Page type"}</span>
-            <select className="portal-field__control" name="pageType" defaultValue={page.page_type}>
-              <option value="home">home</option>
-              <option value="page">page</option>
-              <option value="collection">collection</option>
-              <option value="detail">detail</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="admin-content__form-grid admin-content__form-grid--two">
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Title VI" : "Title VI"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Tiêu đề VI", en: "Title VI" })}</span>
             <input className="portal-field__control" name="titleVi" defaultValue={page.title_vi} />
           </label>
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Title EN" : "Title EN"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Tiêu đề EN", en: "Title EN" })}</span>
             <input className="portal-field__control" name="titleEn" defaultValue={page.title_en} />
           </label>
         </div>
 
         <div className="admin-content__form-grid admin-content__form-grid--two">
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Description VI" : "Description VI"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Mô tả VI", en: "Description VI" })}</span>
             <textarea className="portal-field__control" name="descriptionVi" rows={3} defaultValue={page.description_vi} />
           </label>
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Description EN" : "Description EN"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Mô tả EN", en: "Description EN" })}</span>
             <textarea className="portal-field__control" name="descriptionEn" rows={3} defaultValue={page.description_en} />
           </label>
         </div>
 
         <label className="portal-field">
-          <span className="portal-field__label">{locale === "en" ? "Content JSON" : "Content JSON"}</span>
+          <span className="portal-field__label">{localize(locale, { vi: "Nội dung JSON", en: "Content JSON" })}</span>
           <textarea className="portal-field__control admin-content__json" name="contentJson" rows={12} defaultValue={formatJson(page.content_json)} />
         </label>
 
         <div className="admin-content__form-grid admin-content__form-grid--footer">
           <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Sort order" : "Sort order"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Thứ tự hiển thị", en: "Sort order" })}</span>
             <input className="portal-field__control" name="sortOrder" type="number" defaultValue={page.sort_order} />
           </label>
           <label className="admin-content__publish-toggle">
-            <span className="portal-field__label">{locale === "en" ? "Published" : "Published"}</span>
+            <span className="portal-field__label">{localize(locale, { vi: "Đang xuất bản", en: "Published" })}</span>
             <input className="portal-field__checkbox" name="isPublished" type="checkbox" defaultChecked={page.is_published} />
           </label>
           <div className="admin-content__editor-actions">
             <button className="button button--solid" type="submit">
-              {locale === "en" ? "Save" : "Save"}
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <form className="admin-content__delete-form" action={deleteContentPageAction}>
-        <input name="id" type="hidden" value={page.id} />
-        <input name="slug" type="hidden" value={page.slug} />
-        <button className="button button--text-light" type="submit">
-          {locale === "en" ? "Delete" : "Delete"}
-        </button>
-      </form>
-    </details>
-  );
-}
-
-function NewPageEditor({ locale }: { locale: Locale }) {
-  return (
-    <details className="admin-content__editor admin-content__editor--new" id="new-page-editor">
-      <summary className="admin-content__page-row">
-        <div className="admin-content__page-row-copy">
-          <div className="admin-content__page-icon">+</div>
-          <div className="admin-content__page-main">
-            <p className="admin-content__page-title">{locale === "en" ? "Add New Page" : "Add New Page"}</p>
-            <p className="admin-content__page-slug">{locale === "en" ? "Create a new content record." : "Create a new content record."}</p>
-          </div>
-        </div>
-        <PortalBadge tone="soft">{locale === "en" ? "Create" : "Create"}</PortalBadge>
-      </summary>
-
-      <form className="admin-content__editor-form" action={saveContentPageAction}>
-        <div className="admin-content__form-grid admin-content__form-grid--two">
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Slug" : "Slug"}</span>
-            <input className="portal-field__control" name="slug" placeholder="/about-us" />
-          </label>
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Page type" : "Page type"}</span>
-            <select className="portal-field__control" name="pageType" defaultValue="page">
-              <option value="home">home</option>
-              <option value="page">page</option>
-              <option value="collection">collection</option>
-              <option value="detail">detail</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="admin-content__form-grid admin-content__form-grid--two">
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Title VI" : "Title VI"}</span>
-            <input className="portal-field__control" name="titleVi" placeholder="Về chúng tôi" />
-          </label>
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Title EN" : "Title EN"}</span>
-            <input className="portal-field__control" name="titleEn" placeholder="About us" />
-          </label>
-        </div>
-
-        <div className="admin-content__form-grid admin-content__form-grid--two">
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Description VI" : "Description VI"}</span>
-            <textarea className="portal-field__control" name="descriptionVi" rows={3} />
-          </label>
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Description EN" : "Description EN"}</span>
-            <textarea className="portal-field__control" name="descriptionEn" rows={3} />
-          </label>
-        </div>
-
-        <label className="portal-field">
-          <span className="portal-field__label">{locale === "en" ? "Content JSON" : "Content JSON"}</span>
-          <textarea className="portal-field__control admin-content__json" name="contentJson" rows={12} defaultValue="{}" />
-        </label>
-
-        <div className="admin-content__form-grid admin-content__form-grid--footer">
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Sort order" : "Sort order"}</span>
-            <input className="portal-field__control" name="sortOrder" type="number" defaultValue={0} />
-          </label>
-          <label className="admin-content__publish-toggle">
-            <span className="portal-field__label">{locale === "en" ? "Published" : "Published"}</span>
-            <input className="portal-field__checkbox" name="isPublished" type="checkbox" defaultChecked />
-          </label>
-          <div className="admin-content__editor-actions">
-            <button className="button button--solid" type="submit">
-              {locale === "en" ? "Create" : "Create"}
+              {localize(locale, { vi: "Lưu thay đổi", en: "Save changes" })}
             </button>
           </div>
         </div>
@@ -249,11 +150,13 @@ function BannerCard({
   active,
   label,
   note,
-  tone
+  tone,
+  locale
 }: {
   active: boolean;
   label: string;
   note: string;
+  locale: Locale;
   tone: "default" | "muted";
 }) {
   return (
@@ -266,7 +169,11 @@ function BannerCard({
         </label>
       </div>
       <p className="admin-content__banner-copy">{note}</p>
-      <p className="admin-content__banner-slot">{tone === "default" ? "HOMEPAGE HERO BANNER" : "OFFERS PAGE ONLY"}</p>
+      <p className="admin-content__banner-slot">
+        {tone === "default"
+          ? localize(locale, { vi: "Banner hero trang chủ", en: "Homepage hero banner" })
+          : localize(locale, { vi: "Chỉ trang ưu đãi", en: "Offers page only" })}
+      </p>
     </article>
   );
 }
@@ -394,25 +301,26 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
   const sortedPages = sortPages(pages);
   const mediaAssets = pickMediaAssets(assets).slice(0, 4);
   const collection = collections[0];
-  const collectionTitle = collection ? localize(locale, { vi: collection.name_vi, en: collection.name_en }) : "LOGOS & ICONS";
+  const collectionTitle = collection ? localize(locale, { vi: collection.name_vi, en: collection.name_en }) : localize(locale, { vi: "Logo & biểu tượng", en: "Logos & icons" });
   const collectionDescription = collection
     ? localize(locale, { vi: collection.description_vi || collection.name_vi, en: collection.description_en || collection.name_en })
-    : "Recent uploads used across pages and banners.";
+    : localize(locale, { vi: "Ảnh gần đây dùng cho trang và banner.", en: "Recent uploads used across pages and banners." });
 
   return (
     <div className="admin-page admin-content">
       <div className="admin-page__hero">
         <div className="admin-page__copy">
-          <h1 className="admin-page__title">{locale === "en" ? "Content Management" : "Content Management"}</h1>
+          <h1 className="admin-page__title">{localize(locale, { vi: "Quản lý nội dung", en: "Content management" })}</h1>
           <p className="admin-page__description">
-            {locale === "en"
-              ? "Manage public-facing website content, media, and promotional banners."
-              : "Quản lý nội dung public, media và banner khuyến mãi."}
+            {localize(locale, {
+              vi: "Quản lý nội dung public, media và banner khuyến mãi.",
+              en: "Manage public-facing website content, media, and promotional banners."
+            })}
           </p>
         </div>
 
         <button className="button button--solid admin-content__publish-button" type="button">
-          {locale === "en" ? "Publish All Changes" : "Publish All Changes"}
+          {localize(locale, { vi: "Xuất bản tất cả", en: "Publish all changes" })}
         </button>
       </div>
 
@@ -422,11 +330,12 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
             i
           </div>
           <div>
-            <h2 className="admin-content__notice-title">{locale === "en" ? "Syncing Guidelines" : "Syncing Guidelines"}</h2>
+            <h2 className="admin-content__notice-title">{localize(locale, { vi: "Nguyên tắc đồng bộ", en: "Syncing guidelines" })}</h2>
             <p className="admin-content__notice-copy">
-              {locale === "en"
-                ? "Changes made in 'Edit' mode are saved as drafts. They will not appear on the live SK Boutique Hotel website until you explicitly click 'Publish'. Use 'Preview' to review changes safely."
-                : "Thay đổi trong chế độ Edit được lưu dưới dạng draft. Chúng sẽ không xuất hiện trên website công khai cho tới khi bạn bấm Publish. Dùng Preview để kiểm tra an toàn."}
+              {localize(locale, {
+                vi: "Thay đổi trong chế độ edit được lưu dưới dạng draft. Chúng chỉ xuất hiện trên website công khai khi bạn bấm Publish. Dùng Preview để kiểm tra an toàn.",
+                en: "Changes made in edit mode are saved as drafts. They will not appear on the live SK Boutique Hotel website until you explicitly click Publish. Use Preview to review changes safely."
+              })}
             </p>
           </div>
         </div>
@@ -435,15 +344,11 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
       <div className="admin-content__grid">
         <PortalCard className="admin-content__panel admin-content__panel--pages">
           <div className="admin-content__panel-head">
-            <h2 className="admin-content__panel-title">{locale === "en" ? "Public Pages" : "Public Pages"}</h2>
-            <Link className="admin-content__panel-action" href="#new-page-editor">
-              <span aria-hidden="true">+</span>
-              {locale === "en" ? "New Page" : "New Page"}
-            </Link>
+            <h2 className="admin-content__panel-title">{localize(locale, { vi: "Trang công khai", en: "Public pages" })}</h2>
+            <PortalBadge tone="soft">{localize(locale, { vi: "Chỉ sửa", en: "Edit only" })}</PortalBadge>
           </div>
 
           <div className="admin-content__editor-stack">
-            <NewPageEditor locale={locale} />
             {sortedPages.map((page) => (
               <PageEditor key={page.id} locale={locale} page={page} />
             ))}
@@ -453,24 +358,30 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
         <PortalCard className="admin-content__panel admin-content__panel--banners">
           <div className="admin-content__panel-head admin-content__panel-head--stacked">
             <div>
-              <h2 className="admin-content__panel-title">{locale === "en" ? "Active Banners" : "Active Banners"}</h2>
-              <p className="admin-content__panel-copy">
-                {locale === "en" ? "Manage global site promotions." : "Quản lý banner khuyến mãi toàn site."}
-              </p>
+              <h2 className="admin-content__panel-title">{localize(locale, { vi: "Banner hiện hoạt", en: "Active banners" })}</h2>
+              <p className="admin-content__panel-copy">{localize(locale, { vi: "Quản lý banner khuyến mãi toàn site.", en: "Manage global site promotions." })}</p>
             </div>
           </div>
 
           <div className="admin-content__banners">
             <BannerCard
               active
-              label={locale === "en" ? "Summer Escape 2024" : "Summer Escape 2024"}
-              note={locale === "en" ? '"Book 3 nights, get the 4th free at select boutique locations."' : '"Book 3 nights, get the 4th free at select boutique locations."'}
+              label={localize(locale, { vi: "Kỳ nghỉ hè 2024", en: "Summer Escape 2024" })}
+              note={localize(locale, {
+                vi: '"Đặt 3 đêm, tặng đêm thứ 4 tại một số chi nhánh boutique."',
+                en: '"Book 3 nights, get the 4th free at select boutique locations."'
+              })}
+              locale={locale}
               tone="default"
             />
             <BannerCard
               active={false}
-              label={locale === "en" ? "Winter Retreat Spa Package" : "Winter Retreat Spa Package"}
-              note={locale === "en" ? '"Complimentary 60-minute massage with suite bookings."' : '"Complimentary 60-minute massage with suite bookings."'}
+              label={localize(locale, { vi: "Gói spa mùa đông", en: "Winter Retreat Spa Package" })}
+              note={localize(locale, {
+                vi: '"Tặng massage 60 phút khi đặt suite."',
+                en: '"Complimentary 60-minute massage with suite bookings."'
+              })}
+              locale={locale}
               tone="muted"
             />
           </div>
@@ -480,18 +391,16 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
       <PortalCard className="admin-content__media-card">
         <div className="admin-content__media-head">
           <div>
-            <h2 className="admin-content__panel-title">{locale === "en" ? "Media Library Overview" : "Media Library Overview"}</h2>
-            <p className="admin-content__panel-copy">
-              {locale === "en" ? "Recent uploads used across pages and banners." : "Các ảnh gần đây dùng cho page và banner."}
-            </p>
+            <h2 className="admin-content__panel-title">{localize(locale, { vi: "Tổng quan thư viện media", en: "Media library overview" })}</h2>
+            <p className="admin-content__panel-copy">{collectionDescription}</p>
           </div>
 
           <div className="admin-content__media-actions">
             <Link className="button button--text-light" href={appendLocaleQuery("/admin/media", locale)}>
-              {locale === "en" ? "Browse All Media" : "Browse All Media"}
+              {localize(locale, { vi: "Xem tất cả media", en: "Browse all media" })}
             </Link>
             <Link className="button button--solid" href={appendLocaleQuery("/admin/media", locale)}>
-              {locale === "en" ? "Upload" : "Upload"}
+              {localize(locale, { vi: "Tải lên", en: "Upload" })}
             </Link>
           </div>
         </div>
@@ -499,7 +408,12 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
         <div className="admin-content__media-grid">
           {mediaAssets.map((asset) => (
             <figure className="admin-content__media-thumb" key={asset.id}>
-              <img alt={asset.alt_en || asset.title_en || asset.slug} className="admin-content__media-image" loading="lazy" src={asset.public_url || asset.fallback_url || "/home/block.jpg"} />
+              <img
+                alt={locale === "en" ? asset.alt_en || asset.title_en || asset.slug : asset.alt_vi || asset.title_vi || asset.slug}
+                className="admin-content__media-image"
+                loading="lazy"
+                src={asset.public_url || asset.fallback_url || "/home/block.jpg"}
+              />
             </figure>
           ))}
 
@@ -514,7 +428,7 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
             <span className="admin-content__media-upload-icon" aria-hidden="true">
               +
             </span>
-            <span className="admin-content__media-upload-label">{locale === "en" ? "Drag to Upload" : "Drag to Upload"}</span>
+            <span className="admin-content__media-upload-label">{localize(locale, { vi: "Kéo để tải lên", en: "Drag to upload" })}</span>
           </div>
         </div>
         <p className="admin-content__media-note">{collectionDescription}</p>

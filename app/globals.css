@@ -8971,6 +8971,13 @@ textarea {
   color: #506076;
 }
 
+.admin-bookings__empty-row {
+  padding: 2rem 1.2rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+}
+
 .admin-bookings__footer {
   display: flex;
   align-items: center;
@@ -9046,6 +9053,25 @@ textarea {
 .admin-rooms__floor-tab--active {
   background: linear-gradient(135deg, #b58b45 0%, #8d6827 100%);
   color: #ffffff;
+}
+
+.admin-rooms__empty-state {
+  display: grid;
+  gap: 0.35rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.admin-rooms__empty-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-rooms__empty-copy {
+  margin: 0;
+  color: #6b7280;
 }
 
 .admin-rooms__filter-card {

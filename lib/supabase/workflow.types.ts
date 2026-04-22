@@ -112,8 +112,11 @@ export type WorkflowRoomSuggestion = RoomRow & {
   floor_name_vi: string | null;
 };
 
+export type WorkflowDashboardRange = "today" | "7d" | "30d";
+
 export type WorkflowSelection = {
   branchId?: string;
+  range?: WorkflowDashboardRange;
   requestId?: string;
   roomTypeId?: string;
   stayEndAt?: string;

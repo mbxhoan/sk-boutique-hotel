@@ -26,7 +26,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "dashboard",
     href: "/admin",
     label: {
-      vi: "Dashboard",
+      vi: "Tổng quan",
       en: "Dashboard"
     }
   },
@@ -34,7 +34,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "bookings",
     href: "/admin/bookings",
     label: {
-      vi: "Bookings",
+      vi: "Đặt phòng",
       en: "Bookings"
     }
   },
@@ -42,7 +42,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "rooms",
     href: "/admin/rooms",
     label: {
-      vi: "Room Management",
+      vi: "Quản lý phòng",
       en: "Room Management"
     }
   },
@@ -50,7 +50,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "customers",
     href: "/admin/accounts",
     label: {
-      vi: "Customers",
+      vi: "Khách hàng",
       en: "Customers"
     }
   },
@@ -58,7 +58,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "content",
     href: "/admin/content-pages",
     label: {
-      vi: "Content",
+      vi: "Nội dung",
       en: "Content"
     }
   },
@@ -66,7 +66,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: "settings",
     href: "/admin/roles",
     label: {
-      vi: "Settings",
+      vi: "Cài đặt",
       en: "Settings"
     }
   }
@@ -228,6 +228,10 @@ function ShellIcon({
 }
 
 function isActiveNavItem(pathname: string, href: string) {
+  if (href === "/admin") {
+    return pathname === "/admin";
+  }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -237,7 +241,7 @@ function getSearchPlaceholder(pathname: string, locale: "en" | "vi") {
   }
 
   if (pathname.startsWith("/admin/rooms")) {
-    return locale === "en" ? "Search..." : "Tìm...";
+    return locale === "en" ? "Search rooms, types..." : "Tìm phòng, loại phòng...";
   }
 
   if (pathname.startsWith("/admin/content-pages")) {
@@ -253,6 +257,8 @@ export function AdminShell({ children }: AdminShellProps) {
   const router = useRouter();
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
+  const currentSearch = searchParams.toString();
+  const currentHref = currentSearch ? `${pathname}?${currentSearch}` : pathname;
   const showSearchTopbar =
     pathname === "/admin" || pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/rooms");
 
@@ -270,7 +276,7 @@ export function AdminShell({ children }: AdminShellProps) {
           <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
           <div className="admin-shell__brand-copy">
             <p className="admin-shell__brand-title">SK Boutique</p>
-            <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Admin Portal"}</p>
+            <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
           </div>
         </div>
 
@@ -299,13 +305,13 @@ export function AdminShell({ children }: AdminShellProps) {
             <span className="admin-shell__nav-icon" aria-hidden="true">
               <ShellIcon icon="support" />
             </span>
-            <span>{locale === "en" ? "Support" : "Support"}</span>
+            <span>{locale === "en" ? "Support" : "Hỗ trợ"}</span>
           </a>
           <button className="admin-shell__footer-link admin-shell__footer-link--button" onClick={handleSignOut} type="button">
             <span className="admin-shell__nav-icon" aria-hidden="true">
               <ShellIcon icon="logout" />
             </span>
-            <span>{locale === "en" ? "Log Out" : "Đăng xuất"}</span>
+            <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
           </button>
         </div>
       </aside>
@@ -336,7 +342,7 @@ export function AdminShell({ children }: AdminShellProps) {
               <span className="admin-shell__branch-selector-icon" aria-hidden="true">
                 <ShellIcon icon="storefront" size={16} />
               </span>
-              <span>{locale === "en" ? "Branch Selector" : "Branch Selector"}</span>
+              <span>{locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
               <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
                 <ShellIcon icon="chevron" size={15} />
               </span>
@@ -353,7 +359,7 @@ export function AdminShell({ children }: AdminShellProps) {
               <ShellIcon icon="storefront" />
             </button>
 
-            <Link className="admin-shell__locale-switch" href={appendLocaleQuery(pathname, localeToggle)}>
+            <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
               {localeLabel(localeToggle)}
             </Link>
 

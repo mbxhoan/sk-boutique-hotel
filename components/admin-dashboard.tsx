@@ -9,6 +9,8 @@ type AdminDashboardProps = {
   canOperate: boolean;
   data: WorkflowDashboardData;
   locale: Locale;
+  range: "today" | "7d" | "30d";
+  searchParams: Record<string, string | undefined>;
   testEmailDefaultRecipient: string;
 };
 
@@ -23,7 +25,9 @@ type AdminGlanceItem = {
 
 type MetricTone = "default" | "gold" | "warning";
 
-const metricCards: Array<{
+type DashboardRange = "today" | "7d" | "30d";
+
+type DashboardMetricBlueprint = {
   detail: {
     en: string;
     vi: string;
@@ -33,92 +37,154 @@ const metricCards: Array<{
     en: string;
     vi: string;
   };
-  value: string;
   tone: MetricTone;
   trend: {
     en: string;
     vi: string;
   };
-}> = [
-  {
-    detail: {
-      vi: "So với tuần trước",
-      en: "vs last week"
-    },
-    icon: "bookings",
-    label: {
-      vi: "Tổng booking",
-      en: "Total Bookings"
-    },
-    value: "142",
-    tone: "default",
-    trend: {
-      vi: "+12%",
-      en: "+12%"
-    }
-  },
-  {
-    detail: {
-      vi: "So với tuần trước",
-      en: "vs last week"
-    },
-    icon: "payments",
-    label: {
-      vi: "Doanh thu",
-      en: "Revenue"
-    },
-    value: "$24,500",
-    tone: "default",
-    trend: {
-      vi: "+8.4%",
-      en: "+8.4%"
-    }
-  },
-  {
-    detail: {
-      vi: "So với tuần trước",
-      en: "vs last week"
-    },
-    icon: "occupancy",
-    label: {
-      vi: "Tỉ lệ lấp đầy",
-      en: "Occupancy Rate"
-    },
-    value: "85%",
-    tone: "gold",
-    trend: {
-      vi: "+2.1%",
-      en: "+2.1%"
-    }
-  },
-  {
-    detail: {
-      vi: "Cần xử lý",
-      en: "Action required"
-    },
-    icon: "pending",
-    label: {
-      vi: "Yêu cầu chờ",
-      en: "Pending Requests"
-    },
-    value: "12",
-    tone: "warning",
-    trend: {
-      vi: "Cảnh báo",
-      en: "Action required"
-    }
-  }
-];
+  value: string;
+};
 
 const trendBars = [
-  { day: "Mon", value: 60, tone: "default" },
-  { day: "Tue", value: 86, tone: "gold" },
-  { day: "Wed", value: 42, tone: "default" },
-  { day: "Thu", value: 73, tone: "default" },
-  { day: "Fri", value: 90, tone: "accent" },
-  { day: "Sat", value: 57, tone: "default" },
-  { day: "Sun", value: 68, tone: "default" }
+  { day: { en: "Mon", vi: "T2" }, value: 60, tone: "default" },
+  { day: { en: "Tue", vi: "T3" }, value: 86, tone: "gold" },
+  { day: { en: "Wed", vi: "T4" }, value: 42, tone: "default" },
+  { day: { en: "Thu", vi: "T5" }, value: 73, tone: "default" },
+  { day: { en: "Fri", vi: "T6" }, value: 90, tone: "accent" },
+  { day: { en: "Sat", vi: "T7" }, value: 57, tone: "default" },
+  { day: { en: "Sun", vi: "CN" }, value: 68, tone: "default" }
 ] as const;
+
+const rangeLabels: Record<
+  DashboardRange,
+  {
+    en: string;
+    vi: string;
+  }
+> = {
+  today: {
+    vi: "Hôm nay",
+    en: "Today"
+  },
+  "7d": {
+    vi: "7 ngày",
+    en: "7 Days"
+  },
+  "30d": {
+    vi: "30 ngày",
+    en: "30 Days"
+  }
+};
+
+function buildRangeHref(searchParams: Record<string, string | undefined>, locale: Locale, range: DashboardRange) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    }
+  });
+
+  params.set("range", range);
+
+  return appendLocaleQuery(`/admin${params.toString() ? `?${params.toString()}` : ""}`, locale);
+}
+
+function formatMoneyVnd(locale: Locale, value: number) {
+  const formatted = new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+    maximumFractionDigits: 0
+  }).format(Math.max(0, value));
+
+  return `${formatted} VND`;
+}
+
+function getStatValue(data: WorkflowDashboardData, labelEn: string) {
+  return Number(data.stats.find((stat) => stat.label_en === labelEn)?.value ?? 0);
+}
+
+function buildMetricCards(data: WorkflowDashboardData, locale: Locale): DashboardMetricBlueprint[] {
+  const totalBookings = data.recent_reservations.length;
+  const revenue = data.recent_reservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0);
+  const activeHolds = getStatValue(data, "Active holds");
+  const pendingRequests = getStatValue(data, "Open requests");
+
+  return [
+    {
+      detail: {
+        vi: "Từ Supabase",
+        en: "from Supabase"
+      },
+      icon: "bookings",
+      label: {
+        vi: "Booking gần đây",
+        en: "Recent bookings"
+      },
+      tone: "default",
+      trend: {
+        vi: "Dữ liệu thật",
+        en: "Live data"
+      },
+      value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+        maximumFractionDigits: 0
+      }).format(totalBookings)
+    },
+    {
+      detail: {
+        vi: "từ booking gần đây",
+        en: "from recent bookings"
+      },
+      icon: "payments",
+      label: {
+        vi: "Doanh thu",
+        en: "Revenue"
+      },
+      tone: "default",
+      trend: {
+        vi: "VND",
+        en: "VND"
+      },
+      value: formatMoneyVnd(locale, revenue)
+    },
+    {
+      detail: {
+        vi: "Phòng đang được giữ",
+        en: "Rooms currently held"
+      },
+      icon: "occupancy",
+      label: {
+        vi: "Hold đang mở",
+        en: "Active holds"
+      },
+      tone: "gold",
+      trend: {
+        vi: "Queue vận hành",
+        en: "Operational queue"
+      },
+      value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+        maximumFractionDigits: 0
+      }).format(activeHolds)
+    },
+    {
+      detail: {
+        vi: "từ inbox thật",
+        en: "from the live inbox"
+      },
+      icon: "pending",
+      label: {
+        vi: "Yêu cầu chờ",
+        en: "Pending requests"
+      },
+      tone: "warning",
+      trend: {
+        vi: "Cần xử lý",
+        en: "Action required"
+      },
+      value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+        maximumFractionDigits: 0
+      }).format(pendingRequests)
+    }
+  ];
+}
 
 function initialsFromName(name: string) {
   return name
@@ -230,84 +296,10 @@ function MetricCard({
 function getGlanceItems(data: WorkflowDashboardData, locale: Locale): AdminGlanceItem[] {
   const recentReservations = data.recent_reservations.slice(0, 3);
   const recentRequests = data.availability_requests.slice(0, 1);
-
-  const items: AdminGlanceItem[] = [
-    {
-      initials: "ES",
-      label: "Eleanor Shellstrop",
-      detail: "Deluxe Suite • 2 Nights",
-      time: "14:00",
-      badge: locale === "en" ? "Check In" : "Check In",
-      badgeTone: "blue"
-    },
-    {
-      initials: "CD",
-      label: "Chidi Anagonye",
-      detail: "Standard King",
-      time: "11:00",
-      badge: locale === "en" ? "Check Out" : "Check Out",
-      badgeTone: "gold"
-    },
-    {
-      initials: "TA",
-      label: "Tahani Al-Jamil",
-      detail: "Penthouse • Extra Towels",
-      time: "",
-      badge: locale === "en" ? "Request" : "Request",
-      badgeTone: "danger"
-    },
-    {
-      initials: "JM",
-      label: "Jianyu Mendoza",
-      detail: "Standard Twin • 4 Nights",
-      time: "16:30",
-      badge: locale === "en" ? "Check In" : "Check In",
-      badgeTone: "blue"
-    }
-  ];
-
+  const requestBadge = locale === "en" ? "Request" : "Yêu cầu";
   const mapped: AdminGlanceItem[] = [];
 
-  recentReservations.slice(0, 4).forEach((reservation, index) => {
-    const fallback = items[index];
-
-    mapped.push({
-      initials: initialsFromName(reservation.customer_name),
-      label: reservation.customer_name,
-      detail: `${locale === "en" ? reservation.primary_room_type_name_en : reservation.primary_room_type_name_vi} • ${formatReservationNights(
-        reservation.stay_start_at,
-        reservation.stay_end_at
-      )} ${locale === "en" ? "Nights" : "đêm"}`,
-      time: formatTime(reservation.created_at),
-      badge:
-        reservation.status === "confirmed"
-          ? locale === "en"
-            ? "Check In"
-            : "Check In"
-          : reservation.status === "cancelled"
-            ? locale === "en"
-              ? "Cancelled"
-              : "Đã hủy"
-            : locale === "en"
-              ? "Booking"
-              : "Booking",
-      badgeTone: reservation.status === "cancelled" ? "danger" : index % 2 === 0 ? "blue" : "gold"
-    });
-
-    if (fallback && index === 2 && recentRequests.length) {
-      const request = recentRequests[0];
-      mapped[index] = {
-        initials: initialsFromName(request.contact_name),
-        label: request.contact_name,
-        detail: `${locale === "en" ? request.room_type_name_en : request.room_type_name_vi} • ${locale === "en" ? "Pending" : "Chờ xử lý"}`,
-        time: "",
-        badge: locale === "en" ? "Request" : "Request",
-        badgeTone: "danger"
-      };
-    }
-  });
-
-  if (mapped.length < 4 && recentRequests.length > 0 && !mapped.some((item) => item.badge === "Request")) {
+  if (recentRequests.length > 0) {
     const request = recentRequests[0];
 
     mapped.push({
@@ -315,62 +307,126 @@ function getGlanceItems(data: WorkflowDashboardData, locale: Locale): AdminGlanc
       label: request.contact_name,
       detail: `${locale === "en" ? request.room_type_name_en : request.room_type_name_vi} • ${locale === "en" ? "Pending" : "Chờ xử lý"}`,
       time: "",
-      badge: locale === "en" ? "Request" : "Request",
+      badge: requestBadge,
       badgeTone: "danger"
     });
   }
 
-  while (mapped.length < 4) {
-    const fallback = items[mapped.length];
-
-    if (!fallback) {
-      break;
+  recentReservations.forEach((reservation) => {
+    if (mapped.length >= 4) {
+      return;
     }
 
-    mapped.push(fallback);
+    const badgeTone =
+      reservation.status === "cancelled" ? "danger" : mapped.length % 2 === 0 ? "blue" : "gold";
+
+    mapped.push({
+      initials: initialsFromName(reservation.customer_name),
+      label: reservation.customer_name,
+      detail: `${locale === "en" ? reservation.primary_room_type_name_en : reservation.primary_room_type_name_vi} • ${formatReservationNights(
+        reservation.stay_start_at,
+        reservation.stay_end_at
+      )} ${locale === "en" ? "nights" : "đêm"}`,
+      time: formatTime(reservation.created_at),
+      badge:
+        reservation.status === "confirmed"
+          ? locale === "en"
+            ? "Check in"
+            : "Nhận phòng"
+          : reservation.status === "cancelled"
+            ? locale === "en"
+              ? "Cancelled"
+              : "Đã hủy"
+            : reservation.status === "pending_deposit"
+              ? locale === "en"
+                ? "Pending deposit"
+                : "Chờ cọc"
+              : reservation.status === "completed"
+                ? locale === "en"
+                  ? "Completed"
+                  : "Hoàn tất"
+                : reservation.status === "expired"
+                  ? locale === "en"
+                    ? "Expired"
+                    : "Hết hạn"
+                  : reservation.status === "draft"
+                    ? locale === "en"
+                      ? "Draft"
+                      : "Nháp"
+                    : locale === "en"
+                      ? "Booking"
+                      : "Booking",
+      badgeTone
+    });
+  });
+
+  while (mapped.length < 4) {
+    mapped.push({
+      initials: "--",
+      label: locale === "en" ? "Waiting for live data" : "Đang chờ dữ liệu thật",
+      detail: locale === "en" ? "No recent reservation has been synced yet." : "Chưa có booking gần đây được đồng bộ.",
+      time: "",
+      badge: locale === "en" ? "Pending" : "Đang chờ",
+      badgeTone: "danger"
+    });
   }
 
   return mapped.slice(0, 4);
 }
 
-export function AdminDashboard({ data, locale }: AdminDashboardProps) {
+export function AdminDashboard({ data, locale, range, searchParams }: AdminDashboardProps) {
   const glanceItems = getGlanceItems(data, locale);
+  const metricCards = buildMetricCards(data, locale);
+  const currentRangeLabel = rangeLabels[range][locale];
 
   return (
     <div className="admin-page admin-dashboard">
       <div className="admin-dashboard__heading">
         <div className="admin-dashboard__title-block">
           <div className="admin-dashboard__title-row">
-            <h1 className="admin-dashboard__title">{locale === "en" ? "Overview" : "Overview"}</h1>
-            <PortalHelp content={locale === "en" ? "These metrics reflect the latest operational snapshot." : "Các chỉ số phản ánh snapshot vận hành mới nhất."} label="i" locale={locale} />
+            <h1 className="admin-dashboard__title">{locale === "en" ? "Overview" : "Tổng quan"}</h1>
+            <PortalHelp
+              content={
+                locale === "en"
+                  ? "These metrics reflect the latest operational snapshot."
+                  : "Các chỉ số phản ánh snapshot vận hành mới nhất."
+              }
+              label="i"
+              locale={locale}
+            />
           </div>
         </div>
 
         <div className="admin-dashboard__period-switch" aria-label={locale === "en" ? "Period selector" : "Chọn khoảng thời gian"}>
-          <button className="admin-dashboard__period-button admin-dashboard__period-button--active" type="button">
-            {locale === "en" ? "Today" : "Today"}
-          </button>
-          <button className="admin-dashboard__period-button" type="button">
-            {locale === "en" ? "7 Days" : "7 Days"}
-          </button>
-          <button className="admin-dashboard__period-button" type="button">
-            {locale === "en" ? "30 Days" : "30 Days"}
-          </button>
+          {( ["today", "7d", "30d"] as const ).map((item) => {
+            const active = range === item;
+
+            return (
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={`admin-dashboard__period-button${active ? " admin-dashboard__period-button--active" : ""}`}
+                href={buildRangeHref(searchParams, locale, item)}
+                key={item}
+              >
+                {rangeLabels[item][locale]}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
       <div className="admin-dashboard__metrics">
         {metricCards.map((metric) => (
-          <MetricCard key={metric.label.en} locale={locale} {...metric} />
+          <MetricCard key={`${metric.label.en}-${metric.value}`} locale={locale} {...metric} />
         ))}
       </div>
 
       <div className="admin-dashboard__body">
         <PortalCard className="admin-dashboard__chart-card">
           <div className="admin-dashboard__card-head">
-            <h2 className="admin-dashboard__card-title">{locale === "en" ? "Occupancy Trends" : "Occupancy Trends"}</h2>
+            <h2 className="admin-dashboard__card-title">{locale === "en" ? "Booking Trends" : "Xu hướng booking"}</h2>
             <Link className="admin-dashboard__view-report" href={appendLocaleQuery("/admin/bookings", locale)}>
-              <span>{locale === "en" ? "View Report" : "View Report"}</span>
+              <span>{locale === "en" ? "View Report" : "Xem báo cáo"}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -385,14 +441,14 @@ export function AdminDashboard({ data, locale }: AdminDashboardProps) {
             </div>
             <div className="admin-dashboard__chart-bars" aria-hidden="true">
               {trendBars.map((bar) => (
-                <div className="admin-dashboard__chart-column" key={bar.day}>
+                <div className="admin-dashboard__chart-column" key={bar.day.en}>
                   <div className={`admin-dashboard__chart-bar admin-dashboard__chart-bar--${bar.tone}`} style={{ height: `${bar.value}%` }} />
                 </div>
               ))}
             </div>
             <div className="admin-dashboard__chart-x-axis" aria-hidden="true">
               {trendBars.map((bar) => (
-                <span key={bar.day}>{bar.day}</span>
+                <span key={bar.day.en}>{bar.day[locale]}</span>
               ))}
             </div>
           </div>
@@ -400,8 +456,8 @@ export function AdminDashboard({ data, locale }: AdminDashboardProps) {
 
         <PortalCard className="admin-dashboard__glance-card">
           <div className="admin-dashboard__card-head admin-dashboard__card-head--glance">
-            <h2 className="admin-dashboard__card-title">{locale === "en" ? "At a Glance" : "At a Glance"}</h2>
-            <span className="admin-dashboard__glance-chip">{locale === "en" ? "Today" : "Today"}</span>
+            <h2 className="admin-dashboard__card-title">{locale === "en" ? "At a Glance" : "Tóm tắt nhanh"}</h2>
+            <span className="admin-dashboard__glance-chip">{currentRangeLabel}</span>
           </div>
 
           <div className="admin-dashboard__glance-list">
@@ -424,7 +480,7 @@ export function AdminDashboard({ data, locale }: AdminDashboardProps) {
 
           <div className="admin-dashboard__glance-footer">
             <Link className="admin-dashboard__view-all" href={appendLocaleQuery("/admin/bookings", locale)}>
-              {locale === "en" ? "View All Activity" : "View All Activity"}
+              {locale === "en" ? "View All Activity" : "Xem toàn bộ hoạt động"}
             </Link>
           </div>
         </PortalCard>

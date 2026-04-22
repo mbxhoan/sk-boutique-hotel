@@ -300,6 +300,18 @@ function getVietnamStartOfDayIso(date = new Date()) {
   return new Date(startUtc).toISOString();
 }
 
+function getDashboardWindowSince(range: WorkflowSelection["range"]) {
+  if (range === "7d") {
+    return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  }
+
+  if (range === "30d") {
+    return new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  }
+
+  return getVietnamStartOfDayIso();
+}
+
 export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = {}): Promise<WorkflowDashboardData> {
   const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
 
@@ -310,6 +322,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     });
   }
 
+  const dashboardWindowSince = getDashboardWindowSince(selection.range);
   const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs, bankAccounts, paymentRequests, paymentProofs] = await Promise.all([
     listBranches(),
     listRoomTypes(),
@@ -318,8 +331,8 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     listReservationRoomItems(),
     listAvailabilityRequests({ limit: 8 }),
     listRoomHolds({ limit: 8, status: ["active", "converted", "expired"] }),
-    listReservations({ limit: 20 }),
-    listAuditLogs({ limit: 10, since: getVietnamStartOfDayIso() }),
+    listReservations({ limit: 20, since: dashboardWindowSince }),
+    listAuditLogs({ limit: 10, since: dashboardWindowSince }),
     listBranchBankAccounts({ limit: 20 }),
     listPaymentRequests({ limit: 12 }),
     listPaymentProofs({ limit: 20 })
@@ -414,11 +427,11 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   });
   const activeHoldCount = await countRoomHolds({ status: "active" });
   const expiringHoldCount = await countExpiringRoomHolds(30);
-  const pendingReservationCount = await countReservations({ status: ["draft", "pending_deposit"] });
+  const pendingReservationCount = await countReservations({ since: dashboardWindowSince, status: ["draft", "pending_deposit"] });
   const pendingPaymentCount = await countPaymentRequests({ status: ["sent", "pending_verification"] });
   const verifiedPaymentCount = await countPaymentRequests({ status: "verified" });
-  const auditTodayCount = await countAuditLogs({ since: getVietnamStartOfDayIso() });
-  const analyticsWindowSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const auditWindowCount = await countAuditLogs({ since: dashboardWindowSince });
+  const analyticsWindowSince = dashboardWindowSince;
   const pageViewCount = await countAnalyticsEvents({ eventType: "page_view", since: analyticsWindowSince });
   const roomViewCount = await countAnalyticsEvents({ eventType: "room_view", since: analyticsWindowSince });
   const branchViewCount = await countAnalyticsEvents({ eventType: "branch_view", since: analyticsWindowSince });
@@ -450,64 +463,64 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
       value: `${expiringHoldCount}`
     },
     {
-      detail_en: "Draft and pending deposit reservations.",
-      detail_vi: "Reservation bản nháp hoặc chờ deposit.",
+      detail_en: "Draft and pending deposit reservations in the selected period.",
+      detail_vi: "Reservation bản nháp hoặc chờ deposit trong khoảng đã chọn.",
       label_en: "Pending reservations",
       label_vi: "Reservation chờ",
       tone: "soft",
       value: `${pendingReservationCount}`
     },
     {
-      detail_en: "Deposit requests waiting for manual verification.",
-      detail_vi: "Payment request đang chờ staff verify.",
+      detail_en: "Deposit requests waiting for manual verification in the selected period.",
+      detail_vi: "Payment request chờ verify trong khoảng đã chọn.",
       label_en: "Payment pending",
       label_vi: "Chờ payment",
       tone: "default",
       value: `${pendingPaymentCount}`
     },
     {
-      detail_en: "Confirmed payments processed today.",
-      detail_vi: "Payment đã xác nhận trong ngày.",
+      detail_en: "Confirmed payments processed in the selected period.",
+      detail_vi: "Payment đã xác nhận trong khoảng đã chọn.",
       label_en: "Verified payments",
       label_vi: "Payment đã duyệt",
       tone: "accent",
       value: `${verifiedPaymentCount}`
     },
     {
-      detail_en: "Audit entries created today.",
-      detail_vi: "Audit entry trong ngày.",
+      detail_en: "Audit entries created in the selected period.",
+      detail_vi: "Audit entry trong khoảng đã chọn.",
       label_en: "Audit entries",
-      label_vi: "Audit trong ngày",
+      label_vi: "Nhật ký audit",
       tone: "default",
-      value: `${auditTodayCount}`
+      value: `${auditWindowCount}`
     },
     {
-      detail_en: "Public page views tracked in the last 7 days.",
-      detail_vi: "Lượt xem public page trong 7 ngày gần nhất.",
+      detail_en: "Public page views tracked in the selected period.",
+      detail_vi: "Lượt xem public page trong khoảng đã chọn.",
       label_en: "Page views",
       label_vi: "Lượt xem",
       tone: "soft",
       value: `${pageViewCount}`
     },
     {
-      detail_en: "Room detail interest tracked in the last 7 days.",
-      detail_vi: "Lượt xem chi tiết phòng trong 7 ngày gần nhất.",
+      detail_en: "Room detail interest tracked in the selected period.",
+      detail_vi: "Lượt xem chi tiết phòng trong khoảng đã chọn.",
       label_en: "Room views",
       label_vi: "Xem phòng",
       tone: "accent",
       value: `${roomViewCount}`
     },
     {
-      detail_en: "Branch interest tracked in the last 7 days.",
-      detail_vi: "Lượt xem chi nhánh trong 7 ngày gần nhất.",
+      detail_en: "Branch interest tracked in the selected period.",
+      detail_vi: "Lượt xem chi nhánh trong khoảng đã chọn.",
       label_en: "Branch views",
       label_vi: "Xem chi nhánh",
       tone: "soft",
       value: `${branchViewCount}`
     },
     {
-      detail_en: "Tracked CTA clicks in the last 7 days.",
-      detail_vi: "Số click CTA trong 7 ngày gần nhất.",
+      detail_en: "Tracked CTA clicks in the selected period.",
+      detail_vi: "Số click CTA trong khoảng đã chọn.",
       label_en: "CTA clicks",
       label_vi: "CTA click",
       tone: "default",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AdminBookingsPage } from "@/components/admin-bookings-page";
 import { resolveLocale } from "@/lib/locale";
+import { localize } from "@/lib/mock/i18n";
 import { loadAdminWorkflowDashboard } from "@/lib/supabase/queries/operations";
 import { countReservations } from "@/lib/supabase/queries/reservations";
 
@@ -18,22 +19,22 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
 
   return {
-    title: locale === "en" ? "Bookings" : "Bookings",
-    description:
-      locale === "en"
-        ? "Manage all current, upcoming, and past reservations."
-        : "Quản lý toàn bộ booking hiện tại, sắp tới và lịch sử đặt phòng."
+    title: localize(locale, { vi: "Đặt phòng", en: "Bookings" }),
+    description: localize(locale, {
+      vi: "Quản lý booking hiện tại, sắp tới và lịch sử đặt phòng.",
+      en: "Manage current, upcoming, and past reservations."
+    })
   };
 }
 
 export default async function AdminBookingsRoute({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
-  const parsedLimit = resolvedSearchParams.limit ? Number(resolvedSearchParams.limit) : 6;
+  const parsedLimit = resolvedSearchParams.limit ? Number(resolvedSearchParams.limit) : 20;
 
   const dashboard = await loadAdminWorkflowDashboard({
     branchId: resolvedSearchParams.branch,
-    limit: Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 6
+    limit: Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20
   });
   const totalCount = await countReservations({
     branchId: resolvedSearchParams.branch

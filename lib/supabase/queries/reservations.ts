@@ -13,6 +13,7 @@ type ReservationQueryOptions = {
   branchId?: string;
   customerId?: string;
   limit?: number;
+  since?: string;
   status?: ReservationStatus | ReservationStatus[];
 };
 
@@ -27,6 +28,10 @@ export async function listReservations(options: ReservationQueryOptions = {}) {
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
       }
 
       if (options.status) {
@@ -60,6 +65,10 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
       }
 
       if (options.status) {

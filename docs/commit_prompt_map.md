@@ -1112,3 +1112,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(admin)/admin/rooms/page.tsx`
   - `app/(admin)/admin/content-pages/page.tsx`
   - `app/globals.css`
+
+### Entry 101
+- `time`: 2026-04-22T10:12:11+07:00
+- `prompt_summary`: Sửa trạng thái active của sidebar admin, nối dashboard/bookings/rooms/content pages vào dữ liệu thật từ Supabase, khóa content pages theo hướng chỉ sửa nội dung/hình ảnh không tạo/xóa, làm toàn bộ admin portal song ngữ VI/EN, bật lọc 7 ngày/30 ngày trên dashboard và chuẩn hóa toàn bộ tiền hiển thị sang VND.
+- `commit_message`: `feat(admin-portal): wire real data and bilingual labels`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `app/(admin)/admin/page.tsx`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/globals.css`

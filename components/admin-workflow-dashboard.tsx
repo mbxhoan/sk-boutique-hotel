@@ -58,7 +58,7 @@ function formatMoney(locale: Locale, value: number, currency = "VND") {
     maximumFractionDigits: 0
   }).format(value);
 
-  return locale === "en" ? `${formatted} ${currency}` : `${formatted} ${currency === "VND" ? "đ" : currency}`;
+  return `${formatted} VND`;
 }
 
 function calculateNights(startAt: string, endAt: string) {

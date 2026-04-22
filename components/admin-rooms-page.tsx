@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
+import { localize } from "@/lib/mock/i18n";
 import type { FloorRow, RoomRow, RoomTypeRow } from "@/lib/supabase/database.types";
 
 type RoomView = RoomRow & {
@@ -17,6 +18,7 @@ type RoomTypeOption = Pick<RoomTypeRow, "id" | "name_en" | "name_vi">;
 
 type AdminRoomsPageProps = {
   branchName: string;
+  branchId: string | null;
   floorId: string | null;
   floors: FloorOption[];
   locale: Locale;
@@ -101,6 +103,7 @@ function buildRoomViews(rooms: RoomView[]) {
 
 export function AdminRoomsPage({
   branchName,
+  branchId,
   floorId,
   floors,
   locale,
@@ -112,41 +115,75 @@ export function AdminRoomsPage({
   const selectedFloor = floors.find((floor) => floor.id === floorId) ?? floors[0] ?? null;
 
   const visibleRooms = selectedFloor ? resolvedRooms.filter((room) => room.floor_id === selectedFloor.id) : resolvedRooms;
-  const fallbackRooms = visibleRooms.length ? visibleRooms : resolvedRooms;
+  const gridRooms = selectedFloor ? visibleRooms : resolvedRooms;
   const selectedRoom =
-    fallbackRooms.find((room) => room.id === selectedRoomId) ?? fallbackRooms[0] ?? resolvedRooms.find((room) => room.id === selectedRoomId) ?? resolvedRooms[0] ?? null;
+    gridRooms.find((room) => room.id === selectedRoomId) ??
+    gridRooms[0] ??
+    (selectedFloor ? null : resolvedRooms.find((room) => room.id === selectedRoomId) ?? resolvedRooms[0] ?? null);
+  const selectedFloorLabel = selectedFloor
+    ? locale === "en"
+      ? selectedFloor.name_en ?? selectedFloor.code
+      : selectedFloor.name_vi ?? selectedFloor.code
+    : branchName;
 
   function buildFloorHref(floor: FloorOption) {
-    return `?floor=${floor.id}${locale === "en" ? "&lang=en" : ""}`;
+    const params = new URLSearchParams();
+
+    if (branchId) {
+      params.set("branch", branchId);
+    }
+
+    params.set("floor", floor.id);
+
+    if (locale === "en") {
+      params.set("lang", "en");
+    }
+
+    return `?${params.toString()}`;
   }
 
   function buildRoomHref(room: RoomView) {
-    return `?floor=${room.floor_id}&room=${room.id}${locale === "en" ? "&lang=en" : ""}`;
+    const params = new URLSearchParams();
+
+    if (branchId) {
+      params.set("branch", branchId);
+    }
+
+    params.set("floor", room.floor_id);
+    params.set("room", room.id);
+
+    if (locale === "en") {
+      params.set("lang", "en");
+    }
+
+    return `?${params.toString()}`;
   }
 
   return (
     <div className="admin-page admin-rooms">
       <div className="admin-page__hero admin-page__hero--rooms">
         <div className="admin-page__copy">
-          <h1 className="admin-page__title">{locale === "en" ? "Room Availability & Floor Plan" : "Room Availability & Floor Plan"}</h1>
+          <h1 className="admin-page__title">{localize(locale, { vi: "Phòng & sơ đồ tầng", en: "Room availability & floor plan" })}</h1>
           <p className="admin-page__description">
-            {locale === "en"
-              ? "Manage physical inventory and real-time statuses."
-              : "Quản lý phòng vật lý và trạng thái thời gian thực."}
+            {localize(locale, {
+              vi: "Quản lý phòng vật lý và trạng thái thời gian thực.",
+              en: "Manage physical rooms and real-time statuses."
+            })}
           </p>
         </div>
 
-        <div className="admin-rooms__floor-tabs" role="tablist" aria-label={locale === "en" ? "Floors" : "Floors"}>
+        <div className="admin-rooms__floor-tabs" role="tablist" aria-label={localize(locale, { vi: "Các tầng", en: "Floors" })}>
           {floors.map((floor) => {
             const active = floor.id === selectedFloor?.id;
 
             return (
-                <Link
-                  className={`admin-rooms__floor-tab${active ? " admin-rooms__floor-tab--active" : ""}`}
-                  href={buildFloorHref(floor)}
-                  key={floor.id}
-                >
-                  {floor.name_en || floor.code}
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={`admin-rooms__floor-tab${active ? " admin-rooms__floor-tab--active" : ""}`}
+                href={buildFloorHref(floor)}
+                key={floor.id}
+              >
+                {locale === "en" ? floor.name_en || floor.code : floor.name_vi || floor.code}
               </Link>
             );
           })}
@@ -157,13 +194,18 @@ export function AdminRoomsPage({
         <div className="admin-rooms__filter-group">
           <div className="admin-rooms__filter">
             <label className="portal-field__label" htmlFor="room-search">
-              {locale === "en" ? "Search" : "Search"}
+              {localize(locale, { vi: "Tìm kiếm", en: "Search" })}
             </label>
             <div className="admin-rooms__input-wrap">
               <span className="admin-rooms__input-icon" aria-hidden="true">
                 <SearchIcon />
               </span>
-              <input className="admin-rooms__input" id="room-search" placeholder={locale === "en" ? "Room # or Type..." : "Room # or Type..."} type="search" />
+              <input
+                className="admin-rooms__input"
+                id="room-search"
+                placeholder={localize(locale, { vi: "Số phòng hoặc loại phòng...", en: "Room # or type..." })}
+                type="search"
+              />
             </div>
           </div>
 
@@ -171,11 +213,11 @@ export function AdminRoomsPage({
 
           <div className="admin-rooms__filter admin-rooms__filter--view">
             <label className="portal-field__label" htmlFor="room-view">
-              {locale === "en" ? "View" : "View"}
+              {localize(locale, { vi: "Xem", en: "View" })}
             </label>
             <div className="admin-rooms__select-wrap">
               <select className="admin-rooms__select" id="room-view" defaultValue="all">
-                <option value="all">{locale === "en" ? "All Categories" : "All Categories"}</option>
+                <option value="all">{localize(locale, { vi: "Tất cả loại", en: "All categories" })}</option>
                 {roomTypes.slice(0, 4).map((roomType) => (
                   <option key={roomType.id} value={roomType.id}>
                     {locale === "en" ? roomType.name_en : roomType.name_vi}
@@ -186,71 +228,88 @@ export function AdminRoomsPage({
           </div>
         </div>
 
-        <div className="admin-rooms__legend" aria-label={locale === "en" ? "Status legend" : "Status legend"}>
+        <div className="admin-rooms__legend" aria-label={localize(locale, { vi: "Chú giải trạng thái", en: "Status legend" })}>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--occupied" />
-            {locale === "en" ? "Occupied" : "Occupied"}
+            {localize(locale, { vi: "Đang ở", en: "Occupied" })}
           </span>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--available" />
-            {locale === "en" ? "Available" : "Available"}
+            {localize(locale, { vi: "Trống", en: "Available" })}
           </span>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--cleaning" />
-            {locale === "en" ? "Cleaning" : "Cleaning"}
+            {localize(locale, { vi: "Đang dọn", en: "Cleaning" })}
           </span>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--maintenance" />
-            {locale === "en" ? "Maintenance" : "Maintenance"}
+            {localize(locale, { vi: "Bảo trì", en: "Maintenance" })}
           </span>
         </div>
       </PortalCard>
 
       <div className="admin-rooms__body">
         <PortalCard className="admin-rooms__grid-card">
-          <div className="admin-rooms__grid">
-            {fallbackRooms.map((room) => {
-              const active = room.id === selectedRoom?.id;
+          {gridRooms.length ? (
+            <div className="admin-rooms__grid">
+              {gridRooms.map((room) => {
+                const active = room.id === selectedRoom?.id;
 
-              return (
-                <Link
-                  className={`admin-room-card admin-room-card--${statusTone(room.display_status)}${active ? " admin-room-card--active" : ""}`}
-                  href={buildRoomHref(room)}
-                  key={room.id}
-                >
-                  <div className="admin-room-card__top">
-                    <span className="admin-room-card__number">{room.code}</span>
-                    <span className="admin-room-card__icon" aria-hidden="true">
-                      {roomCardIcon(room.display_status)}
-                    </span>
-                  </div>
-                  <div className="admin-room-card__type">{locale === "en" ? room.room_type_name_en : room.room_type_name_vi}</div>
-                  <div className="admin-room-card__footer">
-                    <span className="admin-room-card__status">{statusLabel(locale, room.display_status)}</span>
-                    <span className="admin-room-card__status-icon" aria-hidden="true">
-                      {room.display_status === "occupied" ? "👤" : room.display_status === "maintenance" ? "🔧" : room.display_status === "cleaning" ? "🧹" : ""}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                return (
+                  <Link
+                    className={`admin-room-card admin-room-card--${statusTone(room.display_status)}${active ? " admin-room-card--active" : ""}`}
+                    href={buildRoomHref(room)}
+                    key={room.id}
+                  >
+                    <div className="admin-room-card__top">
+                      <span className="admin-room-card__number">{room.code}</span>
+                      <span className="admin-room-card__icon" aria-hidden="true">
+                        {roomCardIcon(room.display_status)}
+                      </span>
+                    </div>
+                    <div className="admin-room-card__type">{locale === "en" ? room.room_type_name_en : room.room_type_name_vi}</div>
+                    <div className="admin-room-card__footer">
+                      <span className="admin-room-card__status">{statusLabel(locale, room.display_status)}</span>
+                      <span className="admin-room-card__status-icon" aria-hidden="true">
+                        {room.display_status === "occupied" ? "👤" : room.display_status === "maintenance" ? "🔧" : room.display_status === "cleaning" ? "🧹" : ""}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="admin-rooms__empty-state">
+              <p className="admin-rooms__empty-title">
+                {localize(locale, {
+                  vi: selectedFloor ? "Tầng này chưa có phòng" : "Chưa có dữ liệu phòng",
+                  en: selectedFloor ? "No rooms on this floor" : "No room data yet"
+                })}
+              </p>
+              <p className="admin-rooms__empty-copy">
+                {localize(locale, {
+                  vi: selectedFloor ? "Supabase chưa trả về phòng nào cho tầng này." : "Supabase chưa trả về phòng nào cho chi nhánh này.",
+                  en: selectedFloor ? "Supabase has not returned any rooms for this floor." : "Supabase has not returned any rooms for this branch."
+                })}
+              </p>
+            </div>
+          )}
         </PortalCard>
 
         <PortalCard className="admin-rooms__inspector">
           <div className="admin-rooms__inspector-bar" />
           <div className="admin-rooms__inspector-head">
             <div>
-              <p className="admin-rooms__eyebrow">{locale === "en" ? "Selected Room" : "Selected Room"}</p>
+              <p className="admin-rooms__eyebrow">{localize(locale, { vi: "Phòng được chọn", en: "Selected room" })}</p>
               <h2 className="admin-rooms__selected-number">
-                {selectedRoom?.code ?? "101"}{" "}
+                {selectedRoom?.code ?? localize(locale, { vi: "Chưa có", en: "N/A" })}{" "}
                 <span className="admin-rooms__selected-icon" aria-hidden="true">
                   {selectedRoom ? roomCardIcon(selectedRoom.display_status) : "🛏"}
                 </span>
               </h2>
               <p className="admin-rooms__selected-copy">
                 {selectedRoom
-                  ? `${locale === "en" ? selectedRoom.room_type_name_en : selectedRoom.room_type_name_vi} • ${selectedFloor?.name_en ?? selectedFloor?.code ?? ""}`
+                  ? `${locale === "en" ? selectedRoom.room_type_name_en : selectedRoom.room_type_name_vi} • ${selectedFloorLabel}`
                   : `${branchName}`}
               </p>
             </div>
@@ -262,60 +321,70 @@ export function AdminRoomsPage({
           <div className="admin-rooms__guest-card">
             <div className="admin-rooms__guest-avatar">{selectedRoom ? initials(selectedRoom.code) : "JD"}</div>
             <div className="admin-rooms__guest-copy">
-              <p className="admin-rooms__guest-name">{selectedRoom?.notes_en?.split("\n")[0] || selectedRoom?.notes_vi?.split("\n")[0] || (locale === "en" ? "John Doe" : "John Doe")}</p>
+              <p className="admin-rooms__guest-name">
+                {locale === "en"
+                  ? selectedRoom?.notes_en?.split("\n")[0] || selectedRoom?.notes_vi?.split("\n")[0] || localize(locale, { vi: "Chưa có ghi chú", en: "No notes yet" })
+                  : selectedRoom?.notes_vi?.split("\n")[0] || selectedRoom?.notes_en?.split("\n")[0] || localize(locale, { vi: "Chưa có ghi chú", en: "No notes yet" })}
+              </p>
               <p className="admin-rooms__guest-detail">
                 {selectedRoom?.display_status === "occupied"
-                  ? locale === "en"
-                    ? "Checkout: Tomorrow, 11:00 AM"
-                    : "Checkout: Tomorrow, 11:00 AM"
-                  : locale === "en"
-                    ? "Room notes and housekeeping context"
-                    : "Room notes and housekeeping context"}
+                  ? localize(locale, {
+                      vi: "Trả phòng: ngày mai, 11:00 sáng",
+                      en: "Checkout: tomorrow, 11:00 AM"
+                    })
+                  : localize(locale, {
+                      vi: "Ghi chú phòng và ngữ cảnh housekeeping",
+                      en: "Room notes and housekeeping context"
+                    })}
               </p>
             </div>
           </div>
 
           <div className="admin-rooms__status-section">
-            <p className="admin-rooms__section-title">{locale === "en" ? "Update Room Status" : "Update Room Status"}</p>
+            <p className="admin-rooms__section-title">{localize(locale, { vi: "Cập nhật trạng thái", en: "Update room status" })}</p>
             <div className="admin-rooms__status-grid">
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "available" ? " admin-rooms__status-button--selected" : ""}`}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--available" />
-                {locale === "en" ? "Available" : "Available"}
+                {localize(locale, { vi: "Trống", en: "Available" })}
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "occupied" ? " admin-rooms__status-button--selected" : ""}`}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--occupied" />
-                {locale === "en" ? "Occupied" : "Occupied"}
+                {localize(locale, { vi: "Đang ở", en: "Occupied" })}
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "cleaning" ? " admin-rooms__status-button--selected" : ""}`}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--cleaning" />
-                {locale === "en" ? "Cleaning" : "Cleaning"}
+                {localize(locale, { vi: "Đang dọn", en: "Cleaning" })}
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "maintenance" ? " admin-rooms__status-button--selected" : ""}`}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--maintenance" />
-                {locale === "en" ? "Maintenance" : "Maintenance"}
+                {localize(locale, { vi: "Bảo trì", en: "Maintenance" })}
               </button>
             </div>
           </div>
 
           <div className="admin-rooms__notes-section">
-            <p className="admin-rooms__section-title">{locale === "en" ? "Housekeeping Notes" : "Housekeeping Notes"}</p>
-            <textarea className="admin-rooms__notes" defaultValue={selectedRoom?.notes_en ?? selectedRoom?.notes_vi ?? ""} placeholder={locale === "en" ? "Add notes here..." : "Add notes here..."} />
+            <p className="admin-rooms__section-title">{localize(locale, { vi: "Ghi chú housekeeping", en: "Housekeeping notes" })}</p>
+            <textarea
+              className="admin-rooms__notes"
+              defaultValue={locale === "en" ? selectedRoom?.notes_en ?? selectedRoom?.notes_vi ?? "" : selectedRoom?.notes_vi ?? selectedRoom?.notes_en ?? ""}
+              placeholder={localize(locale, { vi: "Thêm ghi chú tại đây...", en: "Add notes here..." })}
+            />
           </div>
 
           <button className="button button--solid admin-rooms__save" type="button">
-            {locale === "en" ? "SAVE CHANGES" : "SAVE CHANGES"}
+            {localize(locale, { vi: "LƯU THAY ĐỔI", en: "SAVE CHANGES" })}
           </button>
         </PortalCard>
       </div>
