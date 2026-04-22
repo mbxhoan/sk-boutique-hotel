@@ -1095,3 +1095,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/operations.ts`
   - `lib/supabase/workflow.types.ts`
   - `lib/supabase/workflows.ts`
+
+## 2026-04-22
+
+### Entry 100
+- `time`: 2026-04-22T09:42:52+07:00
+- `prompt_summary`: Đọc `prompt.md` và refactor UI/UX admin portal theo mockups trong `docs/ui/sk_admin_portal`, áp theme DESIGN.md, thêm các màn hình dashboard/bookings/rooms/content pages và shell admin mới.
+- `commit_message`: `feat(admin-ui): refactor shell and core screens to mockups`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `app/(admin)/admin/content-pages/page.tsx`
+  - `app/globals.css`

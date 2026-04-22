@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Management - SK Boutique Hotel</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#e5eeff",
+                    "on-secondary-container": "#4b617d",
+                    "primary-fixed": "#ffdeae",
+                    "outline": "#807569",
+                    "on-primary-fixed": "#281800",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-container": "#c5dcfd",
+                    "tertiary": "#5c5f60",
+                    "secondary-fixed-dim": "#b1c8e9",
+                    "on-error": "#ffffff",
+                    "secondary": "#4a607c",
+                    "error": "#ba1a1a",
+                    "on-primary-container": "#3d2700",
+                    "inverse-surface": "#213145",
+                    "outline-variant": "#d1c5b6",
+                    "tertiary-container": "#919394",
+                    "surface-bright": "#f8f9ff",
+                    "surface-tint": "#775928",
+                    "inverse-primary": "#e8c086",
+                    "on-secondary-fixed-variant": "#324863",
+                    "secondary-fixed": "#d2e4ff",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary-fixed-variant": "#5d4213",
+                    "surface-container-low": "#eff4ff",
+                    "on-surface": "#0b1c30",
+                    "tertiary-fixed": "#e1e3e4",
+                    "background": "#f8f9ff",
+                    "primary": "#775928",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#4e453a",
+                    "on-background": "#0b1c30",
+                    "on-tertiary-container": "#292c2d",
+                    "primary-fixed-dim": "#e8c086",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "surface-variant": "#d3e4fe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface": "#f8f9ff",
+                    "on-secondary-fixed": "#021c36",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#b08d57",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#191c1d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "gutter": "20px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "sidebar-width": "260px",
+                    "sm": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "table-data": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "h3": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "h2": ["Inter"]
+            },
+            "fontSize": {
+                    "table-data": ["13px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h3": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Scrollbar for high-density tables */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1c5b6; /* outline-variant */
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #807569; /* outline */
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased overflow-hidden">
+<!-- Shared Component: SideNavBar -->
+<nav class="fixed left-0 top-0 w-[260px] h-screen border-r border-slate-800 bg-slate-950 flex flex-col justify-between py-8 px-4 z-50">
+<div>
+<!-- Header -->
+<div class="mb-10 px-4 flex flex-col items-start">
+<span class="text-xl font-black text-[#B08D57] tracking-tighter">SK Boutique</span>
+<span class="text-slate-400 font-['Inter'] text-[13px] font-medium mt-1">Admin Portal</span>
+</div>
+<!-- Main Navigation -->
+<ul class="flex flex-col gap-2">
+<!-- Dashboard -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<!-- Bookings (ACTIVE) -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-slate-900 text-[#B08D57] border-r-2 border-[#B08D57] transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                        Bookings
+                    </a>
+</li>
+<!-- Room Management -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+                        Room Management
+                    </a>
+</li>
+<!-- Customers -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">person_outline</span>
+                        Customers
+                    </a>
+</li>
+<!-- Content -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">edit_note</span>
+                        Content
+                    </a>
+</li>
+<!-- Settings -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+<!-- Footer Navigation -->
+<ul class="flex flex-col gap-2 mt-auto pt-8 border-t border-slate-800/50">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+                    Support
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out font-['Inter'] text-[13px] font-medium active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                    Log Out
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Shared Component: TopNavBar -->
+<header class="fixed top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md font-['Inter'] antialiased tracking-tight h-16 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center px-8 w-[calc(100%-260px)] ml-[260px]">
+<!-- Search Bar (On Left) -->
+<div class="flex items-center w-80">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 bg-surface-container-lowest border border-outline-variant rounded focus:border-secondary focus:ring-1 focus:ring-secondary text-table-data font-table-data transition-colors placeholder:text-outline" placeholder="Quick search..." type="text"/>
+</div>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-6">
+<!-- Trailing Secondary Action -->
+<div class="flex items-center gap-2 cursor-pointer hover:text-[#B08D57] transition-colors text-slate-500 dark:text-slate-400">
+<span class="font-body-sm font-medium">Branch Selector</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:opacity-70">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:opacity-70">
+<span class="material-symbols-outlined">storefront</span>
+</button>
+<!-- Profile Image -->
+<div class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-outline-variant cursor-pointer active:opacity-70 transition-opacity">
+<div class="w-full h-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-h3 text-xs">
+                        AD
+                    </div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] mt-16 p-lg h-[calc(100vh-64px)] flex flex-col gap-lg bg-surface">
+<!-- Page Header -->
+<div class="flex items-center justify-between shrink-0">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface">Bookings</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Manage all current, upcoming, and past reservations.</p>
+</div>
+<div class="flex items-center gap-md">
+<button class="px-4 py-2 border border-secondary text-secondary bg-transparent rounded font-label-caps text-label-caps flex items-center gap-2 hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    Export CSV
+                </button>
+<button class="px-4 py-2 bg-primary-container text-white rounded font-label-caps text-label-caps flex items-center gap-2 hover:bg-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Add Booking
+                </button>
+</div>
+</div>
+<!-- Filter Bar -->
+<section class="flex items-end gap-md pb-md border-b border-outline-variant shrink-0">
+<!-- Search -->
+<div class="flex flex-col gap-xs flex-1 max-w-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Search</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded font-body-sm text-body-sm text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary placeholder:text-outline transition-colors" placeholder="Booking ID, Guest Name..." type="text"/>
+</div>
+</div>
+<!-- Status Filter -->
+<div class="flex flex-col gap-xs w-40">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Status</label>
+<div class="relative">
+<select class="w-full pl-3 pr-8 py-2 bg-surface-container-lowest border border-outline-variant rounded font-body-sm text-body-sm text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary appearance-none cursor-pointer">
+<option value="all">All Statuses</option>
+<option value="confirmed">Confirmed</option>
+<option value="pending">Pending</option>
+<option value="cancelled">Cancelled</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+<!-- Date Range Picker (Custom Styled) -->
+<div class="flex flex-col gap-xs w-64">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Stay Dates</label>
+<div class="relative flex items-center bg-surface-container-lowest border border-outline-variant rounded cursor-pointer hover:border-outline transition-colors">
+<span class="material-symbols-outlined pl-3 text-outline text-[18px]">calendar_today</span>
+<div class="flex items-center px-3 py-2 font-body-sm text-body-sm text-on-surface w-full justify-between">
+<span class="text-primary font-medium">Oct 12</span>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">arrow_forward</span>
+<span class="text-primary font-medium">Oct 18</span>
+</div>
+</div>
+</div>
+<div class="flex-1"></div> <!-- Spacer -->
+<!-- Columns Dropdown -->
+<button class="px-3 py-2 border border-outline-variant text-on-surface-variant bg-surface-container-lowest rounded font-body-sm text-body-sm flex items-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">view_column</span>
+                Columns
+            </button>
+</section>
+<!-- High-Density Data Table -->
+<section class="flex-1 min-h-0 bg-surface-container-lowest border border-outline-variant rounded shadow-[0px_2px_4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+<div class="overflow-x-auto overflow-y-auto flex-1">
+<table class="w-full text-left whitespace-nowrap border-collapse">
+<thead class="sticky top-0 bg-surface z-10 border-b border-outline-variant">
+<tr>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-1">
+                                    Booking ID
+                                    <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">arrow_downward</span>
+</div>
+</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-1">
+                                    Guest Name
+                                    <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">arrow_downward</span>
+</div>
+</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">Room Type</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-1">
+                                    Dates
+                                    <span class="material-symbols-outlined text-[14px] opacity-100 text-secondary">arrow_downward</span>
+</div>
+</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant text-center">Status</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant text-right cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="flex items-center justify-end gap-1">
+                                    Total
+                                    <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">arrow_downward</span>
+</div>
+</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant text-center w-16">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<!-- Row 1 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium">#BK-1042</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface">Eleanor Vance</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Deluxe Suite</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Oct 12 - Oct 15</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-[10px] tracking-wider">
+                                    CONFIRMED
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right">$1,250.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium">#BK-1043</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface">Marcus Sterling</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Premium King</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Oct 13 - Oct 14</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] tracking-wider">
+                                    PENDING
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right">$480.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium">#BK-1044</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface">Sarah Jenkins</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Standard Double</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Oct 14 - Oct 18</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-[10px] tracking-wider">
+                                    CONFIRMED
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right">$890.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium text-outline">#BK-1045</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-outline">David Chen</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant text-outline">Executive Suite</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant text-outline">Oct 15 - Oct 20</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-caps text-[10px] tracking-wider">
+                                    CANCELLED
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right text-outline">$0.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium">#BK-1046</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface">Elena Rodriguez</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Deluxe Suite</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Oct 16 - Oct 17</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-[10px] tracking-wider">
+                                    CONFIRMED
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right">$420.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="h-[40px] hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface font-medium">#BK-1047</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface">James Wilson</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Standard Double</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface-variant">Oct 18 - Oct 22</td>
+<td class="px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] tracking-wider">
+                                    PENDING
+                                </span>
+</td>
+<td class="px-4 py-2 font-table-data text-table-data text-on-surface text-right">$760.00</td>
+<td class="px-4 py-2 text-center">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container opacity-0 group-hover:opacity-100 focus:opacity-100" title="Email Guest">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="border-t border-outline-variant px-4 py-3 flex items-center justify-between bg-surface-bright">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Showing 1 to 6 of 124 entries</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-outline hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary-container text-white font-body-sm text-body-sm transition-colors">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container font-body-sm text-body-sm transition-colors">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container font-body-sm text-body-sm transition-colors">3</button>
+<span class="text-outline-variant px-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-outline hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+</body></html>
