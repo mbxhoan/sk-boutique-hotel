@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
@@ -112,14 +115,30 @@ export function AdminRoomsPage({
   roomTypes
 }: AdminRoomsPageProps) {
   const resolvedRooms = buildRoomViews(rooms);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roomTypeFilter, setRoomTypeFilter] = useState("all");
   const selectedFloor = floors.find((floor) => floor.id === floorId) ?? floors[0] ?? null;
+  const normalizedSearch = searchQuery.trim().toLowerCase();
 
-  const visibleRooms = selectedFloor ? resolvedRooms.filter((room) => room.floor_id === selectedFloor.id) : resolvedRooms;
-  const gridRooms = selectedFloor ? visibleRooms : resolvedRooms;
-  const selectedRoom =
-    gridRooms.find((room) => room.id === selectedRoomId) ??
-    gridRooms[0] ??
-    (selectedFloor ? null : resolvedRooms.find((room) => room.id === selectedRoomId) ?? resolvedRooms[0] ?? null);
+  useEffect(() => {
+    setSearchQuery("");
+    setRoomTypeFilter("all");
+  }, [branchId]);
+
+  const filteredRooms = resolvedRooms.filter((room) => {
+    const matchesSearch =
+      !normalizedSearch ||
+      [room.code, room.room_type_name_en, room.room_type_name_vi, room.notes_en, room.notes_vi, room.floor_code, room.floor_label]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedSearch);
+    const matchesRoomType = roomTypeFilter === "all" || room.room_type_id === roomTypeFilter;
+
+    return matchesSearch && matchesRoomType;
+  });
+  const visibleRooms = selectedFloor ? filteredRooms.filter((room) => room.floor_id === selectedFloor.id) : filteredRooms;
+  const gridRooms = selectedFloor ? visibleRooms : filteredRooms;
+  const selectedRoom = gridRooms.find((room) => room.id === selectedRoomId) ?? gridRooms[0] ?? null;
   const selectedFloorLabel = selectedFloor
     ? locale === "en"
       ? selectedFloor.name_en ?? selectedFloor.code
@@ -203,7 +222,9 @@ export function AdminRoomsPage({
               <input
                 className="admin-rooms__input"
                 id="room-search"
+                onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder={localize(locale, { vi: "Số phòng hoặc loại phòng...", en: "Room # or type..." })}
+                value={searchQuery}
                 type="search"
               />
             </div>
@@ -216,9 +237,9 @@ export function AdminRoomsPage({
               {localize(locale, { vi: "Xem", en: "View" })}
             </label>
             <div className="admin-rooms__select-wrap">
-              <select className="admin-rooms__select" id="room-view" defaultValue="all">
+              <select className="admin-rooms__select" id="room-view" onChange={(event) => setRoomTypeFilter(event.target.value)} value={roomTypeFilter}>
                 <option value="all">{localize(locale, { vi: "Tất cả loại", en: "All categories" })}</option>
-                {roomTypes.slice(0, 4).map((roomType) => (
+                {roomTypes.map((roomType) => (
                   <option key={roomType.id} value={roomType.id}>
                     {locale === "en" ? roomType.name_en : roomType.name_vi}
                   </option>
@@ -282,14 +303,22 @@ export function AdminRoomsPage({
             <div className="admin-rooms__empty-state">
               <p className="admin-rooms__empty-title">
                 {localize(locale, {
-                  vi: selectedFloor ? "Tầng này chưa có phòng" : "Chưa có dữ liệu phòng",
-                  en: selectedFloor ? "No rooms on this floor" : "No room data yet"
+                  vi: normalizedSearch || roomTypeFilter !== "all" ? "Không có phòng khớp bộ lọc" : selectedFloor ? "Tầng này chưa có phòng" : "Chưa có dữ liệu phòng",
+                  en: normalizedSearch || roomTypeFilter !== "all" ? "No rooms match the current filters" : selectedFloor ? "No rooms on this floor" : "No room data yet"
                 })}
               </p>
               <p className="admin-rooms__empty-copy">
                 {localize(locale, {
-                  vi: selectedFloor ? "Supabase chưa trả về phòng nào cho tầng này." : "Supabase chưa trả về phòng nào cho chi nhánh này.",
-                  en: selectedFloor ? "Supabase has not returned any rooms for this floor." : "Supabase has not returned any rooms for this branch."
+                  vi: normalizedSearch || roomTypeFilter !== "all"
+                    ? "Hãy thử xóa bộ lọc hoặc đổi từ khóa tìm kiếm."
+                    : selectedFloor
+                      ? "Supabase chưa trả về phòng nào cho tầng này."
+                      : "Supabase chưa trả về phòng nào cho chi nhánh này.",
+                  en: normalizedSearch || roomTypeFilter !== "all"
+                    ? "Try clearing the filters or changing the search term."
+                    : selectedFloor
+                      ? "Supabase has not returned any rooms for this floor."
+                      : "Supabase has not returned any rooms for this branch."
                 })}
               </p>
             </div>

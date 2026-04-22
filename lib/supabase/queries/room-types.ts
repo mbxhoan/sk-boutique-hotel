@@ -8,7 +8,7 @@ import { buildRoomDetailHref } from "@/lib/room-routes";
 import { translate } from "@/lib/locale";
 import type { RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, formatCurrencyText, text } from "@/lib/supabase/content";
-import { queryWithFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
 
 const roomCollectionTemplate = roomCollectionPageCopy;
 
@@ -261,7 +261,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
 }
 
 export async function listRoomTypes() {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("room_types")
@@ -283,7 +283,7 @@ export async function listRoomTypes() {
 }
 
 async function getRoomTypeBySlug(slug: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("room_types")

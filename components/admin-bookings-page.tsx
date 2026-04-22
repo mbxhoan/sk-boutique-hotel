@@ -1,64 +1,293 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
-import type { WorkflowReservation } from "@/lib/supabase/workflow.types";
+import type { WorkflowBookingRow } from "@/lib/supabase/workflow.types";
 
 type AdminBookingsPageProps = {
+  bookings: WorkflowBookingRow[];
   locale: Locale;
-  reservations: WorkflowReservation[];
   totalCount: number;
 };
 
+type BookingColumnKey = "booking_code" | "customer" | "room_type" | "stay_dates" | "status" | "total" | "actions";
+
+type DateRangeState = {
+  end: string;
+  start: string;
+};
+
+const PAGE_SIZE = 8;
+
+const bookingColumns: Array<{
+  key: BookingColumnKey;
+  label: Record<Locale, string>;
+}> = [
+  {
+    key: "booking_code",
+    label: {
+      en: "Booking ID",
+      vi: "Mã booking"
+    }
+  },
+  {
+    key: "customer",
+    label: {
+      en: "Guest name",
+      vi: "Khách hàng"
+    }
+  },
+  {
+    key: "room_type",
+    label: {
+      en: "Room type",
+      vi: "Loại phòng"
+    }
+  },
+  {
+    key: "stay_dates",
+    label: {
+      en: "Dates",
+      vi: "Ngày ở"
+    }
+  },
+  {
+    key: "status",
+    label: {
+      en: "Status",
+      vi: "Trạng thái"
+    }
+  },
+  {
+    key: "total",
+    label: {
+      en: "Total",
+      vi: "Tổng tiền"
+    }
+  },
+  {
+    key: "actions",
+    label: {
+      en: "Action",
+      vi: "Hành động"
+    }
+  }
+];
+
+const statusLabels: Record<Locale, Record<WorkflowBookingRow["status"], string>> = {
+  en: {
+    cancelled: "CANCELLED",
+    closed: "CLOSED",
+    completed: "COMPLETED",
+    converted: "CONVERTED",
+    draft: "DRAFT",
+    expired: "EXPIRED",
+    in_review: "IN REVIEW",
+    new: "NEW",
+    pending_deposit: "PENDING DEPOSIT",
+    confirmed: "CONFIRMED",
+    rejected: "REJECTED",
+    quoted: "QUOTED"
+  },
+  vi: {
+    cancelled: "ĐÃ HỦY",
+    closed: "ĐÃ ĐÓNG",
+    completed: "HOÀN TẤT",
+    converted: "ĐÃ CHUYỂN",
+    draft: "NHÁP",
+    expired: "HẾT HẠN",
+    in_review: "ĐANG XỬ LÝ",
+    new: "MỚI",
+    pending_deposit: "CHỜ CỌC",
+    confirmed: "ĐÃ XÁC NHẬN",
+    rejected: "TỪ CHỐI",
+    quoted: "ĐÃ BÁO GIÁ"
+  }
+};
+
+const statusOptions: Array<{
+  value: WorkflowBookingRow["status"] | "all";
+  label: Record<Locale, string>;
+}> = [
+  {
+    value: "all",
+    label: {
+      en: "All statuses",
+      vi: "Tất cả trạng thái"
+    }
+  },
+  ...([
+    "new",
+    "in_review",
+    "quoted",
+    "converted",
+    "draft",
+    "pending_deposit",
+    "confirmed",
+    "completed",
+    "cancelled",
+    "closed",
+    "rejected",
+    "expired"
+  ] as const).map((status) => ({
+    value: status,
+    label: {
+      en: statusLabels.en[status],
+      vi: statusLabels.vi[status]
+    }
+  }))
+];
+
+function formatMoney(locale: Locale, value: number) {
+  return (
+    new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+      maximumFractionDigits: 0
+    }).format(value) + " VND"
+  );
+}
+
 function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "vi-VN", {
+    day: "numeric",
     month: "short",
-    day: "numeric"
+    timeZone: "Asia/Ho_Chi_Minh"
   });
 
   return `${formatter.format(new Date(startAt))} - ${formatter.format(new Date(endAt))}`;
 }
 
-function formatMoney(locale: Locale, value: number) {
-  return new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
-    maximumFractionDigits: 0,
-  }).format(value) + " VND";
+function formatDateChip(locale: Locale, value: string) {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "vi-VN", {
+    day: "numeric",
+    month: "short",
+    timeZone: "Asia/Ho_Chi_Minh"
+  }).format(new Date(`${value}T00:00:00+07:00`));
 }
 
-function statusTone(status: WorkflowReservation["status"]) {
+function getLocalDateValue(date: Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh"
+  }).format(date);
+}
+
+function getInputDateValue(value: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh"
+  }).format(new Date(value));
+}
+
+function normalizeDateBoundary(value: string, side: "end" | "start") {
+  return new Date(`${value}T${side === "end" ? "23:59:59.999" : "00:00:00"}+07:00`).getTime();
+}
+
+function getInitialDateRange(bookings: WorkflowBookingRow[]): DateRangeState {
+  if (!bookings.length) {
+    const today = getLocalDateValue(new Date());
+
+    return {
+      end: today,
+      start: today
+    };
+  }
+
+  const sortedStartDates = [...bookings].sort((left, right) => new Date(left.stay_start_at).getTime() - new Date(right.stay_start_at).getTime());
+  const earliestStart = getInputDateValue(sortedStartDates[0].stay_start_at);
+  const latestEnd = getInputDateValue(
+    [...bookings].sort((left, right) => new Date(right.stay_end_at).getTime() - new Date(left.stay_end_at).getTime())[0].stay_end_at
+  );
+
+  return {
+    end: latestEnd,
+    start: earliestStart
+  };
+}
+
+function statusTone(status: WorkflowBookingRow["status"]) {
   switch (status) {
     case "confirmed":
+    case "completed":
+    case "converted":
       return "accent" as const;
-    case "pending_deposit":
+    case "new":
+    case "in_review":
+    case "quoted":
     case "draft":
+    case "pending_deposit":
       return "soft" as const;
-    case "cancelled":
-      return "neutral" as const;
     default:
       return "neutral" as const;
   }
 }
 
-function statusLabel(locale: Locale, status: WorkflowReservation["status"]) {
-  const labels: Record<Locale, Record<WorkflowReservation["status"], string>> = {
-    en: {
-      cancelled: "CANCELLED",
-      completed: "COMPLETED",
-      confirmed: "CONFIRMED",
-      draft: "DRAFT",
-      expired: "EXPIRED",
-      pending_deposit: "PENDING DEPOSIT"
-    },
-    vi: {
-      cancelled: "ĐÃ HỦY",
-      completed: "HOÀN TẤT",
-      confirmed: "ĐÃ XÁC NHẬN",
-      draft: "NHÁP",
-      expired: "HẾT HẠN",
-      pending_deposit: "CHỜ CỌC"
-    }
-  };
+function sourceLabel(locale: Locale, source: WorkflowBookingRow["source"]) {
+  return localize(locale, {
+    vi: source === "reservation" ? "Đặt phòng" : "Yêu cầu",
+    en: source === "reservation" ? "Reservation" : "Request"
+  });
+}
 
-  return labels[locale][status] ?? status;
+function matchesSearch(row: WorkflowBookingRow, searchTerm: string) {
+  if (!searchTerm) {
+    return true;
+  }
+
+  const haystack = [
+    row.booking_code,
+    row.customer_name,
+    row.customer_email,
+    row.branch_name_en,
+    row.branch_name_vi,
+    row.room_type_name_en,
+    row.room_type_name_vi,
+    row.notes,
+    row.source
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(searchTerm);
+}
+
+function getPaginationWindow(currentPage: number, totalPages: number) {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+  return Array.from({ length: 5 }, (_, index) => start + index);
+}
+
+function escapeCsv(value: string) {
+  return `"${value.replaceAll("\"", "\"\"")}"`;
+}
+
+function buildCsv(rows: WorkflowBookingRow[], locale: Locale) {
+  const headers = [
+    localize(locale, { vi: "Mã booking", en: "Booking ID" }),
+    localize(locale, { vi: "Khách hàng", en: "Guest name" }),
+    localize(locale, { vi: "Email", en: "Email" }),
+    localize(locale, { vi: "Loại phòng", en: "Room type" }),
+    localize(locale, { vi: "Ngày ở", en: "Stay dates" }),
+    localize(locale, { vi: "Trạng thái", en: "Status" }),
+    localize(locale, { vi: "Tổng tiền", en: "Total" })
+  ];
+
+  const lines = rows.map((row) =>
+    [
+      escapeCsv(row.booking_code),
+      escapeCsv(row.customer_name),
+      escapeCsv(row.customer_email),
+      escapeCsv(locale === "en" ? row.room_type_name_en : row.room_type_name_vi),
+      escapeCsv(formatDateRange(locale, row.stay_start_at, row.stay_end_at)),
+      escapeCsv(statusLabels[locale][row.status]),
+      escapeCsv(formatMoney(locale, row.total_amount))
+    ].join(",")
+  );
+
+  return [headers.map(escapeCsv).join(","), ...lines].join("\n");
 }
 
 function MailIcon() {
@@ -89,28 +318,132 @@ function DownloadIcon() {
   );
 }
 
-export function AdminBookingsPage({ locale, reservations, totalCount }: AdminBookingsPageProps) {
-  const rows = reservations;
+function ColumnsIcon() {
+  return <span className="admin-bookings__columns-icon">|||</span>;
+}
+
+function statusLabel(locale: Locale, status: WorkflowBookingRow["status"]) {
+  return statusLabels[locale][status] ?? status;
+}
+
+export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBookingsPageProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<WorkflowBookingRow["status"] | "all">("all");
+  const [dateRange, setDateRange] = useState<DateRangeState>(() => getInitialDateRange(bookings));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleColumns, setVisibleColumns] = useState<Record<BookingColumnKey, boolean>>({
+    actions: true,
+    booking_code: true,
+    customer: true,
+    room_type: true,
+    stay_dates: true,
+    status: true,
+    total: true
+  });
+  const bookingsSignature = bookings.map((booking) => booking.id).join("|");
+
+  useEffect(() => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setDateRange(getInitialDateRange(bookings));
+    setCurrentPage(1);
+  }, [bookingsSignature]);
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const startBoundary = normalizeDateBoundary(dateRange.start, "start");
+  const endBoundary = normalizeDateBoundary(dateRange.end, "end");
+
+  const filteredRows = bookings.filter((row) => {
+    const bookingStart = new Date(row.stay_start_at).getTime();
+    const bookingEnd = new Date(row.stay_end_at).getTime();
+
+    return (
+      (statusFilter === "all" || row.status === statusFilter) &&
+      matchesSearch(row, normalizedSearch) &&
+      bookingEnd >= startBoundary &&
+      bookingStart <= endBoundary
+    );
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const pageRows = filteredRows.slice((safeCurrentPage - 1) * PAGE_SIZE, safeCurrentPage * PAGE_SIZE);
+  const visibleColumnKeys = bookingColumns.filter((column) => visibleColumns[column.key]);
+  const visibleColumnCount = Math.max(1, visibleColumnKeys.length);
+  const pageNumbers = getPaginationWindow(safeCurrentPage, totalPages);
+  function handleSearchChange(value: string) {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  }
+
+  function handleStatusChange(value: WorkflowBookingRow["status"] | "all") {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  }
+
+  function handleStartDateChange(value: string) {
+    setDateRange((current) => {
+      const nextEnd = current.end < value ? value : current.end;
+
+      return {
+        end: nextEnd,
+        start: value
+      };
+    });
+    setCurrentPage(1);
+  }
+
+  function handleEndDateChange(value: string) {
+    setDateRange((current) => {
+      const nextStart = current.start > value ? value : current.start;
+
+      return {
+        end: value,
+        start: nextStart
+      };
+    });
+    setCurrentPage(1);
+  }
+
+  function exportCsv() {
+    if (!filteredRows.length) {
+      return;
+    }
+
+    const csv = buildCsv(filteredRows, locale);
+    const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = `sk-boutique-bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="admin-page admin-bookings">
       <div className="admin-page__hero">
         <div className="admin-page__copy">
           <h1 className="admin-page__title">{localize(locale, { vi: "Đặt phòng", en: "Bookings" })}</h1>
-          <p className="admin-page__description">{localize(locale, {
-            vi: "Quản lý booking hiện tại, sắp tới và lịch sử đặt phòng.",
-            en: "Manage current, upcoming, and past reservations."
-          })}</p>
+          <p className="admin-page__description">
+            {localize(locale, {
+              vi: "Quản lý booking, yêu cầu lưu trú và lịch sử từ Supabase.",
+              en: "Manage bookings, stay requests, and history from Supabase."
+            })}
+          </p>
         </div>
 
         <div className="admin-page__actions">
-          <button className="button button--text-light admin-page__secondary-action" type="button">
+          <button className="button button--text-light admin-page__secondary-action" onClick={exportCsv} type="button">
             <span className="admin-page__action-icon" aria-hidden="true">
               <DownloadIcon />
             </span>
             {localize(locale, { vi: "Xuất CSV", en: "Export CSV" })}
           </button>
-          <button className="button button--solid admin-page__primary-action" type="button">
+          <button className="button button--solid admin-page__primary-action" type="button" title={localize(locale, { vi: "Tính năng tạo mới đang được kết nối", en: "Create flow is being wired" })}>
             <span className="admin-page__action-plus" aria-hidden="true">
               +
             </span>
@@ -131,7 +464,9 @@ export function AdminBookingsPage({ locale, reservations, totalCount }: AdminBoo
             <input
               className="admin-bookings__input"
               id="booking-search"
+              onChange={(event) => handleSearchChange(event.target.value)}
               placeholder={localize(locale, { vi: "Mã booking, tên khách...", en: "Booking ID, guest name..." })}
+              value={searchQuery}
               type="search"
             />
           </div>
@@ -142,41 +477,95 @@ export function AdminBookingsPage({ locale, reservations, totalCount }: AdminBoo
             {localize(locale, { vi: "Trạng thái", en: "Status" })}
           </label>
           <div className="admin-bookings__select-wrap">
-            <select className="admin-bookings__select" id="booking-status" defaultValue="all">
-              <option value="all">{localize(locale, { vi: "Tất cả trạng thái", en: "All statuses" })}</option>
-              <option value="confirmed">{localize(locale, { vi: "Đã xác nhận", en: "Confirmed" })}</option>
-              <option value="pending_deposit">{localize(locale, { vi: "Chờ cọc", en: "Pending deposit" })}</option>
-              <option value="cancelled">{localize(locale, { vi: "Đã hủy", en: "Cancelled" })}</option>
+            <select
+              className="admin-bookings__select"
+              id="booking-status"
+              onChange={(event) => handleStatusChange(event.target.value as WorkflowBookingRow["status"] | "all")}
+              value={statusFilter}
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label[locale]}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        <div className="admin-bookings__filter admin-bookings__filter--dates">
-          <label className="portal-field__label" htmlFor="booking-dates">
-            {localize(locale, { vi: "Ngày lưu trú", en: "Stay dates" })}
-          </label>
-          <div className="admin-bookings__date-range" id="booking-dates">
-            <span className="admin-bookings__date-range-icon" aria-hidden="true">
-              <span>📅</span>
-            </span>
-            <div className="admin-bookings__date-range-values">
-              <span className="admin-bookings__date-value admin-bookings__date-value--active">Oct 12</span>
-              <span className="admin-bookings__date-divider" aria-hidden="true">
-                →
+        <details className="admin-bookings__date-menu">
+          <summary className="admin-bookings__date-range-button">
+            <label className="portal-field__label" htmlFor="booking-dates">
+              {localize(locale, { vi: "Ngày lưu trú", en: "Stay dates" })}
+            </label>
+            <div className="admin-bookings__date-range" id="booking-dates">
+              <span className="admin-bookings__date-range-icon" aria-hidden="true">
+                <span>📅</span>
               </span>
-              <span className="admin-bookings__date-value">Oct 18</span>
+              <div className="admin-bookings__date-range-values">
+                <span className="admin-bookings__date-value admin-bookings__date-value--active">{formatDateChip(locale, dateRange.start)}</span>
+                <span className="admin-bookings__date-divider" aria-hidden="true">
+                  →
+                </span>
+                <span className="admin-bookings__date-value">{formatDateChip(locale, dateRange.end)}</span>
+              </div>
             </div>
+          </summary>
+          <div className="admin-bookings__date-panel">
+            <label className="admin-bookings__date-field">
+              <span className="admin-bookings__date-field-label">{localize(locale, { vi: "Từ ngày", en: "From" })}</span>
+              <input className="admin-bookings__date-input" onChange={(event) => handleStartDateChange(event.target.value)} type="date" value={dateRange.start} />
+            </label>
+            <label className="admin-bookings__date-field">
+              <span className="admin-bookings__date-field-label">{localize(locale, { vi: "Đến ngày", en: "To" })}</span>
+              <input className="admin-bookings__date-input" onChange={(event) => handleEndDateChange(event.target.value)} type="date" value={dateRange.end} />
+            </label>
           </div>
-        </div>
+        </details>
 
         <div className="admin-bookings__spacer" aria-hidden="true" />
 
-        <button className="button admin-bookings__columns-button" type="button">
-          <span className="admin-page__action-icon" aria-hidden="true">
-            <span className="admin-bookings__columns-icon">|||</span>
-          </span>
-          {localize(locale, { vi: "Cột", en: "Columns" })}
-        </button>
+        <details className="admin-bookings__columns-menu">
+          <summary className="button admin-bookings__columns-button">
+            <span className="admin-page__action-icon" aria-hidden="true">
+              <ColumnsIcon />
+            </span>
+            {localize(locale, { vi: "Cột", en: "Columns" })}
+          </summary>
+          <div className="admin-bookings__columns-panel" role="menu">
+            {bookingColumns.map((column) => (
+              <label className="admin-bookings__column-toggle" key={column.key}>
+                <input
+                  checked={visibleColumns[column.key]}
+                  onChange={() =>
+                    setVisibleColumns((current) => ({
+                      ...current,
+                      [column.key]: !current[column.key]
+                    }))
+                  }
+                  type="checkbox"
+                />
+                <span>{column.label[locale]}</span>
+              </label>
+            ))}
+            <button
+              className="admin-bookings__columns-reset"
+              onClick={() =>
+                setVisibleColumns({
+                  actions: true,
+                  booking_code: true,
+                  customer: true,
+                  room_type: true,
+                  stay_dates: true,
+                  status: true,
+                  total: true
+                })
+              }
+              type="button"
+            >
+              {localize(locale, { vi: "Khôi phục", en: "Reset" })}
+            </button>
+          </div>
+        </details>
       </PortalCard>
 
       <PortalCard className="admin-bookings__table-card">
@@ -184,57 +573,89 @@ export function AdminBookingsPage({ locale, reservations, totalCount }: AdminBoo
           <table className="admin-bookings__table">
             <thead>
               <tr>
-                <th>{localize(locale, { vi: "Mã booking", en: "Booking ID" })}</th>
-                <th>{localize(locale, { vi: "Khách hàng", en: "Guest name" })}</th>
-                <th>{localize(locale, { vi: "Loại phòng", en: "Room type" })}</th>
-                <th>
-                  <span className="admin-bookings__th-sort">
-                    <span>{localize(locale, { vi: "Ngày ở", en: "Dates" })}</span>
-                    <span aria-hidden="true">↓</span>
-                  </span>
-                </th>
-                <th className="admin-bookings__th-center">{localize(locale, { vi: "Trạng thái", en: "Status" })}</th>
-                <th className="admin-bookings__th-right">{localize(locale, { vi: "Tổng tiền", en: "Total" })}</th>
-                <th className="admin-bookings__th-center">{localize(locale, { vi: "Hành động", en: "Action" })}</th>
+                {visibleColumns.booking_code ? <th>{localize(locale, { vi: "Mã booking", en: "Booking ID" })}</th> : null}
+                {visibleColumns.customer ? <th>{localize(locale, { vi: "Khách hàng", en: "Guest name" })}</th> : null}
+                {visibleColumns.room_type ? <th>{localize(locale, { vi: "Loại phòng", en: "Room type" })}</th> : null}
+                {visibleColumns.stay_dates ? (
+                  <th>
+                    <span className="admin-bookings__th-sort">
+                      <span>{localize(locale, { vi: "Ngày ở", en: "Dates" })}</span>
+                      <span aria-hidden="true">↓</span>
+                    </span>
+                  </th>
+                ) : null}
+                {visibleColumns.status ? <th className="admin-bookings__th-center">{localize(locale, { vi: "Trạng thái", en: "Status" })}</th> : null}
+                {visibleColumns.total ? <th className="admin-bookings__th-right">{localize(locale, { vi: "Tổng tiền", en: "Total" })}</th> : null}
+                {visibleColumns.actions ? <th className="admin-bookings__th-center">{localize(locale, { vi: "Hành động", en: "Action" })}</th> : null}
               </tr>
             </thead>
             <tbody>
-              {rows.length ? (
-                rows.map((reservation) => {
-                  const status = reservation.status as WorkflowReservation["status"];
+              {pageRows.length ? (
+                pageRows.map((booking) => {
+                  const tone = statusTone(booking.status);
 
                   return (
-                    <tr className="admin-bookings__row" key={reservation.id}>
-                      <td className={status === "cancelled" ? "admin-bookings__muted" : undefined}>{reservation.booking_code}</td>
-                      <td className={status === "cancelled" ? "admin-bookings__muted" : undefined}>{reservation.customer_name}</td>
-                      <td className={status === "cancelled" ? "admin-bookings__muted" : undefined}>
-                        {locale === "en" ? reservation.primary_room_type_name_en : reservation.primary_room_type_name_vi}
-                      </td>
-                      <td className={status === "cancelled" ? "admin-bookings__muted" : undefined}>
-                        {formatDateRange(locale, reservation.stay_start_at, reservation.stay_end_at)}
-                      </td>
-                      <td className="admin-bookings__status-cell">
-                        <PortalBadge tone={statusTone(status)}>{statusLabel(locale, status)}</PortalBadge>
-                      </td>
-                      <td className="admin-bookings__total-cell">{formatMoney(locale, reservation.total_amount)}</td>
-                      <td className="admin-bookings__action-cell">
-                        <button
-                          className="admin-bookings__action-button"
-                          type="button"
-                          title={localize(locale, { vi: "Gửi email cho khách", en: "Email guest" })}
-                        >
-                          <MailIcon />
-                        </button>
-                      </td>
+                    <tr className="admin-bookings__row" key={booking.id}>
+                      {visibleColumns.booking_code ? (
+                        <td>
+                          <div className="admin-bookings__primary-value">{booking.booking_code}</div>
+                          <div className={`admin-bookings__source-pill admin-bookings__source-pill--${booking.source === "reservation" ? "reservation" : "request"}`}>
+                            {sourceLabel(locale, booking.source)}
+                          </div>
+                        </td>
+                      ) : null}
+                      {visibleColumns.customer ? (
+                        <td>
+                          <div className={tone === "neutral" ? "admin-bookings__muted" : undefined}>{booking.customer_name}</div>
+                          <div className="admin-bookings__secondary-value">{booking.customer_email}</div>
+                        </td>
+                      ) : null}
+                      {visibleColumns.room_type ? (
+                        <td className={tone === "neutral" ? "admin-bookings__muted" : undefined}>
+                          {locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi}
+                        </td>
+                      ) : null}
+                      {visibleColumns.stay_dates ? (
+                        <td className={tone === "neutral" ? "admin-bookings__muted" : undefined}>{formatDateRange(locale, booking.stay_start_at, booking.stay_end_at)}</td>
+                      ) : null}
+                      {visibleColumns.status ? (
+                        <td className="admin-bookings__status-cell">
+                          <PortalBadge tone={tone}>{statusLabel(locale, booking.status)}</PortalBadge>
+                        </td>
+                      ) : null}
+                      {visibleColumns.total ? <td className="admin-bookings__total-cell">{formatMoney(locale, booking.total_amount)}</td> : null}
+                      {visibleColumns.actions ? (
+                        <td className="admin-bookings__action-cell">
+                          {booking.customer_email.includes("@") ? (
+                            <a
+                              className="admin-bookings__action-button"
+                              href={`mailto:${booking.customer_email}`}
+                              rel="noreferrer"
+                              title={localize(locale, { vi: "Gửi email cho khách", en: "Email guest" })}
+                            >
+                              <MailIcon />
+                            </a>
+                          ) : (
+                            <button
+                              className="admin-bookings__action-button"
+                              disabled
+                              type="button"
+                              title={localize(locale, { vi: "Không có email hợp lệ", en: "No valid email" })}
+                            >
+                              <MailIcon />
+                            </button>
+                          )}
+                        </td>
+                      ) : null}
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td className="admin-bookings__empty-row" colSpan={7}>
+                  <td className="admin-bookings__empty-row" colSpan={visibleColumnCount}>
                     {localize(locale, {
-                      vi: "Chưa có booking nào từ Supabase.",
-                      en: "No reservations were returned from Supabase."
+                      vi: "Không có booking nào khớp bộ lọc hiện tại.",
+                      en: "No bookings match the current filters."
                     })}
                   </td>
                 </tr>
@@ -245,34 +666,37 @@ export function AdminBookingsPage({ locale, reservations, totalCount }: AdminBoo
 
         <div className="admin-bookings__footer">
           <span className="admin-bookings__summary">
-            {rows.length
-              ? localize(locale, {
-                  vi: `Hiển thị 1 đến ${rows.length} trên tổng ${totalCount || rows.length} booking`,
-                  en: `Showing 1 to ${rows.length} of ${totalCount || rows.length} entries`
-                })
-              : localize(locale, {
-                  vi: "Chưa có booking nào.",
-                  en: "No reservations available."
-                })}
+            {localize(locale, {
+              vi: `Hiển thị ${pageRows.length ? (safeCurrentPage - 1) * PAGE_SIZE + 1 : 0} đến ${Math.min(safeCurrentPage * PAGE_SIZE, filteredRows.length)} trên tổng ${totalCount} booking`,
+              en: `Showing ${pageRows.length ? (safeCurrentPage - 1) * PAGE_SIZE + 1 : 0} to ${Math.min(safeCurrentPage * PAGE_SIZE, filteredRows.length)} of ${totalCount} bookings`
+            })}
           </span>
 
           <div className="admin-bookings__pagination" aria-label={localize(locale, { vi: "Phân trang", en: "Pagination" })}>
-            <button className="admin-bookings__page-button" type="button">
+            <button
+              className="admin-bookings__page-button"
+              disabled={safeCurrentPage <= 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              type="button"
+            >
               <span aria-hidden="true">‹</span>
             </button>
-            <button className="admin-bookings__page-button admin-bookings__page-button--active" type="button">
-              1
-            </button>
-            <button className="admin-bookings__page-button" type="button">
-              2
-            </button>
-            <button className="admin-bookings__page-button" type="button">
-              3
-            </button>
-            <span className="admin-bookings__pagination-ellipsis" aria-hidden="true">
-              …
-            </span>
-            <button className="admin-bookings__page-button" type="button">
+            {pageNumbers.map((page) => (
+              <button
+                className={`admin-bookings__page-button${page === safeCurrentPage ? " admin-bookings__page-button--active" : ""}`}
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                type="button"
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              className="admin-bookings__page-button"
+              disabled={safeCurrentPage >= totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              type="button"
+            >
               <span aria-hidden="true">›</span>
             </button>
           </div>

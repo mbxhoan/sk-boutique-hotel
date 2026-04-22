@@ -1128,3 +1128,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-content-pages-manager.tsx`
   - `components/admin-workflow-dashboard.tsx`
   - `app/globals.css`
+
+### Entry 102
+- `time`: 2026-04-22T12:27:21+07:00
+- `prompt_summary`: Khắc phục admin portal không filter/click được, không mở ẩn/hiện cột, không đổi được bộ lọc ngày lưu trú và chi nhánh; map lại bookings/rooms theo dữ liệu thực Supabase, dùng branch-aware queries, đồng bộ dữ liệu booking thật từ `availability_requests` + `reservations`, và giữ toàn bộ giao diện song ngữ VI/EN với tiền hiển thị VND.
+- `commit_message`: `fix(admin-portal): wire branch-aware filters and live booking data`
+- `main_files`:
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `app/(admin)/layout.tsx`
+  - `app/globals.css`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/room-holds.ts`
+  - `lib/supabase/workflow.types.ts`

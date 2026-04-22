@@ -72,15 +72,17 @@ export async function countRoomHolds(options: RoomHoldQueryOptions = {}) {
   );
 }
 
-export async function countExpiringRoomHolds(windowMinutes = 30) {
+export async function countExpiringRoomHolds(windowMinutes = 30, branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
       const cutoff = new Date(Date.now() + windowMinutes * 60_000).toISOString();
-      const { count, error } = await client
-        .from("room_holds")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "active")
-        .lte("expires_at", cutoff);
+      let query = client.from("room_holds").select("id", { count: "exact", head: true }).eq("status", "active").lte("expires_at", cutoff);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { count, error } = await query;
 
       if (error) {
         throw error;

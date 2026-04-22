@@ -98,13 +98,52 @@ function formatMoneyVnd(locale: Locale, value: number) {
   return `${formatted} VND`;
 }
 
+function buildMap<T extends { id: string }>(items: T[]) {
+  return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
+}
+
+function calculateNights(startAt: string, endAt: string) {
+  const diffMs = new Date(endAt).getTime() - new Date(startAt).getTime();
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.round(diffMs / 86_400_000));
+}
+
+function estimateRequestTotal(
+  request: WorkflowDashboardData["availability_requests"][number],
+  roomTypeMap: Record<string, WorkflowDashboardData["room_type_options"][number]>
+) {
+  const roomType = roomTypeMap[request.room_type_id];
+
+  if (!roomType) {
+    return 0;
+  }
+
+  const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
+  const nights = calculateNights(request.stay_start_at, request.stay_end_at);
+
+  return nightlyRate * nights + (roomType.weekend_surcharge ?? 0);
+}
+
 function getStatValue(data: WorkflowDashboardData, labelEn: string) {
   return Number(data.stats.find((stat) => stat.label_en === labelEn)?.value ?? 0);
 }
 
 function buildMetricCards(data: WorkflowDashboardData, locale: Locale): DashboardMetricBlueprint[] {
-  const totalBookings = data.recent_reservations.length;
-  const revenue = data.recent_reservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0);
+  const roomTypeMap = buildMap(data.room_type_options);
+  const convertedRequestIds = new Set(
+    data.recent_reservations
+      .map((reservation) => reservation.availability_request_id)
+      .filter((requestId): requestId is string => Boolean(requestId))
+  );
+  const openRequests = data.availability_requests.filter((request) => !convertedRequestIds.has(request.id));
+  const totalBookings = data.recent_reservations.length + openRequests.length;
+  const revenue =
+    data.recent_reservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0) +
+    openRequests.reduce((sum, request) => sum + estimateRequestTotal(request, roomTypeMap), 0);
   const activeHolds = getStatValue(data, "Active holds");
   const pendingRequests = getStatValue(data, "Open requests");
 

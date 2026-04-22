@@ -5,7 +5,7 @@ import { findPageBySlug, getStaticRouteParams } from "@/lib/site-content";
 import type { Database } from "@/lib/supabase/database.types";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { PageContent } from "@/lib/site-content";
-import { queryWithFallback } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 type ContentPageType = "home" | "page" | "collection" | "detail";
 export type ContentPageRow = Database["public"]["Tables"]["content_pages"]["Row"];
@@ -17,7 +17,7 @@ function normalizePath(slug: string) {
 }
 
 async function loadContentPage<T>(slug: string, pageType: ContentPageType, fallback: T): Promise<T> {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("content_pages")
@@ -38,7 +38,7 @@ async function loadContentPage<T>(slug: string, pageType: ContentPageType, fallb
 }
 
 async function listContentPageParams(pageType: ContentPageType, fallback: { slug: string }[]) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("content_pages")
@@ -96,7 +96,7 @@ export async function getContentNewsStaticParams() {
 }
 
 export async function listContentPages() {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("content_pages")

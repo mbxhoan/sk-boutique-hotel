@@ -1,8 +1,8 @@
 import type { FloorRow } from "@/lib/supabase/database.types";
-import { queryWithFallback } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 export async function listFloorsByBranchId(branchId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("floors")
@@ -23,7 +23,7 @@ export async function listFloorsByBranchId(branchId: string) {
 }
 
 export async function getFloorById(floorId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("floors")

@@ -9,7 +9,7 @@ import type {
 } from "@/lib/mock/public-cms";
 import type { BranchRow } from "@/lib/supabase/database.types";
 import { text } from "@/lib/supabase/content";
-import { queryWithFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
 
 const branchCollectionTemplate = branchCollectionPageCopy;
 
@@ -215,7 +215,7 @@ function patchBranchDetailPage(branch: BranchRow, branches: BranchRow[], fallbac
 }
 
 export async function listBranches() {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("branches")
@@ -237,7 +237,7 @@ export async function listBranches() {
 }
 
 async function getBranchBySlug(slug: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("branches")

@@ -235,14 +235,16 @@ function toSuggestionView(
   };
 }
 
-async function listActiveRooms() {
+async function listActiveRooms(branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("rooms")
-        .select(roomSelect)
-        .eq("is_active", true)
-        .order("code", { ascending: true });
+      let query = client.from("rooms").select(roomSelect).eq("is_active", true);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query.order("code", { ascending: true });
 
       if (error) {
         throw error;
@@ -254,15 +256,16 @@ async function listActiveRooms() {
   );
 }
 
-async function listActiveFloors() {
+async function listActiveFloors(branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("floors")
-        .select(floorSelect)
-        .eq("is_active", true)
-        .order("branch_id", { ascending: true })
-        .order("level_number", { ascending: true });
+      let query = client.from("floors").select(floorSelect).eq("is_active", true);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query.order("branch_id", { ascending: true }).order("level_number", { ascending: true });
 
       if (error) {
         throw error;
@@ -323,18 +326,19 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   }
 
   const dashboardWindowSince = getDashboardWindowSince(selection.range);
+  const branchFilterId = selection.branchId ?? undefined;
   const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs, bankAccounts, paymentRequests, paymentProofs] = await Promise.all([
     listBranches(),
     listRoomTypes(),
-    listActiveRooms(),
-    listActiveFloors(),
+    listActiveRooms(branchFilterId),
+    listActiveFloors(branchFilterId),
     listReservationRoomItems(),
-    listAvailabilityRequests({ limit: 8 }),
-    listRoomHolds({ limit: 8, status: ["active", "converted", "expired"] }),
-    listReservations({ limit: 20, since: dashboardWindowSince }),
-    listAuditLogs({ limit: 10, since: dashboardWindowSince }),
-    listBranchBankAccounts({ limit: 20 }),
-    listPaymentRequests({ limit: 12 }),
+    listAvailabilityRequests({ branchId: branchFilterId, limit: 8 }),
+    listRoomHolds({ branchId: branchFilterId, limit: 8, status: ["active", "converted", "expired"] }),
+    listReservations({ branchId: branchFilterId, limit: 20, since: dashboardWindowSince }),
+    listAuditLogs({ branchId: branchFilterId, limit: 10, since: dashboardWindowSince }),
+    listBranchBankAccounts({ branchId: branchFilterId, limit: 20 }),
+    listPaymentRequests({ branchId: branchFilterId, limit: 12 }),
     listPaymentProofs({ limit: 20 })
   ]);
 
@@ -423,19 +427,20 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     : [];
 
   const openRequestCount = await countAvailabilityRequests({
+    branchId: branchFilterId,
     status: ["new", "in_review", "quoted"]
   });
-  const activeHoldCount = await countRoomHolds({ status: "active" });
-  const expiringHoldCount = await countExpiringRoomHolds(30);
-  const pendingReservationCount = await countReservations({ since: dashboardWindowSince, status: ["draft", "pending_deposit"] });
-  const pendingPaymentCount = await countPaymentRequests({ status: ["sent", "pending_verification"] });
-  const verifiedPaymentCount = await countPaymentRequests({ status: "verified" });
-  const auditWindowCount = await countAuditLogs({ since: dashboardWindowSince });
+  const activeHoldCount = await countRoomHolds({ branchId: branchFilterId, status: "active" });
+  const expiringHoldCount = await countExpiringRoomHolds(30, branchFilterId);
+  const pendingReservationCount = await countReservations({ branchId: branchFilterId, since: dashboardWindowSince, status: ["draft", "pending_deposit"] });
+  const pendingPaymentCount = await countPaymentRequests({ branchId: branchFilterId, status: ["sent", "pending_verification"] });
+  const verifiedPaymentCount = await countPaymentRequests({ branchId: branchFilterId, status: "verified" });
+  const auditWindowCount = await countAuditLogs({ branchId: branchFilterId, since: dashboardWindowSince });
   const analyticsWindowSince = dashboardWindowSince;
-  const pageViewCount = await countAnalyticsEvents({ eventType: "page_view", since: analyticsWindowSince });
-  const roomViewCount = await countAnalyticsEvents({ eventType: "room_view", since: analyticsWindowSince });
-  const branchViewCount = await countAnalyticsEvents({ eventType: "branch_view", since: analyticsWindowSince });
-  const ctaClickCount = await countAnalyticsEvents({ eventType: "cta_click", since: analyticsWindowSince });
+  const pageViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "page_view", since: analyticsWindowSince });
+  const roomViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "room_view", since: analyticsWindowSince });
+  const branchViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "branch_view", since: analyticsWindowSince });
+  const ctaClickCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "cta_click", since: analyticsWindowSince });
 
   const stats: WorkflowStatCard[] = [
     {

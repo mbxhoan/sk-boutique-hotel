@@ -6,10 +6,12 @@ import type { ReactNode } from "react";
 
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
+import type { BranchRow } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AdminShellProps = {
   children: ReactNode;
+  branches: Pick<BranchRow, "id" | "name_en" | "name_vi" | "slug">[];
 };
 
 type AdminNavItem = {
@@ -251,7 +253,27 @@ function getSearchPlaceholder(pathname: string, locale: "en" | "vi") {
   return locale === "en" ? "Search bookings, guests..." : "Tìm booking, khách...";
 }
 
-export function AdminShell({ children }: AdminShellProps) {
+function buildBranchHref(
+  pathname: string,
+  searchParams: {
+    toString(): string;
+  },
+  locale: "en" | "vi",
+  branchId?: string | null
+) {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (branchId) {
+    params.set("branch", branchId);
+  } else {
+    params.delete("branch");
+  }
+
+  const query = params.toString();
+  return appendLocaleQuery(`${pathname}${query ? `?${query}` : ""}`, locale);
+}
+
+export function AdminShell({ children, branches }: AdminShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -259,6 +281,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const localeToggle = locale === "en" ? "vi" : "en";
   const currentSearch = searchParams.toString();
   const currentHref = currentSearch ? `${pathname}?${currentSearch}` : pathname;
+  const branchId = searchParams.get("branch");
+  const currentBranch =
+    branches.find((branch) => branch.id === branchId) ?? branches[0] ?? null;
   const showSearchTopbar =
     pathname === "/admin" || pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/rooms");
 
@@ -338,15 +363,37 @@ export function AdminShell({ children }: AdminShellProps) {
           )}
 
           <div className="admin-shell__actions">
-            <button className="admin-shell__branch-selector" type="button">
-              <span className="admin-shell__branch-selector-icon" aria-hidden="true">
-                <ShellIcon icon="storefront" size={16} />
-              </span>
-              <span>{locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
-              <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
-                <ShellIcon icon="chevron" size={15} />
-              </span>
-            </button>
+            <details className="admin-shell__branch-menu">
+              <summary className="admin-shell__branch-selector">
+                <span className="admin-shell__branch-selector-icon" aria-hidden="true">
+                  <ShellIcon icon="storefront" size={16} />
+                </span>
+                <span>{currentBranch ? (locale === "en" ? currentBranch.name_en : currentBranch.name_vi) : locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
+                <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
+                  <ShellIcon icon="chevron" size={15} />
+                </span>
+              </summary>
+              <div className="admin-shell__branch-menu-panel" role="menu">
+                <Link className="admin-shell__branch-menu-link" href={buildBranchHref(pathname, searchParams, locale)}>
+                  {locale === "en" ? "All branches" : "Tất cả chi nhánh"}
+                </Link>
+                {branches.map((branch) => {
+                  const href = buildBranchHref(pathname, searchParams, locale, branch.id);
+                  const active = branch.id === currentBranch?.id;
+
+                  return (
+                    <Link
+                      aria-current={active ? "page" : undefined}
+                      className={`admin-shell__branch-menu-link${active ? " admin-shell__branch-menu-link--active" : ""}`}
+                      href={href}
+                      key={branch.id}
+                    >
+                      <span>{locale === "en" ? branch.name_en : branch.name_vi}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </details>
 
             <span className="admin-shell__divider" aria-hidden="true" />
 

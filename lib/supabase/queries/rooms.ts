@@ -1,8 +1,8 @@
 import type { RoomRow, RoomStatus } from "@/lib/supabase/database.types";
-import { queryWithFallback } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 export async function listRoomsByBranchId(branchId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("rooms")
@@ -22,7 +22,7 @@ export async function listRoomsByBranchId(branchId: string) {
 }
 
 export async function listRoomsByRoomTypeId(roomTypeId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("rooms")
@@ -42,7 +42,7 @@ export async function listRoomsByRoomTypeId(roomTypeId: string) {
 }
 
 export async function listRoomsByStatus(status: RoomStatus) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("rooms")
@@ -62,7 +62,7 @@ export async function listRoomsByStatus(status: RoomStatus) {
 }
 
 export async function getRoomById(roomId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("rooms")

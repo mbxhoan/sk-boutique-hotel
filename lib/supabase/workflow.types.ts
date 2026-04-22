@@ -87,6 +87,30 @@ export type WorkflowReservation = ReservationRow & {
   room_code: string;
 };
 
+export type WorkflowBookingSource = "availability_request" | "reservation";
+
+export type WorkflowBookingRow = {
+  booking_code: string;
+  branch_id: string;
+  branch_name_en: string;
+  branch_name_vi: string;
+  created_at: string;
+  customer_email: string;
+  customer_name: string;
+  guest_count: number;
+  id: string;
+  notes: string;
+  room_type_id: string;
+  room_type_name_en: string;
+  room_type_name_vi: string;
+  source: WorkflowBookingSource;
+  status: AvailabilityRequestRow["status"] | ReservationRow["status"];
+  stay_end_at: string;
+  stay_start_at: string;
+  total_amount: number;
+  updated_at: string;
+};
+
 export type WorkflowAuditLog = AuditLogRow & {
   branch_name_en: string | null;
   branch_name_vi: string | null;
