@@ -38,9 +38,34 @@ export type RoomCatalogEntry = {
 };
 
 const galleryByRoomSlug: Record<string, string[]> = {
-  "family-room": ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg", "/home/bed1.jpg"],
-  "quadruple-room": ["/home/pool3.jpg", "/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"],
-  "superior-room": ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg", "/home/bed1.jpg"]
+  "family-room": [
+    "/assets/room_types/family/1.png", 
+    "/assets/room_types/family/2.png", 
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/4.png",
+    "/assets/room_types/family/5.png",
+    "/assets/room_types/family/6.png",
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/family/8.png",
+    "/assets/room_types/family/9.png",
+  ],
+  "superior-room": [
+    "/assets/room_types/superior/1.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/3.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/5.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/superior/7.png",
+  ],
+  "quadruple-room": [
+    "/assets/room_types/quadruple/1.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/3.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/5.png",
+    "/assets/room_types/quadruple/6.png",
+  ]
 };
 
 function formatRoomNumber(locale: Locale, value: number) {
@@ -74,7 +99,17 @@ function buildGallery(roomType: RoomTypeRow, overrideGallery?: string[]) {
     return overrideGallery;
   }
 
-  return galleryByRoomSlug[roomType.slug] ?? ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"];
+  return galleryByRoomSlug[roomType.slug] ?? [
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/5.png", 
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/7.png",
+  ];
 }
 
 function buildAvailabilityLabel(availableRooms: number) {

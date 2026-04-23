@@ -31,12 +31,37 @@ function getDefaultFilters() {
   };
 }
 
-const roomsHeroFallback = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
-const roomsCarouselFallback = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
+const roomsHeroFallback = ["/assets/room_types/family/1.png", "/assets/room_types/superior/1.png", "/assets/room_types/quadruple/1.png"];
+const roomsCarouselFallback = ["/assets/room_types/family/1.png", "/assets/room_types/superior/1.png", "/assets/room_types/quadruple/1.png"];
 const roomGalleryFallbacks: Record<string, string[]> = {
-  "family-room": ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg", "/home/bed1.jpg"],
-  "quadruple-room": ["/home/pool3.jpg", "/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"],
-  "superior-room": ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg", "/home/bed1.jpg"]
+  "family-room": [
+    "/assets/room_types/family/1.png", 
+    "/assets/room_types/family/2.png", 
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/4.png",
+    "/assets/room_types/family/5.png",
+    "/assets/room_types/family/6.png",
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/family/8.png",
+    "/assets/room_types/family/9.png",
+  ],
+  "superior-room": [
+    "/assets/room_types/superior/1.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/3.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/5.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/superior/7.png",
+  ],
+  "quadruple-room": [
+    "/assets/room_types/quadruple/1.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/3.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/5.png",
+    "/assets/room_types/quadruple/6.png",
+  ]
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
