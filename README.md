@@ -51,6 +51,14 @@ Mở `http://localhost:3000`.
 
 Chỉ cần thay các file này là header/footer sẽ đổi theo.
 
+## Cấu hình hiển thị
+
+### Số lượng ảnh phòng
+Mặc định, mỗi hạng phòng trong trang danh sách (`/rooms`) chỉ hiển thị tối đa **4 ảnh**. Để thay đổi giới hạn này:
+1. Mở file `app/(marketing)/rooms/page.tsx`.
+2. Tìm các dòng gọi hàm `loadMediaCollectionImageUrls` cho từng hạng phòng (`room-family`, `room-superior`, `room-quadruple`).
+3. Thay đổi tham số `limit` (con số cuối cùng, ví dụ: `4`) thành số lượng bạn muốn hiển thị.
+
 ## Ghi chú
 
 - Nội dung hiện tại là placeholder tĩnh, chưa map data.

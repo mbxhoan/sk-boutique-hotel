@@ -111,9 +111,9 @@ export default async function RoomsPage({ searchParams }: PageProps) {
   const [roomsHeroImage, roomCarouselImages, familyGallery, superiorGallery, quadrupleGallery] = await Promise.all([
     loadMediaCollectionImageUrls("rooms-hero", roomsHeroFallback, 1).then((images) => images[0] ?? roomsHeroFallback[0]),
     loadMediaCollectionImageUrls("rooms-gallery", roomsCarouselFallback, 12),
-    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 4),
-    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 4),
-    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 4)
+    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 10),
+    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 10),
+    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 10)
   ]);
 
   return (
