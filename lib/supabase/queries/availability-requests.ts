@@ -7,8 +7,9 @@ import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 const availabilityRequestSelect = `
   id, request_code, customer_id, branch_id, room_type_id, stay_start_at, stay_end_at,
   guest_count, contact_name, contact_email, contact_phone, note, marketing_consent,
-  preferred_locale, source, status, response_due_at, assigned_to, handled_by,
-  handled_at, closed_at, created_by, updated_by, created_at, updated_at
+  preferred_locale, source, status, response_due_at, quoted_nightly_rate,
+  quoted_total_amount, quoted_currency, assigned_to, handled_by, handled_at,
+  closed_at, created_by, updated_by, created_at, updated_at
 `;
 
 type AvailabilityRequestQueryOptions = {

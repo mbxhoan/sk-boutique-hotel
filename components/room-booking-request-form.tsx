@@ -14,6 +14,9 @@ type RoomBookingRequestFormProps = {
   guestCount: number;
   locale: Locale;
   availableRooms: number;
+  quotedCurrency?: string;
+  quotedNightlyRate?: number | null;
+  quotedTotalAmount?: number | null;
   roomTypeId: string;
   stayEndAt: string;
   stayStartAt: string;
@@ -93,6 +96,9 @@ export function RoomBookingRequestForm({
   availableRooms,
   guestCount,
   locale,
+  quotedCurrency = "VND",
+  quotedNightlyRate = null,
+  quotedTotalAmount = null,
   roomTypeId,
   stayEndAt,
   stayStartAt
@@ -197,6 +203,9 @@ export function RoomBookingRequestForm({
         marketingConsent,
         note,
         preferredLocale: locale,
+        quotedCurrency,
+        quotedNightlyRate,
+        quotedTotalAmount,
         roomTypeId,
         source: "member_portal",
         stayEndAt,

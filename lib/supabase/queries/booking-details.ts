@@ -51,6 +51,10 @@ function estimateRequestTotal(request: Awaited<ReturnType<typeof getAvailability
     return 0;
   }
 
+  if (request.quoted_total_amount != null) {
+    return request.quoted_total_amount;
+  }
+
   const roomType = roomTypeMap[request.room_type_id];
 
   if (!roomType) {

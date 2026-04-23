@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getSupabaseUser } from "@/lib/supabase/auth";
+import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
 import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { createPaymentRequest, uploadPaymentProof, verifyPaymentRequest } from "@/lib/supabase/payments";
@@ -67,10 +67,14 @@ function readReturnTo(formData: FormData) {
 }
 
 export async function createPaymentRequestAction(formData: FormData) {
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+
   await createPaymentRequest({
+    actorRole: actorRole ?? "staff",
     amount: readRequiredNumber(formData, "amount"),
     branchBankAccountId: readOptionalString(formData, "branchBankAccountId"),
-    createdBy: readOptionalString(formData, "createdBy"),
+    createdBy: user?.id ?? readOptionalString(formData, "createdBy"),
     note: readOptionalString(formData, "note") ?? "",
     reservationId: readRequiredString(formData, "reservationId"),
     source: readOptionalString(formData, "source") ?? "admin_console"
@@ -134,9 +138,12 @@ export async function submitPaymentProofAction(formData: FormData) {
 }
 
 export async function verifyPaymentRequestAction(formData: FormData) {
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+
   await verifyPaymentRequest({
-    actorRole: readOptionalString(formData, "actorRole") ?? "staff",
-    actorUserId: readOptionalString(formData, "actorUserId"),
+    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
     paymentRequestId: readRequiredString(formData, "paymentRequestId"),
     reviewNote: readOptionalString(formData, "reviewNote") ?? "",
     status: (readRequiredString(formData, "status") as "verified" | "rejected")

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
@@ -90,6 +93,72 @@ function getReservationTotal(roomType: WorkflowRoomTypeOption | undefined, start
   const nights = calculateNights(startAt, endAt);
 
   return pricing.nightlyRate * nights + pricing.weekendSurcharge;
+}
+
+function getRequestNightlyRate(request: WorkflowAvailabilityRequest, roomType?: WorkflowRoomTypeOption | null) {
+  if (request.quoted_nightly_rate != null) {
+    return request.quoted_nightly_rate;
+  }
+
+  if (request.quoted_total_amount != null) {
+    return Number((request.quoted_total_amount / calculateNights(request.stay_start_at, request.stay_end_at)).toFixed(2));
+  }
+
+  return getRoomTypePricing(roomType).nightlyRate;
+}
+
+function getRequestTotal(request: WorkflowAvailabilityRequest, roomType?: WorkflowRoomTypeOption | null) {
+  if (request.quoted_total_amount != null) {
+    return request.quoted_total_amount;
+  }
+
+  return getReservationTotal(roomType ?? undefined, request.stay_start_at, request.stay_end_at);
+}
+
+function formatCountdown(locale: Locale, expiresAt: string, now = Date.now()) {
+  const diffMs = new Date(expiresAt).getTime() - now;
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return locale === "en" ? "Expired" : "Đã hết hạn";
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [
+    hours > 0 ? `${hours}h` : null,
+    `${minutes.toString().padStart(2, "0")}m`,
+    `${seconds.toString().padStart(2, "0")}s`
+  ].filter(Boolean);
+
+  return parts.join(" ");
+}
+
+function CountdownBadge({
+  expiresAt,
+  locale,
+  tone = "accent"
+}: {
+  expiresAt: string;
+  locale: Locale;
+  tone?: "accent" | "neutral" | "soft";
+}) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <PortalBadge tone={tone}>
+      {locale === "en" ? "Time left" : "Còn lại"} {formatCountdown(locale, expiresAt, now)}
+    </PortalBadge>
+  );
 }
 
 function badgeToneForRequest(status: WorkflowAvailabilityRequest["status"]) {
@@ -609,7 +678,8 @@ function RequestDetailPanel({
 
   const pricing = getRoomTypePricing(roomType);
   const nights = calculateNights(request.stay_start_at, request.stay_end_at);
-  const totalAmount = getReservationTotal(roomType ?? undefined, request.stay_start_at, request.stay_end_at);
+  const nightlyRate = getRequestNightlyRate(request, roomType);
+  const totalAmount = getRequestTotal(request, roomType);
   const alternativeStatuses = availabilityRequestStatusTransitions.filter((option) => option.value !== request.status);
 
   return (
@@ -659,6 +729,9 @@ function RequestDetailPanel({
         <div className="portal-workflow-card__status-current">
           <p className="portal-panel__eyebrow">{locale === "en" ? "Current status" : "Trạng thái hiện tại"}</p>
           <PortalBadge tone={badgeToneForRequest(request.status)}>{statusLabel(locale, request.status)}</PortalBadge>
+          <div className="portal-panel__note-copy">
+            <CountdownBadge expiresAt={request.response_due_at} locale={locale} tone="soft" />
+          </div>
         </div>
         {canOperate ? (
           <form className="portal-form portal-workflow-card__status-form" action={updateAvailabilityRequestStatusAction}>
@@ -783,10 +856,10 @@ function RequestDetailPanel({
         <span>{locale === "en" ? "Nights" : "Đêm"}</span>
         <strong>{nights}</strong>
         <span>{locale === "en" ? "Nightly rate" : "Giá đêm"}</span>
-        <strong>{formatMoney(locale, pricing.nightlyRate)}</strong>
+        <strong>{formatMoney(locale, nightlyRate)}</strong>
         <span>{locale === "en" ? "Weekend surcharge" : "Phụ thu cuối tuần"}</span>
         <strong>{formatMoney(locale, pricing.weekendSurcharge)}</strong>
-        <span>{locale === "en" ? "Estimated total" : "Tổng dự kiến"}</span>
+        <span>{request.quoted_total_amount != null ? (locale === "en" ? "Quoted total" : "Tổng đã gửi khách") : locale === "en" ? "Estimated total" : "Tổng dự kiến"}</span>
         <strong>{formatMoney(locale, totalAmount)}</strong>
       </div>
 

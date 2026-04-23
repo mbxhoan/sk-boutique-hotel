@@ -212,6 +212,24 @@ function HoldCountdown({ expiresAt, locale }: { expiresAt: string; locale: Local
   );
 }
 
+function RequestCountdown({ expiresAt, locale }: { expiresAt: string; locale: Locale }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <PortalBadge tone="soft">
+      {localize(locale, { vi: "SLA còn lại", en: "SLA left" })} {formatCountdown(locale, expiresAt, now)}
+    </PortalBadge>
+  );
+}
+
 function PaymentRequestActions({
   locale,
   paymentRequest
@@ -664,6 +682,12 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
                     en: "This reservation has moved into the booking workflow. Major changes are handled in the operations queue."
                   })}
             </p>
+
+            {canUpdateRequest && detail.request?.response_due_at ? (
+              <div className="portal-panel__note-copy">
+                <RequestCountdown expiresAt={detail.request.response_due_at} locale={locale} />
+              </div>
+            ) : null}
 
             {canUpdateRequest && detail.request ? (
               <RequestStatusForm locale={locale} requestId={detail.request.id} requestStatus={detail.request.status} />

@@ -775,6 +775,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -801,6 +804,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -826,6 +832,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -1234,6 +1243,9 @@ export interface Database {
           p_marketing_consent?: boolean | null;
           p_note?: string | null;
           p_preferred_locale?: string | null;
+          p_quoted_currency?: string | null;
+          p_quoted_nightly_rate?: number | null;
+          p_quoted_total_amount?: number | null;
           p_room_type_id: string;
           p_source?: string | null;
           p_stay_end_at: string;

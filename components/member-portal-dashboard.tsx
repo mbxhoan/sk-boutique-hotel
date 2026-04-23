@@ -1,4 +1,7 @@
+"use client";
+
 import { submitPaymentProofAction } from "@/app/actions/payments";
+import { useEffect, useState } from "react";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
@@ -27,8 +30,10 @@ type BookingEntry = {
   status: LocalizedText;
   statusTone: "neutral" | "soft" | "accent";
   title: LocalizedText;
+  totalAmount: number | null;
   updatedAt: string;
   branchName: LocalizedText;
+  responseDueAt: string | null;
   stayStartAt: string;
   stayEndAt: string;
 };
@@ -82,6 +87,26 @@ function formatMoney(locale: Locale, value: number, currency = "VND") {
   }
 
   return locale === "en" ? `${formatted} ${currency}` : `${formatted} ${currency}`;
+}
+
+function formatCountdown(locale: Locale, expiresAt: string, now = Date.now()) {
+  const diffMs = new Date(expiresAt).getTime() - now;
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return locale === "en" ? "Expired" : "Đã hết hạn";
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [
+    hours > 0 ? `${hours}h` : null,
+    `${minutes.toString().padStart(2, "0")}m`,
+    `${seconds.toString().padStart(2, "0")}s`
+  ].filter(Boolean);
+
+  return parts.join(" ");
 }
 
 function statusToneForStage(stage: BookingStage): "neutral" | "soft" | "accent" {
@@ -166,7 +191,9 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
     kind: "request",
     kindLabel: text("Yêu cầu", "Request"),
     paymentRequest: null,
+    totalAmount: request.quoted_total_amount ?? null,
     roomTypeName: text(request.room_type_name_vi, request.room_type_name_en),
+    responseDueAt: request.response_due_at,
     stage,
     status: text(
       request.status === "new"
@@ -270,7 +297,9 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
     kind: "reservation",
     kindLabel: text("Booking", "Booking"),
     paymentRequest,
+    totalAmount: reservation.total_amount,
     roomTypeName: text(reservation.primary_room_type_name_vi, reservation.primary_room_type_name_en),
+    responseDueAt: null,
     stage,
     status: statusText,
     statusTone: statusToneForStage(stage),
@@ -452,6 +481,24 @@ function PaymentRequestPanel({
   );
 }
 
+function CountdownBadge({ expiresAt, locale }: { expiresAt: string; locale: Locale }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <PortalBadge tone="soft">
+      {locale === "en" ? "Time left" : "Còn lại"} {formatCountdown(locale, expiresAt, now)}
+    </PortalBadge>
+  );
+}
+
 function BookingCard({ entry, locale }: BookingCardProps) {
   const paymentRequest = entry.paymentRequest;
   const showPaymentPanel = paymentRequest?.status === "sent" && entry.kind === "reservation" && entry.stage !== "active" && entry.stage !== "done";
@@ -495,7 +542,23 @@ function BookingCard({ entry, locale }: BookingCardProps) {
             <dt className="member-booking-card__fact-label">{locale === "en" ? "Created" : "Tạo lúc"}</dt>
             <dd className="member-booking-card__fact-value">{formatDateTime(locale, entry.createdAt)}</dd>
           </div>
+          {entry.totalAmount != null ? (
+            <div className="member-booking-card__fact">
+              <dt className="member-booking-card__fact-label">{locale === "en" ? "Amount" : "Giá tiền"}</dt>
+              <dd className="member-booking-card__fact-value">{formatMoney(locale, entry.totalAmount)}</dd>
+            </div>
+          ) : null}
         </dl>
+
+        {entry.kind === "request" && entry.responseDueAt ? (
+          <div className="member-booking-card__status-panel">
+            <p className="member-booking-card__status-panel-eyebrow">{locale === "en" ? "Response SLA" : "Hạn phản hồi"}</p>
+            <p className="member-booking-card__status-panel-title">{formatDateTime(locale, entry.responseDueAt)}</p>
+            <p className="member-booking-card__status-panel-copy">
+              <CountdownBadge expiresAt={entry.responseDueAt} locale={locale} />
+            </p>
+          </div>
+        ) : null}
 
         {showPaymentPanel && paymentRequest ? (
           <PaymentRequestPanel locale={locale} paymentRequest={paymentRequest} returnTo={returnTo} />

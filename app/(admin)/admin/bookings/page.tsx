@@ -33,6 +33,10 @@ function calculateNights(startAt: string, endAt: string) {
 }
 
 function estimateRequestTotal(request: AvailabilityRequestRow, roomTypeMap: Record<string, RoomTypeRow>) {
+  if (request.quoted_total_amount != null) {
+    return request.quoted_total_amount;
+  }
+
   const roomType = roomTypeMap[request.room_type_id];
 
   if (!roomType) {

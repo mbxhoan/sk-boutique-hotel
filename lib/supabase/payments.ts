@@ -22,6 +22,7 @@ import {
 } from "@/lib/supabase/email";
 
 export type CreatePaymentRequestInput = {
+  actorRole?: string | null;
   amount: number;
   branchBankAccountId?: string | null;
   createdBy?: string | null;
@@ -292,7 +293,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
 
   await logAuditEvent({
     action: "payment_request_created",
-    actorRole: input.createdBy ?? "staff",
+    actorRole: input.actorRole ?? "staff",
     branchId: reservation.branch_id,
     customerId: reservation.customer_id,
     entityId: data.id,
@@ -511,7 +512,7 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
     rejected_at: input.status === "rejected" ? reviewedAt : paymentRequest.rejected_at,
     rejected_reason: input.status === "rejected" ? input.reviewNote ?? "" : paymentRequest.rejected_reason,
     status: nextRequestStatus,
-    updated_by: input.actorRole ?? paymentRequest.updated_by,
+    updated_by: input.actorUserId ?? paymentRequest.updated_by,
     verified_at: input.status === "verified" ? reviewedAt : paymentRequest.verified_at
   };
 
@@ -527,7 +528,7 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
       .update({
         confirmed_at: reviewedAt,
         status: "confirmed",
-        updated_by: input.actorRole ?? paymentRequest.updated_by
+        updated_by: input.actorUserId ?? paymentRequest.updated_by
       })
       .eq("id", paymentRequest.reservation_id);
 

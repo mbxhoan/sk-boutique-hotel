@@ -1229,3 +1229,24 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(member)/member/page.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 110
+- `time`: 2026-04-23T23:08:13+07:00
+- `prompt_summary`: Sửa lệch giá giữa public booking và admin/member bằng cách lưu snapshot giá ngay lúc gửi request, khôi phục admin payment flow do lỗi ghi sai UUID actor, thêm countdown SLA còn lại cho request, và hiển thị giá tiền rõ trên member portal/admin booking views.
+- `commit_message`: `fix(booking-workflow): persist quoted request totals and restore admin payment actions`
+- `main_files`:
+  - `supabase/migrations/20260423113000_phase_i_request_quote_snapshot.sql`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/workflows.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `components/room-canvas-modal.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `app/actions/payments.ts`
+  - `lib/supabase/payments.ts`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `lib/supabase/queries/availability-requests.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `docs/commit_prompt_map.md`

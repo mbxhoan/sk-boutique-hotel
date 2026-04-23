@@ -17,6 +17,9 @@ type BookingRequestBody = {
   marketingConsent?: boolean;
   note?: string;
   preferredLocale?: Locale;
+  quotedCurrency?: string;
+  quotedNightlyRate?: number;
+  quotedTotalAmount?: number;
   roomTypeId?: string;
   source?: string;
   stayEndAt?: string;
@@ -59,6 +62,9 @@ function readBody(body: BookingRequestBody) {
   const preferredLocale: Locale = body.preferredLocale === "en" ? "en" : "vi";
   const guestCount = readNumber(body.guestCount) ?? 1;
   const marketingConsent = Boolean(body.marketingConsent);
+  const quotedCurrency = readString(body.quotedCurrency) || "VND";
+  const quotedNightlyRate = readNumber(body.quotedNightlyRate);
+  const quotedTotalAmount = readNumber(body.quotedTotalAmount);
 
   if (!branchId || !roomTypeId || !stayStartAt || !stayEndAt || !contactName || !contactEmail || !createdBy) {
     throw new Error("Missing required booking request fields.");
@@ -74,6 +80,9 @@ function readBody(body: BookingRequestBody) {
     marketingConsent,
     note,
     preferredLocale,
+    quotedCurrency,
+    quotedNightlyRate,
+    quotedTotalAmount,
     roomTypeId,
     source,
     stayEndAt,

@@ -83,6 +83,16 @@ function roomAmenities(locale: Locale) {
       ];
 }
 
+function calculateNights(stayStartAt: string, stayEndAt: string) {
+  const diffMs = new Date(stayEndAt).getTime() - new Date(stayStartAt).getTime();
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.round(diffMs / 86_400_000));
+}
+
 export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }: RoomCanvasModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [breakfastIndex, setBreakfastIndex] = useState(0);
@@ -167,6 +177,8 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const cancellationOption = room.cancellationOptions[cancellationIndex] ?? room.cancellationOptions[0];
   const basePrice = room.currentPrice ?? 0;
   const totalPrice = room.priceVisible ? basePrice + breakfastOption.delta + cancellationOption.delta : null;
+  const stayNights = calculateNights(bookingContext.stayStartAt, bookingContext.stayEndAt);
+  const quotedNightlyRate = totalPrice != null ? Number((totalPrice / stayNights).toFixed(2)) : null;
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
   const isSoldOut = room.availableRooms <= 0;
@@ -428,6 +440,8 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
                 availableRooms={room.availableRooms}
                 guestCount={bookingContext.guestCount}
                 locale={locale}
+                quotedNightlyRate={quotedNightlyRate}
+                quotedTotalAmount={totalPrice}
                 roomTypeId={room.roomTypeId}
                 stayEndAt={bookingContext.stayEndAt}
                 stayStartAt={bookingContext.stayStartAt}

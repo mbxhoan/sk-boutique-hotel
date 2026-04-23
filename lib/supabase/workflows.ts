@@ -24,6 +24,9 @@ export type AvailabilityRequestInput = {
   marketingConsent?: boolean;
   note?: string;
   preferredLocale?: "en" | "vi";
+  quotedCurrency?: string;
+  quotedNightlyRate?: number | null;
+  quotedTotalAmount?: number | null;
   roomTypeId: string;
   source?: string;
   stayEndAt: string;
@@ -140,6 +143,14 @@ function calculateNights(stayStartAt: string, stayEndAt: string) {
   return Math.max(1, Math.round(diffMs / 86_400_000));
 }
 
+function normalizeQuotedAmount(value: number | null | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return null;
+  }
+
+  return Number(value.toFixed(2));
+}
+
 async function assertRoomsAvailable(
   supabase: ReturnType<typeof createSupabaseServiceClient>,
   input: Pick<AvailabilityRequestInput, "branchId" | "roomTypeId" | "stayEndAt" | "stayStartAt">
@@ -174,6 +185,9 @@ export async function submitAvailabilityRequest(input: AvailabilityRequestInput)
     p_marketing_consent: input.marketingConsent ?? false,
     p_note: input.note ?? "",
     p_preferred_locale: input.preferredLocale ?? "vi",
+    p_quoted_currency: input.quotedCurrency ?? "VND",
+    p_quoted_nightly_rate: normalizeQuotedAmount(input.quotedNightlyRate),
+    p_quoted_total_amount: normalizeQuotedAmount(input.quotedTotalAmount),
     p_room_type_id: input.roomTypeId,
     p_source: input.source ?? "admin_console",
     p_stay_end_at: normalizeTimestamptzInput(input.stayEndAt),
@@ -203,7 +217,7 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
   const { data: request, error: requestError } = await supabase
     .from("availability_requests")
     .select(
-      "id, request_code, branch_id, customer_id, room_type_id, stay_start_at, stay_end_at, guest_count, contact_name, contact_email, contact_phone, note, marketing_consent, preferred_locale, source, status, response_due_at, assigned_to, handled_by, handled_at, closed_at, created_by, updated_by, created_at, updated_at"
+      "id, request_code, branch_id, customer_id, room_type_id, stay_start_at, stay_end_at, guest_count, contact_name, contact_email, contact_phone, note, marketing_consent, preferred_locale, source, status, response_due_at, quoted_nightly_rate, quoted_total_amount, quoted_currency, assigned_to, handled_by, handled_at, closed_at, created_by, updated_by, created_at, updated_at"
     )
     .eq("id", input.availabilityRequestId)
     .maybeSingle();
@@ -239,8 +253,21 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
   const stayStartAt = normalizeTimestamptzInput(input.stayStartAt);
   const stayEndAt = normalizeTimestamptzInput(input.stayEndAt);
   const nights = calculateNights(stayStartAt, stayEndAt);
-  const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
-  const totalAmount = nightlyRate * nights + roomType.weekend_surcharge;
+  const quotedNightlyRate =
+    normalizeQuotedAmount(request.quoted_nightly_rate) ??
+    (() => {
+      const quotedTotalAmount = normalizeQuotedAmount(request.quoted_total_amount);
+
+      if (quotedTotalAmount != null && nights > 0) {
+        return Number((quotedTotalAmount / nights).toFixed(2));
+      }
+
+      return null;
+    })();
+  const nightlyRate = quotedNightlyRate ?? roomType.manual_override_price ?? roomType.base_price;
+  const totalAmount =
+    normalizeQuotedAmount(request.quoted_total_amount) ??
+    Number((nightlyRate * nights + roomType.weekend_surcharge).toFixed(2));
   const depositAmount = Math.max(0, Number.isFinite(input.depositAmount) ? input.depositAmount : 0);
   const guestCount = Math.max(1, Number.isFinite(input.guestCount ?? request.guest_count) ? Number(input.guestCount ?? request.guest_count) : 1);
   const notes = input.notes?.trim() || request.note || "";
@@ -254,6 +281,9 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
       handled_at: now,
       handled_by: input.actorUserId ?? request.handled_by ?? null,
       note: notes,
+      quoted_currency: request.quoted_currency ?? "VND",
+      quoted_nightly_rate: nightlyRate,
+      quoted_total_amount: totalAmount,
       room_type_id: input.roomTypeId,
       stay_end_at: stayEndAt,
       stay_start_at: stayStartAt,
