@@ -4129,6 +4129,7 @@ textarea {
     background 0.2s ease,
     border-color 0.2s ease,
     transform 0.2s ease;
+  opacity: 50%;
 }
 
 .hero-carousel__nav:hover {
@@ -7574,9 +7575,9 @@ textarea {
   min-height: clamp(12.5rem, 32vw, 31rem);
   height: auto;
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
   border-radius: 0.75rem;
-  background: #0b1320;
+  /* border: 1px solid var(--border-subtle); */
+  /* background: #0b1320; */
   box-shadow: var(--shadow-soft);
 }
 
@@ -7622,6 +7623,7 @@ textarea {
   color: var(--ink);
   box-shadow: 0 16px 30px rgba(0, 12, 30, 0.18);
   transform: translateY(-50%);
+  opacity: 50%;
 }
 
 .rooms-image-carousel__nav--prev {

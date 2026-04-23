@@ -31,8 +31,23 @@ function getDefaultFilters() {
   };
 }
 
-const roomsHeroFallback = ["/assets/room_types/family/1.png", "/assets/room_types/superior/1.png", "/assets/room_types/quadruple/1.png"];
-const roomsCarouselFallback = ["/assets/room_types/family/1.png", "/assets/room_types/superior/1.png", "/assets/room_types/quadruple/1.png"];
+const roomsHeroFallback = [
+  "/assets/room_types/family/1.png", 
+  "/assets/room_types/superior/1.png", 
+  "/assets/room_types/quadruple/1.png"
+];
+const roomsCarouselFallback = [
+  "/assets/room_types/family/5.png", 
+  "/assets/room_types/family/2.png", 
+  "/assets/room_types/family/4.png", 
+  "/assets/room_types/family/9.png", 
+  "/assets/room_types/family/6.png", 
+  "/assets/room_types/superior/7.png", 
+  "/assets/room_types/superior/3.png", 
+  "/assets/room_types/superior/2.png", 
+  "/assets/room_types/quadruple/1.png",
+  "/assets/room_types/quadruple/5.png"
+];
 const roomGalleryFallbacks: Record<string, string[]> = {
   "family-room": [
     "/assets/room_types/family/1.png", 
@@ -110,10 +125,10 @@ export default async function RoomsPage({ searchParams }: PageProps) {
   }, {});
   const [roomsHeroImage, roomCarouselImages, familyGallery, superiorGallery, quadrupleGallery] = await Promise.all([
     loadMediaCollectionImageUrls("rooms-hero", roomsHeroFallback, 1).then((images) => images[0] ?? roomsHeroFallback[0]),
-    loadMediaCollectionImageUrls("rooms-gallery", roomsCarouselFallback, 12),
-    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 10),
-    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 10),
-    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 10)
+    loadMediaCollectionImageUrls("rooms-gallery", roomsCarouselFallback, 15),
+    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 20),
+    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 20),
+    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 20)
   ]);
 
   return (

@@ -145,10 +145,22 @@ values
   ('home-hero', 'slide-1', 'Hero 1', 'Hero 1', 'Ảnh hero 1', 'Hero image 1', '', '', '/hero/hero-1.png', 10, true, true),
   ('home-hero', 'slide-2', 'Hero 2', 'Hero 2', 'Ảnh hero 2', 'Hero image 2', '', '', '/hero/hero-2.png', 20, true, true),
   ('home-hero', 'slide-3', 'Hero 3', 'Hero 3', 'Ảnh hero 3', 'Hero image 3', '', '', '/hero/hero-3.png', 30, true, true),
+  
   ('rooms-hero', 'bed-1', 'Rooms hero', 'Rooms hero', 'Ảnh hero trang phòng', 'Room listing hero image', '', '', '/home/bed1.jpg', 10, true, true),
-  ('rooms-gallery', 'gallery-1', 'Rooms gallery 1', 'Rooms gallery 1', 'Ảnh carousel phòng 1', 'Room carousel image 1', '', '', '/assets/room_types/family/1.png', 10, true, true),
-  ('rooms-gallery', 'gallery-2', 'Rooms gallery 2', 'Rooms gallery 2', 'Ảnh carousel phòng 2', 'Room carousel image 2', '', '', '/assets/room_types/superior/1.png', 20, true, true),
-  ('rooms-gallery', 'gallery-3', 'Rooms gallery 3', 'Rooms gallery 3', 'Ảnh carousel phòng 3', 'Room carousel image 3', '', '', '/assets/room_types/quadruple/1.png', 30, true, true),
+  
+  -- carousel images for rooms gallery
+  ('rooms-gallery', 'gallery-1', 'Rooms gallery 1', 'Rooms gallery 1', 'Ảnh carousel phòng 1', 'Room carousel image 1', '', '', '/assets/room_types/family/5.png', 10, true, true),
+  ('rooms-gallery', 'gallery-2', 'Rooms gallery 2', 'Rooms gallery 2', 'Ảnh carousel phòng 2', 'Room carousel image 2', '', '', '/assets/room_types/family/2.png', 20, true, true),
+  ('rooms-gallery', 'gallery-3', 'Rooms gallery 3', 'Rooms gallery 3', 'Ảnh carousel phòng 3', 'Room carousel image 3', '', '', '/assets/room_types/family/4.png', 30, true, true),
+  ('rooms-gallery', 'gallery-4', 'Rooms gallery 4', 'Rooms gallery 4', 'Ảnh carousel phòng 4', 'Room carousel image 4', '', '', '/assets/room_types/family/9.png', 40, true, true),
+  ('rooms-gallery', 'gallery-5', 'Rooms gallery 5', 'Rooms gallery 5', 'Ảnh carousel phòng 5', 'Room carousel image 5', '', '', '/assets/room_types/family/6.png', 50, true, true),
+  ('rooms-gallery', 'gallery-6', 'Rooms gallery 6', 'Rooms gallery 6', 'Ảnh carousel phòng 6', 'Room carousel image 6', '', '', '/assets/room_types/superior/7.png', 60, true, true),
+  ('rooms-gallery', 'gallery-7', 'Rooms gallery 7', 'Rooms gallery 7', 'Ảnh carousel phòng 7', 'Room carousel image 7', '', '', '/assets/room_types/superior/3.png', 70, true, true),
+  ('rooms-gallery', 'gallery-8', 'Rooms gallery 8', 'Rooms gallery 8', 'Ảnh carousel phòng 8', 'Room carousel image 8', '', '', '/assets/room_types/superior/2.png', 80, true, true),
+  ('rooms-gallery', 'gallery-9', 'Rooms gallery 9', 'Rooms gallery 9', 'Ảnh carousel phòng 9', 'Room carousel image 9', '', '', '/assets/room_types/quadruple/1.png', 90, true, true),
+  ('rooms-gallery', 'gallery-10', 'Rooms gallery 10', 'Rooms gallery 10', 'Ảnh carousel phòng 10', 'Room carousel image 10', '', '', '/assets/room_types/quadruple/5.png', 100, true, true),
+  
+  -- family room images
   ('room-family', 'cover-1', 'Family cover 1', 'Family cover 1', 'Ảnh Family Room 1', 'Family room image 1', '', '', '/assets/room_types/family/1.png', 10, true, true),
   ('room-family', 'cover-2', 'Family cover 2', 'Family cover 2', 'Ảnh Family Room 2', 'Family room image 2', '', '', '/assets/room_types/family/2.png', 20, true, true),
   ('room-family', 'cover-3', 'Family cover 3', 'Family cover 3', 'Ảnh Family Room 3', 'Family room image 3', '', '', '/assets/room_types/family/3.png', 30, true, true),
@@ -158,6 +170,8 @@ values
   ('room-family', 'cover-7', 'Family cover 7', 'Family cover 7', 'Ảnh Family Room 7', 'Family room image 7', '', '', '/assets/room_types/family/7.png', 70, true, true),
   ('room-family', 'cover-8', 'Family cover 8', 'Family cover 8', 'Ảnh Family Room 8', 'Family room image 8', '', '', '/assets/room_types/family/8.png', 80, true, true),
   ('room-family', 'cover-9', 'Family cover 9', 'Family cover 9', 'Ảnh Family Room 9', 'Family room image 9', '', '', '/assets/room_types/family/9.png', 90, true, true),
+  
+  -- superior room images
   ('room-superior', 'cover-1', 'Superior cover 1', 'Superior cover 1', 'Ảnh Superior Room 1', 'Superior room image 1', '', '', '/assets/room_types/superior/1.png', 10, true, true),
   ('room-superior', 'cover-2', 'Superior cover 2', 'Superior cover 2', 'Ảnh Superior Room 2', 'Superior room image 2', '', '', '/assets/room_types/superior/2.png', 20, true, true),
   ('room-superior', 'cover-3', 'Superior cover 3', 'Superior cover 3', 'Ảnh Superior Room 3', 'Superior room image 3', '', '', '/assets/room_types/superior/3.png', 30, true, true),
@@ -165,6 +179,8 @@ values
   ('room-superior', 'cover-5', 'Superior cover 5', 'Superior cover 5', 'Ảnh Superior Room 5', 'Superior room image 5', '', '', '/assets/room_types/superior/5.png', 50, true, true),
   ('room-superior', 'cover-6', 'Superior cover 6', 'Superior cover 6', 'Ảnh Superior Room 6', 'Superior room image 6', '', '', '/assets/room_types/superior/6.png', 60, true, true),
   ('room-superior', 'cover-7', 'Superior cover 7', 'Superior cover 7', 'Ảnh Superior Room 7', 'Superior room image 7', '', '', '/assets/room_types/superior/7.png', 70, true, true),
+  
+  -- quadruple room images
   ('room-quadruple', 'cover-1', 'Quadruple cover 1', 'Quadruple cover 1', 'Ảnh Quadruple Room 1', 'Quadruple room image 1', '', '', '/assets/room_types/quadruple/1.png', 10, true, true),
   ('room-quadruple', 'cover-2', 'Quadruple cover 2', 'Quadruple cover 2', 'Ảnh Quadruple Room 2', 'Quadruple room image 2', '', '', '/assets/room_types/quadruple/2.png', 20, true, true),
   ('room-quadruple', 'cover-3', 'Quadruple cover 3', 'Quadruple cover 3', 'Ảnh Quadruple Room 3', 'Quadruple room image 3', '', '', '/assets/room_types/quadruple/3.png', 30, true, true),
