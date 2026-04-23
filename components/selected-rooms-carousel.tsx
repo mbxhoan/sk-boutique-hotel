@@ -160,7 +160,8 @@ export function SelectedRoomsCarousel({
                           alt={item.imageAlt ? localize(locale, item.imageAlt) : localize(locale, item.title)}
                           className="cms-room-card__image"
                           fill
-                          sizes="(max-width: 720px) 92vw, (max-width: 1080px) 44vw, 28vw"
+                          quality={90}
+                          sizes="(max-width: 720px) calc(100vw - 2rem), (max-width: 1080px) 44vw, 28vw"
                           src={resolveMediaSource(item.image, mediaLookup) ?? item.image}
                         />
                       ) : null}

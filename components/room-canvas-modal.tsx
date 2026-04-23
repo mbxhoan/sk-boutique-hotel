@@ -201,6 +201,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
               alt={room.title[locale]}
               className="room-canvas__image"
               fill
+              quality={90}
               priority
               sizes="(max-width: 960px) 100vw, 900px"
               src={currentImage}
@@ -486,14 +487,15 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
                   </>
                 ) : null}
 
-                <Image
-                  alt={room.title[locale]}
-                  className="room-canvas__zoom-image"
-                  fill
-                  priority
-                  sizes="(max-width: 960px) 100vw, 92vw"
-                  src={currentImage}
-                />
+              <Image
+                alt={room.title[locale]}
+                className="room-canvas__zoom-image"
+                fill
+                quality={90}
+                priority
+                sizes="(max-width: 960px) 100vw, 92vw"
+                src={currentImage}
+              />
               </div>
             </section>
           </div>

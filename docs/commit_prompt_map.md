@@ -1206,3 +1206,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 108
+- `time`: 2026-04-23T14:52:52+07:00
+- `prompt_summary`: Nâng chất lượng ảnh hạng phòng trên mobile responsive, chỉnh `sizes` cho sát khung hiển thị thật, và mở whitelist quality của Next để ảnh không bị lỗi runtime khi tăng chất lượng.
+- `commit_message`: `fix(room-images): improve mobile rendering quality`
+- `main_files`:
+  - `next.config.ts`
+  - `components/rooms-catalog-page.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `components/selected-rooms-carousel.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `docs/commit_prompt_map.md`

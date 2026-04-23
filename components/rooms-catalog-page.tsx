@@ -58,7 +58,14 @@ function RoomCard({
     <Link className={`rooms-card__link${room.slug === activeSlug ? " rooms-card__link--active" : ""}`} href={href}>
       <article className="rooms-card">
         <div className="rooms-card__media">
-          <Image alt={room.title[locale]} className="rooms-card__image" fill sizes="(max-width: 720px) 92vw, (max-width: 1080px) 44vw, 28vw" src={room.gallery[0]} />
+          <Image
+            alt={room.title[locale]}
+            className="rooms-card__image"
+            fill
+            quality={90}
+            sizes="(max-width: 720px) calc(100vw - 2rem), (max-width: 1080px) 44vw, 28vw"
+            src={room.gallery[0]}
+          />
 
           <span className="rooms-card__badge">{room.galleryBadge[locale]}</span>
         </div>

@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     "192.168.2.43"
   ],
   images: {
-    qualities: [85]
+    qualities: [85, 90]
   }
 };
 
