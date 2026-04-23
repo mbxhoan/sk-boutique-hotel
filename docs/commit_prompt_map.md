@@ -1180,3 +1180,21 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/payments.ts`
   - `app/globals.css`
   - `README.md`
+
+### Entry 105
+- `time`: 2026-04-23T14:00:28+07:00
+- `prompt_summary`: Thêm chức năng bấm vào ảnh trong chi tiết hạng phòng để mở lớp phóng to riêng, có nút đóng chế độ phóng to và hỗ trợ Escape/backdrop để tắt zoom.
+- `commit_message`: `feat(room-canvas): add image zoom overlay in room detail`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 106
+- `time`: 2026-04-23T14:13:58+07:00
+- `prompt_summary`: Khi đang ở chế độ phóng to ảnh trong chi tiết hạng phòng, cho phép chuyển ảnh trước/sau ngay trong overlay để không phải thoát zoom mới xem ảnh khác.
+- `commit_message`: `feat(room-canvas): add zoom gallery navigation`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`

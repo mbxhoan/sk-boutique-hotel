@@ -90,7 +90,7 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
           </div>
         </div>
         <h1 className="admin-auth-card__title">{localize(locale, pageCopy.title)}</h1>
-        <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p>
+        {/* <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p> */}
         {user ? (
           <PortalCard className="admin-auth-card__notice" tone="soft">
             <p className="admin-auth-card__notice-title">{locale === "en" ? "Signed in with a member account" : "Đang đăng nhập bằng tài khoản member"}</p>

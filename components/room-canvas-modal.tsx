@@ -88,6 +88,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const [breakfastIndex, setBreakfastIndex] = useState(0);
   const [cancellationIndex, setCancellationIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [imageZoomOpen, setImageZoomOpen] = useState(false);
   const bookingPanelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -102,6 +103,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     setBreakfastIndex(breakfastSelected >= 0 ? breakfastSelected : 0);
     setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
     setBookingOpen(false);
+    setImageZoomOpen(false);
   }, [open, room]);
 
   useEffect(() => {
@@ -113,8 +115,28 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     document.body.style.overflow = "hidden";
 
     const onEscape = (event: KeyboardEvent) => {
+      const galleryLength = room?.gallery.length ?? 0;
+
       if (event.key === "Escape") {
+        if (imageZoomOpen) {
+          setImageZoomOpen(false);
+          return;
+        }
+
         onClose();
+        return;
+      }
+
+      if (!imageZoomOpen || galleryLength < 2) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setActiveImageIndex((current) => (current - 1 + galleryLength) % galleryLength);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setActiveImageIndex((current) => (current + 1) % galleryLength);
       }
     };
 
@@ -124,7 +146,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onEscape);
     };
-  }, [onClose, open]);
+  }, [imageZoomOpen, onClose, open, room]);
 
   useEffect(() => {
     if (!bookingOpen) {
@@ -148,6 +170,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
   const isSoldOut = room.availableRooms <= 0;
+  const canNavigateGallery = room.gallery.length > 1;
 
   return (
     <div className="room-canvas" role="presentation">
@@ -168,7 +191,21 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
         </div>
 
         <div className="room-canvas__media">
-          <Image alt={room.title[locale]} className="room-canvas__image" fill priority sizes="(max-width: 960px) 100vw, 900px" src={currentImage} />
+          <button
+            aria-label={locale === "en" ? "Open enlarged photo" : "Phóng to ảnh"}
+            className="room-canvas__media-zoom-trigger"
+            onClick={() => setImageZoomOpen(true)}
+            type="button"
+          >
+            <Image
+              alt={room.title[locale]}
+              className="room-canvas__image"
+              fill
+              priority
+              sizes="(max-width: 960px) 100vw, 900px"
+              src={currentImage}
+            />
+          </button>
 
           <button
             aria-label={locale === "en" ? "Previous photo" : "Ảnh trước"}
@@ -398,6 +435,69 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
           ) : null}
         </div>
       </section>
+
+        {imageZoomOpen ? (
+          <div className="room-canvas__zoom" role="presentation">
+            <button
+              aria-label={locale === "en" ? "Close enlarged photo" : "Đóng chế độ phóng to"}
+              className="room-canvas__zoom-backdrop"
+            onClick={() => setImageZoomOpen(false)}
+            type="button"
+          />
+
+          <section
+            aria-label={locale === "en" ? "Enlarged photo viewer" : "Trình xem ảnh phóng to"}
+            aria-modal="true"
+            className="room-canvas__zoom-dialog"
+            role="dialog"
+            >
+              <div className="room-canvas__zoom-head">
+                <span className="room-canvas__zoom-title">{room.title[locale]}</span>
+                <button
+                  aria-label={locale === "en" ? "Close enlarged photo" : "Đóng chế độ phóng to"}
+                  className="room-canvas__zoom-close"
+                  onClick={() => setImageZoomOpen(false)}
+                  type="button"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+
+              <div className="room-canvas__zoom-media">
+                {canNavigateGallery ? (
+                  <>
+                    <button
+                      aria-label={locale === "en" ? "Previous enlarged photo" : "Ảnh phóng to trước"}
+                      className="room-canvas__zoom-nav room-canvas__zoom-nav--prev"
+                      onClick={() => setActiveImageIndex((current) => (current - 1 + room.gallery.length) % room.gallery.length)}
+                      type="button"
+                    >
+                      <ArrowIcon direction="left" />
+                    </button>
+
+                    <button
+                      aria-label={locale === "en" ? "Next enlarged photo" : "Ảnh phóng to tiếp theo"}
+                      className="room-canvas__zoom-nav room-canvas__zoom-nav--next"
+                      onClick={() => setActiveImageIndex((current) => (current + 1) % room.gallery.length)}
+                      type="button"
+                    >
+                      <ArrowIcon direction="right" />
+                    </button>
+                  </>
+                ) : null}
+
+                <Image
+                  alt={room.title[locale]}
+                  className="room-canvas__zoom-image"
+                  fill
+                  priority
+                  sizes="(max-width: 960px) 100vw, 92vw"
+                  src={currentImage}
+                />
+              </div>
+            </section>
+          </div>
+        ) : null}
     </div>
   );
 }

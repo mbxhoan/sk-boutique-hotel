@@ -111,13 +111,23 @@ export default async function RoomsPage({ searchParams }: PageProps) {
     room: resolvedSearchParams.room
   };
 
+  // const availableRooms = defaultBranchId
+  //   ? await findAvailableRooms({
+  //       branchId: defaultBranchId,
+  //       stayEndAt: initialFilters.checkout,
+  //       stayStartAt: initialFilters.checkin
+  //     })
+  //   : [];
+
   const availableRooms = defaultBranchId
-    ? await findAvailableRooms({
-        branchId: defaultBranchId,
-        stayEndAt: initialFilters.checkout,
-        stayStartAt: initialFilters.checkin
-      })
-    : [];
+  ? await findAvailableRooms({
+      branchId: defaultBranchId,
+      stayEndAt: initialFilters.checkout,
+      stayStartAt: initialFilters.checkin,
+      limit: 100 // Thêm dòng này để quét tối đa 100 phòng thay vì 12
+    })
+  : [];
+
   const roomAvailabilityByTypeId = availableRooms.reduce<Record<string, number>>((accumulator, room) => {
     accumulator[room.room_type_id] = (accumulator[room.room_type_id] ?? 0) + 1;
 

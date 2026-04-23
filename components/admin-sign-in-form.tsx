@@ -22,8 +22,8 @@ const copy = {
     en: "Email"
   } satisfies LocalizedText,
   helper: {
-    vi: "Chạy npm run seed:auth sau khi reset DB. Mật khẩu dev: SkbhAdmin2026!.",
-    en: "Run npm run seed:auth after resetting the DB. Dev password: SkbhAdmin2026!."
+    vi: "Mật khẩu: SkbhAdmin2026!",
+    en: "Password: SkbhAdmin2026!"
   } satisfies LocalizedText,
   password: {
     vi: "Mật khẩu",
@@ -35,12 +35,12 @@ const copy = {
       en: "Invalid email or password."
     } satisfies LocalizedText,
     missingConfig: {
-      vi: "Thiếu cấu hình đăng nhập Supabase.",
-      en: "Missing Supabase sign-in configuration."
+      vi: "Thiếu cấu hình đăng nhập hệ thống.",
+      en: "Missing sign-in configuration."
     } satisfies LocalizedText,
     network: {
-      vi: "Không thể kết nối Supabase lúc này.",
-      en: "Unable to reach Supabase right now."
+      vi: "Không thể kết nối máy chủ lúc này.",
+      en: "Unable to reach server right now."
     } satisfies LocalizedText,
     fallback: {
       vi: "Đăng nhập không thành công. Vui lòng thử lại.",
