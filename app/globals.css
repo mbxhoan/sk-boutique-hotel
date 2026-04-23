@@ -7682,15 +7682,16 @@ textarea {
 }
 
 .rooms-image-carousel {
-  width: 100vw;
-  margin-inline: calc(50% - 50vw);
+  width: 100%;
+  margin-inline: 0;
   padding-top: clamp(0.6rem, 1.6vw, 1.2rem);
+  overflow-x: clip;
 }
 
 .rooms-image-carousel > .section-shell {
   width: 100%;
-  max-width: none;
-  padding-inline: clamp(1rem, 2vw, 1.6rem);
+  max-width: 100%;
+  padding-inline: clamp(0.9rem, 2vw, 1.6rem);
 }
 
 .rooms-image-carousel__frame {
@@ -7703,6 +7704,7 @@ textarea {
   /* border: 1px solid var(--border-subtle); */
   /* background: #0b1320; */
   box-shadow: var(--shadow-soft);
+  max-width: 100%;
 }
 
 .rooms-image-carousel__viewport {

@@ -1198,3 +1198,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/room-canvas-modal.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 107
+- `time`: 2026-04-23T14:17:29+07:00
+- `prompt_summary`: Sửa carousel ảnh ở trang phòng để không tràn ngang và phá responsive trên mobile, giữ slider nằm trong khung nội dung chuẩn.
+- `commit_message`: `fix(rooms-carousel): stop horizontal overflow on mobile`
+- `main_files`:
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
