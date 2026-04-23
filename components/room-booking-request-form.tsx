@@ -432,7 +432,7 @@ export function RoomBookingRequestForm({
               ? localize(locale, "Hết phòng", "Sold out")
               : memberProfile
                 ? localize(locale, "Gửi yêu cầu", "Send request")
-                : localize(locale, "Gửi yêu cầu & đăng nhập", "Send request & sign in")}
+                : localize(locale, "Gửi yêu cầu", "Send request")}
         </button>
       </div>
 

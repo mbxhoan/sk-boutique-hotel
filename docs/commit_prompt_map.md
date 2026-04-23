@@ -1218,3 +1218,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/selected-rooms-carousel.tsx`
   - `components/room-canvas-modal.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 109
+- `time`: 2026-04-23T16:19:50+07:00
+- `prompt_summary`: Chỉnh member portal theo luồng tối giản và sang hơn: greeting ở đầu, tổng quan số liệu clickable, booking và trạng thái sort mới/chưa hoàn tất lên trước, mở payment chỉ ở booking chưa book xong, sidebar chỉ còn 3 anchor tổng quan/booking/thông tin, và kiểm tra lại responsive mobile.
+- `commit_message`: `feat(member-portal): refine overview, booking flow, and responsive layout`
+- `main_files`:
+  - `components/member-portal-dashboard.tsx`
+  - `components/member-portal-sidebar.tsx`
+  - `app/(member)/member/page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { MemberHistoryDashboard } from "@/components/member-history-dashboard";
+import { MemberHistoryDashboard } from "@/components/member-portal-dashboard";
 import { MemberPortalSidebar } from "@/components/member-portal-sidebar";
 import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { memberDashboardCopy } from "@/lib/mock/member-dashboard";
@@ -89,7 +89,11 @@ export default async function MemberPage({ searchParams }: PageProps) {
       <div className="section-shell member-portal-layout">
         <MemberPortalSidebar locale={locale} />
         <div className="member-portal-layout__content">
-          <MemberHistoryDashboard data={data} locale={locale} />
+          <MemberHistoryDashboard
+            data={data}
+            locale={locale}
+            customerNameFallback={typeof session.user.user_metadata?.full_name === "string" ? session.user.user_metadata.full_name : null}
+          />
         </div>
       </div>
     </section>

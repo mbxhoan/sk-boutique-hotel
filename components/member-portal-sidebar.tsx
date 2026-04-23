@@ -3,11 +3,9 @@
 import Link from "next/link";
 
 import { LogoMark } from "@/components/logo-mark";
-import { PortalBadge, PortalBulletList, PortalCard } from "@/components/portal-ui";
+import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import { appendLocaleQuery, localeLabel } from "@/lib/locale";
 import type { Locale } from "@/lib/locale";
-import { localize } from "@/lib/mock/i18n";
-import { memberDashboardCopy } from "@/lib/mock/member-dashboard";
 
 type MemberPortalSidebarProps = {
   locale: Locale;
@@ -15,6 +13,20 @@ type MemberPortalSidebarProps = {
 
 export function MemberPortalSidebar({ locale }: MemberPortalSidebarProps) {
   const localeToggle = locale === "en" ? "vi" : "en";
+  const navItems = [
+    {
+      href: "#overview",
+      label: locale === "en" ? "Overview" : "Tổng quan"
+    },
+    {
+      href: "#booking",
+      label: locale === "en" ? "Booking" : "Booking"
+    },
+    {
+      href: "#info",
+      label: locale === "en" ? "Info" : "Thông tin"
+    }
+  ];
 
   return (
     <aside className="member-portal-sidebar">
@@ -29,26 +41,16 @@ export function MemberPortalSidebar({ locale }: MemberPortalSidebarProps) {
         </div>
 
         <div className="member-portal-sidebar__intro">
-          <PortalBadge tone="accent">{localize(locale, memberDashboardCopy.shell.badge)}</PortalBadge>
-          {/* <h1 className="member-portal-sidebar__title">{localize(locale, memberDashboardCopy.shell.title)}</h1> */}
-          {/* <p className="member-portal-sidebar__description">{localize(locale, memberDashboardCopy.shell.description)}</p> */}
+          <PortalBadge tone="accent">{locale === "en" ? "Member portal" : "Cổng thành viên"}</PortalBadge>
         </div>
 
         <nav aria-label={locale === "en" ? "Member navigation" : "Điều hướng thành viên"} className="member-portal-sidebar__nav">
-          {memberDashboardCopy.nav.map((item) => (
+          {navItems.map((item) => (
             <a className="member-portal-sidebar__link" href={item.href} key={item.href}>
-              {localize(locale, item.label)}
+              {item.label}
             </a>
           ))}
         </nav>
-
-        <div className="member-portal-sidebar__actions">
-          <Link className="button button--solid member-portal-sidebar__cta" href="#requests">
-            {locale === "en" ? "New booking request" : "Gửi yêu cầu mới"}
-          </Link>
-        </div>
-
-        {/* <PortalBulletList className="member-portal-sidebar__bullets" items={memberDashboardCopy.shell.bullets} locale={locale} /> */}
       </PortalCard>
     </aside>
   );
