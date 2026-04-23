@@ -1250,3 +1250,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-booking-detail-page.tsx`
   - `components/member-portal-dashboard.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 111
+- `time`: 2026-04-23T23:28:51+07:00
+- `prompt_summary`: Làm rõ luồng admin sau khi bấm mở workflow bằng cách cho route `/admin?request=...` nhảy thẳng xuống khu Requests & holds và hiển thị chỉ dẫn ngắn ngay trong dashboard overview.
+- `commit_message`: `fix(admin-workflow): deep link request workflows to the operations panel`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-dashboard.tsx`
+  - `docs/commit_prompt_map.md`

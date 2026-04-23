@@ -223,7 +223,7 @@ const featureFrameLeft: CmsMediaFrame = {
     "Can later become real photography for rooms, lobby, or dining zones."
   ),
   tone: "paper",
-  title: text("Ấm áp, êm ái, sang trọng.", "Warm, calm, premium")
+  title: text("Ấm áp, êm ái, sang.", "Warm, calm, premium")
 };
 
 const featureFrameRight: CmsMediaFrame = {
@@ -240,7 +240,7 @@ const featureFrameRight: CmsMediaFrame = {
     "This area can still map to gallery or CMS media fields later."
   ),
   tone: "gold",
-  title: text("Ấm áp, êm ái, sang trọng.", "Warm, calm, premium")
+  title: text("Ấm áp, êm ái, sang.", "Warm, calm, premium")
 };
 
 const toCardItem = (

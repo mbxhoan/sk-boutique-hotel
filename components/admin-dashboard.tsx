@@ -417,6 +417,7 @@ export function AdminDashboard({ data, locale, range, searchParams }: AdminDashb
   const glanceItems = getGlanceItems(data, locale);
   const metricCards = buildMetricCards(data, locale);
   const currentRangeLabel = rangeLabels[range][locale];
+  const activeRequestId = searchParams.request ?? null;
 
   return (
     <div className="admin-page admin-dashboard">
@@ -434,6 +435,13 @@ export function AdminDashboard({ data, locale, range, searchParams }: AdminDashb
               locale={locale}
             />
           </div>
+          {activeRequestId ? (
+            <p className="admin-dashboard__note">
+              {locale === "en"
+                ? "A request is selected. Scroll to Requests & holds to review room suggestions, then convert it to a hold or reservation."
+                : "Đã chọn sẵn một request. Kéo xuống mục Requests & holds để xem gợi ý phòng, rồi chuyển sang hold hoặc reservation."}
+            </p>
+          ) : null}
         </div>
 
         <div className="admin-dashboard__period-switch" aria-label={locale === "en" ? "Period selector" : "Chọn khoảng thời gian"}>

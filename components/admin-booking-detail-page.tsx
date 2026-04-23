@@ -479,7 +479,7 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
   const guestEmail = detail.customer?.email ?? booking.customer_email;
   const guestPhone = detail.customer?.phone ?? detail.request?.contact_phone ?? null;
   const activeRoomHold = detail.room_holds.find((hold) => hold.status === "active") ?? detail.room_holds[0] ?? null;
-  const workflowHref = detail.request ? appendLocaleQuery(`/admin?request=${detail.request.id}`, locale) : null;
+  const workflowHref = detail.request ? appendLocaleQuery(`/admin?request=${detail.request.id}#requests`, locale) : null;
   const backHref = appendLocaleQuery("/admin/bookings", locale);
   const roomTypeLabel = locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi;
   const branchLabel = locale === "en" ? booking.branch_name_en : booking.branch_name_vi;
