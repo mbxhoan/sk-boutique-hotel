@@ -1,21 +1,25 @@
 import type { BranchRow, PaymentProofRow, PaymentRequestRow, ReservationRow, RoomTypeRow } from "@/lib/supabase/database.types";
-import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
+import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
+import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
 import { listPaymentProofs } from "@/lib/supabase/queries/payment-proofs";
 import { listPaymentRequests } from "@/lib/supabase/queries/payment-requests";
 import { listReservations } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
+  WorkflowAuditLog,
   WorkflowMemberHistoryData,
   WorkflowPaymentProof,
   WorkflowPaymentRequest,
   WorkflowReservation,
   WorkflowRoomTypeOption
 } from "@/lib/supabase/workflow.types";
+import type { CustomerRow } from "@/lib/supabase/database.types";
 
 function buildMap<T extends { id: string }>(items: T[]) {
   return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
@@ -34,7 +38,9 @@ function buildLatestProofMap(proofs: PaymentProofRow[]) {
 function toReservationView(
   reservation: ReservationRow,
   branchMap: Record<string, BranchRow>,
-  roomTypeMap: Record<string, RoomTypeRow>
+  roomTypeMap: Record<string, RoomTypeRow>,
+  customerName: string,
+  customerEmail: string
 ): WorkflowReservation {
   const branch = branchMap[reservation.branch_id];
   const roomType = roomTypeMap[reservation.primary_room_type_id];
@@ -43,6 +49,8 @@ function toReservationView(
     ...reservation,
     branch_name_en: branch?.name_en ?? reservation.branch_id,
     branch_name_vi: branch?.name_vi ?? reservation.branch_id,
+    customer_email: customerEmail,
+    customer_name: customerName,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
     room_code: reservation.booking_code
@@ -105,28 +113,100 @@ function toPaymentProofView(
   };
 }
 
-export async function loadMemberHistoryDashboard(authUserId: string): Promise<WorkflowMemberHistoryData | null> {
+function toAuditLogView(log: Awaited<ReturnType<typeof listAuditLogs>>[number], branchMap: Record<string, BranchRow>): WorkflowAuditLog {
+  const branch = log.branch_id ? branchMap[log.branch_id] : null;
+  const entityLabels = {
+    availability_request: { en: "Availability request", vi: "Yêu cầu đặt phòng" },
+    payment_request: { en: "Payment request", vi: "Yêu cầu cọc" },
+    reservation: { en: "Reservation", vi: "Reservation" },
+    room_hold: { en: "Room hold", vi: "Hold phòng" }
+  } as const;
+
+  const entityLabel = entityLabels[log.entity_type as keyof typeof entityLabels] ?? {
+    en: log.entity_type,
+    vi: log.entity_type
+  };
+
+  return {
+    ...log,
+    branch_name_en: branch?.name_en ?? null,
+    branch_name_vi: branch?.name_vi ?? null,
+    entity_label_en: entityLabel.en,
+    entity_label_vi: entityLabel.vi
+  };
+}
+
+export async function loadMemberHistoryDashboard(authUserId: string, authUserEmail: string | null = null): Promise<WorkflowMemberHistoryData | null> {
+  return loadMemberHistoryDashboardByUser(authUserId, authUserEmail);
+}
+
+export async function loadMemberHistoryDashboardByUser(authUserId: string, authUserEmail: string | null): Promise<WorkflowMemberHistoryData | null> {
   return queryWithServiceFallback(
     async () => {
-      const customer = await getCustomerByAuthUserId(authUserId);
+      const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+
+      if (releaseResults.some((result) => result.status === "rejected")) {
+        console.warn("[workflow] Failed to release expired holds/reservations before loading member history", {
+          holds: releaseResults[0].status === "fulfilled",
+          reservations: releaseResults[1].status === "fulfilled"
+        });
+      }
+
+      const customer =
+        (await getCustomerByAuthUserId(authUserId)) ??
+        (authUserEmail ? await getCustomerByEmail(authUserEmail) : null) ??
+        (authUserEmail
+          ? ({
+              auth_user_id: authUserId,
+              created_at: new Date().toISOString(),
+              email: authUserEmail,
+              full_name: authUserEmail.split("@")[0] || authUserEmail,
+              id: authUserId,
+              last_seen_at: null,
+              marketing_consent: false,
+              marketing_consent_at: null,
+              marketing_consent_source: null,
+              notes: "",
+              phone: null,
+              preferred_locale: "vi",
+              source: "member_portal",
+              updated_at: new Date().toISOString()
+            } satisfies CustomerRow)
+          : null);
 
       if (!customer) {
         return null;
       }
 
-      const [branches, roomTypes, availabilityRequests, reservations, paymentRequests, paymentProofs] = await Promise.all([
+      const [branches, roomTypes, customerAvailabilityRequests, emailAvailabilityRequests, reservations, paymentRequests, paymentProofs, auditLogs] =
+        await Promise.all([
         listBranches(),
         listRoomTypes(),
         listAvailabilityRequests({ customerId: customer.id, limit: 8 }),
+        authUserEmail ? listAvailabilityRequests({ contactEmail: authUserEmail, limit: 8 }) : Promise.resolve([] as WorkflowAvailabilityRequest[]),
         listReservations({ customerId: customer.id, limit: 8 }),
         listPaymentRequests({ customerId: customer.id, limit: 8 }),
-        listPaymentProofs({ customerId: customer.id, limit: 16 })
+        listPaymentProofs({ customerId: customer.id, limit: 16 }),
+        listAuditLogs({ customerId: customer.id, limit: 12 })
       ]);
+
+      const availabilityRequests = (() => {
+        const merged = new Map<string, WorkflowAvailabilityRequest>();
+
+        for (const request of [...customerAvailabilityRequests, ...emailAvailabilityRequests]) {
+          merged.set(request.id, request as WorkflowAvailabilityRequest);
+        }
+
+        return [...merged.values()];
+      })();
 
       const branchMap = buildMap(branches);
       const roomTypeMap = buildMap(roomTypes);
       const reservationViewMap = Object.fromEntries(
-        reservations.map((reservation) => [reservation.id, toReservationView(reservation, branchMap, roomTypeMap)])
+        reservations.map((reservation) => [
+          reservation.id,
+          toReservationView(reservation, branchMap, roomTypeMap, customer.full_name, customer.email)
+        ])
       ) as Record<string, WorkflowReservation>;
       const latestProofMap = buildLatestProofMap(paymentProofs);
       const paymentRequestMap = Object.fromEntries(paymentRequests.map((request) => [request.id, request])) as Record<
@@ -136,6 +216,7 @@ export async function loadMemberHistoryDashboard(authUserId: string): Promise<Wo
 
       return {
         availability_requests: availabilityRequests as WorkflowAvailabilityRequest[],
+        audit_logs: auditLogs.map((log) => toAuditLogView(log, branchMap)),
         branch_options: branches,
         customer,
         payment_proofs: paymentProofs.map((proof) => toPaymentProofView(proof, paymentRequestMap, branchMap, reservationViewMap)),

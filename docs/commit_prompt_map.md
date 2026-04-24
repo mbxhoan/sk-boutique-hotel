@@ -850,3 +850,412 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `lib/supabase/email.ts`
   - `README.md`
+
+### Entry 079
+- `time`: 2026-04-18T15:16:49+07:00
+- `prompt_summary`: Thiết lập luồng booking phase 1 theo hướng manual-first: đăng ký/đăng nhập member với mật khẩu mặc định, tạo request booking từ public room canvas, gửi mail xác nhận cho khách và admin, bổ sung realtime notifications cho admin/member portal, quản lý lịch sử booking của khách, và thêm cơ chế hết hạn reservation sau 30 phút để admin tạo booking/xử lý cọc theo workflow vận hành.
+- `commit_message`: `feat(booking-platform): add member auth, booking workflow, and realtime notifications`
+- `main_files`:
+  - `components/member-auth-form.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `components/admin-live-updates.tsx`
+  - `components/member-live-updates.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/(marketing)/layout.tsx`
+  - `app/(member-auth)/member/sign-in/page.tsx`
+  - `app/(member-auth)/member/sign-up/page.tsx`
+  - `app/api/member/bootstrap/route.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `lib/supabase/workflows.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/database.types.ts`
+  - `supabase/migrations/20260418093000_phase_g_reservation_expiry.sql`
+  - `README.md`
+
+### Entry 080
+- `time`: 2026-04-18T16:46:43+07:00
+- `prompt_summary`: Khi bấm đặt phòng thì panel thông tin khách trong room canvas phải tự cuộn vào view; đồng thời sửa lỗi request booking bị 400 bằng cách không để bước gửi email làm hỏng luồng tạo availability request.
+- `commit_message`: `fix(booking-request): auto-scroll booking panel and tolerate email failures`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `lib/supabase/workflows.ts`
+
+### Entry 081
+- `time`: 2026-04-18T17:13:09+07:00
+- `prompt_summary`: Nới chiều cao khung ảnh trong popup chi tiết phòng để khung hình gần tỉ lệ 16:9 hơn, giảm việc ảnh bị crop mất nội dung trên desktop và mobile.
+- `commit_message`: `fix(room-canvas): raise gallery frame to 16:9`
+- `main_files`:
+  - `app/globals.css`
+
+### Entry 082
+- `time`: 2026-04-18T17:15:20+07:00
+- `prompt_summary`: Làm cho card canvas phòng đóng ngay lập tức khi bấm nút đóng hoặc bấm ra ngoài, thay vì chờ navigation route cập nhật xong mới unmount.
+- `commit_message`: `fix(room-canvas): close modal immediately on backdrop click`
+- `main_files`:
+  - `components/rooms-catalog-page.tsx`
+
+### Entry 083
+- `time`: 2026-04-18T21:55:25+07:00
+- `prompt_summary`: Đưa member portal về cùng template sáng, premium như website public thay vì kiểu admin portal; đồng thời nếu khách đã đăng nhập thì không cần nhập lại họ tên, email, số điện thoại khi đặt phòng.
+- `commit_message`: `feat(member-portal): match site template and reuse signed-in profile`
+- `main_files`:
+  - `app/api/member/profile/route.ts`
+  - `components/room-booking-request-form.tsx`
+  - `app/globals.css`
+
+### Entry 084
+- `time`: 2026-04-18T22:12:12+07:00
+- `prompt_summary`: Cập nhật seed Supabase theo thông tin thực tế của SK Boutique Hotel Phú Quốc: branch/contact, 7 tầng, 19 phòng, 3 hạng phòng, VIP Family Room tầng 2, và route nội dung phòng chuyển sang chuẩn `/rooms`.
+- `commit_message`: `fix(seed): align hotel branch and room inventory with Phu Quoc data`
+- `main_files`:
+  - `supabase/seed.sql`
+
+### Entry 085
+- `time`: 2026-04-18T23:01:44+07:00
+- `prompt_summary`: Sửa bản EN để không lọt "Giường đôi" trong room cards/detail, localize lại địa chỉ và Google Maps cho English view, và liệt kê toàn bộ link/route hiện có để chọn nhóm cần tắt sau này.
+- `commit_message`: `fix(i18n): localize room labels and location strings`
+- `main_files`:
+  - `lib/locale.ts`
+  - `lib/mock/public-cms.ts`
+  - `components/public-cms.tsx`
+  - `components/location-section.tsx`
+  - `components/site-footer.tsx`
+  - `lib/rooms/catalog.ts`
+  - `lib/supabase/queries/room-types.ts`
+
+### Entry 086
+- `time`: 2026-04-18T23:08:22+07:00
+- `prompt_summary`: Chuyển loại giường và view phòng sang cột thông tin khác, đồng thời thêm ăn sáng miễn phí và giặt ủi trong ngày vào phần tiện nghi khách sạn.
+- `commit_message`: `feat(room-facilities): rebalance amenities and room info columns`
+- `main_files`:
+  - `components/facilities-section.tsx`
+
+### Entry 087
+- `time`: 2026-04-18T23:19:57+07:00
+- `prompt_summary`: Tạm ẩn các static pages/urls (/thuong-hieu, /uu-dai, /dich-vu, /lien-he, /ho-tro, /tuyen-dung), gom /ve-chung-toi về /about-us, gộp /phong sang /rooms, và ẩn internal routes /tin-tuc cùng /tin-tuc/[slug].
+- `commit_message`: `fix(routes): hide legacy public pages and news routes`
+- `main_files`:
+  - `lib/hidden-routes.ts`
+  - `lib/site-content.ts`
+  - `components/site-footer.tsx`
+  - `components/sections.tsx`
+  - `components/analytics-link.tsx`
+  - `lib/supabase/queries/content-pages.ts`
+  - `app/(marketing)/[slug]/page.tsx`
+  - `app/(marketing)/tin-tuc/page.tsx`
+  - `app/(marketing)/tin-tuc/[slug]/page.tsx`
+
+### Entry 088
+- `time`: 2026-04-18T23:49:18+07:00
+- `prompt_summary`: Sửa logic sold out của trang `/rooms` để chỉ báo hết phòng khi khoảng ngày đang xem thực sự không còn phòng trống, và chặn gửi yêu cầu booking nếu user cố submit khi đã sold out.
+- `commit_message`: `fix(rooms-availability): count availability by stay window and block sold-out bookings`
+- `main_files`:
+  - `app/(marketing)/rooms/page.tsx`
+  - `lib/supabase/workflows.ts`
+  - `components/room-booking-request-form.tsx`
+  - `components/room-canvas-modal.tsx`
+
+### Entry 089
+- `time`: 2026-04-18T23:49:18+07:00
+- `prompt_summary`: Gửi booking request bị lỗi với payload ngày dạng `YYYY-MM-DD`; cần sửa normalize timestamptz cho date-only input và trả lỗi rõ ràng hơn từ workflow.
+- `commit_message`: `fix(booking-request): normalize date-only stay windows`
+- `main_files`:
+  - `lib/supabase/workflows.ts`
+
+### Entry 090
+- `time`: 2026-04-19T00:00:00+07:00
+- `prompt_summary`: Chuẩn hóa response lỗi để trả message rõ ràng hơn cho API booking/member, đồng thời log lỗi server-side với context để admin theo dõi và debug.
+- `commit_message`: `feat(error-handling): standardize API error responses and server logging`
+- `main_files`:
+  - `lib/server/api-error.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `app/api/member/profile/route.ts`
+  - `app/api/member/bootstrap/route.ts`
+  - `components/room-booking-request-form.tsx`
+
+### Entry 091
+- `time`: 2026-04-19T00:44:11+07:00
+- `prompt_summary`: Đổi trang member sang template web công khai, dùng lại topbar menu và footer thay vì member dashboard shell riêng, đồng thời giữ member dashboard content bên trong.
+- `commit_message`: `feat(member-site): reuse public header and footer for member pages`
+- `main_files`:
+  - `app/(member)/layout.tsx`
+  - `app/(member)/member/page.tsx`
+
+### Entry 092
+- `time`: 2026-04-19T10:34:00+07:00
+- `prompt_summary`: Thiết kế member portal với sidebar anchor menu cho Đặt phòng / Lịch sử / Thông tin / Thông báo, và sửa trang admin sign-in để tài khoản member không bị redirect ngược về member portal khi truy cập /admin.
+- `commit_message`: `feat(member-portal): add anchored sidebar and keep admin sign-in on admin portal`
+- `main_files`:
+  - `app/(member)/member/page.tsx`
+  - `components/member-portal-sidebar.tsx`
+  - `components/member-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `app/admin/sign-in/page.tsx`
+  - `app/globals.css`
+  - `lib/mock/member-dashboard.ts`
+
+### Entry 093
+- `time`: 2026-04-19T10:54:00+07:00
+- `prompt_summary`: Bổ sung data thật cho member portal thay vì placeholder, và thêm CRUD thực cho admin portal content_pages để quản lý bài viết/trang web hiện có từ Supabase.
+- `commit_message`: `feat(cms-member-data): wire real member history and content page CRUD`
+- `main_files`:
+  - `app/(member)/member/page.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `app/(admin)/admin/content-pages/page.tsx`
+  - `app/(admin)/admin/content-pages/actions.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/availability-requests.ts`
+  - `lib/supabase/queries/content-pages.ts`
+  - `app/globals.css`
+
+### Entry 094
+- `time`: 2026-04-20T12:13:35+07:00
+- `prompt_summary`: Dựng thư viện media dùng chung cho toàn app, chia collection/asset trong Supabase, cho public pages chọn ảnh từ media thay vì hard-code, và thêm admin CRUD cho media library.
+- `commit_message`: `feat(media-library): add shared media collections and admin CRUD`
+- `main_files`:
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `app/(admin)/admin/media/page.tsx`
+  - `app/(admin)/admin/media/actions.ts`
+  - `components/about-us-page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `components/admin-shell.tsx`
+  - `components/public-cms.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `lib/media/library.ts`
+  - `lib/mock/admin-dashboard.ts`
+  - `lib/mock/public-cms.ts`
+  - `lib/rooms/catalog.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/queries/media.ts`
+  - `app/globals.css`
+  - `supabase/migrations/20260420100000_phase_h_media_library.sql`
+
+### Entry 095
+- `time`: 2026-04-21T14:12:51+07:00
+- `prompt_summary`: Sửa `generate:content-pages-seed` để chạy được bằng Node thuần, loại bỏ alias `@/` khỏi chuỗi import mà seed generator đi qua, rồi sinh lại file `supabase/seed-content-pages.sql`.
+- `commit_message`: `fix(content-pages-seed): replace app aliases with node-safe imports`
+- `main_files`:
+  - `lib/mock/public-cms.ts`
+  - `lib/site-content.ts`
+  - `supabase/seed-content-pages.sql`
+
+### Entry 096
+- `time`: 2026-04-21T14:40:20+07:00
+- `prompt_summary`: Sửa lỗi `next/image` nhận nhầm media reference `media://...` khi load trang, bằng cách resolve ảnh CMS collection trước khi render carousel room trên public site.
+- `commit_message`: `fix(media-images): resolve cms media refs before next/image`
+- `main_files`:
+  - `components/selected-rooms-carousel.tsx`
+  - `components/public-cms.tsx`
+
+### Entry 097
+- `time`: 2026-04-21T16:26:58+07:00
+- `prompt_summary`: Tiếp tục phần booking workflow dang dở: khóa nút gửi khi profile member đang được nhận diện, làm request/admin queue hiển thị rõ hơn, auto-select request để staff thấy contact/status/hold/reservation/payment, đẩy realtime cho admin/member, và bỏ fallback placeholder ở member portal để ưu tiên dữ liệu thật.
+- `commit_message`: `feat(workflow-ui): surface request inbox and lock booking submit while loading`
+- `main_files`:
+  - `components/room-booking-request-form.tsx`
+  - `components/admin-shell.tsx`
+  - `components/admin-live-updates.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/workflows.ts`
+  - `app/(admin)/admin/actions.ts`
+  - `app/(member)/member/page.tsx`
+  - `lib/mock/admin-dashboard.ts`
+
+### Entry 098
+- `time`: 2026-04-21T17:02:20+07:00
+- `prompt_summary`: Xoá khối realtime riêng trong admin portal, thu overview về lưới 5 ô trên một hàng, và gom phần booking/status thành một khối gọn với chỉ trạng thái hiện tại và các trạng thái hợp lệ để staff đổi.
+- `commit_message`: `refactor(admin-portal): compact workflow overview and remove realtime panel`
+- `main_files`:
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/globals.css`
+
+### Entry 099
+- `time`: 2026-04-22T00:48:08+07:00
+- `prompt_summary`: Chốt lại booking workflow phase 1 theo hướng request -> admin confirm -> deposit QR -> member upload proof -> admin verify -> auto booking confirmation, đồng thời làm gọn admin portal kiểu SaaS với table cho các list, thêm tooltip `?` cho hướng dẫn, và cập nhật member portal/status label cho rõ hành động thanh toán cọc.
+- `commit_message`: `feat(workflow-admin): streamline booking handoff and admin queues`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/actions/payments.ts`
+  - `app/globals.css`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/portal-ui.tsx`
+  - `README.md`
+  - `lib/supabase/email.ts`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/workflows.ts`
+
+## 2026-04-22
+
+### Entry 100
+- `time`: 2026-04-22T09:42:52+07:00
+- `prompt_summary`: Đọc `prompt.md` và refactor UI/UX admin portal theo mockups trong `docs/ui/sk_admin_portal`, áp theme DESIGN.md, thêm các màn hình dashboard/bookings/rooms/content pages và shell admin mới.
+- `commit_message`: `feat(admin-ui): refactor shell and core screens to mockups`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `app/(admin)/admin/content-pages/page.tsx`
+  - `app/globals.css`
+
+### Entry 101
+- `time`: 2026-04-22T10:12:11+07:00
+- `prompt_summary`: Sửa trạng thái active của sidebar admin, nối dashboard/bookings/rooms/content pages vào dữ liệu thật từ Supabase, khóa content pages theo hướng chỉ sửa nội dung/hình ảnh không tạo/xóa, làm toàn bộ admin portal song ngữ VI/EN, bật lọc 7 ngày/30 ngày trên dashboard và chuẩn hóa toàn bộ tiền hiển thị sang VND.
+- `commit_message`: `feat(admin-portal): wire real data and bilingual labels`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `app/(admin)/admin/page.tsx`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `app/globals.css`
+
+### Entry 102
+- `time`: 2026-04-22T12:27:21+07:00
+- `prompt_summary`: Khắc phục admin portal không filter/click được, không mở ẩn/hiện cột, không đổi được bộ lọc ngày lưu trú và chi nhánh; map lại bookings/rooms theo dữ liệu thực Supabase, dùng branch-aware queries, đồng bộ dữ liệu booking thật từ `availability_requests` + `reservations`, và giữ toàn bộ giao diện song ngữ VI/EN với tiền hiển thị VND.
+- `commit_message`: `fix(admin-portal): wire branch-aware filters and live booking data`
+- `main_files`:
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-shell.tsx`
+  - `components/admin-dashboard.tsx`
+  - `app/(admin)/layout.tsx`
+  - `app/globals.css`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/room-holds.ts`
+  - `lib/supabase/workflow.types.ts`
+
+### Entry 103
+- `time`: 2026-04-22T15:36:16+07:00
+- `prompt_summary`: Triển khai trang chi tiết cho record đặt phòng trong admin portal, cho phép bấm từ danh sách booking để mở detail view có hồ sơ khách, request gốc, request status, payment deposit, hold, audit timeline và các link điều hướng workflow liên quan.
+- `commit_message`: `feat(admin-bookings): add booking detail page and row links`
+- `main_files`:
+  - `app/(admin)/admin/bookings/[bookingCode]/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-booking-detail-toolbar.tsx`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/reservation-room-items.ts`
+  - `app/globals.css`
+  - `README.md`
+
+### Entry 104
+- `time`: 2026-04-22T23:10:36+07:00
+- `prompt_summary`: Tiếp tục hoàn thiện booking detail/admin/member theo dữ liệu thật: fixed sidebar admin, bỏ overview thừa ở booking detail, thêm countdown hold, hiển thị customer/account thật, thêm badge tầng có phòng booked, chèn QR VietQR với actions cọc, và làm gọn member/admin portal theo workflow vận hành thực tế.
+- `commit_message`: `feat(operations-ui): streamline booking detail and real data views`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-accounts-page.tsx`
+  - `app/(admin)/admin/accounts/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-shell.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-live-updates.tsx`
+  - `app/(member)/member/page.tsx`
+  - `app/(admin)/admin/actions.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/audit-logs.ts`
+  - `lib/supabase/payments.ts`
+  - `app/globals.css`
+  - `README.md`
+
+### Entry 105
+- `time`: 2026-04-23T14:00:28+07:00
+- `prompt_summary`: Thêm chức năng bấm vào ảnh trong chi tiết hạng phòng để mở lớp phóng to riêng, có nút đóng chế độ phóng to và hỗ trợ Escape/backdrop để tắt zoom.
+- `commit_message`: `feat(room-canvas): add image zoom overlay in room detail`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 106
+- `time`: 2026-04-23T14:13:58+07:00
+- `prompt_summary`: Khi đang ở chế độ phóng to ảnh trong chi tiết hạng phòng, cho phép chuyển ảnh trước/sau ngay trong overlay để không phải thoát zoom mới xem ảnh khác.
+- `commit_message`: `feat(room-canvas): add zoom gallery navigation`
+- `main_files`:
+  - `components/room-canvas-modal.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 107
+- `time`: 2026-04-23T14:17:29+07:00
+- `prompt_summary`: Sửa carousel ảnh ở trang phòng để không tràn ngang và phá responsive trên mobile, giữ slider nằm trong khung nội dung chuẩn.
+- `commit_message`: `fix(rooms-carousel): stop horizontal overflow on mobile`
+- `main_files`:
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 108
+- `time`: 2026-04-23T14:52:52+07:00
+- `prompt_summary`: Nâng chất lượng ảnh hạng phòng trên mobile responsive, chỉnh `sizes` cho sát khung hiển thị thật, và mở whitelist quality của Next để ảnh không bị lỗi runtime khi tăng chất lượng.
+- `commit_message`: `fix(room-images): improve mobile rendering quality`
+- `main_files`:
+  - `next.config.ts`
+  - `components/rooms-catalog-page.tsx`
+  - `components/rooms-image-carousel.tsx`
+  - `components/selected-rooms-carousel.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 109
+- `time`: 2026-04-23T16:19:50+07:00
+- `prompt_summary`: Chỉnh member portal theo luồng tối giản và sang hơn: greeting ở đầu, tổng quan số liệu clickable, booking và trạng thái sort mới/chưa hoàn tất lên trước, mở payment chỉ ở booking chưa book xong, sidebar chỉ còn 3 anchor tổng quan/booking/thông tin, và kiểm tra lại responsive mobile.
+- `commit_message`: `feat(member-portal): refine overview, booking flow, and responsive layout`
+- `main_files`:
+  - `components/member-portal-dashboard.tsx`
+  - `components/member-portal-sidebar.tsx`
+  - `app/(member)/member/page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 110
+- `time`: 2026-04-23T23:08:13+07:00
+- `prompt_summary`: Sửa lệch giá giữa public booking và admin/member bằng cách lưu snapshot giá ngay lúc gửi request, khôi phục admin payment flow do lỗi ghi sai UUID actor, thêm countdown SLA còn lại cho request, và hiển thị giá tiền rõ trên member portal/admin booking views.
+- `commit_message`: `fix(booking-workflow): persist quoted request totals and restore admin payment actions`
+- `main_files`:
+  - `supabase/migrations/20260423113000_phase_i_request_quote_snapshot.sql`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/workflows.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `components/room-canvas-modal.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `app/actions/payments.ts`
+  - `lib/supabase/payments.ts`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `lib/supabase/queries/availability-requests.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 111
+- `time`: 2026-04-23T23:28:51+07:00
+- `prompt_summary`: Làm rõ luồng admin sau khi bấm mở workflow bằng cách cho route `/admin?request=...` nhảy thẳng xuống khu Requests & holds và hiển thị chỉ dẫn ngắn ngay trong dashboard overview.
+- `commit_message`: `fix(admin-workflow): deep link request workflows to the operations panel`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-dashboard.tsx`
+  - `docs/commit_prompt_map.md`

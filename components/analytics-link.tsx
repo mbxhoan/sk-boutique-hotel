@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { appendLocaleQuery, type Locale } from "@/lib/locale";
+import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
 import { normalizeRoomHref } from "@/lib/room-routes";
 import type { AnalyticsEventType } from "@/lib/supabase/database.types";
 
@@ -59,6 +60,10 @@ export function AnalyticsLink({
 }: AnalyticsLinkProps) {
   const pathname = usePathname();
   const resolvedHref = appendLocaleQuery(normalizeRoomHref(href, locale), locale);
+
+  if (isTemporarilyHiddenHref(resolvedHref)) {
+    return null;
+  }
 
   return (
     <Link

@@ -1,10 +1,11 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
-import { AdminManagementPage } from "@/components/admin-management-page";
-import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
+import { AdminContentPagesManager } from "@/components/admin-content-pages-manager";
+import { resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { adminManagementCopy } from "@/lib/mock/admin-management";
+import { listContentPages } from "@/lib/supabase/queries/content-pages";
+import { listMediaAssets, listMediaCollections, resolveMediaAssetUrl } from "@/lib/supabase/queries/media";
 
 type PageProps = {
   searchParams?: Promise<{
@@ -17,7 +18,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
 
   return {
-    title: locale === "en" ? "Pages & posts" : "Bài viết & trang",
+    title: locale === "en" ? "Pages & articles" : "Bài viết & trang",
     description: localize(locale, adminManagementCopy.contentPages.description)
   };
 }
@@ -25,16 +26,18 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function AdminContentPagesPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const [pages, assets, collections] = await Promise.all([listContentPages(), listMediaAssets(), listMediaCollections()]);
+  const assetsWithUrl = assets.map((asset) => ({
+    ...asset,
+    public_url: resolveMediaAssetUrl(asset)
+  }));
 
   return (
-    <AdminManagementPage
-      actions={
-        <Link className="button button--text-light" target="_blank" href={appendLocaleQuery("/", locale)}>
-          {locale === "en" ? "View public site" : "Xem website"}
-        </Link>
-      }
+    <AdminContentPagesManager
+      assets={assetsWithUrl}
+      collections={collections}
       locale={locale}
-      page={adminManagementCopy.contentPages}
+      pages={pages}
     />
   );
 }

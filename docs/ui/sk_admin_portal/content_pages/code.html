@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SK Boutique Hotel - Content Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#e5eeff",
+                        "on-secondary-container": "#4b617d",
+                        "primary-fixed": "#ffdeae",
+                        "outline": "#807569",
+                        "on-primary-fixed": "#281800",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#c5dcfd",
+                        "tertiary": "#5c5f60",
+                        "secondary-fixed-dim": "#b1c8e9",
+                        "on-error": "#ffffff",
+                        "secondary": "#4a607c",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#3d2700",
+                        "inverse-surface": "#213145",
+                        "outline-variant": "#d1c5b6",
+                        "tertiary-container": "#919394",
+                        "surface-bright": "#f8f9ff",
+                        "surface-tint": "#775928",
+                        "inverse-primary": "#e8c086",
+                        "on-secondary-fixed-variant": "#324863",
+                        "secondary-fixed": "#d2e4ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed-variant": "#5d4213",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface": "#0b1c30",
+                        "tertiary-fixed": "#e1e3e4",
+                        "background": "#f8f9ff",
+                        "primary": "#775928",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#4e453a",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-container": "#292c2d",
+                        "primary-fixed-dim": "#e8c086",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "surface-variant": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface": "#f8f9ff",
+                        "on-secondary-fixed": "#021c36",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#b08d57",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#191c1d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sidebar-width": "260px",
+                        "sm": "8px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "table-data": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "h3": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"]
+                    },
+                    "fontSize": {
+                        "table-data": ["13px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h1": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h3": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h2": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased flex min-h-screen">
+<nav class="bg-slate-950 dark:bg-black font-['Inter'] text-[13px] font-medium fixed left-0 top-0 w-[260px] h-screen border-r border-slate-800 flat no shadows flex flex-col justify-between py-8 px-4 h-full z-50">
+<div>
+<div class="mb-10 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+<img alt="Hotel Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPkDRCJEsVjNgdpSGzBjurMVI3VmwTVM_4NeovNKQQMP2Qfe4OCifwXw8kqxJRF2cYERyvykM6tWj4NLcWx2s8s8SpFWSqTP8XMCHAWUHTebFHnWi8tu4oPwGpRMl0SzzGoBJ3CJJkImf-S--0WmLOg7-LO12biy9C3I5t4A3XLQZnAsd8G0Nc3vloYifE_IU5o_veUphWpox8XiVgdcPXl2-pfXacPHe-WrqgSoIxfnWcyU2vAy8Zdr91nOlorXjfa4Aq6fxMObEj"/>
+</div>
+<div>
+<div class="text-xl font-black text-[#B08D57] tracking-tighter">SK Boutique</div>
+<div class="text-slate-500 text-[11px] uppercase tracking-wider mt-0.5">Admin Portal</div>
+</div>
+</div>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="calendar_month">calendar_month</span>
+<span>Bookings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="meeting_room">meeting_room</span>
+<span>Room Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_outline">person_outline</span>
+<span>Customers</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-slate-900 text-[#B08D57] border-r-2 border-[#B08D57] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit_note">edit_note</span>
+<span>Content</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help_outline">help_outline</span>
+<span>Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+<span>Log Out</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="flex-1 ml-[260px] flex flex-col min-w-0">
+<header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md font-['Inter'] antialiased tracking-tight docked full-width top-0 h-16 border-b border-slate-200 dark:border-slate-800 flat no shadows flex justify-between items-center px-8 w-[calc(100%-260px)] ml-[260px] fixed z-40">
+<div class="flex items-center gap-4">
+<span class="text-lg font-bold text-slate-900 dark:text-white tracking-widest uppercase">SK Boutique Hotel</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 cursor-pointer active:opacity-70 transition-opacity text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors px-3 py-1.5 rounded-md">
+<span class="text-sm font-medium">Branch Selector</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-6">
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer active:opacity-70 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer active:opacity-70 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" data-icon="storefront">storefront</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ml-2 cursor-pointer border border-slate-300 dark:border-slate-600">
+<img alt="Administrator Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf0c966tVB_GT0BUB1YV8HPAndFUOB7Dk5E1tvFT3eP79soOGrMY1gA--0f_on-Du-RDiqWmAK_yi5sYHC_vj4puGmtaqJo_DF0ChZX-uWg5huANB8zUrgHG5Hn1ImFGupVtHAwTxArxk2c0bj8KKc7MMEmH9-IaRW90XPRFdpsv8OXTNTcabNgt-mi0dYDTEGy_oOazJ5SbBtbgD_IIBgqTSFT7LT5lnlKmC1V25kj_DQDxD-i2Bu0RGq5IE_8zsqEwKIagQoPofr"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 p-xl pt-[calc(64px+32px)] flex flex-col gap-lg">
+<div class="flex items-end justify-between border-b border-outline-variant pb-md">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface">Content Management</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Manage public-facing website content, media, and promotional banners.</p>
+</div>
+<button class="bg-primary text-on-primary rounded font-label-caps text-label-caps px-md py-sm hover:opacity-90 transition-opacity shadow-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+                    Publish All Changes
+                </button>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-md flex items-start gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary mt-0.5">info</span>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs">Syncing Guidelines</h3>
+<p class="font-body-sm text-body-sm">Changes made in 'Edit' mode are saved as drafts. They will not appear on the live SK Boutique Hotel website until you explicitly click 'Publish'. Use 'Preview' to review changes safely.</p>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-lg mt-md">
+<div class="col-span-12 lg:col-span-8 bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h2 class="font-h2 text-h2 text-on-surface">Public Pages</h2>
+<button class="text-primary hover:text-primary-container font-label-caps text-label-caps flex items-center gap-xs transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span> New Page
+                        </button>
+</div>
+<div class="flex-1 p-lg">
+<div class="grid grid-cols-1 gap-md">
+<div class="group flex items-center justify-between p-md rounded-lg border border-outline-variant bg-surface hover:shadow-md transition-shadow duration-200">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div>
+<div class="font-h3 text-h3 text-on-surface">Home</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">/index.html</div>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="px-sm py-xs rounded bg-[#e8f5e9] text-[#2e7d32] font-label-caps text-[10px] tracking-wider uppercase border border-[#c8e6c9]">Live</span>
+<div class="flex gap-sm">
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Preview">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="w-8 h-8 rounded border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group flex items-center justify-between p-md rounded-lg border border-outline-variant bg-surface hover:shadow-md transition-shadow duration-200">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">diamond</span>
+</div>
+<div>
+<div class="font-h3 text-h3 text-on-surface">Brand &amp; Philosophy</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">/about-us</div>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="px-sm py-xs rounded bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] tracking-wider uppercase border border-outline-variant">Draft</span>
+<div class="flex gap-sm">
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Preview">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="w-8 h-8 rounded border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group flex items-center justify-between p-md rounded-lg border border-outline-variant bg-surface hover:shadow-md transition-shadow duration-200">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">location_city</span>
+</div>
+<div>
+<div class="font-h3 text-h3 text-on-surface">Branches &amp; Locations</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">/locations</div>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="px-sm py-xs rounded bg-[#e8f5e9] text-[#2e7d32] font-label-caps text-[10px] tracking-wider uppercase border border-[#c8e6c9]">Live</span>
+<div class="flex gap-sm">
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Preview">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="w-8 h-8 rounded border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant bg-surface-bright">
+<h2 class="font-h2 text-h2 text-on-surface">Active Banners</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Manage global site promotions.</p>
+</div>
+<div class="flex-1 p-lg flex flex-col gap-md">
+<div class="p-md rounded-lg border border-primary/30 bg-primary/5 flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="font-h3 text-h3 text-on-surface">Summer Escape 2024</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">"Book 3 nights, get the 4th free at select boutique locations."</p>
+<div class="text-[11px] text-primary font-medium mt-sm uppercase tracking-wide">Homepage Hero Banner</div>
+</div>
+<div class="p-md rounded-lg border border-outline-variant bg-surface flex flex-col gap-sm opacity-70">
+<div class="flex justify-between items-start">
+<div class="font-h3 text-h3 text-on-surface">Winter Retreat Spa Package</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">"Complimentary 60-minute massage with suite bookings."</p>
+<div class="text-[11px] text-on-surface-variant font-medium mt-sm uppercase tracking-wide">Offers Page Only</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden mt-md">
+<div class="p-lg border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<div>
+<h2 class="font-h2 text-h2 text-on-surface">Media Library Overview</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Recent uploads used across pages and banners.</p>
+</div>
+<div class="flex gap-md">
+<button class="border border-outline text-on-surface rounded font-label-caps text-label-caps px-md py-sm hover:bg-surface-container transition-colors">
+                                Browse All Media
+                            </button>
+<button class="bg-primary text-on-primary rounded font-label-caps text-label-caps px-md py-sm hover:opacity-90 transition-opacity flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">add_photo_alternate</span> Upload
+                            </button>
+</div>
+</div>
+<div class="p-lg grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-md">
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="luxury hotel pool area with lounge chairs and clear blue water during daytime" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="luxury hotel pool area with lounge chairs and clear blue water during daytime" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjJPGpuF_74ZeodZQKeWMeaOlak3TsqSruiJRAk-JU7lifXgeTNOuLY4iR-J1GhiJT5PLwg8qSBHw-W0CMttsyW2_MCg8gmZSEeb2BRcFliOmK1htutlq3b_AkLBkrR-jaBw01qR0FeqjlayLA5PJ9oQVMCnlz5k5bK5vpn9JEP_ihZlEPA1mA_rnPiONo-MpgGeRfn0cm7xiJU_A7iUQvZXWhnBFDZdo8_flJ_EQRy-pIL4AKX8elT5V5DGXbu7RSKEtNv2g02yYH"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[32px]">zoom_in</span>
+</div>
+</div>
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="elegant modern hotel lobby with high ceilings, warm lighting, and minimalist furniture" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="elegant modern hotel lobby with high ceilings, warm lighting, and minimalist furniture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDczfI9dSN6W1npo2vSFgVdOf3z-H0euGBdd0Oy2ejv6fs288DFaksJogBd0oIEKcv_f3MHxWCggPXlpELll8bXraKLso6P0iCK7R-BbXAKmzjLjM2SORPFN_lUap0PgVOXyOfQnjB9JWXKsapdZlY9C66T9wjG1PykkaT6j6S8Ah_bwkZ0kkONrf17wqHZkmeyv7-hQ473OH27HtwfwGGMPF1qyPUypvXfge8mLhZO6b50Hx3enVyZf_EZ8YrsHO9s_GJYKJE7txrN"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[32px]">zoom_in</span>
+</div>
+</div>
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="luxurious hotel suite bedroom with crisp white linens and a large window showing city views" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="luxurious hotel suite bedroom with crisp white linens and a large window showing city views" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWo2eYq--Ifce5ikyjg95KXe_3nWkndyf4X7qvPUs3nAJMRiO_OfK0W1ji2m24t44vZJs-ew53AKlwBf1CEK6sn3lpyQpGYn8TK6tlwCK8T2obhIb3r-8MhH5bzZBAlrrVk0cqZ0IffJf1lepDHewcCe9zjfOVDLgpM8qoe0gw-oBaAN2wlu_kjOhtAQHyBGpHY4FjMSEjVGvrlPBo-T0nWo1MFkkwoKuGVs8Le6osbe1c-FPoKgXfchXSf2z63tKk7CZcJwRQ5eyw"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[32px]">zoom_in</span>
+</div>
+</div>
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="close up of fine dining restaurant table setting with crystal glasses and elegant plates" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="close up of fine dining restaurant table setting with crystal glasses and elegant plates" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoOJ_JrFwTMt0aM-A6BZg6f6CpQWowdaybndvQkfrs885DbjrxIUwnj_gN46yW3fm3iqP5dESxDWJG-AFI940_C2GoQrOCX4cMBlBBK5-h4GTuDxxZg_NiSXobR43CR0b-V1LFJLY2qs7MvefHOt7eRm7qe7W3mcE-vPY_mrsE3AQwl0C20X4yAtG8BueEHrXk5I4yUB4hK8n9zRWu6KwzXAH80VvmRzfftJfdln4gHycE-IGsbiopZLskAeVCeJBP_BVcnGtwChnu"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[32px]">zoom_in</span>
+</div>
+</div>
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant bg-surface-container flex flex-col items-center justify-center cursor-pointer hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[32px] mb-xs">folder_open</span>
+<span class="font-label-caps text-[10px] tracking-wider uppercase">Logos &amp; Icons</span>
+</div>
+<div class="group relative aspect-square rounded-lg overflow-hidden border border-outline-variant border-dashed bg-surface flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:text-primary transition-colors text-outline">
+<span class="material-symbols-outlined text-[32px] mb-xs">add</span>
+<span class="font-label-caps text-[10px] tracking-wider uppercase">Drag to Upload</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -18,7 +18,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2",
-    email: "admin@skbh.vn",
+    email: "skhotel.phuquoc@gmail.com",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",

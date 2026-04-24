@@ -11,6 +11,7 @@ type PageProps = {
     branch?: string;
     limit?: string;
     lang?: string;
+    range?: string;
     request?: string;
     roomType?: string;
     stayEndAt?: string;
@@ -34,10 +35,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function AdminPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const range = resolvedSearchParams.range === "7d" || resolvedSearchParams.range === "30d" ? resolvedSearchParams.range : "today";
   const parsedLimit = resolvedSearchParams.limit ? Number(resolvedSearchParams.limit) : null;
   const dashboard = await loadAdminWorkflowDashboard({
     branchId: resolvedSearchParams.branch,
     limit: parsedLimit != null && Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : undefined,
+    range,
     requestId: resolvedSearchParams.request,
     roomTypeId: resolvedSearchParams.roomType,
     stayEndAt: resolvedSearchParams.stayEndAt,
@@ -49,6 +52,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
       canOperate={hasSupabaseServiceConfig()}
       data={dashboard}
       locale={locale}
+      range={range}
+      searchParams={resolvedSearchParams}
       testEmailDefaultRecipient={getSupabaseEmailAdminRecipient()}
     />
   );

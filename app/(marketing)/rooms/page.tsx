@@ -4,8 +4,10 @@ import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
+import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
+import { listBranches } from "@/lib/supabase/queries/branches";
+import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
-import { listRoomsByRoomTypeId } from "@/lib/supabase/queries/rooms";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -29,6 +31,54 @@ function getDefaultFilters() {
   };
 }
 
+const roomsHeroFallback = [
+  "/assets/room_types/family/1.png", 
+  "/assets/room_types/superior/1.png", 
+  "/assets/room_types/quadruple/1.png"
+];
+const roomsCarouselFallback = [
+  "/assets/room_types/family/5.png", 
+  "/assets/room_types/family/2.png", 
+  "/assets/room_types/family/4.png", 
+  "/assets/room_types/family/9.png", 
+  "/assets/room_types/family/6.png", 
+  "/assets/room_types/superior/7.png", 
+  "/assets/room_types/superior/3.png", 
+  "/assets/room_types/superior/2.png", 
+  "/assets/room_types/quadruple/1.png",
+  "/assets/room_types/quadruple/5.png"
+];
+const roomGalleryFallbacks: Record<string, string[]> = {
+  "family-room": [
+    "/assets/room_types/family/1.png", 
+    "/assets/room_types/family/2.png", 
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/4.png",
+    "/assets/room_types/family/5.png",
+    "/assets/room_types/family/6.png",
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/family/8.png",
+    "/assets/room_types/family/9.png",
+  ],
+  "superior-room": [
+    "/assets/room_types/superior/1.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/3.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/5.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/superior/7.png",
+  ],
+  "quadruple-room": [
+    "/assets/room_types/quadruple/1.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/3.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/5.png",
+    "/assets/room_types/quadruple/6.png",
+  ]
+};
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
   const locale = resolveLocale(resolvedSearchParams.lang);
@@ -45,22 +95,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function RoomsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const branches = await listBranches();
   const roomTypes = await listRoomTypes();
   const activeRoomType = resolvedSearchParams.room
     ? roomTypes.find((roomType) => roomType.slug === resolvedSearchParams.room)
-    : null;
-
-  const roomAvailabilityByTypeId = Object.fromEntries(
-    await Promise.all(
-      roomTypes.map(async (roomType) => {
-        const rooms = await listRoomsByRoomTypeId(roomType.id);
-        const availableRooms = rooms.filter((room) => room.status === "available").length;
-
-        return [roomType.id, availableRooms] as const;
-      })
-    )
-  );
-
+  : null;
+  const defaultBranchId = branches[0]?.id ?? null;
   const defaultFilters = getDefaultFilters();
   const initialFilters = {
     adults: resolvedSearchParams.adults ?? defaultFilters.adults,
@@ -70,6 +110,36 @@ export default async function RoomsPage({ searchParams }: PageProps) {
     lang: resolvedSearchParams.lang,
     room: resolvedSearchParams.room
   };
+
+  // const availableRooms = defaultBranchId
+  //   ? await findAvailableRooms({
+  //       branchId: defaultBranchId,
+  //       stayEndAt: initialFilters.checkout,
+  //       stayStartAt: initialFilters.checkin
+  //     })
+  //   : [];
+
+  const availableRooms = defaultBranchId
+  ? await findAvailableRooms({
+      branchId: defaultBranchId,
+      stayEndAt: initialFilters.checkout,
+      stayStartAt: initialFilters.checkin,
+      limit: 100 // Thêm dòng này để quét tối đa 100 phòng thay vì 12
+    })
+  : [];
+
+  const roomAvailabilityByTypeId = availableRooms.reduce<Record<string, number>>((accumulator, room) => {
+    accumulator[room.room_type_id] = (accumulator[room.room_type_id] ?? 0) + 1;
+
+    return accumulator;
+  }, {});
+  const [roomsHeroImage, roomCarouselImages, familyGallery, superiorGallery, quadrupleGallery] = await Promise.all([
+    loadMediaCollectionImageUrls("rooms-hero", roomsHeroFallback, 1).then((images) => images[0] ?? roomsHeroFallback[0]),
+    loadMediaCollectionImageUrls("rooms-gallery", roomsCarouselFallback, 15),
+    loadMediaCollectionImageUrls("room-family", roomGalleryFallbacks["family-room"], 20),
+    loadMediaCollectionImageUrls("room-superior", roomGalleryFallbacks["superior-room"], 20),
+    loadMediaCollectionImageUrls("room-quadruple", roomGalleryFallbacks["quadruple-room"], 20)
+  ]);
 
   return (
     <>
@@ -84,11 +154,19 @@ export default async function RoomsPage({ searchParams }: PageProps) {
         />
       ) : null}
       <RoomsCatalogPage
+        defaultBranchId={defaultBranchId}
         initialFilters={initialFilters}
         initialRoomSlug={activeRoomType?.slug ?? null}
         locale={locale}
+        roomCarouselImages={roomCarouselImages}
+        roomGalleriesBySlug={{
+          "family-room": familyGallery,
+          "quadruple-room": quadrupleGallery,
+          "superior-room": superiorGallery
+        }}
         roomAvailabilityByTypeId={roomAvailabilityByTypeId}
         roomTypes={roomTypes}
+        roomsHeroImage={roomsHeroImage}
       />
     </>
   );

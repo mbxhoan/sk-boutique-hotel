@@ -22,6 +22,7 @@ import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { countRoomHolds, countExpiringRoomHolds, listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { countReservations, listReservations } from "@/lib/supabase/queries/reservations";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowAuditLog,
@@ -120,17 +121,21 @@ function toReservationView(
   branchMap: Record<string, BranchRow>,
   roomMap: Record<string, RoomRow>,
   roomTypeMap: Record<string, RoomTypeRow>,
-  reservationRoomItemMap: Record<string, string>
+  reservationRoomItemMap: Record<string, string>,
+  customerMap: Record<string, { email: string; full_name: string }>
 ): WorkflowReservation {
   const branch = branchMap[reservation.branch_id];
   const roomId = reservationRoomItemMap[reservation.id];
   const room = roomId ? roomMap[roomId] : null;
   const roomType = roomTypeMap[reservation.primary_room_type_id];
+  const customer = customerMap[reservation.customer_id];
 
   return {
     ...reservation,
     branch_name_en: branch?.name_en ?? reservation.branch_id,
     branch_name_vi: branch?.name_vi ?? reservation.branch_id,
+    customer_email: customer?.email ?? reservation.customer_id,
+    customer_name: customer?.full_name ?? reservation.customer_id,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
     room_code: room?.code ?? reservation.id
@@ -230,14 +235,16 @@ function toSuggestionView(
   };
 }
 
-async function listActiveRooms() {
+async function listActiveRooms(branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("rooms")
-        .select(roomSelect)
-        .eq("is_active", true)
-        .order("code", { ascending: true });
+      let query = client.from("rooms").select(roomSelect).eq("is_active", true);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query.order("code", { ascending: true });
 
       if (error) {
         throw error;
@@ -249,15 +256,16 @@ async function listActiveRooms() {
   );
 }
 
-async function listActiveFloors() {
+async function listActiveFloors(branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("floors")
-        .select(floorSelect)
-        .eq("is_active", true)
-        .order("branch_id", { ascending: true })
-        .order("level_number", { ascending: true });
+      let query = client.from("floors").select(floorSelect).eq("is_active", true);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { data, error } = await query.order("branch_id", { ascending: true }).order("level_number", { ascending: true });
 
       if (error) {
         throw error;
@@ -295,19 +303,42 @@ function getVietnamStartOfDayIso(date = new Date()) {
   return new Date(startUtc).toISOString();
 }
 
+function getDashboardWindowSince(range: WorkflowSelection["range"]) {
+  if (range === "7d") {
+    return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  }
+
+  if (range === "30d") {
+    return new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  }
+
+  return getVietnamStartOfDayIso();
+}
+
 export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = {}): Promise<WorkflowDashboardData> {
+  const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+
+  if (releaseResults.some((result) => result.status === "rejected")) {
+    console.warn("[workflow] Failed to release expired holds/reservations before loading admin dashboard", {
+      holds: releaseResults[0].status === "fulfilled",
+      reservations: releaseResults[1].status === "fulfilled"
+    });
+  }
+
+  const dashboardWindowSince = getDashboardWindowSince(selection.range);
+  const branchFilterId = selection.branchId ?? undefined;
   const [branches, roomTypes, rooms, floors, reservationRoomItems, requests, holds, reservations, auditLogs, bankAccounts, paymentRequests, paymentProofs] = await Promise.all([
     listBranches(),
     listRoomTypes(),
-    listActiveRooms(),
-    listActiveFloors(),
+    listActiveRooms(branchFilterId),
+    listActiveFloors(branchFilterId),
     listReservationRoomItems(),
-    listAvailabilityRequests({ limit: 8 }),
-    listRoomHolds({ limit: 8, status: ["active", "converted", "expired"] }),
-    listReservations({ limit: 20 }),
-    listAuditLogs({ limit: 10, since: getVietnamStartOfDayIso() }),
-    listBranchBankAccounts({ limit: 20 }),
-    listPaymentRequests({ limit: 12 }),
+    listAvailabilityRequests({ branchId: branchFilterId, limit: 8 }),
+    listRoomHolds({ branchId: branchFilterId, limit: 8, status: ["active", "converted", "expired"] }),
+    listReservations({ branchId: branchFilterId, limit: 20, since: dashboardWindowSince }),
+    listAuditLogs({ branchId: branchFilterId, limit: 10, since: dashboardWindowSince }),
+    listBranchBankAccounts({ branchId: branchFilterId, limit: 20 }),
+    listPaymentRequests({ branchId: branchFilterId, limit: 12 }),
     listPaymentProofs({ limit: 20 })
   ]);
 
@@ -344,7 +375,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
   const availabilityRequests = requests.map((request) => toAvailabilityRequestView(request, branchMap, roomTypeMap));
   const activeRoomHolds = holds.map((hold) => toRoomHoldView(hold, branchMap, roomMap, roomTypeMap));
   const recentReservations = reservations.map((reservation) =>
-    toReservationView(reservation, branchMap, roomMap, roomTypeMap, reservationRoomItemMap)
+    toReservationView(reservation, branchMap, roomMap, roomTypeMap, reservationRoomItemMap, customerMap)
   );
   const recentAuditLogs = auditLogs.map((log) => toAuditLogView(log, branchMap));
   const branchBankAccountOptions = bankAccounts.map((account) => ({
@@ -356,13 +387,25 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     toPaymentRequestView(request, branchMap, roomTypeMap, latestPaymentProofMap, reservationMap, customerMap)
   );
 
+  const explicitSelectionContext =
+    selection.branchId && selection.roomTypeId && selection.stayStartAt && selection.stayEndAt
+      ? {
+          branchId: selection.branchId,
+          roomTypeId: selection.roomTypeId,
+          stayEndAt: selection.stayEndAt,
+          stayStartAt: selection.stayStartAt
+        }
+      : null;
+
   const selectedRequest = selection.requestId
     ? availabilityRequests.find((request) => request.id === selection.requestId) ??
       (await getAvailabilityRequestById(selection.requestId).then((row) =>
         row ? toAvailabilityRequestView(row, branchMap, roomTypeMap) : null
       )) ??
-      null
-    : null;
+      (explicitSelectionContext ? null : availabilityRequests[0] ?? null)
+    : explicitSelectionContext
+      ? null
+      : availabilityRequests[0] ?? null;
 
   const selectedContext = selectedRequest
     ? {
@@ -371,14 +414,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
         stayEndAt: selectedRequest.stay_end_at,
         stayStartAt: selectedRequest.stay_start_at
       }
-    : selection.branchId && selection.roomTypeId && selection.stayStartAt && selection.stayEndAt
-      ? {
-          branchId: selection.branchId,
-          roomTypeId: selection.roomTypeId,
-          stayEndAt: selection.stayEndAt,
-          stayStartAt: selection.stayStartAt
-        }
-      : null;
+    : explicitSelectionContext;
 
   const suggestions = selectedContext
     ? (await findAvailableRooms({
@@ -391,19 +427,20 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     : [];
 
   const openRequestCount = await countAvailabilityRequests({
+    branchId: branchFilterId,
     status: ["new", "in_review", "quoted"]
   });
-  const activeHoldCount = await countRoomHolds({ status: "active" });
-  const expiringHoldCount = await countExpiringRoomHolds(30);
-  const pendingReservationCount = await countReservations({ status: ["draft", "pending_deposit"] });
-  const pendingPaymentCount = await countPaymentRequests({ status: ["sent", "pending_verification"] });
-  const verifiedPaymentCount = await countPaymentRequests({ status: "verified" });
-  const auditTodayCount = await countAuditLogs({ since: getVietnamStartOfDayIso() });
-  const analyticsWindowSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const pageViewCount = await countAnalyticsEvents({ eventType: "page_view", since: analyticsWindowSince });
-  const roomViewCount = await countAnalyticsEvents({ eventType: "room_view", since: analyticsWindowSince });
-  const branchViewCount = await countAnalyticsEvents({ eventType: "branch_view", since: analyticsWindowSince });
-  const ctaClickCount = await countAnalyticsEvents({ eventType: "cta_click", since: analyticsWindowSince });
+  const activeHoldCount = await countRoomHolds({ branchId: branchFilterId, status: "active" });
+  const expiringHoldCount = await countExpiringRoomHolds(30, branchFilterId);
+  const pendingReservationCount = await countReservations({ branchId: branchFilterId, since: dashboardWindowSince, status: ["draft", "pending_deposit"] });
+  const pendingPaymentCount = await countPaymentRequests({ branchId: branchFilterId, status: ["sent", "pending_verification"] });
+  const verifiedPaymentCount = await countPaymentRequests({ branchId: branchFilterId, status: "verified" });
+  const auditWindowCount = await countAuditLogs({ branchId: branchFilterId, since: dashboardWindowSince });
+  const analyticsWindowSince = dashboardWindowSince;
+  const pageViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "page_view", since: analyticsWindowSince });
+  const roomViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "room_view", since: analyticsWindowSince });
+  const branchViewCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "branch_view", since: analyticsWindowSince });
+  const ctaClickCount = await countAnalyticsEvents({ branchId: branchFilterId, eventType: "cta_click", since: analyticsWindowSince });
 
   const stats: WorkflowStatCard[] = [
     {
@@ -431,64 +468,64 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
       value: `${expiringHoldCount}`
     },
     {
-      detail_en: "Draft and pending deposit reservations.",
-      detail_vi: "Reservation bản nháp hoặc chờ deposit.",
+      detail_en: "Draft and pending deposit reservations in the selected period.",
+      detail_vi: "Reservation bản nháp hoặc chờ deposit trong khoảng đã chọn.",
       label_en: "Pending reservations",
       label_vi: "Reservation chờ",
       tone: "soft",
       value: `${pendingReservationCount}`
     },
     {
-      detail_en: "Deposit requests waiting for manual verification.",
-      detail_vi: "Payment request đang chờ staff verify.",
+      detail_en: "Deposit requests waiting for manual verification in the selected period.",
+      detail_vi: "Payment request chờ verify trong khoảng đã chọn.",
       label_en: "Payment pending",
       label_vi: "Chờ payment",
       tone: "default",
       value: `${pendingPaymentCount}`
     },
     {
-      detail_en: "Confirmed payments processed today.",
-      detail_vi: "Payment đã xác nhận trong ngày.",
+      detail_en: "Confirmed payments processed in the selected period.",
+      detail_vi: "Payment đã xác nhận trong khoảng đã chọn.",
       label_en: "Verified payments",
       label_vi: "Payment đã duyệt",
       tone: "accent",
       value: `${verifiedPaymentCount}`
     },
     {
-      detail_en: "Audit entries created today.",
-      detail_vi: "Audit entry trong ngày.",
+      detail_en: "Audit entries created in the selected period.",
+      detail_vi: "Audit entry trong khoảng đã chọn.",
       label_en: "Audit entries",
-      label_vi: "Audit trong ngày",
+      label_vi: "Nhật ký audit",
       tone: "default",
-      value: `${auditTodayCount}`
+      value: `${auditWindowCount}`
     },
     {
-      detail_en: "Public page views tracked in the last 7 days.",
-      detail_vi: "Lượt xem public page trong 7 ngày gần nhất.",
+      detail_en: "Public page views tracked in the selected period.",
+      detail_vi: "Lượt xem public page trong khoảng đã chọn.",
       label_en: "Page views",
       label_vi: "Lượt xem",
       tone: "soft",
       value: `${pageViewCount}`
     },
     {
-      detail_en: "Room detail interest tracked in the last 7 days.",
-      detail_vi: "Lượt xem chi tiết phòng trong 7 ngày gần nhất.",
+      detail_en: "Room detail interest tracked in the selected period.",
+      detail_vi: "Lượt xem chi tiết phòng trong khoảng đã chọn.",
       label_en: "Room views",
       label_vi: "Xem phòng",
       tone: "accent",
       value: `${roomViewCount}`
     },
     {
-      detail_en: "Branch interest tracked in the last 7 days.",
-      detail_vi: "Lượt xem chi nhánh trong 7 ngày gần nhất.",
+      detail_en: "Branch interest tracked in the selected period.",
+      detail_vi: "Lượt xem chi nhánh trong khoảng đã chọn.",
       label_en: "Branch views",
       label_vi: "Xem chi nhánh",
       tone: "soft",
       value: `${branchViewCount}`
     },
     {
-      detail_en: "Tracked CTA clicks in the last 7 days.",
-      detail_vi: "Số click CTA trong 7 ngày gần nhất.",
+      detail_en: "Tracked CTA clicks in the selected period.",
+      detail_vi: "Số click CTA trong khoảng đã chọn.",
       label_en: "CTA clicks",
       label_vi: "CTA click",
       tone: "default",

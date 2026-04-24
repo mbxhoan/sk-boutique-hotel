@@ -80,9 +80,35 @@ export type WorkflowRoomHold = RoomHoldRow & {
 export type WorkflowReservation = ReservationRow & {
   branch_name_en: string;
   branch_name_vi: string;
+  customer_email: string;
+  customer_name: string;
   primary_room_type_name_en: string;
   primary_room_type_name_vi: string;
   room_code: string;
+};
+
+export type WorkflowBookingSource = "availability_request" | "reservation";
+
+export type WorkflowBookingRow = {
+  booking_code: string;
+  branch_id: string;
+  branch_name_en: string;
+  branch_name_vi: string;
+  created_at: string;
+  customer_email: string;
+  customer_name: string;
+  guest_count: number;
+  id: string;
+  notes: string;
+  room_type_id: string;
+  room_type_name_en: string;
+  room_type_name_vi: string;
+  source: WorkflowBookingSource;
+  status: AvailabilityRequestRow["status"] | ReservationRow["status"];
+  stay_end_at: string;
+  stay_start_at: string;
+  total_amount: number;
+  updated_at: string;
 };
 
 export type WorkflowAuditLog = AuditLogRow & {
@@ -110,8 +136,11 @@ export type WorkflowRoomSuggestion = RoomRow & {
   floor_name_vi: string | null;
 };
 
+export type WorkflowDashboardRange = "today" | "7d" | "30d";
+
 export type WorkflowSelection = {
   branchId?: string;
+  range?: WorkflowDashboardRange;
   requestId?: string;
   roomTypeId?: string;
   stayEndAt?: string;
@@ -141,6 +170,7 @@ export type WorkflowDashboardData = {
 
 export type WorkflowMemberHistoryData = {
   availability_requests: WorkflowAvailabilityRequest[];
+  audit_logs: WorkflowAuditLog[];
   branch_options: WorkflowBranchOption[];
   customer: CustomerRow;
   payment_proofs: WorkflowPaymentProof[];

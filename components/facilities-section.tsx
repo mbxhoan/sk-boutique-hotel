@@ -59,8 +59,8 @@ function buildColumns(locale: Locale): FacilityColumn[] {
         {
           title: { en: "Hotel amenities", vi: "Tiện nghi khách sạn" },
           rows: [
-            { kind: "text", label: { en: "Bed type", vi: "Loại giường" }, value: { en: "Double bed", vi: "Giường đôi" } },
-            { kind: "text", label: { en: "Room view", vi: "View phòng" }, value: { en: "Garden & pool view", vi: "Sân vườn và hồ bơi" } },
+            { kind: "check", label: { en: "Free breakfast", vi: "Ăn sáng miễn phí" } },
+            { kind: "check", label: { en: "Same-day laundry", vi: "Giặt ủi trong ngày" } },
             { icon: "water", kind: "check", label: { en: "Outdoor pool", vi: "Hồ bơi ngoài trời" } },
             { kind: "check", label: { en: "Windows", vi: "Cửa sổ" } },
             { kind: "check", label: { en: "Balcony", vi: "Ban công" } },
@@ -76,6 +76,8 @@ function buildColumns(locale: Locale): FacilityColumn[] {
         {
           title: { en: "Other information", vi: "Thông tin khác" },
           rows: [
+            { kind: "text", label: { en: "Bed type", vi: "Loại giường" }, value: { en: "Double bed", vi: "Giường đôi" } },
+            { kind: "text", label: { en: "Room view", vi: "View phòng" }, value: { en: "Garden & pool view", vi: "Sân vườn và hồ bơi" } },
             { kind: "text", label: { en: "Safe", vi: "Két sắt" }, value: { en: "VIP rooms only", vi: "Chỉ dành cho phòng VIP" } },
             { kind: "text", label: { en: "Housekeeping", vi: "Dọn phòng" }, value: { en: "Daily", vi: "Mỗi ngày" } },
             { kind: "text", label: { en: "Room service", vi: "Dịch vụ phòng" }, value: { en: "24/7", vi: "24/7" } },
@@ -89,8 +91,8 @@ function buildColumns(locale: Locale): FacilityColumn[] {
         {
           title: { en: "Hotel amenities", vi: "Tiện nghi khách sạn" },
           rows: [
-            { kind: "text", label: { en: "Bed type", vi: "Loại giường" }, value: { en: "Double bed", vi: "Giường đôi" } },
-            { kind: "text", label: { en: "Room view", vi: "View phòng" }, value: { en: "Garden & pool view", vi: "Sân vườn và hồ bơi" } },
+            { kind: "check", label: { en: "Free breakfast", vi: "Ăn sáng miễn phí" } },
+            { kind: "check", label: { en: "Same-day laundry", vi: "Giặt ủi trong ngày" } },
             { icon: "water", kind: "check", label: { en: "Outdoor pool", vi: "Hồ bơi ngoài trời" } },
             { kind: "check", label: { en: "Windows", vi: "Cửa sổ" } },
             { kind: "check", label: { en: "Balcony", vi: "Ban công" } },
@@ -106,6 +108,8 @@ function buildColumns(locale: Locale): FacilityColumn[] {
         {
           title: { en: "Other information", vi: "Thông tin khác" },
           rows: [
+            { kind: "text", label: { en: "Bed type", vi: "Loại giường" }, value: { en: "Double bed", vi: "Giường đôi" } },
+            { kind: "text", label: { en: "Room view", vi: "View phòng" }, value: { en: "Garden & pool view", vi: "Sân vườn và hồ bơi" } },
             { kind: "text", label: { en: "Safe", vi: "Két sắt" }, value: { en: "VIP rooms only", vi: "Chỉ dành cho phòng VIP" } },
             { kind: "text", label: { en: "Housekeeping", vi: "Dọn phòng" }, value: { en: "Daily", vi: "Mỗi ngày" } },
             { kind: "text", label: { en: "Room service", vi: "Dịch vụ phòng" }, value: { en: "24/7", vi: "24/7" } },

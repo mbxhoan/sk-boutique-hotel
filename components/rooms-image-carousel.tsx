@@ -25,9 +25,7 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-const defaultImages = ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg"];
-
-export function RoomsImageCarousel({ autoPlayInterval = 3000, images = defaultImages, locale = "vi" }: RoomsImageCarouselProps) {
+export function RoomsImageCarousel({ autoPlayInterval = 3000, images = [], locale = "vi" }: RoomsImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const total = images.length;
 
@@ -79,8 +77,9 @@ export function RoomsImageCarousel({ autoPlayInterval = 3000, images = defaultIm
                     aria-hidden="true"
                     className="rooms-image-carousel__image"
                     fill
+                    quality={90}
                     priority={index === 0}
-                    sizes="(max-width: 720px) 100vw, 1280px"
+                    sizes="(max-width: 720px) calc(100vw - 2rem), (max-width: 1280px) calc(100vw - 3rem), 1280px"
                     src={image}
                   />
                 </div>

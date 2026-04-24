@@ -113,6 +113,26 @@ export function MemberDashboard({ locale }: MemberDashboardProps) {
           </PortalCard>
         </div>
       </section>
+
+      <section className="portal-section" id="notifications">
+        <PortalSectionHeading
+          description={memberDashboardCopy.sections.notifications.description}
+          eyebrow={memberDashboardCopy.sections.notifications.eyebrow}
+          locale={locale}
+          title={memberDashboardCopy.sections.notifications.title}
+        />
+
+        <PortalCard tone="soft">
+          <p className="portal-panel__eyebrow">
+            {locale === "en" ? "No live events yet" : "Chưa có sự kiện mới"}
+          </p>
+          <p className="portal-panel__note-copy">
+            {locale === "en"
+              ? "Once a request, hold, booking, or proof changes state, the update will appear here."
+              : "Khi request, hold, booking hoặc proof thay đổi trạng thái, cập nhật sẽ hiện ở đây."}
+          </p>
+        </PortalCard>
+      </section>
     </div>
   );
 }

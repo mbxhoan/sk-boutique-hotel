@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/locale";
+import { translate } from "@/lib/locale";
 import type { LocalizedText } from "@/lib/mock/i18n";
 import type { RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, localizedArray, text } from "@/lib/supabase/content";
@@ -29,6 +30,7 @@ export type RoomCatalogEntry = {
   }[];
   originalPrice: number | null;
   priceVisible: boolean;
+  roomTypeId: string;
   slug: string;
   sizeLabel: LocalizedText | null;
   summary: LocalizedText;
@@ -36,9 +38,34 @@ export type RoomCatalogEntry = {
 };
 
 const galleryByRoomSlug: Record<string, string[]> = {
-  "family-room": ["/home/bed1.jpg", "/home/pool3.jpg", "/home/block.jpg", "/home/bed1.jpg"],
-  "quadruple-room": ["/home/pool3.jpg", "/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"],
-  "superior-room": ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg", "/home/bed1.jpg"]
+  "family-room": [
+    "/assets/room_types/family/1.png", 
+    "/assets/room_types/family/2.png", 
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/4.png",
+    "/assets/room_types/family/5.png",
+    "/assets/room_types/family/6.png",
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/family/8.png",
+    "/assets/room_types/family/9.png",
+  ],
+  "superior-room": [
+    "/assets/room_types/superior/1.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/3.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/5.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/superior/7.png",
+  ],
+  "quadruple-room": [
+    "/assets/room_types/quadruple/1.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/3.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/5.png",
+    "/assets/room_types/quadruple/6.png",
+  ]
 };
 
 function formatRoomNumber(locale: Locale, value: number) {
@@ -67,8 +94,22 @@ function pickDescriptionEn(roomType: RoomTypeRow) {
   return roomType.summary_en || roomType.description_en || roomType.story_en || roomType.name_en;
 }
 
-function buildGallery(roomType: RoomTypeRow) {
-  return galleryByRoomSlug[roomType.slug] ?? ["/home/bed1.jpg", "/home/block.jpg", "/home/pool3.jpg"];
+function buildGallery(roomType: RoomTypeRow, overrideGallery?: string[]) {
+  if (overrideGallery?.length) {
+    return overrideGallery;
+  }
+
+  return galleryByRoomSlug[roomType.slug] ?? [
+    "/assets/room_types/family/3.png", 
+    "/assets/room_types/family/5.png", 
+    "/assets/room_types/family/7.png",
+    "/assets/room_types/superior/2.png",
+    "/assets/room_types/superior/4.png",
+    "/assets/room_types/superior/6.png",
+    "/assets/room_types/quadruple/2.png",
+    "/assets/room_types/quadruple/4.png",
+    "/assets/room_types/quadruple/7.png",
+  ];
 }
 
 function buildAvailabilityLabel(availableRooms: number) {
@@ -133,12 +174,16 @@ function buildMetaFacts(roomType: RoomTypeRow) {
     },
     {
       label: text("Giường", "Bed"),
-      value: text(roomType.bed_type || "-", roomType.bed_type || "-")
+      value: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-"))
     }
   ];
 }
 
-export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: number): RoomCatalogEntry {
+export function buildRoomCatalogEntry(
+  roomType: RoomTypeRow,
+  availableRooms: number,
+  overrideGallery?: string[]
+): RoomCatalogEntry {
   const currentPrice = roomType.manual_override_price ?? roomType.base_price;
   const originalPrice = roomType.manual_override_price != null ? roomType.base_price : null;
   const discountPercent =
@@ -146,26 +191,28 @@ export function buildRoomCatalogEntry(roomType: RoomTypeRow, availableRooms: num
       ? Math.max(0, Math.round((1 - currentPrice / originalPrice) * 100))
       : null;
   const { breakfast, cancellation } = buildPriceOptions(roomType);
+  const gallery = buildGallery(roomType, overrideGallery);
 
   return {
     availabilityLabel: buildAvailabilityLabel(availableRooms),
     availableRooms,
-    bedLabel: text(roomType.bed_type || "-", roomType.bed_type || "-"),
+    bedLabel: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
     bookingCtaLabel: text("Xem lựa chọn và đặt phòng", "View options and book"),
     breakfastOptions: breakfast,
     cancellationOptions: cancellation,
     currentPrice,
     description: text(pickDescription(roomType), pickDescriptionEn(roomType)),
     discountPercent,
-    gallery: buildGallery(roomType),
+    gallery,
     galleryBadge: text(
-      `Xem ${buildGallery(roomType).length} ảnh`,
-      `View ${buildGallery(roomType).length} photos`
+      `Xem ${gallery.length} ảnh`,
+      `View ${gallery.length} photos`
     ),
     highlights: localizedArray(roomType.highlights_vi, roomType.highlights_en),
     metaFacts: buildMetaFacts(roomType),
     originalPrice,
     priceVisible: roomType.show_public_price,
+    roomTypeId: roomType.id,
     slug: roomType.slug,
     sizeLabel: formatAreaText(roomType.size_sqm),
     summary: text(

@@ -1,180 +1,291 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 
 import { LogoMark } from "@/components/logo-mark";
-import { PortalBadge, PortalCard, PortalBulletList } from "@/components/portal-ui";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
-import { localize } from "@/lib/mock/i18n";
-import { adminDashboardCopy } from "@/lib/mock/admin-dashboard";
+import type { BranchRow } from "@/lib/supabase/database.types";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AdminShellProps = {
   children: ReactNode;
+  branches: Pick<BranchRow, "id" | "name_en" | "name_vi" | "slug">[];
 };
 
-function buildSectionHref(pathname: string, search: string, href: string) {
-  if (!href.startsWith("#")) {
-    return appendLocaleQuery(href, resolveLocale(new URLSearchParams(search).get("lang")));
-  }
+type AdminNavItem = {
+  icon: "bookings" | "content" | "customers" | "dashboard" | "logout" | "rooms" | "settings" | "support";
+  href: string;
+  label: {
+    en: string;
+    vi: string;
+  };
+};
 
-  return `${pathname}${search ? `?${search}` : ""}${href}`;
-}
+const adminNavItems: AdminNavItem[] = [
+  {
+    icon: "dashboard",
+    href: "/admin",
+    label: {
+      vi: "Tổng quan",
+      en: "Dashboard"
+    }
+  },
+  {
+    icon: "bookings",
+    href: "/admin/bookings",
+    label: {
+      vi: "Đặt phòng",
+      en: "Bookings"
+    }
+  },
+  {
+    icon: "rooms",
+    href: "/admin/rooms",
+    label: {
+      vi: "Quản lý phòng",
+      en: "Room Management"
+    }
+  },
+  {
+    icon: "customers",
+    href: "/admin/accounts",
+    label: {
+      vi: "Khách hàng",
+      en: "Customers"
+    }
+  },
+  {
+    icon: "content",
+    href: "/admin/content-pages",
+    label: {
+      vi: "Nội dung",
+      en: "Content"
+    }
+  },
+  {
+    icon: "settings",
+    href: "/admin/roles",
+    label: {
+      vi: "Cài đặt",
+      en: "Settings"
+    }
+  }
+];
 
 function ShellIcon({
-  name
+  icon,
+  size = 18
 }: {
-  name: "audit" | "branches" | "collapse" | "content" | "dashboard" | "expand" | "operations" | "roles" | "users";
+  icon:
+    | "bookings"
+    | "content"
+    | "customers"
+    | "dashboard"
+    | "logout"
+    | "notifications"
+    | "rooms"
+    | "search"
+    | "settings"
+    | "storefront"
+    | "support"
+    | "chevron";
+  size?: number;
 }) {
-  if (name === "collapse" || name === "expand") {
+  if (icon === "search") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
-        <path
-          d="M3 4.5H15M3 9H11.5M3 13.5H15"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.4"
-        />
-        <path
-          d={name === "collapse" ? "M13 6.5L15.5 9L13 11.5" : "M5 6.5L2.5 9L5 11.5"}
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.4"
-        />
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <circle cx="7.6" cy="7.6" r="4.9" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M11.3 11.3L15 15" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
       </svg>
     );
   }
 
-  if (name === "operations") {
+  if (icon === "notifications") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <path
-          d="M3.5 4.5H14.5M3.5 9H14.5M3.5 13.5H14.5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.4"
-        />
-      </svg>
-    );
-  }
-
-  if (name === "branches") {
-    return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
-        <path
-          d="M4 4.5H8.25V8.75H4V4.5ZM9.75 4.5H14V8.75H9.75V4.5ZM4 10.25H8.25V14.5H4V10.25ZM9.75 10.25H14V14.5H9.75V10.25Z"
+          d="M9 3.2a3.5 3.5 0 0 0-3.5 3.5c0 3.7-1.1 4.1-1.1 4.1h9.2s-1.1-.4-1.1-4.1A3.5 3.5 0 0 0 9 3.2Z"
           stroke="currentColor"
           strokeLinejoin="round"
           strokeWidth="1.2"
         />
+        <path d="M7.2 13.9a1.8 1.8 0 0 0 3.6 0" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
       </svg>
     );
   }
 
-  if (name === "audit") {
+  if (icon === "storefront") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M3.5 6h11" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
         <path
-          d="M9 2.75L14.5 5.25V9.5C14.5 12.65 12.24 15.15 9 15.85C5.76 15.15 3.5 12.65 3.5 9.5V5.25L9 2.75Z"
+          d="M4.2 6 5 3.8h8l.8 2.2M4.8 6v7.2h8.4V6"
           stroke="currentColor"
           strokeLinejoin="round"
           strokeWidth="1.2"
         />
-        <path d="M9 5.5V10.2M9 12.2H9.01" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+        <path d="M7.2 13.2V9.7h3.6v3.5" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
       </svg>
     );
   }
 
-  if (name === "users") {
+  if (icon === "chevron") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M4.6 6.8L9 11.2l4.4-4.4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" />
+      </svg>
+    );
+  }
+
+  if (icon === "bookings") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <rect height="11.2" rx="1.5" stroke="currentColor" strokeWidth="1.2" width="12.2" x="2.9" y="3.2" />
+        <path d="M5.1 2.6v2.3M12.9 2.6v2.3M4.2 7.2h9.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === "rooms") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <path
-          d="M9 8.1A2.85 2.85 0 1 0 9 2.4a2.85 2.85 0 0 0 0 5.7ZM4.25 15.6c.45-2.2 2.15-3.7 4.75-3.7s4.3 1.5 4.75 3.7"
+          d="M4 14V5.3a1.1 1.1 0 0 1 1.1-1.1h7.8A1.1 1.1 0 0 1 14 5.3V14"
           stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="1.2"
         />
+        <path d="M5.4 14v-2.8h7.2V14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M6.7 8.2h4.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
       </svg>
     );
   }
 
-  if (name === "roles") {
+  if (icon === "customers") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <circle cx="9" cy="6.1" r="2.7" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M4.4 14.1c.5-2.4 2.4-4 4.6-4s4.1 1.6 4.6 4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === "content") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M4.2 3.8h7.1l2.5 2.6v7.8H4.2V3.8Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M11.3 3.8v2.6h2.5" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M6.2 9.1h5.7M6.2 11.4h5.7" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === "settings") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <path
-          d="M6.75 4.25h4.5M5 7.25h8M6.75 10.25h4.5M4.75 13.25h8.5"
+          d="M7.4 3.3h3.2l.4 1.5a5.5 5.5 0 0 1 1.4.8l1.4-.5 1.6 2.8-1.2 1a5.5 5.5 0 0 1 0 1.6l1.2 1-1.6 2.8-1.4-.5a5.5 5.5 0 0 1-1.4.8l-.4 1.5H7.4L7 14.8a5.5 5.5 0 0 1-1.4-.8l-1.4.5-1.6-2.8 1.2-1a5.5 5.5 0 0 1 0-1.6l-1.2-1 1.6-2.8 1.4.5A5.5 5.5 0 0 1 7 4.8l.4-1.5Z"
           stroke="currentColor"
-          strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth="1.4"
+          strokeWidth="1.1"
         />
+        <circle cx="9" cy="9" r="2" stroke="currentColor" strokeWidth="1.2" />
       </svg>
     );
   }
 
-  if (name === "content") {
+  if (icon === "support") {
     return (
-      <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <path
-          d="M4.25 3.75H11l2.75 2.75v7.75H4.25V3.75Z"
+          d="M9 3.1a4.9 4.9 0 0 0-4.9 4.9v1.8c0 1.3.9 2.4 2.1 2.7v.9a.9.9 0 0 0 1.5.7l1.1-.9h1.9a4.9 4.9 0 0 0 4.9-4.9V8a4.9 4.9 0 0 0-4.9-4.9Z"
           stroke="currentColor"
           strokeLinejoin="round"
           strokeWidth="1.2"
         />
-        <path d="M11 3.75V6.5h2.75" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
-        <path d="M6.25 9h5.5M6.25 11.5h5.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+        <path d="M9 6.1c.8 0 1.4.5 1.4 1.1 0 .7-.7 1-.9 1.2-.3.2-.5.5-.5 1" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+        <circle cx="9" cy="11.7" fill="currentColor" r=".75" />
+      </svg>
+    );
+  }
+
+  if (icon === "logout") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M7.1 3.6H4.4A1.4 1.4 0 0 0 3 5v8A1.4 1.4 0 0 0 4.4 14.4h2.7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M10 6.1 12.9 9 10 11.9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M12.9 9H7.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
       </svg>
     );
   }
 
   return (
-    <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
-      <path
-        d="M3.25 9.25L9 3.75L14.75 9.25V14.5H3.25V9.25Z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.2"
-      />
-      <path d="M7 14.5V10.5H11V14.5" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+    <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+      <path d="M3.4 8.8 9 3.4l5.6 5.4V14H3.4V8.8Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
     </svg>
   );
 }
 
 function isActiveNavItem(pathname: string, href: string) {
-  if (href.startsWith("#")) {
+  if (href === "/admin") {
     return pathname === "/admin";
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AdminShell({ children }: AdminShellProps) {
+function getSearchPlaceholder(pathname: string, locale: "en" | "vi") {
+  if (pathname.startsWith("/admin/bookings")) {
+    return locale === "en" ? "Search bookings, guests..." : "Tìm booking, khách...";
+  }
+
+  if (pathname.startsWith("/admin/rooms")) {
+    return locale === "en" ? "Search rooms, types..." : "Tìm phòng, loại phòng...";
+  }
+
+  if (pathname.startsWith("/admin/content-pages")) {
+    return locale === "en" ? "Search pages, banners..." : "Tìm trang, banner...";
+  }
+
+  return locale === "en" ? "Search bookings, guests..." : "Tìm booking, khách...";
+}
+
+function buildBranchHref(
+  pathname: string,
+  searchParams: {
+    toString(): string;
+  },
+  locale: "en" | "vi",
+  branchId?: string | null
+) {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (branchId) {
+    params.set("branch", branchId);
+  } else {
+    params.delete("branch");
+  }
+
+  const query = params.toString();
+  return appendLocaleQuery(`${pathname}${query ? `?${query}` : ""}`, locale);
+}
+
+export function AdminShell({ children, branches }: AdminShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const search = searchParams.toString();
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("skbh-admin-sidebar-collapsed");
-
-    if (stored === "1") {
-      setIsCollapsed(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("skbh-admin-sidebar-collapsed", isCollapsed ? "1" : "0");
-  }, [isCollapsed]);
+  const currentSearch = searchParams.toString();
+  const currentHref = currentSearch ? `${pathname}?${currentSearch}` : pathname;
+  const branchId = searchParams.get("branch");
+  const currentBranch =
+    branches.find((branch) => branch.id === branchId) ?? branches[0] ?? null;
+  const showSearchTopbar =
+    pathname === "/admin" || pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/rooms");
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -184,111 +295,128 @@ export function AdminShell({ children }: AdminShellProps) {
   }
 
   return (
-    <div className={`portal-shell portal-shell--admin${isCollapsed ? " portal-shell--collapsed" : ""}`}>
-      <aside className="portal-shell__sidebar">
-        <div className="portal-shell__sidebar-head">
-          <LogoMark
-            className="portal-shell__logo"
-            href={appendLocaleQuery("/admin", locale)}
-            priority
-            variant="light"
-          />
-          <button
-            aria-label={
-              isCollapsed
-                ? locale === "en"
-                  ? "Expand menu"
-                  : "Mở menu"
-                : locale === "en"
-                  ? "Collapse menu"
-                  : "Thu gọn menu"
-            }
-            aria-pressed={isCollapsed}
-            className="portal-shell__sidebar-toggle button"
-            onClick={() => setIsCollapsed((current) => !current)}
-            type="button"
-            title={
-              isCollapsed
-                ? locale === "en"
-                  ? "Expand menu"
-                  : "Mở menu"
-                : locale === "en"
-                  ? "Collapse menu"
-                  : "Thu gọn menu"
-            }
-          >
-            <ShellIcon name={isCollapsed ? "expand" : "collapse"} />
+    <div className="portal-shell portal-shell--admin admin-shell">
+      <aside className="admin-shell__sidebar">
+        <div className="admin-shell__brand">
+          <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
+          <div className="admin-shell__brand-copy">
+            <p className="admin-shell__brand-title">SK Boutique</p>
+            <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
+          </div>
+        </div>
+
+        <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="admin-shell__nav">
+          {adminNavItems.map((item) => {
+            const active = isActiveNavItem(pathname, item.href);
+
+            return (
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={`admin-shell__nav-link${active ? " admin-shell__nav-link--active" : ""}`}
+                href={appendLocaleQuery(item.href, locale)}
+                key={item.href}
+              >
+                <span className="admin-shell__nav-icon" aria-hidden="true">
+                  <ShellIcon icon={item.icon} />
+                </span>
+                <span className="admin-shell__nav-label">{item.label[locale]}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="admin-shell__footer">
+          <a className="admin-shell__footer-link" href="mailto:ops@skboutiquehotel.vn">
+            <span className="admin-shell__nav-icon" aria-hidden="true">
+              <ShellIcon icon="support" />
+            </span>
+            <span>{locale === "en" ? "Support" : "Hỗ trợ"}</span>
+          </a>
+          <button className="admin-shell__footer-link admin-shell__footer-link--button" onClick={handleSignOut} type="button">
+            <span className="admin-shell__nav-icon" aria-hidden="true">
+              <ShellIcon icon="logout" />
+            </span>
+            <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
           </button>
         </div>
+      </aside>
 
-        <div className="portal-shell__intro">
-          <PortalBadge tone="accent">{localize(locale, adminDashboardCopy.shell.badge)}</PortalBadge>
-          <h1 className="portal-shell__title">{localize(locale, adminDashboardCopy.shell.title)}</h1>
-          <p className="portal-shell__description">{localize(locale, adminDashboardCopy.shell.description)}</p>
-        </div>
+      <div className="admin-shell__workspace">
+        <header className="admin-shell__topbar">
+          {showSearchTopbar ? (
+            <label className="admin-shell__search">
+              <span className="admin-shell__search-icon" aria-hidden="true">
+                <ShellIcon icon="search" size={17} />
+              </span>
+              <input
+                aria-label={locale === "en" ? "Search admin portal" : "Tìm kiếm admin portal"}
+                className="admin-shell__search-input"
+                defaultValue=""
+                placeholder={getSearchPlaceholder(pathname, locale)}
+                type="search"
+              />
+            </label>
+          ) : (
+            <div className="admin-shell__topbar-brand">
+              <p className="admin-shell__topbar-brand-text">SK Boutique Hotel</p>
+            </div>
+          )}
 
-        <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="portal-shell__nav">
-          {adminDashboardCopy.navGroups.map((group) => (
-            <div className="portal-shell__nav-group" key={group.label.vi}>
-              <p className="portal-shell__nav-group-title">{localize(locale, group.label)}</p>
-              <div className="portal-shell__nav-group-items">
-                {group.items.map((item) => {
-                  const label = localize(locale, item.label);
-                  const resolvedHref = buildSectionHref(pathname, search, item.href);
-                  const active = isActiveNavItem(pathname, item.href);
+          <div className="admin-shell__actions">
+            <details className="admin-shell__branch-menu">
+              <summary className="admin-shell__branch-selector">
+                <span className="admin-shell__branch-selector-icon" aria-hidden="true">
+                  <ShellIcon icon="storefront" size={16} />
+                </span>
+                <span>{currentBranch ? (locale === "en" ? currentBranch.name_en : currentBranch.name_vi) : locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
+                <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
+                  <ShellIcon icon="chevron" size={15} />
+                </span>
+              </summary>
+              <div className="admin-shell__branch-menu-panel" role="menu">
+                <Link className="admin-shell__branch-menu-link" href={buildBranchHref(pathname, searchParams, locale)}>
+                  {locale === "en" ? "All branches" : "Tất cả chi nhánh"}
+                </Link>
+                {branches.map((branch) => {
+                  const href = buildBranchHref(pathname, searchParams, locale, branch.id);
+                  const active = branch.id === currentBranch?.id;
 
                   return (
-                    <a
+                    <Link
                       aria-current={active ? "page" : undefined}
-                      className={`portal-shell__nav-link${active ? " portal-shell__nav-link--active" : ""}`}
-                      href={resolvedHref}
-                      key={item.href}
-                      title={label}
+                      className={`admin-shell__branch-menu-link${active ? " admin-shell__branch-menu-link--active" : ""}`}
+                      href={href}
+                      key={branch.id}
                     >
-                      <span className="portal-shell__nav-icon" aria-hidden="true">
-                        <ShellIcon name={item.icon} />
-                      </span>
-                      <span className="portal-shell__nav-label">{label}</span>
-                    </a>
+                      <span>{locale === "en" ? branch.name_en : branch.name_vi}</span>
+                    </Link>
                   );
                 })}
               </div>
-            </div>
-          ))}
-        </nav>
+            </details>
 
-        <PortalCard className="portal-shell__sidebar-card" tone="soft">
-          <p className="portal-shell__sidebar-card-title">
-            {locale === "en" ? "Operational cautions" : "Ghi chú vận hành"}
-          </p>
-          <PortalBulletList items={adminDashboardCopy.shell.bullets} locale={locale} />
-        </PortalCard>
-      </aside>
+            <span className="admin-shell__divider" aria-hidden="true" />
 
-      <div className="portal-shell__surface">
-        <header className="portal-shell__topbar">
-          <div className="portal-shell__heading">
-            <p className="portal-shell__eyebrow">{localize(locale, adminDashboardCopy.shell.eyebrow)}</p>
-            <PortalBadge tone="accent">{localize(locale, adminDashboardCopy.shell.badge)}</PortalBadge>
-          </div>
-
-          <div className="portal-shell__actions">
-            <Link
-              className="button button--solid"
-              href={buildSectionHref(pathname, search, adminDashboardCopy.shell.actions.primary.href)}
-            >
-              {localize(locale, adminDashboardCopy.shell.actions.primary.label)}
-            </Link>
-            <button className="button button--text-light portal-shell__sign-out" onClick={handleSignOut} type="button">
-              {locale === "en" ? "Sign out" : "Đăng xuất"}
+            <button className="admin-shell__icon-button admin-shell__icon-button--notification" type="button">
+              <ShellIcon icon="notifications" />
+              <span className="admin-shell__notification-dot" aria-hidden="true" />
             </button>
-            <Link className="button button--text-light" href={appendLocaleQuery(pathname, localeToggle)}>
+
+            <button className="admin-shell__icon-button" type="button">
+              <ShellIcon icon="storefront" />
+            </button>
+
+            <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
               {localeLabel(localeToggle)}
             </Link>
+
+            <button className="admin-shell__avatar" type="button">
+              AD
+            </button>
           </div>
         </header>
 
-        <main className="portal-shell__main">{children}</main>
+        <main className="admin-shell__content">{children}</main>
       </div>
     </div>
   );

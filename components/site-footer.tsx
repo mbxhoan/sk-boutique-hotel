@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { LogoMark } from "@/components/logo-mark";
-import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
+import { appendLocaleQuery, resolveLocale, translate } from "@/lib/locale";
+import { isTemporarilyHiddenHref } from "@/lib/hidden-routes";
 import { localize } from "@/lib/mock/i18n";
 import { siteInfo } from "@/lib/site-content";
 import type { LocalizedText } from "@/lib/mock/i18n";
@@ -35,16 +36,12 @@ const footerNavGroups: FooterGroup[] = [
     title: t("Nội dung", "Content"),
     links: [
       { href: "/rooms", label: t("Phòng", "Rooms") },
-      { href: "/tin-tuc", label: t("Tin tức", "News") },
-      { href: "/thuong-hieu", label: t("Thương hiệu", "Brand") }
+      { href: "/about-us", label: t("Về chúng tôi", "About us") }
     ]
   },
   {
     title: t("Thông tin", "Information"),
-    links: [
-      { href: "/about-us", label: t("Về chúng tôi", "About us") },
-      { href: "/ho-tro", label: t("Hỗ trợ", "Support") }
-    ]
+    links: []
   }
 ];
 
@@ -59,6 +56,12 @@ const footerLegal = t("© 2026 SK Boutique Hotel.", "© 2026 SK Boutique Hotel."
 export function SiteFooter() {
   const searchParams = useSearchParams();
   const locale = resolveLocale(searchParams.get("lang"));
+  const visibleNavGroups = footerNavGroups
+    .map((group) => ({
+      ...group,
+      links: group.links.filter((item) => !isTemporarilyHiddenHref(item.href))
+    }))
+    .filter((group) => group.links.length > 0);
 
   return (
     <footer className="site-footer site-footer--boutique" id="site-footer">
@@ -71,7 +74,7 @@ export function SiteFooter() {
           </section>
 
           <nav className="site-footer__nav" aria-label={locale === "en" ? "Footer navigation" : "Điều hướng chân trang"}>
-            {footerNavGroups.map((group) => (
+            {visibleNavGroups.map((group) => (
               <section className="site-footer__nav-group" key={group.title.vi}>
                 <h2 className="site-footer__title">{localize(locale, group.title)}</h2>
                 <div className="site-footer__nav-links">
@@ -94,7 +97,7 @@ export function SiteFooter() {
             <dl className="site-footer__details">
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Address" : "Địa chỉ"}</dt>
-                <dd>{siteInfo.address}</dd>
+                <dd>{translate(locale, siteInfo.address)}</dd>
               </div>
               <div className="site-footer__detail">
                 <dt>{locale === "en" ? "Phone" : "Điện thoại"}</dt>

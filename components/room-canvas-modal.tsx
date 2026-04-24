@@ -1,15 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
-import { appendLocaleQuery } from "@/lib/locale";
 import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
+import { RoomBookingRequestForm } from "@/components/room-booking-request-form";
 
 type RoomCanvasModalProps = {
   locale: Locale;
+  bookingContext: {
+    branchId: string;
+    guestCount: number;
+    stayEndAt: string;
+    stayStartAt: string;
+  };
   onClose: () => void;
   open: boolean;
   room: RoomCatalogEntry | null;
@@ -78,10 +83,23 @@ function roomAmenities(locale: Locale) {
       ];
 }
 
-export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModalProps) {
+function calculateNights(stayStartAt: string, stayEndAt: string) {
+  const diffMs = new Date(stayEndAt).getTime() - new Date(stayStartAt).getTime();
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.round(diffMs / 86_400_000));
+}
+
+export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }: RoomCanvasModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [breakfastIndex, setBreakfastIndex] = useState(0);
   const [cancellationIndex, setCancellationIndex] = useState(0);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [imageZoomOpen, setImageZoomOpen] = useState(false);
+  const bookingPanelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!open || !room) {
@@ -94,6 +112,8 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
 
     setBreakfastIndex(breakfastSelected >= 0 ? breakfastSelected : 0);
     setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
+    setBookingOpen(false);
+    setImageZoomOpen(false);
   }, [open, room]);
 
   useEffect(() => {
@@ -105,8 +125,28 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
     document.body.style.overflow = "hidden";
 
     const onEscape = (event: KeyboardEvent) => {
+      const galleryLength = room?.gallery.length ?? 0;
+
       if (event.key === "Escape") {
+        if (imageZoomOpen) {
+          setImageZoomOpen(false);
+          return;
+        }
+
         onClose();
+        return;
+      }
+
+      if (!imageZoomOpen || galleryLength < 2) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setActiveImageIndex((current) => (current - 1 + galleryLength) % galleryLength);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setActiveImageIndex((current) => (current + 1) % galleryLength);
       }
     };
 
@@ -116,7 +156,18 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onEscape);
     };
-  }, [onClose, open]);
+  }, [imageZoomOpen, onClose, open, room]);
+
+  useEffect(() => {
+    if (!bookingOpen) {
+      return;
+    }
+
+    bookingPanelRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, [bookingOpen]);
 
   if (!open || !room) {
     return null;
@@ -126,8 +177,12 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
   const cancellationOption = room.cancellationOptions[cancellationIndex] ?? room.cancellationOptions[0];
   const basePrice = room.currentPrice ?? 0;
   const totalPrice = room.priceVisible ? basePrice + breakfastOption.delta + cancellationOption.delta : null;
+  const stayNights = calculateNights(bookingContext.stayStartAt, bookingContext.stayEndAt);
+  const quotedNightlyRate = totalPrice != null ? Number((totalPrice / stayNights).toFixed(2)) : null;
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
+  const isSoldOut = room.availableRooms <= 0;
+  const canNavigateGallery = room.gallery.length > 1;
 
   return (
     <div className="room-canvas" role="presentation">
@@ -148,7 +203,22 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
         </div>
 
         <div className="room-canvas__media">
-          <Image alt={room.title[locale]} className="room-canvas__image" fill priority sizes="(max-width: 960px) 100vw, 900px" src={currentImage} />
+          <button
+            aria-label={locale === "en" ? "Open enlarged photo" : "Phóng to ảnh"}
+            className="room-canvas__media-zoom-trigger"
+            onClick={() => setImageZoomOpen(true)}
+            type="button"
+          >
+            <Image
+              alt={room.title[locale]}
+              className="room-canvas__image"
+              fill
+              quality={90}
+              priority
+              sizes="(max-width: 960px) 100vw, 900px"
+              src={currentImage}
+            />
+          </button>
 
           <button
             aria-label={locale === "en" ? "Previous photo" : "Ảnh trước"}
@@ -326,13 +396,124 @@ export function RoomCanvasModal({ locale, onClose, open, room }: RoomCanvasModal
 
             <div className="room-canvas__footer-actions">
               <p className="room-canvas__availability">{room.availabilityLabel[locale]}</p>
-              <Link className="button button--solid room-canvas__cta" href={appendLocaleQuery("/lien-he", locale)}>
-                {locale === "en" ? "Book now" : "Đặt phòng"}
-              </Link>
+              <button
+                className="button button--solid room-canvas__cta"
+                disabled={isSoldOut}
+                onClick={() => {
+                  if (!isSoldOut) {
+                    setBookingOpen(true);
+                  }
+                }}
+                type="button"
+              >
+                {isSoldOut ? (locale === "en" ? "Sold out" : "Hết phòng") : locale === "en" ? "Book now" : "Đặt phòng"}
+              </button>
             </div>
           </div>
+
+          {bookingOpen ? (
+            <div className="room-booking-panel" ref={bookingPanelRef}>
+              <div className="room-booking-panel__head">
+                <div>
+                  <p className="room-booking-panel__eyebrow">{locale === "en" ? "Booking request" : "Yêu cầu đặt phòng"}</p>
+                  <h4 className="room-booking-panel__title">
+                    {locale === "en" ? "Leave your information" : "Nhập thông tin"}
+                  </h4>
+                  <p className="room-booking-panel__description">
+                    {locale === "en"
+                      ? "SK Boutique Hotel will get back to you as soon as possible."
+                      : "SK Boutique Hotel sẽ phản hồi bạn trong thời gian sớm nhất."}
+                  </p>
+                </div>
+                <button className="room-booking-panel__close" onClick={() => setBookingOpen(false)} type="button">
+                  {locale === "en" ? "Hide" : "Ẩn"}
+                </button>
+              </div>
+
+              <div className="room-booking-panel__summary">
+                <span>{room.title[locale]}</span>
+                <strong>{room.bookingCtaLabel[locale]}</strong>
+              </div>
+
+              <RoomBookingRequestForm
+                branchId={bookingContext.branchId}
+                availableRooms={room.availableRooms}
+                guestCount={bookingContext.guestCount}
+                locale={locale}
+                quotedNightlyRate={quotedNightlyRate}
+                quotedTotalAmount={totalPrice}
+                roomTypeId={room.roomTypeId}
+                stayEndAt={bookingContext.stayEndAt}
+                stayStartAt={bookingContext.stayStartAt}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
+
+        {imageZoomOpen ? (
+          <div className="room-canvas__zoom" role="presentation">
+            <button
+              aria-label={locale === "en" ? "Close enlarged photo" : "Đóng chế độ phóng to"}
+              className="room-canvas__zoom-backdrop"
+            onClick={() => setImageZoomOpen(false)}
+            type="button"
+          />
+
+          <section
+            aria-label={locale === "en" ? "Enlarged photo viewer" : "Trình xem ảnh phóng to"}
+            aria-modal="true"
+            className="room-canvas__zoom-dialog"
+            role="dialog"
+            >
+              <div className="room-canvas__zoom-head">
+                <span className="room-canvas__zoom-title">{room.title[locale]}</span>
+                <button
+                  aria-label={locale === "en" ? "Close enlarged photo" : "Đóng chế độ phóng to"}
+                  className="room-canvas__zoom-close"
+                  onClick={() => setImageZoomOpen(false)}
+                  type="button"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+
+              <div className="room-canvas__zoom-media">
+                {canNavigateGallery ? (
+                  <>
+                    <button
+                      aria-label={locale === "en" ? "Previous enlarged photo" : "Ảnh phóng to trước"}
+                      className="room-canvas__zoom-nav room-canvas__zoom-nav--prev"
+                      onClick={() => setActiveImageIndex((current) => (current - 1 + room.gallery.length) % room.gallery.length)}
+                      type="button"
+                    >
+                      <ArrowIcon direction="left" />
+                    </button>
+
+                    <button
+                      aria-label={locale === "en" ? "Next enlarged photo" : "Ảnh phóng to tiếp theo"}
+                      className="room-canvas__zoom-nav room-canvas__zoom-nav--next"
+                      onClick={() => setActiveImageIndex((current) => (current + 1) % room.gallery.length)}
+                      type="button"
+                    >
+                      <ArrowIcon direction="right" />
+                    </button>
+                  </>
+                ) : null}
+
+              <Image
+                alt={room.title[locale]}
+                className="room-canvas__zoom-image"
+                fill
+                quality={90}
+                priority
+                sizes="(max-width: 960px) 100vw, 92vw"
+                src={currentImage}
+              />
+              </div>
+            </section>
+          </div>
+        ) : null}
     </div>
   );
 }

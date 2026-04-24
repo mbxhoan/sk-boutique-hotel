@@ -1,5 +1,9 @@
 import type { AvailabilityRequestRow, BranchRow, RoomTypeRow } from "@/lib/supabase/database.types";
 import {
+  createBookingConfirmedCustomerEmail,
+  createDepositRequestCustomerEmail
+} from "@/lib/email/templates";
+import {
   getSupabaseEmailAdminRecipient,
   getSupabaseEmailFromAddress,
   getSupabaseEmailFromName,
@@ -15,6 +19,38 @@ export type SendEmailInput = {
   to: string;
   subject: string;
   html: string;
+};
+
+export type SendDepositRequestEmailInput = {
+  bookingCode: string;
+  bookingUrl: string;
+  branchName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  depositAmount: string;
+  guestEmail: string;
+  guestName: string;
+  nights: string;
+  paymentAccountName: string;
+  paymentAccountNumber: string;
+  paymentBankName: string;
+  paymentDeadline: string;
+  paymentQrUrl: string;
+  paymentTransferNote: string;
+  roomType: string;
+};
+
+export type SendBookingConfirmedEmailInput = {
+  bookingCode: string;
+  bookingUrl: string;
+  branchName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  guestEmail: string;
+  guestName: string;
+  nights: string;
+  roomType: string;
+  totalAmount: string;
 };
 
 function escapeHtml(value: string) {
@@ -147,6 +183,14 @@ function buildFromHeader(fromAddress?: string) {
   return fromName ? `${fromName} <${resolvedAddress}>` : resolvedAddress;
 }
 
+function buildBrandConfig() {
+  return {
+    brandLine: "Boutique Hotel",
+    contactEmail: getSupabaseEmailFromAddress(),
+    hotelName: getSupabaseEmailFromName()
+  };
+}
+
 export async function sendEmail(input: SendEmailInput) {
   if (!hasSupabaseServiceConfig()) {
     return null;
@@ -260,4 +304,56 @@ export async function sendAvailabilityRequestEmails(request: AvailabilityRequest
     admin: results[1].status === "fulfilled",
     customer: results[0].status === "fulfilled"
   };
+}
+
+export async function sendDepositRequestCustomerEmail(input: SendDepositRequestEmailInput) {
+  const email = createDepositRequestCustomerEmail(buildBrandConfig(), {
+    bookingCode: input.bookingCode,
+    bookingUrl: input.bookingUrl,
+    branchName: input.branchName,
+    checkInDate: input.checkInDate,
+    checkOutDate: input.checkOutDate,
+    depositAmount: input.depositAmount,
+    guestName: input.guestName,
+    nights: input.nights,
+    paymentAccountName: input.paymentAccountName,
+    paymentAccountNumber: input.paymentAccountNumber,
+    paymentBankName: input.paymentBankName,
+    paymentDeadline: input.paymentDeadline,
+    paymentQrUrl: input.paymentQrUrl,
+    paymentTransferNote: input.paymentTransferNote,
+    roomType: input.roomType
+  });
+
+  await sendEmail({
+    from: getSupabaseEmailFromAddress(),
+    html: email.html,
+    subject: email.subject,
+    to: input.guestEmail
+  });
+
+  return email;
+}
+
+export async function sendBookingConfirmedCustomerEmail(input: SendBookingConfirmedEmailInput) {
+  const email = createBookingConfirmedCustomerEmail(buildBrandConfig(), {
+    bookingCode: input.bookingCode,
+    bookingUrl: input.bookingUrl,
+    branchName: input.branchName,
+    checkInDate: input.checkInDate,
+    checkOutDate: input.checkOutDate,
+    guestName: input.guestName,
+    nights: input.nights,
+    roomType: input.roomType,
+    totalAmount: input.totalAmount
+  });
+
+  await sendEmail({
+    from: getSupabaseEmailFromAddress(),
+    html: email.html,
+    subject: email.subject,
+    to: input.guestEmail
+  });
+
+  return email;
 }

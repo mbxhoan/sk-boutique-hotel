@@ -5,7 +5,7 @@ type LogoMarkProps = {
   className?: string;
   href?: string;
   priority?: boolean;
-  variant?: "dark" | "light" | "muted";
+  variant?: "dark" | "light" | "muted" | "noBg";
 };
 
 const logoAssets = {
@@ -21,6 +21,12 @@ const logoAssets = {
     height: 296,
     styleHeight: 56
   },
+  noBg: {
+    src: "/logo-no-bg.png",
+    width: 321,
+    height: 164,
+    styleHeight: 48
+  },
   muted: {
     src: "/logo-gray.png",
     width: 296,
@@ -29,7 +35,7 @@ const logoAssets = {
   }
 } as const;
 
-export function LogoMark({ className, href = "/", priority = false, variant = "dark" }: LogoMarkProps) {
+export function LogoMark({ className, href = "/", priority = false, variant = "noBg" }: LogoMarkProps) {
   const asset = logoAssets[variant];
 
   return (

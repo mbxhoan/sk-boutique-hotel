@@ -10,7 +10,9 @@ const roomHoldSelect = `
 
 type RoomHoldQueryOptions = {
   branchId?: string;
+  availabilityRequestId?: string;
   limit?: number;
+  reservationId?: string;
   status?: RoomHoldStatus | RoomHoldStatus[];
 };
 
@@ -21,6 +23,14 @@ export async function listRoomHolds(options: RoomHoldQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
       }
 
       if (options.status) {
@@ -52,6 +62,14 @@ export async function countRoomHolds(options: RoomHoldQueryOptions = {}) {
         query = query.eq("branch_id", options.branchId);
       }
 
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
+      }
+
       if (options.status) {
         if (Array.isArray(options.status)) {
           query = query.in("status", options.status);
@@ -72,15 +90,17 @@ export async function countRoomHolds(options: RoomHoldQueryOptions = {}) {
   );
 }
 
-export async function countExpiringRoomHolds(windowMinutes = 30) {
+export async function countExpiringRoomHolds(windowMinutes = 30, branchId?: string) {
   return queryWithServiceFallback(
     async (client) => {
       const cutoff = new Date(Date.now() + windowMinutes * 60_000).toISOString();
-      const { count, error } = await client
-        .from("room_holds")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "active")
-        .lte("expires_at", cutoff);
+      let query = client.from("room_holds").select("id", { count: "exact", head: true }).eq("status", "active").lte("expires_at", cutoff);
+
+      if (branchId) {
+        query = query.eq("branch_id", branchId);
+      }
+
+      const { count, error } = await query;
 
       if (error) {
         throw error;

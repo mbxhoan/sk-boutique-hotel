@@ -5,14 +5,16 @@ const reservationSelect = `
   id, booking_code, availability_request_id, hold_id, customer_id, branch_id,
   primary_room_type_id, stay_start_at, stay_end_at, guest_count, status,
   base_price, weekend_surcharge, manual_override_price, nightly_rate,
-  total_amount, deposit_amount, source, notes, confirmed_at, cancelled_at,
-  completed_at, created_by, updated_by, created_at, updated_at
+  total_amount, deposit_amount, expires_at, source, notes, confirmed_at,
+  cancelled_at, completed_at, created_by, updated_by, created_at, updated_at
 `;
 
 type ReservationQueryOptions = {
   branchId?: string;
+  availabilityRequestId?: string;
   customerId?: string;
   limit?: number;
+  since?: string;
   status?: ReservationStatus | ReservationStatus[];
 };
 
@@ -27,6 +29,14 @@ export async function listReservations(options: ReservationQueryOptions = {}) {
 
       if (options.customerId) {
         query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
       }
 
       if (options.status) {
@@ -62,6 +72,14 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
         query = query.eq("customer_id", options.customerId);
       }
 
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
+      }
+
       if (options.status) {
         if (Array.isArray(options.status)) {
           query = query.in("status", options.status);
@@ -79,5 +97,43 @@ export async function countReservations(options: ReservationQueryOptions = {}) {
       return count ?? 0;
     },
     0
+  );
+}
+
+export async function getReservationByBookingCode(bookingCode: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("reservations")
+        .select(reservationSelect)
+        .eq("booking_code", bookingCode)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as ReservationRow | null;
+    },
+    null as ReservationRow | null
+  );
+}
+
+export async function getReservationById(reservationId: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("reservations")
+        .select(reservationSelect)
+        .eq("id", reservationId)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as ReservationRow | null;
+    },
+    null as ReservationRow | null
   );
 }

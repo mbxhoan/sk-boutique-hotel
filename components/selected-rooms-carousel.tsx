@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { AnalyticsLink } from "@/components/analytics-link";
 import { PortalSectionHeading } from "@/components/portal-ui";
+import { resolveMediaSource, type MediaLookup } from "@/lib/media/library";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type { LocalizedText } from "@/lib/mock/i18n";
@@ -15,6 +16,7 @@ type SelectedRoomsCarouselProps = {
   eyebrow: LocalizedText;
   items: CmsCollectionItem[];
   locale: Locale;
+  mediaLookup: MediaLookup;
   title: LocalizedText;
 };
 
@@ -32,7 +34,14 @@ function Chevron({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-export function SelectedRoomsCarousel({ description, eyebrow, items, locale, title }: SelectedRoomsCarouselProps) {
+export function SelectedRoomsCarousel({
+  description,
+  eyebrow,
+  items,
+  locale,
+  mediaLookup,
+  title
+}: SelectedRoomsCarouselProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const rafRef = useRef<number | null>(null);
@@ -151,8 +160,9 @@ export function SelectedRoomsCarousel({ description, eyebrow, items, locale, tit
                           alt={item.imageAlt ? localize(locale, item.imageAlt) : localize(locale, item.title)}
                           className="cms-room-card__image"
                           fill
-                          sizes="(max-width: 720px) 92vw, (max-width: 1080px) 44vw, 28vw"
-                          src={item.image}
+                          quality={90}
+                          sizes="(max-width: 720px) calc(100vw - 2rem), (max-width: 1080px) 44vw, 28vw"
+                          src={resolveMediaSource(item.image, mediaLookup) ?? item.image}
                         />
                       ) : null}
 

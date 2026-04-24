@@ -17,6 +17,33 @@ export function PortalBadge({
   return <span className={`portal-badge portal-badge--${tone}`}>{children}</span>;
 }
 
+export function PortalHelp({
+  content,
+  locale,
+  label = "?"
+}: {
+  content: LocalizedText | string;
+  label?: string;
+  locale: Locale;
+}) {
+  const helpText = typeof content === "string" ? content : localize(locale, content);
+
+  return (
+    <span className="portal-help">
+      <button
+        aria-label={helpText}
+        className="portal-help__button"
+        type="button"
+      >
+        {label}
+      </button>
+      <span className="portal-help__tooltip" role="tooltip">
+        {helpText}
+      </span>
+    </span>
+  );
+}
+
 export function PortalCard({
   children,
   className,
@@ -40,6 +67,7 @@ export function PortalSectionHeading({
   align = "left",
   description,
   eyebrow,
+  help,
   locale,
   title
 }: {
@@ -47,6 +75,7 @@ export function PortalSectionHeading({
   align?: "left" | "center";
   description: LocalizedText;
   eyebrow: LocalizedText;
+  help?: LocalizedText | string;
   locale: Locale;
   title: LocalizedText;
 }) {
@@ -54,7 +83,10 @@ export function PortalSectionHeading({
     <div className={`portal-section-heading portal-section-heading--${align}`}>
       <div className="portal-section-heading__copy">
         <p className="portal-section-heading__eyebrow">{localize(locale, eyebrow)}</p>
-        <h2 className="portal-section-heading__title">{localize(locale, title)}</h2>
+        <div className="portal-section-heading__title-row">
+          <h2 className="portal-section-heading__title">{localize(locale, title)}</h2>
+          {help ? <PortalHelp content={help} locale={locale} /> : null}
+        </div>
         <p className="portal-section-heading__description">{localize(locale, description)}</p>
       </div>
       {actions ? <div className="portal-section-heading__actions">{actions}</div> : null}

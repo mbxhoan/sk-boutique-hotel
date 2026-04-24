@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
@@ -14,11 +14,15 @@ import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from
 import { type RoomTypeRow } from "@/lib/supabase/database.types";
 
 type RoomsCatalogPageProps = {
+  defaultBranchId: string | null;
   initialFilters: RoomsSearchState;
   initialRoomSlug?: string | null;
   locale: Locale;
+  roomCarouselImages: string[];
+  roomGalleriesBySlug: Record<string, string[]>;
   roomAvailabilityByTypeId: Record<string, number>;
   roomTypes: RoomTypeRow[];
+  roomsHeroImage: string;
 };
 
 function formatCompactPrice(locale: Locale, price: number | null) {
@@ -54,7 +58,14 @@ function RoomCard({
     <Link className={`rooms-card__link${room.slug === activeSlug ? " rooms-card__link--active" : ""}`} href={href}>
       <article className="rooms-card">
         <div className="rooms-card__media">
-          <Image alt={room.title[locale]} className="rooms-card__image" fill sizes="(max-width: 720px) 92vw, (max-width: 1080px) 44vw, 28vw" src={room.gallery[0]} />
+          <Image
+            alt={room.title[locale]}
+            className="rooms-card__image"
+            fill
+            quality={90}
+            sizes="(max-width: 720px) calc(100vw - 2rem), (max-width: 1080px) 44vw, 28vw"
+            src={room.gallery[0]}
+          />
 
           <span className="rooms-card__badge">{room.galleryBadge[locale]}</span>
         </div>
@@ -112,18 +123,27 @@ function RoomCard({
 }
 
 export function RoomsCatalogPage({
+  defaultBranchId,
   initialFilters,
   initialRoomSlug,
   locale,
+  roomCarouselImages,
+  roomGalleriesBySlug,
   roomAvailabilityByTypeId,
-  roomTypes
+  roomTypes,
+  roomsHeroImage
 }: RoomsCatalogPageProps) {
   const router = useRouter();
   const roomEntries = useMemo(
-    () => roomTypes.map((roomType) => buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0)),
-    [roomAvailabilityByTypeId, roomTypes]
+    () =>
+      roomTypes.map((roomType) =>
+        buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0, roomGalleriesBySlug[roomType.slug])
+      ),
+    [roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
   );
-  const activeRoom = roomEntries.find((room) => room.slug === initialRoomSlug) ?? null;
+  const [visibleRoomSlug, setVisibleRoomSlug] = useState<string | null>(initialRoomSlug ?? null);
+  const activeRoom = roomEntries.find((room) => room.slug === visibleRoomSlug) ?? null;
+  const guestCount = Math.max(1, (initialFilters.adults ?? 2) + (initialFilters.children ?? 0));
   const closeHref = buildRoomsHref({
     adults: initialFilters.adults,
     checkin: initialFilters.checkin,
@@ -132,11 +152,15 @@ export function RoomsCatalogPage({
     lang: locale
   });
 
+  useEffect(() => {
+    setVisibleRoomSlug(initialRoomSlug ?? null);
+  }, [initialRoomSlug]);
+
   return (
     <div className="rooms-page">
       <section className="rooms-hero">
         <div className="rooms-hero__media">
-          <Image alt="" aria-hidden="true" className="rooms-hero__image" fill priority sizes="100vw" src="/home/bed1.jpg" />
+          <Image alt="" aria-hidden="true" className="rooms-hero__image" fill priority sizes="100vw" src={roomsHeroImage} />
           <span className="rooms-hero__overlay" aria-hidden="true" />
         </div>
 
@@ -171,11 +195,18 @@ export function RoomsCatalogPage({
         </div>
       </section>
 
-      {/* <RoomsImageCarousel locale={locale} /> */}
+      <RoomsImageCarousel images={roomCarouselImages} locale={locale} />
 
       <RoomCanvasModal
+        bookingContext={{
+          branchId: defaultBranchId ?? "",
+          guestCount,
+          stayEndAt: initialFilters.checkout ?? "",
+          stayStartAt: initialFilters.checkin ?? ""
+        }}
         locale={locale}
         onClose={() => {
+          setVisibleRoomSlug(null);
           router.replace(closeHref, { scroll: false });
         }}
         open={Boolean(activeRoom)}

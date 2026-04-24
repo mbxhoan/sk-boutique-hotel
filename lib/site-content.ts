@@ -1,4 +1,5 @@
-import type { LocalizedText } from "@/lib/mock/i18n";
+import type { LocalizedText } from "./mock/i18n.ts";
+import { isTemporarilyHiddenHref } from "./hidden-routes.ts";
 
 export type LinkItem = {
   label: string;
@@ -135,12 +136,7 @@ export type PageContent = {
 export const navItems: LinkItem[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Phòng", href: "/rooms" },
-  { label: "Tin tức", href: "/tin-tuc" },
-  { label: "Thương hiệu", href: "/thuong-hieu" },
   { label: "Về chúng tôi", href: "/about-us" },
-  { label: "Liên hệ", href: "/lien-he" },
-  { label: "Tuyển dụng", href: "/tuyen-dung" },
-  { label: "Hỗ trợ", href: "/ho-tro" }
 ];
 
 export const headerMenu: HeaderMenuConfig = {
@@ -159,6 +155,10 @@ export const headerMenu: HeaderMenuConfig = {
       children: [
         { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } }
       ]
+    },
+    {
+      href: "/member",
+      label: { vi: "Thành viên", en: "Member" }
     }
   ],
   cta: {
@@ -183,7 +183,7 @@ export const socialLinks = [
 ];
 
 export const siteInfo = {
-  gg_map_address: "SK boutique hotel",
+  gg_map_address: "SK Boutique Hotel Phú Quốc",
   address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
   phone: "+84 908 233 583",
   zalo: "0908 233 583",
@@ -981,7 +981,7 @@ export const pages: PageContent[] = [
       formTitle: "Gửi tin nhắn",
       formFields: [
         { label: "Họ và tên", placeholder: "Nhập tên của bạn", type: "text" },
-        { label: "Email", placeholder: "you@example.com", type: "email" },
+        { label: "Email", placeholder: "example@gmail.com", type: "email" },
         { label: "Số điện thoại", placeholder: "+84 9x xxx xxxx", type: "tel" },
         { label: "Nội dung", placeholder: "Hãy cho chúng tôi biết bạn cần gì", type: "textarea" }
       ]
@@ -1252,7 +1252,13 @@ export function findPageBySlug(slug: string) {
 
 export function getStaticRouteParams() {
   return pages
-    .filter((page) => page.slug !== "/" && page.slug !== "/chi-nhanh" && page.slug !== "/about-us")
+    .filter(
+      (page) =>
+        page.slug !== "/" &&
+        page.slug !== "/chi-nhanh" &&
+        page.slug !== "/about-us" &&
+        !isTemporarilyHiddenHref(page.slug)
+    )
     .map((page) => ({
       slug: page.slug.replace(/^\//, "")
     }));

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
-import { AboutUsPage as AboutUsPageContent, aboutUsSeo } from "@/components/about-us-page";
+import { AboutUsPage as AboutUsSection, aboutUsSeo } from "@/components/about-us-page";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
 
 type PageProps = {
   searchParams?: Promise<{
@@ -21,14 +22,23 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   };
 }
 
-export default async function AboutUsPage({ searchParams }: PageProps) {
+export default async function AboutUsPageRoute({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const customerImages = await loadMediaCollectionImageUrls("customers", [
+    "/customers/customers1.jpg",
+    "/customers/customers2.jpg",
+    "/customers/customers3.jpg",
+    "/customers/customers4.jpg",
+    "/customers/customers5.jpg",
+    "/customers/customers6.jpg",
+    "/customers/customers22.jpg"
+  ]);
 
   return (
     <>
       <PageViewTracker eventType="page_view" locale={locale} pagePath="/about-us" entityId="about-us" entityType="static_page" />
-      <AboutUsPageContent locale={locale} />
+      <AboutUsSection customerImages={customerImages} locale={locale} />
     </>
   );
 }

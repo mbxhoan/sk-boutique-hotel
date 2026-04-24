@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/locale";
 import { defaultLocale } from "@/lib/locale";
-import type { CustomerRow } from "@/lib/supabase/database.types";
+import type { CustomerInsert, CustomerRow } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { queryWithFallback, queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
@@ -8,12 +8,12 @@ export type CustomerProfileInput = {
   authUserId: string;
   email: string;
   fullName: string;
-  marketingConsent?: boolean;
+  marketingConsent?: boolean | null;
   marketingConsentSource?: string | null;
-  notes?: string;
+  notes?: string | null;
   phone?: string | null;
-  preferredLocale?: Locale;
-  source?: string;
+  preferredLocale?: Locale | null;
+  source?: string | null;
 };
 
 export async function getCustomerByAuthUserId(authUserId: string) {
@@ -25,6 +25,33 @@ export async function getCustomerByAuthUserId(authUserId: string) {
           "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
         )
         .eq("auth_user_id", authUserId)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as CustomerRow | null;
+    },
+    null as CustomerRow | null
+  );
+}
+
+export async function getCustomerByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    return null as CustomerRow | null;
+  }
+
+  return queryWithFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        )
+        .ilike("email", normalizedEmail)
         .maybeSingle();
 
       if (error) {
@@ -64,21 +91,59 @@ export async function listCustomersByIds(customerIds: string[]) {
   );
 }
 
+export type CustomerQueryOptions = {
+  limit?: number;
+  since?: string;
+};
+
+export async function listCustomers(options: CustomerQueryOptions = {}) {
+  return queryWithServiceFallback(
+    async (client) => {
+      let query = client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        );
+
+      if (options.since) {
+        query = query.gte("created_at", options.since);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false }).limit(options.limit ?? 100);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []) as CustomerRow[];
+    },
+    [] as CustomerRow[]
+  );
+}
+
 export async function upsertCustomerProfile(input: CustomerProfileInput) {
   const supabase = await createSupabaseServerClient();
-  const marketingConsent = input.marketingConsent ?? false;
-  const payload = {
+  let payload: CustomerInsert = {
     auth_user_id: input.authUserId,
     email: input.email,
     full_name: input.fullName,
     phone: input.phone ?? null,
-    preferred_locale: input.preferredLocale ?? defaultLocale,
-    marketing_consent: marketingConsent,
-    marketing_consent_at: marketingConsent ? new Date().toISOString() : null,
-    marketing_consent_source: input.marketingConsentSource ?? (marketingConsent ? "public_form" : null),
-    source: input.source ?? "member_portal",
-    notes: input.notes ?? ""
+    preferred_locale: input.preferredLocale ?? defaultLocale
   };
+
+  if (typeof input.marketingConsent === "boolean") {
+    payload.marketing_consent = input.marketingConsent;
+    payload.marketing_consent_at = input.marketingConsent ? new Date().toISOString() : null;
+    payload.marketing_consent_source = input.marketingConsentSource ?? (input.marketingConsent ? "public_form" : null);
+  }
+
+  if (typeof input.source === "string" && input.source.length > 0) {
+    payload.source = input.source;
+  }
+
+  if (typeof input.notes === "string") {
+    payload.notes = input.notes;
+  }
 
   const { data, error } = await supabase
     .from("customers")

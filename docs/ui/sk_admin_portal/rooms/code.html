@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Room Availability - SK Boutique Admin</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#e5eeff",
+                      "on-secondary-container": "#4b617d",
+                      "primary-fixed": "#ffdeae",
+                      "outline": "#807569",
+                      "on-primary-fixed": "#281800",
+                      "surface-container-high": "#dce9ff",
+                      "secondary-container": "#c5dcfd",
+                      "tertiary": "#5c5f60",
+                      "secondary-fixed-dim": "#b1c8e9",
+                      "on-error": "#ffffff",
+                      "secondary": "#4a607c",
+                      "error": "#ba1a1a",
+                      "on-primary-container": "#3d2700",
+                      "inverse-surface": "#213145",
+                      "outline-variant": "#d1c5b6",
+                      "tertiary-container": "#919394",
+                      "surface-bright": "#f8f9ff",
+                      "surface-tint": "#775928",
+                      "inverse-primary": "#e8c086",
+                      "on-secondary-fixed-variant": "#324863",
+                      "secondary-fixed": "#d2e4ff",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary-fixed-variant": "#5d4213",
+                      "surface-container-low": "#eff4ff",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed": "#e1e3e4",
+                      "background": "#f8f9ff",
+                      "primary": "#775928",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#4e453a",
+                      "on-background": "#0b1c30",
+                      "on-tertiary-container": "#292c2d",
+                      "primary-fixed-dim": "#e8c086",
+                      "tertiary-fixed-dim": "#c5c7c8",
+                      "surface-variant": "#d3e4fe",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "surface": "#f8f9ff",
+                      "on-secondary-fixed": "#021c36",
+                      "on-secondary": "#ffffff",
+                      "primary-container": "#b08d57",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed-variant": "#454748",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed": "#191c1d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "gutter": "20px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "sidebar-width": "260px",
+                      "sm": "8px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "table-data": ["Inter"],
+                      "h1": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "h3": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "h2": ["Inter"]
+              },
+              "fontSize": {
+                      "table-data": ["13px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "h3": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 w-[260px] h-screen border-r border-slate-800 bg-slate-950 dark:bg-black z-50 flex flex-col justify-between py-8 px-4 h-full font-['Inter'] text-[13px] font-medium">
+<div>
+<div class="px-4 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
+<img alt="Hotel Logo" class="w-full h-full object-cover" data-alt="close up of a minimalist gold geometric hotel logo icon on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3NgYqaRBWlgRDAuZlEq6T_j-AT1t-CgKeA63hh-p4yvVuV865NXaoJete2-jjAZ8WIz3_18w14pv3UJ2oy94TywFFtoJBxebeEnd_rvF9_sdkf1PC6z1i91UPTYVfnQ-07igpGij7bSKY3Cgr98YJX4DJnc2pQRrh10rftda1k7wHh0n002SF5HZYxMtQiP0HAcZLCXBaMLb2iSvz6QkZfouxRs_oCRCFL0kNsSg-XyDKw3L-qkSEWHlEUVH53mfmJzlZDz6yY1sM"/>
+</div>
+<div>
+<h1 class="text-xl font-black text-[#B08D57] tracking-tighter">SK Boutique</h1>
+<span class="text-slate-400 text-xs tracking-wider uppercase">Admin Portal</span>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+                    Bookings
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-900 text-[#B08D57] border-r-2 border-[#B08D57] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined icon-fill">meeting_room</span>
+                    Room Management
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">person_outline</span>
+                    Customers
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+                    Content
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</nav>
+</div>
+<div class="flex flex-col gap-1 mt-auto border-t border-slate-800 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-all duration-200 ease-in-out active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Log Out
+            </a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-[260px] flex flex-col h-screen">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-40 flex justify-between items-center px-8 w-[calc(100%-260px)] ml-[260px] fixed font-['Inter'] antialiased tracking-tight">
+<!-- Search Bar (Left as per JSON) -->
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5 w-64 border border-transparent focus-within:border-[#B08D57] transition-colors">
+<span class="material-symbols-outlined text-slate-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-sm w-full text-slate-900 dark:text-white placeholder-slate-500 focus:ring-0 p-0" placeholder="Search..." type="text"/>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-6">
+<!-- Secondary Action -->
+<div class="flex items-center gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors px-3 py-1.5 rounded-lg active:opacity-70 transition-opacity">
+<span class="material-symbols-outlined text-lg">domain</span>
+<span class="text-sm font-medium">Branch Selector</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4 border-l border-slate-200 dark:border-slate-700 pl-6">
+<button class="text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:opacity-70 transition-opacity relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-[#B08D57] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">storefront</span>
+</button>
+<!-- Profile Image -->
+<div class="ml-2 w-8 h-8 rounded-full bg-slate-200 border border-slate-300 overflow-hidden cursor-pointer active:opacity-70 transition-opacity">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="headshot of a professional man in a dark suit smiling subtly against a light grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzyFbraARaVpnmtzpnSBlLsYdehSEEL6FbCc4kvgzCgVN9qpPZizIF6ywyPnM-WmVPhLFgo-7QC0ZI7xQErcIeIo0aloYdQLXB9TPiZcniHGjWVFUbgtIC_1BgU1axELo0xGDfh6g5ganeS-S1iGo3_-jNVpqNUOFmCBPuF1yhh2k7DhXE2qVVVo2FZzS87AKSiKbQTysDCXyg3aFvr0QlrtfghzJe8BGU53qOK55yFeLjo0aLWfIwqqnTRbxPzVJasdRQ-bwB6y2Y"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto mt-16 p-lg bg-background">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface">Room Availability &amp; Floor Plan</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage physical inventory and real-time statuses.</p>
+</div>
+<!-- Floor Selector (Visual Pills) -->
+<div class="flex gap-2 p-1 bg-surface-container-low rounded-lg border border-outline-variant">
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps bg-primary text-on-primary shadow-sm">Floor 1</button>
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps text-on-surface hover:bg-surface-container transition-colors">Floor 2</button>
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps text-on-surface hover:bg-surface-container transition-colors">Floor 3</button>
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps text-on-surface hover:bg-surface-container transition-colors">Penthouse</button>
+</div>
+</div>
+<!-- Filter & Legend Bar -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md mb-lg flex justify-between items-center shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded focus:border-secondary focus:ring-0 font-body-sm text-body-sm w-64 text-on-surface placeholder:text-on-surface-variant" placeholder="Room # or Type..." type="text"/>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">View:</span>
+<select class="py-1.5 pl-3 pr-8 bg-transparent border-none font-body-sm text-body-sm text-on-surface focus:ring-0 cursor-pointer">
+<option>All Categories</option>
+<option>Deluxe King</option>
+<option>Executive Suite</option>
+</select>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex items-center gap-6 font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary"></span> Occupied</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full border border-primary bg-surface-container-lowest"></span> Available</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary-container"></span> Cleaning</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-tertiary-fixed"></span> Maintenance</div>
+</div>
+</div>
+<!-- Bento Layout: Grid vs Inspector -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-lg h-[calc(100vh-280px)]">
+<!-- Left: Floor Plan Grid (Col 1-8) -->
+<div class="xl:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg overflow-y-auto shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<!-- Room Card: Available -->
+<div class="border border-primary rounded-lg p-md flex flex-col gap-3 relative cursor-pointer hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-primary">101</span>
+<span class="material-symbols-outlined text-primary text-xl">bed</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Deluxe King</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-surface-container">
+<span class="font-label-caps text-label-caps text-primary">AVAILABLE</span>
+</div>
+</div>
+<!-- Room Card: Occupied -->
+<div class="border border-secondary bg-secondary rounded-lg p-md flex flex-col gap-3 relative cursor-pointer shadow-sm">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-on-secondary">102</span>
+<span class="material-symbols-outlined text-on-secondary text-xl">bed</span>
+</div>
+<div class="font-body-sm text-body-sm text-secondary-container">Deluxe King</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-on-secondary/20">
+<span class="font-label-caps text-label-caps text-on-secondary">OCCUPIED</span>
+<span class="material-symbols-outlined text-on-secondary text-sm">person</span>
+</div>
+</div>
+<!-- Room Card: Occupied -->
+<div class="border border-secondary bg-secondary rounded-lg p-md flex flex-col gap-3 relative cursor-pointer shadow-sm">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-on-secondary">103</span>
+<span class="material-symbols-outlined text-on-secondary text-xl">meeting_room</span>
+</div>
+<div class="font-body-sm text-body-sm text-secondary-container">Executive Suite</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-on-secondary/20">
+<span class="font-label-caps text-label-caps text-on-secondary">OCCUPIED</span>
+<span class="material-symbols-outlined text-on-secondary text-sm">group</span>
+</div>
+</div>
+<!-- Room Card: Cleaning -->
+<div class="border border-secondary-container bg-secondary-container rounded-lg p-md flex flex-col gap-3 relative cursor-pointer shadow-sm">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-on-secondary-container">104</span>
+<span class="material-symbols-outlined text-on-secondary-container text-xl">bed</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-secondary-container opacity-80">Deluxe Twin</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-on-secondary-container/20">
+<span class="font-label-caps text-label-caps text-on-secondary-container">CLEANING</span>
+<span class="material-symbols-outlined text-on-secondary-container text-sm">cleaning_services</span>
+</div>
+</div>
+<!-- Room Card: Available -->
+<div class="border border-primary rounded-lg p-md flex flex-col gap-3 relative cursor-pointer hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-primary">105</span>
+<span class="material-symbols-outlined text-primary text-xl">bed</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Deluxe King</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-surface-container">
+<span class="font-label-caps text-label-caps text-primary">AVAILABLE</span>
+</div>
+</div>
+<!-- Room Card: Maintenance -->
+<div class="border border-tertiary-fixed bg-tertiary-fixed rounded-lg p-md flex flex-col gap-3 relative cursor-pointer shadow-sm">
+<div class="flex justify-between items-start">
+<span class="font-h2 text-h2 text-on-tertiary-fixed">106</span>
+<span class="material-symbols-outlined text-on-tertiary-fixed text-xl">bed</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-tertiary-fixed opacity-80">Deluxe King</div>
+<div class="mt-auto pt-2 flex items-center justify-between border-t border-on-tertiary-fixed/20">
+<span class="font-label-caps text-label-caps text-on-tertiary-fixed">MAINTENANCE</span>
+<span class="material-symbols-outlined text-on-tertiary-fixed text-sm">build</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Room Inspector (Col 9-12) -->
+<div class="xl:col-span-4 flex flex-col gap-md">
+<!-- Details Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex-1 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] relative overflow-hidden">
+<!-- Abstract decorative top bar -->
+<div class="absolute top-0 left-0 w-full h-2 bg-secondary"></div>
+<div class="flex justify-between items-start mb-6 mt-2">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Selected Room</div>
+<h2 class="font-h1 text-h1 text-on-surface flex items-center gap-2">
+                                    102 <span class="text-secondary material-symbols-outlined icon-fill">bed</span>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Deluxe King • Ocean View</p>
+</div>
+<div class="bg-secondary/10 text-secondary px-3 py-1 rounded-full font-label-caps text-label-caps border border-secondary/20">
+                                Occupied
+                            </div>
+</div>
+<div class="space-y-6">
+<!-- Guest Info Snapshot (If Occupied) -->
+<div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="w-10 h-10 rounded-full bg-outline-variant flex items-center justify-center text-on-surface font-h3 text-h3">
+                                    JD
+                                </div>
+<div>
+<div class="font-h3 text-h3 text-on-surface">John Doe</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Checkout: Tomorrow, 11:00 AM</div>
+</div>
+</div>
+<!-- Real-time Status Toggle -->
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-2">Update Room Status</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="flex items-center justify-center gap-2 p-2 rounded border border-outline-variant hover:bg-surface-container font-body-sm text-body-sm text-on-surface transition-colors">
+<span class="w-2 h-2 rounded-full border border-primary"></span> Available
+                                    </button>
+<button class="flex items-center justify-center gap-2 p-2 rounded border border-secondary bg-secondary text-on-secondary font-body-sm text-body-sm transition-colors shadow-inner">
+<span class="w-2 h-2 rounded-full bg-on-secondary"></span> Occupied
+                                    </button>
+<button class="flex items-center justify-center gap-2 p-2 rounded border border-outline-variant hover:bg-secondary-container hover:text-on-secondary-container hover:border-secondary-container font-body-sm text-body-sm text-on-surface transition-colors">
+<span class="w-2 h-2 rounded-full bg-secondary-container border border-on-secondary-container/20"></span> Cleaning
+                                    </button>
+<button class="flex items-center justify-center gap-2 p-2 rounded border border-outline-variant hover:bg-tertiary-fixed hover:border-tertiary-fixed font-body-sm text-body-sm text-on-surface transition-colors">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed border border-on-tertiary-fixed/20"></span> Maintenance
+                                    </button>
+</div>
+</div>
+<!-- Quick Notes/Flags -->
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-2">Housekeeping Notes</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded p-3 font-body-sm text-body-sm text-on-surface focus:border-secondary focus:ring-0 resize-none h-24" placeholder="Add notes here..."></textarea>
+</div>
+</div>
+<div class="absolute bottom-lg left-lg right-lg">
+<button class="w-full bg-primary text-on-primary font-label-caps text-label-caps py-3 rounded hover:bg-primary-container transition-colors shadow-sm">
+                                SAVE CHANGES
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

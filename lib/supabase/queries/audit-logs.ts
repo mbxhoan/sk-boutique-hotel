@@ -9,7 +9,12 @@ const auditLogSelect = `
 
 type AuditLogQueryOptions = {
   branchId?: string;
+  availabilityRequestId?: string;
+  customerId?: string;
+  holdId?: string;
   limit?: number;
+  paymentRequestId?: string;
+  reservationId?: string;
   since?: string;
 };
 
@@ -20,6 +25,26 @@ export async function listAuditLogs(options: AuditLogQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.holdId) {
+        query = query.eq("hold_id", options.holdId);
+      }
+
+      if (options.paymentRequestId) {
+        query = query.eq("entity_id", options.paymentRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
       }
 
       if (options.since) {
@@ -45,6 +70,26 @@ export async function countAuditLogs(options: AuditLogQueryOptions = {}) {
 
       if (options.branchId) {
         query = query.eq("branch_id", options.branchId);
+      }
+
+      if (options.availabilityRequestId) {
+        query = query.eq("availability_request_id", options.availabilityRequestId);
+      }
+
+      if (options.customerId) {
+        query = query.eq("customer_id", options.customerId);
+      }
+
+      if (options.holdId) {
+        query = query.eq("hold_id", options.holdId);
+      }
+
+      if (options.paymentRequestId) {
+        query = query.eq("entity_id", options.paymentRequestId);
+      }
+
+      if (options.reservationId) {
+        query = query.eq("reservation_id", options.reservationId);
       }
 
       if (options.since) {

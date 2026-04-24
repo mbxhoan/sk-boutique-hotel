@@ -1,6 +1,9 @@
-import type { LocalizedText } from "@/lib/mock/i18n";
+import type { LocalizedText } from "./i18n.ts";
+import { buildMediaReference } from "../media/library.ts";
 
 const text = (vi: string, en: string): LocalizedText => ({ vi, en });
+const media = (collectionSlug: string, assetSlug: string, fallbackUrl: string) =>
+  buildMediaReference(collectionSlug, assetSlug, fallbackUrl);
 
 export type CmsTone = "ink" | "paper" | "gold";
 export type CmsActionTone = "solid" | "ghost" | "text";
@@ -12,7 +15,7 @@ export type CmsAction = {
 };
 
 export type CmsMediaFrame = {
-  chips?: string[];
+  chips?: Array<string | LocalizedText>;
   description: LocalizedText;
   image?: string;
   imageAlt?: LocalizedText;
@@ -212,7 +215,7 @@ const featureFrameLeft: CmsMediaFrame = {
     "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
     "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/home/block.jpg",
+  image: media("about-visuals", "about-visual-1", "/home/block.jpg"),
   imageAlt: text("Phòng khách boutique sáng và tinh tế", "A bright and refined boutique room"),
   label: text("SK stay story", "SK stay story"),
   note: text(
@@ -220,7 +223,7 @@ const featureFrameLeft: CmsMediaFrame = {
     "Can later become real photography for rooms, lobby, or dining zones."
   ),
   tone: "paper",
-  title: text("Warm, calm, premium", "Warm, calm, premium")
+  title: text("Ấm áp, êm ái, sang.", "Warm, calm, premium")
 };
 
 const featureFrameRight: CmsMediaFrame = {
@@ -229,7 +232,7 @@ const featureFrameRight: CmsMediaFrame = {
     "Khung cảnh ấm cúng, sang trọng và cảm giác boutique.",
     "A warm, premium frame with a distinct boutique mood."
   ),
-  image: "/home/block.jpg",
+  image: media("about-visuals", "about-visual-2", "/home/block.jpg"),
   imageAlt: text("Không gian boutique với nhịp thị giác ấm", "A warm boutique space with layered visual rhythm"),
   label: text("Visual detail", "Visual detail"),
   note: text(
@@ -237,7 +240,7 @@ const featureFrameRight: CmsMediaFrame = {
     "This area can still map to gallery or CMS media fields later."
   ),
   tone: "gold",
-  title: text("Warm, calm, premium", "Warm, calm, premium")
+  title: text("Ấm áp, êm ái, sang.", "Warm, calm, premium")
 };
 
 const toCardItem = (
@@ -286,7 +289,7 @@ const roomItems: CmsCollectionItem[] = [
       "Không gian rộng rãi, lý tưởng cho gia đình, kết hợp sự tiện nghi và riêng tư với tầm nhìn sân vườn & hồ bơi.",
       "Spacious and refined, perfect for families seeking comfort, privacy, and serene garden & pool views."
     ),
-    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 2.400.000", "From 2,400,000")],
+    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 1,700,000", "From 1,700,000")],
     "paper",
     "/home/bed1.jpg",
     text("Family Room", "Family Room")
@@ -299,7 +302,7 @@ const roomItems: CmsCollectionItem[] = [
       "Thiết kế tinh gọn, ấm cúng, phù hợp cho cặp đôi hoặc khách công tác, mang lại trải nghiệm nghỉ dưỡng nhẹ nhàng.",
       "A cozy, well-designed retreat ideal for couples or solo travelers looking for a calm, elegant stay."
     ),
-    [text("3 khách", "3 guests"), text("25 m²", "25 sqm"), text("From 3.800.000", "From 3,800,000")],
+    [text("3 khách", "3 guests"), text("25 m²", "25 sqm"), text("Từ 650,000đ", "From 650,000")],
     "gold",
     "/home/bed1.jpg",
     text("Superior Room", "Superior Room")
@@ -312,7 +315,7 @@ const roomItems: CmsCollectionItem[] = [
       "Lựa chọn linh hoạt cho nhóm bạn hoặc gia đình nhỏ, cân bằng giữa không gian, tiện nghi và chi phí.",
       "Flexible and comfortable, designed for small groups with a balance of space, functionality, and value."
     ),
-    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1.900.000", "From 1,900,000")],
+    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1,300,000", "From 1,300,000")],
     "ink",
     "/home/bed1.jpg",
     text("Quadruple Room", "Quadruple Room")
@@ -321,7 +324,11 @@ const roomItems: CmsCollectionItem[] = [
 
 const homeRoomItems: CmsCollectionItem[] = roomItems.map((item, index) => ({
   ...item,
-  image: ["/home/bed1.jpg", "/home/bed1.jpg", "/home/bed1.jpg"][index],
+  image: [
+    media("room-family", "cover-1", "/home/bed1.jpg"),
+    media("room-superior", "cover-1", "/home/bed1.jpg"),
+    media("room-quadruple", "cover-1", "/home/bed1.jpg")
+  ][index],
   imageAlt: item.title,
 }));
 
@@ -506,7 +513,7 @@ const homePageSections: CmsSection[] = [
     },
     slides: [
       {
-        image: "/hero/hero-1.png",
+        image: media("home-hero", "slide-1", "/hero/hero-1.png"),
         eyebrow: text("SK Boutique Hotel", "SK Boutique Hotel"),
         title: text(
           "Chào mừng đến SK Boutique Hotel",
@@ -530,7 +537,7 @@ const homePageSections: CmsSection[] = [
         }
       },
       {
-        image: "/hero/hero-2.png",
+        image: media("home-hero", "slide-2", "/hero/hero-2.png"),
         eyebrow: text("Phòng nghỉ", "Our Rooms"),
         title: text(
           "Phòng nghỉ sang trọng, thanh lịch",
@@ -554,7 +561,7 @@ const homePageSections: CmsSection[] = [
         }
       },
       {
-        image: "/hero/hero-3.png",
+        image: media("home-hero", "slide-3", "/hero/hero-3.png"),
         eyebrow: text("Trải nghiệm", "Experience"),
         title: text(
           "Thư giãn đẳng cấp, tầm nhìn tuyệt đẹp",
@@ -604,14 +611,14 @@ const homePageSections: CmsSection[] = [
         value: text("03", "03"),
         label: text("Hạng phòng", "Room types"),
         detail: text(
-          "Hạng phòng public đủ để staff map sang physical rooms sau này.",
-          "Public room types are ready for later mapping to physical rooms."
+          "Hạng phòng đa dạng phù hợp mọi nhu cầu.",
+          "Diverse room types suitable for all needs."
         ),
         tone: "paper"
       },
       {
-        value: text("20 phút", "20 min"),
-        label: text("Trung tâm", "City center"),
+        value: text("20", "20"),
+        label: text("Phút", "Minutes"),
         detail: text(
           "Khoảng 20 phút để vào trung tâm thành phố.",
           "About 20 minutes to the city center."
@@ -640,48 +647,49 @@ const homePageSections: CmsSection[] = [
     ),
     items: homeRoomItems
   },
-  {
-    id: "amenities",
-    kind: "amenities",
-    eyebrow: text("Tiện nghi", "Amenities"),
-    title: text("Tiện nghi khách sạn", "Hotel amenities"),
-    description: text(
-      "Những tiện nghi và thông tin vận hành quan trọng được trình bày rõ ràng theo từng nhóm.",
-      "Key room amenities and operational details are grouped clearly for fast reading."
-    ),
-    groups: [
-      {
-        title: text("Tiện nghi khách sạn", "Hotel amenities"),
-        items: [
-          amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
-          amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
-          amenityWaterItem("Hồ bơi ngoài trời", "Outdoor pool"),
-          amenityCheckItem("Cửa sổ", "Windows"),
-          amenityCheckItem("Ban công", "Balcony"),
-          amenityCheckItem("Kê nệm phụ", "Extra mattress"),
-          amenityCheckItem("Bồn tắm", "Bathtub"),
-          amenityCheckItem("Bàn làm việc", "Desk"),
-          amenityCheckItem("Tủ lạnh", "Fridge"),
-          amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
-          amenityCheckItem("Máy sấy tóc", "Hair dryer"),
-          amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
-        ]
-      },
-      {
-        title: text("Thông tin khác", "Other information"),
-        items: [
-          // amenityCheckItem("Không hút thuốc", "No smoking"),
-          // amenityCheckItem("Không cho thú cưng", "No pets"),
-          amenityTextItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
-          amenityTextItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
-          amenityTextItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
-          amenityCheckItem("Không phụ thu cuối tuần", "No weekend surcharge"),
-          amenityCheckItem("Cho check-in sớm", "Early check-in available"),
-          amenityCheckItem("Không thu phí check-in sớm", "No early check-in fee")
-        ]
-      }
-    ]
-  },
+  /* tạm ẩn phần Tiện nghi vì đã có phần Tiện nghi cố định trên trang */
+  // {
+  //   id: "amenities",
+  //   kind: "amenities",
+  //   eyebrow: text("Tiện nghi", "Amenities"),
+  //   title: text("Tiện nghi khách sạn", "Hotel amenities"),
+  //   description: text(
+  //     "Những tiện nghi và thông tin vận hành quan trọng được trình bày rõ ràng theo từng nhóm.",
+  //     "Key room amenities and operational details are grouped clearly for fast reading."
+  //   ),
+  //   groups: [
+  //     {
+  //       title: text("Tiện nghi khách sạn", "Hotel amenities"),
+  //       items: [
+  //         amenityTextItem("Loại giường", "Bed type", "Giường đôi", "Double bed"),
+  //         amenityTextItem("View phòng", "Room view", "Sân vườn và hồ bơi", "Garden & pool view"),
+  //         amenityWaterItem("Hồ bơi ngoài trời", "Outdoor pool"),
+  //         amenityCheckItem("Cửa sổ", "Windows"),
+  //         amenityCheckItem("Ban công", "Balcony"),
+  //         amenityCheckItem("Kê nệm phụ", "Extra mattress"),
+  //         amenityCheckItem("Bồn tắm", "Bathtub"),
+  //         amenityCheckItem("Bàn làm việc", "Desk"),
+  //         amenityCheckItem("Tủ lạnh", "Fridge"),
+  //         amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
+  //         amenityCheckItem("Máy sấy tóc", "Hair dryer"),
+  //         amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
+  //       ]
+  //     },
+  //     {
+  //       title: text("Thông tin khác", "Other information"),
+  //       items: [
+  //         // amenityCheckItem("Không hút thuốc", "No smoking"),
+  //         // amenityCheckItem("Không cho thú cưng", "No pets"),
+  //         amenityTextItem("Két sắt", "Safe", "Chỉ dành cho phòng VIP", "VIP rooms only"),
+  //         amenityTextItem("Dọn phòng", "Housekeeping", "Mỗi ngày", "Daily"),
+  //         amenityTextItem("Dịch vụ phòng", "Room service", "24/7", "24/7"),
+  //         amenityCheckItem("Không phụ thu cuối tuần", "No weekend surcharge"),
+  //         amenityCheckItem("Cho check-in sớm", "Early check-in available"),
+  //         amenityCheckItem("Không thu phí check-in sớm", "No early check-in fee")
+  //       ]
+  //     }
+  //   ]
+  // },
   // {
   //   id: "next-step",
   //   kind: "band",

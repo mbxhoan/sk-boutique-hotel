@@ -5,9 +5,10 @@ import {
 } from "@/lib/mock/public-cms";
 import type { CmsCollectionItem, CmsPageCopy } from "@/lib/mock/public-cms";
 import { buildRoomDetailHref } from "@/lib/room-routes";
+import { translate } from "@/lib/locale";
 import type { RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, formatCurrencyText, text } from "@/lib/supabase/content";
-import { queryWithFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
 
 const roomCollectionTemplate = roomCollectionPageCopy;
 
@@ -35,7 +36,7 @@ function toRoomCard(roomType: RoomTypeRow): CmsCollectionItem {
         `${roomType.occupancy_adults + roomType.occupancy_children} khách`,
         `${roomType.occupancy_adults + roomType.occupancy_children} guests`
       ),
-      formatAreaText(roomType.size_sqm) ?? text(roomType.bed_type, roomType.bed_type),
+      formatAreaText(roomType.size_sqm) ?? text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
       priceMeta
     ],
     tone: roomType.sort_order % 2 === 0 ? "paper" : "gold"
@@ -125,7 +126,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
             ...section.frame,
             chips: [
               roomType.code,
-              roomType.bed_type || "Room type",
+              text(roomType.bed_type || "Room type", translate("en", roomType.bed_type || "Room type")),
               roomType.show_public_price ? "From pricing" : "CTA only"
             ]
           }
@@ -157,7 +158,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
               tone: "gold" as const
             },
             {
-              value: text(roomType.bed_type || "-", roomType.bed_type || "-"),
+              value: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
               label: text("Bed", "Bed"),
               detail: text("Bed type có thể chỉnh theo inventory.", "Bed type can vary by inventory."),
               tone: "ink" as const
@@ -260,7 +261,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
 }
 
 export async function listRoomTypes() {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("room_types")
@@ -282,7 +283,7 @@ export async function listRoomTypes() {
 }
 
 async function getRoomTypeBySlug(slug: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("room_types")

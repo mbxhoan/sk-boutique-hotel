@@ -348,6 +348,126 @@ export interface Database {
         } & RowTimestampFields>;
         Relationships: [];
       };
+      media_collections: {
+        Row: {
+          created_at: string;
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          description_en: string;
+          description_vi: string;
+          id: string;
+          is_active: boolean;
+          name_en: string;
+          name_vi: string;
+          slug: string;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
+      media_assets: {
+        Row: {
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_at: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_at: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          alt_en: string;
+          alt_vi: string;
+          collection_slug: string;
+          created_by: string | null;
+          description_en: string;
+          description_vi: string;
+          fallback_url: string;
+          file_bucket: string;
+          file_name: string;
+          file_path: string | null;
+          file_size: number;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_featured: boolean;
+          mime_type: string;
+          slug: string;
+          sort_order: number;
+          title_en: string;
+          title_vi: string;
+          updated_by: string | null;
+          width: number | null;
+        } & RowTimestampFields>;
+        Relationships: [
+          {
+            foreignKeyName: "media_assets_collection_slug_fkey";
+            columns: ["collection_slug"];
+            isOneToOne: false;
+            referencedRelation: "media_collections";
+            referencedColumns: ["slug"];
+          }
+        ];
+      };
       customers: {
         Row: {
           auth_user_id: string | null;
@@ -655,6 +775,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -681,6 +804,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -706,6 +832,9 @@ export interface Database {
           marketing_consent: boolean;
           note: string;
           preferred_locale: "vi" | "en";
+          quoted_currency: string;
+          quoted_nightly_rate: number | null;
+          quoted_total_amount: number | null;
           request_code: string;
           response_due_at: string;
           room_type_id: string;
@@ -799,6 +928,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -827,6 +957,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -853,6 +984,7 @@ export interface Database {
           created_by: string | null;
           customer_id: string;
           deposit_amount: number;
+          expires_at: string | null;
           guest_count: number;
           hold_id: string | null;
           id: string;
@@ -995,7 +1127,7 @@ export interface Database {
       payment_proof_status: "uploaded" | "verified" | "rejected";
       payment_request_status: "sent" | "pending_verification" | "verified" | "rejected" | "expired" | "cancelled";
       reservation_room_item_status: "active" | "released" | "cancelled";
-      reservation_status: "draft" | "pending_deposit" | "confirmed" | "cancelled" | "completed";
+      reservation_status: "draft" | "pending_deposit" | "confirmed" | "cancelled" | "completed" | "expired";
       room_hold_status: "active" | "converted" | "released" | "expired" | "cancelled";
       room_status: "available" | "held" | "booked" | "blocked" | "maintenance";
     };
@@ -1009,6 +1141,7 @@ export interface Database {
           p_created_by?: string | null;
           p_customer_id?: string | null;
           p_deposit_amount?: number | null;
+          p_expires_at?: string | null;
           p_guest_count?: number | null;
           p_hold_id?: string | null;
           p_manual_override_price?: number | null;
@@ -1085,6 +1218,20 @@ export interface Database {
           status: Database["public"]["Enums"]["room_hold_status"];
         }[];
       };
+      release_expired_reservations: {
+        Args: {
+          p_as_of?: string | null;
+        };
+        Returns: {
+          booking_code: string;
+          branch_id: string;
+          customer_id: string;
+          expires_at: string;
+          released_at: string | null;
+          reservation_id: string;
+          status: Database["public"]["Enums"]["reservation_status"];
+        }[];
+      };
       submit_availability_request: {
         Args: {
           p_branch_id: string;
@@ -1096,6 +1243,9 @@ export interface Database {
           p_marketing_consent?: boolean | null;
           p_note?: string | null;
           p_preferred_locale?: string | null;
+          p_quoted_currency?: string | null;
+          p_quoted_nightly_rate?: number | null;
+          p_quoted_total_amount?: number | null;
           p_room_type_id: string;
           p_source?: string | null;
           p_stay_end_at: string;
