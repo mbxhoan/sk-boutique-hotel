@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createContext, startTransition, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, startTransition, Suspense, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { PortalCard } from "@/components/portal-ui";
 import { appendLocaleQuery, type Locale } from "@/lib/locale";
@@ -225,6 +225,7 @@ function buildCleanHref(pathname: string, searchParams: URLSearchParams) {
 
 function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotificationItem[]) {
   const pathname = usePathname();
+  const router = useRouter();
   const [readIds, setReadIds] = useState<string[]>([]);
   const [localItems, setLocalItems] = useState<AdminNotificationItem[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<AdminNotificationItem | null>(null);
