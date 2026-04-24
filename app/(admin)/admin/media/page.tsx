@@ -6,6 +6,7 @@ import { listMediaAssets, listMediaCollections, resolveMediaAssetUrl } from "@/l
 
 type PageProps = {
   searchParams?: Promise<{
+    collection?: string;
     lang?: string;
   }>;
 };
@@ -32,5 +33,5 @@ export default async function AdminMediaPage({ searchParams }: PageProps) {
     public_url: resolveMediaAssetUrl(asset)
   }));
 
-  return <AdminMediaManager assets={assets} collections={collections} locale={locale} />;
+  return <AdminMediaManager activeCollectionSlug={resolvedSearchParams.collection ?? "all"} assets={assets} collections={collections} locale={locale} />;
 }

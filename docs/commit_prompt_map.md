@@ -1367,3 +1367,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(member-auth)/member/sign-up/page.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 121
+- `time`: 2026-04-24T15:01:44+07:00
+- `prompt_summary`: Sơ đồ phòng phải có bộ lọc ngày mặc định là hôm nay và chặn ngày cũ, tách thư viện media thành một menu tính năng riêng theo tab, và xây dựng CMS quản lý toàn bộ nội dung/hình ảnh/tiện ích/giá của hạng phòng theo mockup.
+- `commit_message`: `feat(admin-portal): add media tabs, room type CMS, and room plan date filter`
+- `main_files`:
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `app/(admin)/admin/media/page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `app/(admin)/admin/room-types/page.tsx`
+  - `app/(admin)/admin/room-types/actions.ts`
+  - `components/admin-room-types-manager.tsx`
+  - `lib/supabase/queries/room-types.ts`
+  - `components/admin-shell.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`

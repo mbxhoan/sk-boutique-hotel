@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { PortalCard } from "@/components/portal-ui";
@@ -25,6 +26,8 @@ type AdminRoomsPageProps = {
   floorId: string | null;
   floors: FloorOption[];
   locale: Locale;
+  minimumDate: string;
+  selectedDate: string;
   rooms: RoomView[];
   selectedRoomId: string | null;
   roomTypes: RoomTypeOption[];
@@ -110,6 +113,8 @@ export function AdminRoomsPage({
   floorId,
   floors,
   locale,
+  minimumDate,
+  selectedDate,
   rooms,
   selectedRoomId,
   roomTypes
@@ -117,10 +122,13 @@ export function AdminRoomsPage({
   const resolvedRooms = buildRoomViews(rooms);
   const [searchQuery, setSearchQuery] = useState("");
   const [roomTypeFilter, setRoomTypeFilter] = useState("all");
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const selectedFloor = floors.find((floor) => floor.id === floorId) ?? floors[0] ?? null;
   const normalizedSearch = searchQuery.trim().toLowerCase();
   const bookedCountByFloor = resolvedRooms.reduce((map, room) => {
-    if (room.status === "booked") {
+    if (room.display_status === "occupied") {
       map[room.floor_id] = (map[room.floor_id] ?? 0) + 1;
     }
 
@@ -131,6 +139,21 @@ export function AdminRoomsPage({
     setSearchQuery("");
     setRoomTypeFilter("all");
   }, [branchId]);
+
+  function buildCurrentHref(nextParams: Record<string, string | null | undefined>) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    for (const [key, value] of Object.entries(nextParams)) {
+      if (value && value.length > 0) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    }
+
+    const query = params.toString();
+    return `${pathname}${query ? `?${query}` : ""}`;
+  }
 
   const filteredRooms = resolvedRooms.filter((room) => {
     const matchesSearch =
@@ -160,6 +183,7 @@ export function AdminRoomsPage({
     }
 
     params.set("floor", floor.id);
+    params.set("date", selectedDate);
 
     if (locale === "en") {
       params.set("lang", "en");
@@ -177,6 +201,7 @@ export function AdminRoomsPage({
 
     params.set("floor", room.floor_id);
     params.set("room", room.id);
+    params.set("date", selectedDate);
 
     if (locale === "en") {
       params.set("lang", "en");
@@ -242,7 +267,7 @@ export function AdminRoomsPage({
             </div>
           </div>
 
-          <div className="admin-rooms__divider" aria-hidden="true" />
+            <div className="admin-rooms__divider" aria-hidden="true" />
 
           <div className="admin-rooms__filter admin-rooms__filter--view">
             <label className="portal-field__label" htmlFor="room-view">
@@ -259,12 +284,47 @@ export function AdminRoomsPage({
               </select>
             </div>
           </div>
+
+          <div className="admin-rooms__divider" aria-hidden="true" />
+
+          <div className="admin-rooms__filter admin-rooms__filter--date">
+            <label className="portal-field__label" htmlFor="room-date">
+              {localize(locale, { vi: "Ngày", en: "Date" })}
+            </label>
+            <div className="admin-rooms__input-wrap">
+              <span className="admin-rooms__input-icon" aria-hidden="true">
+                <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
+                  <rect height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" width="11.5" x="3.2" y="4.1" />
+                  <path d="M5.1 2.8v2.6M12.9 2.8v2.6M3.9 7.3h10.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+                </svg>
+              </span>
+              <input
+                className="admin-rooms__input"
+                id="room-date"
+                onChange={(event) => {
+                  if (event.target.value < minimumDate) {
+                    router.push(buildCurrentHref({ date: minimumDate }));
+                    return;
+                  }
+
+                  router.push(buildCurrentHref({ date: event.target.value }));
+                }}
+                min={minimumDate}
+                value={selectedDate}
+                type="date"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="admin-rooms__legend" aria-label={localize(locale, { vi: "Chú giải trạng thái", en: "Status legend" })}>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--occupied" />
             {localize(locale, { vi: "Đang ở", en: "Occupied" })}
+          </span>
+          <span className="admin-rooms__legend-item">
+            <span className="admin-rooms__legend-dot admin-rooms__legend-dot--blocked" />
+            {localize(locale, { vi: "Chặn", en: "Blocked" })}
           </span>
           <span className="admin-rooms__legend-item">
             <span className="admin-rooms__legend-dot admin-rooms__legend-dot--available" />

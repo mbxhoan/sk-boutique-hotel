@@ -23,7 +23,7 @@ type AdminShellProps = {
 };
 
 type AdminNavItem = {
-  icon: "bookings" | "content" | "customers" | "dashboard" | "logout" | "rooms" | "settings" | "support";
+  icon: "bookings" | "content" | "customers" | "dashboard" | "logout" | "media" | "rooms" | "roomTypes" | "settings" | "support";
   href: string;
   label: {
     en: string;
@@ -54,6 +54,22 @@ const adminNavItems: AdminNavItem[] = [
     label: {
       vi: "Quản lý phòng",
       en: "Room Management"
+    }
+  },
+  {
+    icon: "roomTypes",
+    href: "/admin/room-types",
+    label: {
+      vi: "Hạng phòng",
+      en: "Room Types"
+    }
+  },
+  {
+    icon: "media",
+    href: "/admin/media",
+    label: {
+      vi: "Thư viện ảnh",
+      en: "Media Library"
     }
   },
   {
@@ -92,8 +108,10 @@ function ShellIcon({
     | "customers"
     | "dashboard"
     | "logout"
+    | "media"
     | "notifications"
     | "rooms"
+    | "roomTypes"
     | "search"
     | "settings"
     | "storefront"
@@ -152,6 +170,26 @@ function ShellIcon({
       <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <rect height="11.2" rx="1.5" stroke="currentColor" strokeWidth="1.2" width="12.2" x="2.9" y="3.2" />
         <path d="M5.1 2.6v2.3M12.9 2.6v2.3M4.2 7.2h9.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === "media") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <rect height="11.6" rx="1.8" stroke="currentColor" strokeWidth="1.2" width="13.2" x="2.4" y="3.2" />
+        <path d="M5 11.4 7.4 8.8l2.1 2 1.9-1.8 2.2 2.4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <circle cx="6" cy="6.4" fill="currentColor" r=".8" />
+      </svg>
+    );
+  }
+
+  if (icon === "roomTypes") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M3.5 6.1 9 3l5.5 3.1-5.5 3.1L3.5 6.1Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M3.5 10.1 9 13l5.5-2.9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M3.5 8.1 9 11l5.5-2.9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
       </svg>
     );
   }
@@ -254,6 +292,14 @@ function getSearchPlaceholder(pathname: string, locale: "en" | "vi") {
     return locale === "en" ? "Search rooms, types..." : "Tìm phòng, loại phòng...";
   }
 
+  if (pathname.startsWith("/admin/room-types")) {
+    return locale === "en" ? "Search room types..." : "Tìm hạng phòng...";
+  }
+
+  if (pathname.startsWith("/admin/media")) {
+    return locale === "en" ? "Search media, folders..." : "Tìm media, thư mục...";
+  }
+
   if (pathname.startsWith("/admin/content-pages")) {
     return locale === "en" ? "Search pages, banners..." : "Tìm trang, banner...";
   }
@@ -293,7 +339,11 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
   const currentBranch =
     branches.find((branch) => branch.id === branchId) ?? branches[0] ?? null;
   const showSearchTopbar =
-    pathname === "/admin" || pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/rooms");
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/bookings") ||
+    pathname.startsWith("/admin/rooms") ||
+    pathname.startsWith("/admin/room-types") ||
+    pathname.startsWith("/admin/media");
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
