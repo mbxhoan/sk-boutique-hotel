@@ -95,7 +95,6 @@ function calculateNights(stayStartAt: string, stayEndAt: string) {
 
 export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }: RoomCanvasModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [breakfastIndex, setBreakfastIndex] = useState(0);
   const [cancellationIndex, setCancellationIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [imageZoomOpen, setImageZoomOpen] = useState(false);
@@ -107,10 +106,8 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     }
 
     setActiveImageIndex(0);
-    const breakfastSelected = room.breakfastOptions.findIndex((option) => option.selected);
     const cancellationSelected = room.cancellationOptions.findIndex((option) => option.selected);
 
-    setBreakfastIndex(breakfastSelected >= 0 ? breakfastSelected : 0);
     setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
     setBookingOpen(false);
     setImageZoomOpen(false);
@@ -173,10 +170,10 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     return null;
   }
 
-  const breakfastOption = room.breakfastOptions[breakfastIndex] ?? room.breakfastOptions[0];
   const cancellationOption = room.cancellationOptions[cancellationIndex] ?? room.cancellationOptions[0];
   const basePrice = room.currentPrice ?? 0;
-  const totalPrice = room.priceVisible ? basePrice + breakfastOption.delta + cancellationOption.delta : null;
+  const breakfastIncluded = room.breakfastOptions[0] ?? null;
+  const totalPrice = room.priceVisible ? basePrice + cancellationOption.delta : null;
   const stayNights = calculateNights(bookingContext.stayStartAt, bookingContext.stayEndAt);
   const quotedNightlyRate = totalPrice != null ? Number((totalPrice / stayNights).toFixed(2)) : null;
   const originalPrice = room.originalPrice;
@@ -313,35 +310,22 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
           <div className="room-canvas__options">
             <div className="room-canvas__option-group">
               <h4 className="room-canvas__section-title">{locale === "en" ? "Room options" : "Tùy chọn phòng"}</h4>
-              <p className="room-canvas__section-subtitle">{locale === "en" ? "Meal choice" : "Lựa chọn bữa ăn"}</p>
+              <p className="room-canvas__section-subtitle">
+                {locale === "en" ? "Breakfast included at no extra charge" : "Bữa sáng đã bao gồm, không phụ thu"}
+              </p>
 
-              <div className="room-canvas__option-list">
-                {room.breakfastOptions.map((option, index) => {
-                  const isSelected = index === breakfastIndex;
-                  const priceDelta = option.delta ? formatRoomCurrency(locale, option.delta) : null;
-
-                  return (
-                    <button
-                      className={`room-canvas__option${isSelected ? " room-canvas__option--selected" : ""}`}
-                      key={option.label.vi}
-                      onClick={() => setBreakfastIndex(index)}
-                      type="button"
-                    >
-                      <span className="room-canvas__option-copy">
-                        <span className="room-canvas__option-radio">
-                          <RadioIcon checked={isSelected} />
-                        </span>
-                        <span>
-                          <strong>{option.label[locale]}</strong>
-                          {option.note ? <span className="room-canvas__option-note">{option.note[locale]}</span> : null}
-                        </span>
-                      </span>
-
-                      {priceDelta ? <span className="room-canvas__option-price">+{priceDelta}</span> : null}
-                    </button>
-                  );
-                })}
-              </div>
+              {breakfastIncluded ? (
+                <div className="room-canvas__included">
+                  <span className="room-canvas__included-icon" aria-hidden="true">
+                    <CheckIcon />
+                  </span>
+                  <span className="room-canvas__included-copy">
+                    <strong>{breakfastIncluded.label[locale]}</strong>
+                    {breakfastIncluded.note ? <span className="room-canvas__included-note">{breakfastIncluded.note[locale]}</span> : null}
+                  </span>
+                  <span className="room-canvas__included-price">{locale === "en" ? "Free" : "Miễn phí"}</span>
+                </div>
+              ) : null}
             </div>
 
             <div className="room-canvas__option-group">

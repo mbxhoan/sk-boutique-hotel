@@ -1017,7 +1017,7 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
     <div className="admin-page admin-booking-detail">
       <PortalCard className="admin-booking-detail__hero-card">
         <div className="admin-booking-detail__hero-top">
-          <div>
+          <div className="admin-booking-detail__hero-copy">
             <Link className="admin-booking-detail__back-link" href={backHref}>
               ← {locale === "en" ? "Back to bookings" : "Quay lại danh sách booking"}
             </Link>
@@ -1027,27 +1027,26 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
             </div>
             <p className="admin-booking-detail__hero-description">{getWorkflowTitle(detail, locale)}</p>
           </div>
-          {countdownTarget ? <CountdownPill expiresAt={countdownTarget} locale={locale} /> : null}
+          <div className="admin-booking-detail__hero-actions">
+            {countdownTarget ? <CountdownPill expiresAt={countdownTarget} locale={locale} /> : null}
+            <AdminBookingDetailToolbar
+              canCancel={canCancelReservation ?? false}
+              canComplete={canCompleteReservation}
+              canReject={canRejectRequest ?? false}
+              copiedLabel={localize(locale, { vi: "Đã sao chép", en: "Copied" })}
+              copyLabel={localize(locale, { vi: "Sao chép link", en: "Copy link" })}
+              emailHref={booking.customer_email ? `mailto:${booking.customer_email}` : null}
+              emailLabel={localize(locale, { vi: "Email khách", en: "Email guest" })}
+              locale={locale}
+              printLabel={localize(locale, { vi: "In", en: "Print" })}
+              requestId={request?.id}
+              reservationId={reservation?.id}
+              returnTo={detailHref}
+              workflowHref={workflowHref}
+              workflowLabel={localize(locale, { vi: "Mở workflow", en: "Open workflow" })}
+            />
+          </div>
         </div>
-
-        <AdminBookingDetailToolbar
-          backHref={backHref}
-          backLabel={localize(locale, { vi: "Quay lại", en: "Back" })}
-          canCancel={canCancelReservation ?? false}
-          canComplete={canCompleteReservation}
-          canReject={canRejectRequest ?? false}
-          copiedLabel={localize(locale, { vi: "Đã sao chép", en: "Copied" })}
-          copyLabel={localize(locale, { vi: "Sao chép link", en: "Copy link" })}
-          emailHref={booking.customer_email ? `mailto:${booking.customer_email}` : null}
-          emailLabel={localize(locale, { vi: "Email khách", en: "Email guest" })}
-          locale={locale}
-          printLabel={localize(locale, { vi: "In", en: "Print" })}
-          requestId={request?.id}
-          reservationId={reservation?.id}
-          returnTo={detailHref}
-          workflowHref={workflowHref}
-          workflowLabel={localize(locale, { vi: "Mở workflow", en: "Open workflow" })}
-        />
 
         <HeroMetrics detail={detail} locale={locale} />
       </PortalCard>

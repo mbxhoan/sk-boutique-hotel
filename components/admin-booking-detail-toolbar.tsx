@@ -6,8 +6,6 @@ import { useState, useTransition } from "react";
 import { updateAvailabilityRequestStatusAction, updateReservationLifecycleAction } from "@/app/(admin)/admin/actions";
 
 type AdminBookingDetailToolbarProps = {
-  backHref: string;
-  backLabel: string;
   canCancel?: boolean;
   canComplete?: boolean;
   canReject?: boolean;
@@ -25,8 +23,6 @@ type AdminBookingDetailToolbarProps = {
 };
 
 export function AdminBookingDetailToolbar({
-  backHref,
-  backLabel,
   canCancel,
   canComplete,
   canReject,
@@ -98,22 +94,19 @@ export function AdminBookingDetailToolbar({
 
   return (
     <div className="admin-booking-detail__toolbar">
-      <Link className="button button--text-light admin-booking-detail__toolbar-link" href={backHref}>
-        {backLabel}
-      </Link>
       {workflowHref ? (
         <Link className="button button--text-light admin-booking-detail__toolbar-link" href={workflowHref}>
           {workflowLabel}
         </Link>
       ) : null}
+      <button className="button button--solid admin-booking-detail__toolbar-link" onClick={() => window.print()} type="button">
+        {printLabel}
+      </button>
       {emailHref ? (
         <a className="button button--text-light admin-booking-detail__toolbar-link" href={emailHref}>
           {emailLabel}
         </a>
       ) : null}
-      <button className="button button--solid admin-booking-detail__toolbar-link" onClick={() => window.print()} type="button">
-        {printLabel}
-      </button>
       <button className="button button--text-light admin-booking-detail__toolbar-link" onClick={handleCopyLink} type="button">
         {copied ? copiedLabel : copyLabel}
       </button>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Media Library - SK Boutique Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#d2e4ff",
+                        "outline": "#807569",
+                        "secondary": "#4a607c",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#021c36",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "secondary-container": "#c5dcfd",
+                        "inverse-primary": "#e8c086",
+                        "on-secondary-container": "#4b617d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-fixed-dim": "#e8c086",
+                        "on-tertiary-container": "#292c2d",
+                        "primary-fixed": "#ffdeae",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary": "#5c5f60",
+                        "on-primary-fixed": "#281800",
+                        "on-primary-fixed-variant": "#5d4213",
+                        "surface-variant": "#d3e4fe",
+                        "primary-container": "#b08d57",
+                        "surface": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary-fixed": "#191c1d",
+                        "primary": "#775928",
+                        "on-primary-container": "#3d2700",
+                        "surface-tint": "#775928",
+                        "tertiary-container": "#919394",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#4e453a",
+                        "tertiary-fixed": "#e1e3e4",
+                        "outline-variant": "#d1c5b6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed-dim": "#b1c8e9",
+                        "on-surface": "#0b1c30",
+                        "on-background": "#0b1c30",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#324863"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "table-data": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h1": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h3": ["Inter"]
+                    },
+                    "fontSize": {
+                        "table-data": ["13px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "h3": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen text-on-background flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[260px] border-r border-slate-800 bg-slate-950 font-inter antialiased tracking-tight text-sm flex flex-col h-full py-6 z-50">
+<!-- Header -->
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-lg">
+                SK
+            </div>
+<div>
+<h1 class="text-lg font-semibold tracking-widest text-white uppercase leading-tight">SK Boutique</h1>
+<p class="text-slate-400 text-xs">Admin Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-1 px-4">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Bookings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span>Bookings</span>
+</a>
+<!-- Room Management -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">bed</span>
+<span>Room Management</span>
+</a>
+<!-- Media Library (ACTIVE) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded bg-slate-900 text-[#B08D57] border-r-2 border-[#B08D57] font-medium transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px] fill">perm_media</span>
+<span>Media Library</span>
+</a>
+<!-- Customers -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span>Customers</span>
+</a>
+<!-- Content -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span>Content</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<!-- Footer Links -->
+<div class="mt-auto px-4 flex flex-col gap-1 border-t border-slate-800 pt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-900/50 transition-colors duration-200 ease-in-out cursor-pointer active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="ml-[260px] w-[calc(100%-260px)] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="sticky top-0 right-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-8 h-16 w-full font-inter text-sm font-medium">
+<!-- Search -->
+<div class="flex items-center flex-1 max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-md focus:ring-1 focus:ring-primary-container text-slate-900 placeholder-slate-400 transition-all duration-200 ease-in-out text-sm" placeholder="Search media, folders..." type="text"/>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-4 ml-auto">
+<!-- Branch Selector -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all duration-200 ease-in-out">
+<span>Main Branch</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-slate-200 mx-2"></div>
+<!-- Icon Actions -->
+<button class="text-slate-500 hover:bg-slate-50 p-2 rounded-md transition-all duration-200 ease-in-out relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-slate-500 hover:bg-slate-50 p-2 rounded-md transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<!-- Profile -->
+<button class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-slate-200 hover:ring-2 hover:ring-primary-container transition-all duration-200">
+<img alt="Manager Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXhUiGAnUchmK2sbKSAVSVGt5kvz8dezXXwmBGl73mWKS8KAC74F0cfNaY_Rt5TmMyidw7sR_aA3rcAThhYlcY9twnhBvmyZ-Iym4QChmp2fwEMDr6HaTm7ofy_w0oZxxsgWrFxs_9LxFsyqVCuHd3eK7nBtK68VtN_-6vrec3xvUH16LDu-08tZaIlp2vv0wRhO_CjzGnHc5QG0fNqIQpDparTSjaA34_BT8-QYXcQYofIb3dcpm5XY7ygtPEPf4NiGKxpCYCDGQX"/>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-lg flex flex-col gap-lg bg-surface">
+<!-- Page Header -->
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-h1 text-h1 text-on-surface">Media Library</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Quản lý thư viện hình ảnh và tài liệu website</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container rounded font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                    Upload Image
+                </button>
+</div>
+<!-- Tabbed Navigation -->
+<div class="border-b border-outline-variant flex gap-6 mt-2">
+<button class="pb-3 border-b-2 border-primary text-primary font-body-md text-body-md font-medium transition-colors">
+                    Tất cả
+                </button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md transition-colors">
+                    /rooms
+                </button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md transition-colors">
+                    /dining
+                </button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md transition-colors">
+                    /wellness
+                </button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md transition-colors">
+                    /experiences
+                </button>
+</div>
+<!-- Filters & Secondary Actions (Minimalist) -->
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-md text-on-surface-variant">
+<span class="font-table-data text-table-data">248 items total</span>
+<div class="h-4 w-px bg-outline-variant"></div>
+<button class="flex items-center gap-1 hover:text-on-surface font-table-data text-table-data transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                    </button>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 rounded text-on-surface bg-surface-container-high border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
+<span class="material-symbols-outlined text-[18px]">view_list</span>
+</button>
+</div>
+</div>
+<!-- Image Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-md">
+<!-- Card 1 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Luxurious hotel suite bedroom with a large bed, warm ambient lighting, elegant decor, and a city view through large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2-DB3ZqfomBF90tMONLBtp_cMBMpOabQKaebuWCab9xsI8xK2c3ILrrp--TLkbXYwS01JGVk5PG0zq88sIkE0CPszbjpfGEGTN66bvhQ_MEzjMzr8pZiPWS5U3rctpcRStBGEURM-6aoOJvk26XBRu7sphGQyEZrKdXvIm3-7bsPhXrB6OCQIm1YYitwWCNJwPXjJ7R1ut1tUIV5UMxG8pqv1cLHg1KQBL0hw3y0Iabeqn9Pc2eTg-J_XPakueNovh8COtwu4Iwa7"/>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="deluxe-suite-master-bedroom.jpg">deluxe-suite-master-bedroom.jpg</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">2.4 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/rooms</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Fine dining restaurant interior set up for dinner with elegant table settings, wine glasses, and soft moody lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfkiKDkzTWG3wB8G8_xL4tQdVzG_j_vr_DZrjUkZBnJfkEVyfhgPncuSXDhZrSpQpsUjp7aPW3U4SANyIgWT7cZ6CaRuZ_4AU4EQVH_73U9fmqCRnCmy-RD4lrPQhuuRV_WGnLicNPCekLytFRXfel7uclE5GgJzmAyS0amxcxeTYlW4zMN7Dc1ZlPHyvA3VEqiIxiN3iTYzv9O9KQl1G92z0wgURgBx-OTUKxEJ7S3guXuiPuSvP2tVd9cxHX8ahqWDqxhSim2odW"/>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="restaurant-evening-setup.webp">restaurant-evening-setup.webp</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">1.8 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/dining</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Tranquil spa treatment room with massage tables, clean white towels, candles, and natural wooden elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwEnvhMoy2H6qJLlhsaYcjRMTIA-WvqvGaSiBrB-hCpH_eNeEbN-FDK971Ac3FB4dQEKy9GX5aTGu8Shxrjb3bNE1eBHnvlwQZCDrLzIn5Iq3bXyvgx3Kn6QbdNzZOWrTAay2RDD-uH1JRHbbaW1qe3wFaveygoV0GFaZzfJU4p98xUBVPm5flKiUMa3Y6rRQwaWc1o2ufTaNT2ia4q97jF9dk8DD540FncqVT-z7PRjxWHhD8GZAay3ETGFj0mrVGsM_2bcWXzDhS"/>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="spa-treatment-room.jpg">spa-treatment-room.jpg</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">3.1 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/wellness</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Modern hotel bathroom with freestanding white bathtub, dark marble walls, and premium bath amenities" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHf-b4nj8UK5hnO7UWJq_CbPhH-bza1mvVeAgdJ1AlQLmSk7i5ATmZ1IGqSk28RdlwDhhzq0BnT9O0dfPFtspU3Cs9BfZpM3-KjKEqOK4SfFD0XL1nSg8Jg6iNB52KFtIMYUchOUrFEZ7tDAzMwvDy6HqXgPySsxwAX24wXy1Fi20PZQ0VTM76poK5yxD1K5TmFIeqibX-KRnopc5lIr-fGkK-JyEYzqQ0bPFryYkoeVTgxzRiLJsurUg6evuY4yg0mr0JYrhOJW3g"/>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="suite-bathroom-marble.png">suite-bathroom-marble.png</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">4.5 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/rooms</span>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Outdoor hotel swimming pool surrounded by palm trees and white lounge chairs under a clear blue summer sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlIpVD3z00xmT4ZD6VmDA42KDDnQTxpOqy57jnpFJv6IX77MLClo6egNdtErrUu1hth-HnAs_MXklLzh14y7dg2AwTKntENWc1Enhx4S9kux9_tGzn4xRb550fRSK0oJFpZlLna8_mL1y9X2yW6qRsZJYIAoGAylvLknD_5ablSSOFQSY_YeK8vpczM65FPtZRUberoDBQ7PwcYg97RsDVI46nLe-C6FMNRXJiEYzTWqqCcSncdkG0rYRFsDfInxC5EA_LWV19VoeR"/>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="main-pool-daytime.jpg">main-pool-daytime.jpg</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">2.1 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/experiences</span>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant rounded overflow-hidden flex flex-col hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+<div class="relative aspect-[4/3] bg-surface-variant overflow-hidden border-b border-outline-variant flex items-center justify-center bg-surface-container">
+<!-- Example of a non-image file placeholder -->
+<span class="material-symbols-outlined text-[48px] text-outline-variant">picture_as_pdf</span>
+<!-- Hover Overlay Actions -->
+<div class="absolute inset-0 bg-inverse-surface/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface text-on-surface flex items-center justify-center hover:bg-error hover:text-on-error transition-colors shadow-sm" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-body-sm text-body-sm text-on-surface truncate" title="hotel-brochure-2024.pdf">hotel-brochure-2024.pdf</span>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-table-data text-table-data">8.5 MB</span>
+<span class="font-table-data text-table-data text-[11px] bg-surface-container px-1.5 py-0.5 rounded">/docs</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination (Minimalist) -->
+<div class="flex items-center justify-between border-t border-outline-variant pt-4 mt-4">
+<span class="font-table-data text-table-data text-on-surface-variant">Showing 1 to 24 of 248 entries</span>
+<div class="flex gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-primary-container text-on-primary-container font-body-sm text-body-sm flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded text-on-surface hover:bg-surface-container font-body-sm text-body-sm flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded text-on-surface hover:bg-surface-container font-body-sm text-body-sm flex items-center justify-center transition-colors">3</button>
+<span class="w-8 h-8 flex items-center justify-center text-on-surface-variant">...</span>
+<button class="w-8 h-8 rounded text-on-surface hover:bg-surface-container font-body-sm text-body-sm flex items-center justify-center transition-colors">11</button>
+<button class="p-1 rounded text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

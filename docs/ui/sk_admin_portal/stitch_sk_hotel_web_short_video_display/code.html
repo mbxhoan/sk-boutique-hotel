@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SK Boutique Hotel - Heritage Experience</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#474744",
+                        "secondary-container": "#fdd587",
+                        "tertiary": "#000000",
+                        "primary-fixed-dim": "#b9c7e0",
+                        "tertiary-fixed": "#e4e2de",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#848481",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2de",
+                        "on-secondary-fixed-variant": "#5c4200",
+                        "outline-variant": "#c5c6cd",
+                        "background": "#fbf9f5",
+                        "primary-fixed": "#d5e3fd",
+                        "tertiary-container": "#1b1c1a",
+                        "primary": "#000000",
+                        "secondary-fixed": "#ffdea3",
+                        "on-primary-fixed": "#0e1c2f",
+                        "on-primary-container": "#77859b",
+                        "surface-container-high": "#eae8e4",
+                        "on-tertiary-fixed": "#1b1c1a",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#44474c",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-variant": "#e4e2de",
+                        "surface-bright": "#fbf9f5",
+                        "on-background": "#1b1c1a",
+                        "secondary": "#775a19",
+                        "on-surface": "#1b1c1a",
+                        "inverse-surface": "#30312e",
+                        "inverse-primary": "#b9c7e0",
+                        "tertiary-fixed-dim": "#c8c6c3",
+                        "surface-tint": "#515f75",
+                        "primary-container": "#0e1c2f",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#261900",
+                        "on-secondary-container": "#785a19",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#3a485c",
+                        "secondary-fixed-dim": "#e8c176",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#efeeea",
+                        "surface": "#fbf9f5",
+                        "outline": "#75777d",
+                        "surface-container-low": "#f5f3ef",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dbdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Playfair Display", "serif"],
+                        "display": ["Playfair Display", "serif"],
+                        "body": ["Be Vietnam Pro", "sans-serif"],
+                        "label": ["Be Vietnam Pro", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fbf9f5; color: #1b1c1a; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-12 py-6 bg-[#fbf9f5]/80 backdrop-blur-xl docked full-width top-0 z-50 tonal-shift-no-border">
+<div class="text-2xl font-serif uppercase tracking-widest text-[#000c1e] font-['Playfair_Display'] tracking-tight">
+            SK Boutique
+        </div>
+<div class="hidden md:flex space-x-8">
+<a class="text-[#000c1e] opacity-80 hover:text-[#775a19] transition-colors duration-300 font-['Playfair_Display'] tracking-tight" href="#">The Heritage</a>
+<a class="text-[#000c1e] opacity-80 hover:text-[#775a19] transition-colors duration-300 font-['Playfair_Display'] tracking-tight" href="#">Suites</a>
+<a class="text-[#000c1e] opacity-80 hover:text-[#775a19] transition-colors duration-300 font-['Playfair_Display'] tracking-tight" href="#">Dining</a>
+<a class="text-[#000c1e] opacity-80 hover:text-[#775a19] transition-colors duration-300 font-['Playfair_Display'] tracking-tight" href="#">Wellness</a>
+<a class="text-[#000c1e] opacity-80 hover:text-[#775a19] transition-colors duration-300 font-['Playfair_Display'] tracking-tight" href="#">Experiences</a>
+</div>
+<div>
+<button class="bg-gradient-to-br from-secondary to-on-secondary-container text-on-secondary px-6 py-2 rounded-md font-body font-medium hover:opacity-90 transition-opacity">
+                Book Now
+            </button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pt-32 pb-24 px-6 md:px-12 lg:px-24">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<!-- Left Column: Content -->
+<div class="space-y-8 relative z-10">
+<div class="space-y-4">
+<span class="block text-secondary font-label text-sm tracking-[0.1em] uppercase">The Anthology</span>
+<h1 class="font-headline text-5xl md:text-6xl lg:text-7xl leading-tight text-primary-container tracking-tighter">
+                        Trải Nghiệm Đẳng Cấp Di Sản
+                    </h1>
+</div>
+<p class="font-body text-lg leading-relaxed text-on-surface-variant max-w-lg">
+                    Discover a sanctuary where timeless elegance meets modern sophistication. Every detail of SK Boutique Hotel is meticulously curated to transport you into a world of refined luxury, offering an unparalleled heritage experience in the heart of the city.
+                </p>
+<div class="pt-6">
+<button class="text-secondary font-body font-medium flex items-center gap-2 group pb-1 border-b border-outline-variant/40 hover:border-secondary transition-colors duration-300">
+                        Explore Our Story
+                        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Vertical Video Block -->
+<div class="relative w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto aspect-[9/16] rounded-lg overflow-hidden bg-surface-container-low">
+<!-- Placeholder Image -->
+<img alt="Luxury hotel interior with elegant lighting and rich textures" class="w-full h-full object-cover" data-alt="vertical video placeholder showing a slow pan of a luxury hotel suite with deep navy velvet curtains, golden hour lighting streaming through large windows, and an impeccably made king bed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMvHSl5X0FGacrPZLFTZytCblRMAcxLooqger1ukoDEDQpe0JmQAp8G9bm4_rLJnm3zM37D58qUnShRcf9CU5caxWqr5l6of7ANLsu-wQZfCVEf8VXaFLPNqoWHoJojwjHavr4FEdU4HmwiANCDANJ9J64qwd2l57kYOa0_HBLpvuaxqstkFd9sYVhAPy4NYFjTkfId3zMYmqihG6MNLS0IOanIOrs-AxowTUDRB8H0kUCEiLH76DOaYKfVjKpm5suaM5JSyVkfvCR"/>
+<!-- Video Overlay -->
+<div class="absolute inset-0 bg-primary-container/20 flex items-center justify-center group cursor-pointer transition-colors duration-500 hover:bg-primary-container/10">
+<div class="w-16 h-16 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center text-primary-container group-hover:scale-110 transition-transform duration-300 shadow-[0_20px_40px_rgba(0,12,30,0.06)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<!-- Subtle Decorative Element -->
+<div class="absolute bottom-6 left-6 right-6">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md p-4 rounded-sm shadow-[0_20px_40px_rgba(0,12,30,0.06)]">
+<p class="font-headline text-primary-container text-sm">A Glimpse of Elegance</p>
+<p class="font-body text-xs text-on-surface-variant mt-1">Watch our short film</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 px-12 flex flex-col md:flex-row justify-between items-center border-t border-[#fbf9f5]/10 bg-[#000c1e] text-[#775a19] full-width tonal-shift-navy-to-cream">
+<div class="text-xl font-serif text-[#fbf9f5] font-['Playfair_Display'] mb-6 md:mb-0">
+            SK Boutique
+        </div>
+<div class="font-['Be_Vietnam_Pro'] text-sm tracking-wide text-[#fbf9f5]/60 mb-6 md:mb-0">
+            © 2024 SK Boutique Hotel. Crafted Heritage.
+        </div>
+<div class="flex space-x-6">
+<a class="text-[#fbf9f5]/60 hover:text-[#fbf9f5] transition-all font-['Be_Vietnam_Pro'] text-sm tracking-wide" href="#">Privacy Policy</a>
+<a class="text-[#fbf9f5]/60 hover:text-[#fbf9f5] transition-all font-['Be_Vietnam_Pro'] text-sm tracking-wide" href="#">Terms of Service</a>
+<a class="text-[#fbf9f5]/60 hover:text-[#fbf9f5] transition-all font-['Be_Vietnam_Pro'] text-sm tracking-wide" href="#">Press Room</a>
+<a class="text-[#fbf9f5]/60 hover:text-[#fbf9f5] transition-all font-['Be_Vietnam_Pro'] text-sm tracking-wide" href="#">Careers</a>
+</div>
+</footer>
+</body></html>

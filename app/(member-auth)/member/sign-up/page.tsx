@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { MemberAuthPage } from "@/components/member-auth-page";
 import { MemberAuthForm } from "@/components/member-auth-form";
-import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import { getSupabaseUser } from "@/lib/supabase/auth";
@@ -30,16 +29,6 @@ const pageCopy = {
   } satisfies LocalizedText
 } as const;
 
-function buildMemberLocaleHref(pathname: string, locale: "vi" | "en", next?: string) {
-  const url = new URL(pathname, "https://sk-boutique-hotel.local");
-
-  if (next?.startsWith("/")) {
-    url.searchParams.set("next", next);
-  }
-
-  return appendLocaleQuery(`${url.pathname}${url.search}${url.hash}`, locale);
-}
-
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
@@ -61,31 +50,15 @@ export default async function MemberSignUpPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="admin-auth-page">
-      <section className="admin-auth-card">
-        <div className="admin-auth-card__topbar">
-          <LogoMark className="site-header__logo" href={appendLocaleQuery("/", locale)} priority />
-          <div className="admin-auth-card__locale-switch" aria-label={locale === "en" ? "Language switch" : "Chuyển ngôn ngữ"}>
-            <Link
-              className={`admin-auth-card__locale-link${locale === "vi" ? " admin-auth-card__locale-link--active" : ""}`}
-              href={buildMemberLocaleHref("/member/sign-up", "vi", nextHref)}
-            >
-              VI
-            </Link>
-            <Link
-              className={`admin-auth-card__locale-link${locale === "en" ? " admin-auth-card__locale-link--active" : ""}`}
-              href={buildMemberLocaleHref("/member/sign-up", "en", nextHref)}
-            >
-              EN
-            </Link>
-          </div>
-        </div>
-
-        <p className="portal-shell__eyebrow">{localize(locale, pageCopy.eyebrow)}</p>
-        <h1 className="admin-auth-card__title">{localize(locale, pageCopy.title)}</h1>
-        <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p>
-        <MemberAuthForm locale={locale} mode="sign-up" />
-      </section>
-    </main>
+    <MemberAuthPage
+      description={pageCopy.description}
+      eyebrow={pageCopy.eyebrow}
+      locale={locale}
+      nextHref={nextHref}
+      routePath="/member/sign-up"
+      title={pageCopy.title}
+    >
+      <MemberAuthForm locale={locale} mode="sign-up" />
+    </MemberAuthPage>
   );
 }

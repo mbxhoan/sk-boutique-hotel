@@ -66,6 +66,18 @@ textarea {
   color: var(--ink);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 :focus-visible {
   outline: 2px solid rgba(197, 160, 89, 0.9);
   outline-offset: 3px;
@@ -4236,6 +4248,262 @@ textarea {
   font-size: 0.88rem;
 }
 
+.member-auth-page {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  padding: clamp(1rem, 4vw, 2rem);
+  overflow: hidden;
+  color: #f8f5ef;
+  isolation: isolate;
+}
+
+.member-auth-page__media {
+  position: absolute;
+  inset: 0;
+}
+
+.member-auth-page__image {
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.92) contrast(0.95);
+  transform: scale(1.02);
+}
+
+.member-auth-page__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(4, 9, 16, 0.72) 0%, rgba(4, 9, 16, 0.48) 42%, rgba(11, 24, 40, 0.66) 100%),
+    radial-gradient(circle at top right, rgba(197, 160, 89, 0.16), transparent 28%);
+}
+
+.member-auth-page__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, 30rem);
+  margin: auto;
+  gap: 0.9rem;
+}
+
+.member-auth-page__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.member-auth-page__logo {
+  flex: 0 0 auto;
+}
+
+.member-auth-page__logo .logo-mark__image {
+  height: clamp(2.4rem, 4vw, 3.4rem) !important;
+}
+
+.member-auth-page__locale-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.member-auth-page__locale-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.15rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.member-auth-page__locale-link:hover {
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.member-auth-page__locale-link--active {
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+}
+
+.member-auth-card {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.65rem, 3.6vw, 2.3rem) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.75rem;
+  background: rgba(251, 249, 245, 0.82);
+  box-shadow: 0 32px 72px rgba(0, 12, 30, 0.28);
+  backdrop-filter: blur(20px) saturate(118%);
+  -webkit-backdrop-filter: blur(20px) saturate(118%);
+  color: var(--ink);
+}
+
+.member-auth-card__eyebrow {
+  margin: 0;
+  color: var(--gold-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.member-auth-card__description {
+  margin: 0;
+  color: rgba(16, 35, 62, 0.74);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.member-auth-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.2rem;
+}
+
+.member-auth-form__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.member-auth-form__description {
+  margin: 0.35rem 0 0;
+  color: rgba(16, 35, 62, 0.72);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.member-auth-form__fields {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.member-auth-form__field {
+  display: grid;
+  gap: 0.4rem;
+  color: rgba(16, 35, 62, 0.82);
+}
+
+.member-auth-form__field span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.member-auth-form__input {
+  width: 100%;
+  padding: 0.92rem 1rem;
+  border: 1px solid rgba(16, 35, 62, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 12, 30, 0.03);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.member-auth-form__input::placeholder {
+  color: rgba(16, 35, 62, 0.36);
+}
+
+.member-auth-form__input:focus {
+  border-color: rgba(197, 160, 89, 0.72);
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.14);
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.member-auth-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.member-auth-form__actions--primary {
+  margin-top: 0.1rem;
+}
+
+.member-auth-form__submit {
+  width: 100%;
+  justify-content: center;
+  min-height: 3rem;
+}
+
+.member-auth-form__actions--secondary {
+  justify-content: center;
+}
+
+.member-auth-form__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.15rem 0;
+  color: var(--gold-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.member-auth-form__link:hover {
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.member-auth-form__hint {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(16, 35, 62, 0.08);
+  border-radius: 1rem;
+  background: rgba(16, 35, 62, 0.04);
+  color: rgba(16, 35, 62, 0.74);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.member-auth-form__error {
+  margin: 0;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(216, 84, 84, 0.18);
+  border-radius: 1rem;
+  background: rgba(255, 236, 236, 0.78);
+  color: #a63e3e;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 .marketing-home {
   display: flex;
   flex-direction: column;
@@ -6314,6 +6582,11 @@ textarea {
   color: var(--ink);
 }
 
+.availability-calendar__month-nav:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
 .availability-calendar__month-nav--spacer {
   border-color: transparent;
   background: transparent;
@@ -6363,6 +6636,18 @@ textarea {
 
 .availability-calendar__day--muted {
   color: rgba(0, 12, 30, 0.36);
+}
+
+.availability-calendar__day--disabled,
+.availability-calendar__day:disabled {
+  color: rgba(0, 12, 30, 0.2);
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.availability-calendar__day--disabled:hover,
+.availability-calendar__day:disabled:hover {
+  background: transparent;
 }
 
 .availability-calendar__day--range {
@@ -7854,6 +8139,54 @@ textarea {
 
 .room-canvas__option-price {
   flex: none;
+  color: var(--gold-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.room-canvas__included {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(0, 12, 30, 0.08);
+  border-radius: 1rem;
+  background: rgba(16, 35, 62, 0.05);
+}
+
+.room-canvas__included-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--gold-strong);
+}
+
+.room-canvas__included-copy {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.room-canvas__included-copy strong {
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.room-canvas__included-note {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.room-canvas__included-price {
   color: var(--gold-strong);
   font-size: 0.72rem;
   font-weight: 700;
@@ -9565,6 +9898,19 @@ textarea {
   gap: 1rem;
 }
 
+.admin-booking-detail__hero-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-booking-detail__hero-actions {
+  display: grid;
+  justify-items: end;
+  gap: 0.75rem;
+  flex: 0 1 auto;
+  min-width: min(100%, 30rem);
+}
+
 .admin-booking-detail__back-link {
   display: inline-flex;
   align-items: center;
@@ -10043,6 +10389,15 @@ textarea {
     align-items: flex-start;
   }
 
+  .admin-booking-detail__hero-actions {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .admin-booking-detail__toolbar {
+    justify-content: flex-start;
+  }
+
   .admin-booking-detail__metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -10070,6 +10425,40 @@ textarea {
   .admin-notifications__dialog-body,
   .admin-notifications__toast {
     grid-template-columns: 1fr;
+  }
+
+  .member-auth-page__topbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .member-auth-page__locale-switch {
+    /* align-self: flex-start; */
+  }
+
+  .member-auth-card {
+    padding: 1.15rem;
+  }
+
+  .member-auth-form__title {
+    font-size: clamp(1.25rem, 5.4vw, 1.6rem);
+  }
+
+  .member-auth-form__actions--secondary {
+    justify-content: flex-start;
+  }
+
+  .member-auth-page__logo .logo-mark__image {
+    height: 2.7rem !important;
+  }
+
+  .room-canvas__included {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .room-canvas__included-price {
+    margin-top: 0.15rem;
   }
 
   .admin-booking-detail__hero-card,
@@ -11020,7 +11409,9 @@ textarea {
 .admin-booking-detail__toolbar {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.65rem;
+  width: 100%;
 }
 
 .admin-booking-detail__toolbar-link {

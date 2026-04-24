@@ -1349,3 +1349,21 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `components/admin-booking-detail-toolbar.tsx`
 - `lib/supabase/queries/operations.ts`
 - `lib/supabase/queries/member-history.ts`
+
+### Entry 120
+- `time`: 2026-04-24T14:08:23+07:00
+- `prompt_summary`: Tạm thời miễn phí bữa sáng cho mọi hạng phòng, đưa actions của trang chi tiết booking admin lên header, khóa bộ lọc ngày không cho chọn ngày cũ, và refactor login member portal theo mockup với nền ảnh có overlay.
+- `commit_message`: `fix(ui): make breakfast free and refresh booking/member auth flows`
+- `main_files`:
+  - `lib/rooms/catalog.ts`
+  - `components/room-canvas-modal.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-booking-detail-toolbar.tsx`
+  - `components/availability-check-bar.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `components/member-auth-page.tsx`
+  - `components/member-auth-form.tsx`
+  - `app/(member-auth)/member/sign-in/page.tsx`
+  - `app/(member-auth)/member/sign-up/page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
