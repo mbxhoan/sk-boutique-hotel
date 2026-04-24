@@ -13,8 +13,8 @@ export function MarketingBottomSections() {
 
   return (
     <>
-      <LocationSection locale={locale} />
       <FacilitiesSection locale={locale} />
+      <LocationSection locale={locale} />
       <PaymentSection locale={locale} />
     </>
   );
