@@ -15,6 +15,7 @@ import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { calculateDepositAmount, calculateRemainingBalance, calculateVerifiedDepositAmount, DEFAULT_BOOKING_DEPOSIT_PERCENT } from "@/lib/supabase/booking-finance";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
 import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   BranchRow,
   PaymentProofRow,
@@ -164,6 +165,7 @@ function mapPaymentRequest(
     latest_proof_review_note: latestProof?.review_note ?? null,
     latest_proof_status: latestProof?.status ?? null,
     latest_proof_uploaded_at: latestProof?.created_at ?? null,
+    latest_proof_url: null,
     payment_upload_path: buildPaymentUploadPath(request),
     qr_image_url: buildVietQrImageUrl(request),
     reservation_booking_code: reservation?.booking_code ?? request.reservation_id,
@@ -439,6 +441,15 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     paymentRequestViews.find((paymentRequest) => ["pending_verification", "sent"].includes(paymentRequest.status)) ??
     paymentRequestViews[0] ??
     null;
+  const supabase = createSupabaseServiceClient();
+
+  for (const pr of paymentRequestViews) {
+    if (pr.latest_proof_file_path) {
+      const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(pr.latest_proof_file_path, 3600);
+      pr.latest_proof_url = data?.signedUrl ?? null;
+    }
+  }
+
   const defaultDepositAmount = calculateDepositAmount({
     totalAmount
   });

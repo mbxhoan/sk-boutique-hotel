@@ -427,15 +427,20 @@ function ProcessingTimeline({
               vi: "Cọc đã được khách chuyển và admin đã xác nhận thủ công.",
               en: "The deposit was paid and manually verified."
             })
-          : activePaymentRequest
+          : activePaymentRequest?.latest_proof_uploaded_at
             ? localize(locale, {
-                vi: "QR cọc đã phát hành, đang chờ khách thanh toán.",
-                en: "The deposit QR has been issued and is waiting for payment."
-            })
-            : localize(locale, {
-                vi: "QR cọc sẽ được phát hành ngay sau khi chốt booking.",
-                en: "The deposit QR will be generated after booking confirmation."
-              }),
+                vi: "Khách đã tải lên proof thanh toán và đang chờ admin kiểm tra.",
+                en: "Guest has uploaded the payment proof and is waiting for review."
+              })
+            : activePaymentRequest
+              ? localize(locale, {
+                  vi: "QR cọc đã phát hành, đang chờ khách thanh toán.",
+                  en: "The deposit QR has been issued and is waiting for payment."
+              })
+              : localize(locale, {
+                  vi: "QR cọc sẽ được phát hành ngay sau khi chốt booking.",
+                  en: "The deposit QR will be generated after booking confirmation."
+                }),
       time: activePaymentRequest?.verified_at
         ? formatDateTime(locale, activePaymentRequest.verified_at)
         : activePaymentRequest?.latest_proof_uploaded_at
@@ -762,9 +767,28 @@ function VerifyDepositCard({
       </div>
 
       {activePaymentRequest?.latest_proof_uploaded_at ? (
-        <p className="admin-booking-detail__action-description">
-          {locale === "en" ? "Latest proof uploaded at" : "Proof gần nhất được tải lên lúc"} {formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)}
-        </p>
+        <div className="admin-booking-detail__action-description">
+          <p>
+            {locale === "en" ? "Latest proof uploaded at" : "Proof gần nhất được tải lên lúc"} {formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)}
+          </p>
+          {activePaymentRequest.latest_proof_url && (
+            <a href={activePaymentRequest.latest_proof_url} rel="noreferrer" target="_blank">
+              <img
+                alt="Payment proof"
+                src={activePaymentRequest.latest_proof_url}
+                style={{
+                  borderRadius: "0.5rem",
+                  border: "1px solid rgba(0, 12, 30, 0.12)",
+                  display: "block",
+                  marginTop: "0.6rem",
+                  maxHeight: "20rem",
+                  maxWidth: "100%",
+                  objectFit: "contain"
+                }}
+              />
+            </a>
+          )}
+        </div>
       ) : (
         <p className="admin-booking-detail__action-description">
           {locale === "en"

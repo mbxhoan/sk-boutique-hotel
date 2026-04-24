@@ -1325,3 +1325,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/actions/payments.ts`
   - `docs/commit_prompt_map.md`
+
+### Entry 118
+- `time`: 2026-04-24T12:37:00+07:00
+- `prompt_summary`: Admin không xem được ảnh chụp màn hình thanh toán cọc (proof) mà khách đã upload và trạng thái xử lý không hiển thị việc khách đã gửi proof.
+- `commit_message`: `fix(admin-portal): render payment proof image and update processing timeline description for uploaded proofs`
+- `main_files`:
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `components/admin-booking-detail-page.tsx`
+  - `docs/commit_prompt_map.md`
