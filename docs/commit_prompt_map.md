@@ -1335,3 +1335,17 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/booking-details.ts`
   - `components/admin-booking-detail-page.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 119
+**Date:** 2026-04-24
+**Prompt:** "1. nếu như admin đã xác nhận thanh toán cọc thì ẩn "Bước 2: Thanh toán cọc" và "Bước 3: Xác nhận nhận cọc đi". 
+2. thay "Trạng thái xử lý" là "Lịch sử", gồm Trạng thái xử lý gộp Lịch sử thanh toán cọc vào đó luôn
+3. phần "Lịch sử thanh toán cọc" đưa gộp vào trong "Trạng thái xử lý" luôn.
+4. sau đó, đưa "Thông tin booking" gộp vào trong "Thông tin khách hàng & Đặt phòng" cho gọn
+5. Đưa các nút chuyển trạng thái, actions, thao tác lên trên giống nhưu ảnh minh hoạ đính kèm"
+**Commit Message:** `refactor(admin-booking-detail): reorganize booking details UI, hide verified deposit steps, and move primary actions to header toolbar`
+**Files Modified:**
+- `components/admin-booking-detail-page.tsx`
+- `components/admin-booking-detail-toolbar.tsx`
+- `lib/supabase/queries/operations.ts`
+- `lib/supabase/queries/member-history.ts`

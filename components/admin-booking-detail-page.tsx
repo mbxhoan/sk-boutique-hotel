@@ -262,6 +262,9 @@ function GuestBookingCard({
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
 
+  const specialRequest = request?.note || booking.notes || null;
+  const branchLabel = locale === "en" ? booking.branch_name_en : booking.branch_name_vi;
+
   return (
     <PortalCard className="admin-booking-detail__surface-card admin-booking-detail__guest-card">
       <div className="admin-booking-detail__card-head">
@@ -305,9 +308,25 @@ function GuestBookingCard({
         </div>
       </div>
 
-      <div className="admin-booking-detail__special-request">
-        <p className="admin-booking-detail__meta-label">{locale === "en" ? "Special request" : "Yêu cầu đặc biệt"}</p>
-        <p className="admin-booking-detail__special-request-copy">{request?.note || booking.notes || localize(locale, { vi: "Không có ghi chú thêm.", en: "No special request." })}</p>
+      {specialRequest ? (
+        <div className="admin-booking-detail__special-request">
+          <p className="admin-booking-detail__meta-label">{locale === "en" ? "Special request" : "Yêu cầu đặc biệt"}</p>
+          <p className="admin-booking-detail__special-request-copy">{specialRequest}</p>
+        </div>
+      ) : null}
+
+      <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(0,12,30,0.08)" }}>
+        <h3 className="admin-booking-detail__card-title" style={{ marginBottom: "1rem" }}>{locale === "en" ? "Booking info" : "Thông tin booking"}</h3>
+        <dl className="portal-profile-list portal-profile-list--dense">
+          {renderField(locale === "en" ? "Guest" : "Khách đặt", guestName)}
+          {renderField(locale === "en" ? "Email" : "Email", guestEmail)}
+          {renderField(locale === "en" ? "Phone" : "Điện thoại", guestPhone)}
+          {renderField(locale === "en" ? "Branch" : "Chi nhánh", branchLabel)}
+          {renderField(locale === "en" ? "Room type" : "Loại phòng", roomTypeLabel)}
+          {renderField(locale === "en" ? "Assigned room" : "Phòng", detail.room_code ?? "—")}
+          {renderField(locale === "en" ? "Created at" : "Tạo lúc", formatDateTime(locale, booking.created_at))}
+          {renderField(locale === "en" ? "Marketing consent" : "Marketing consent", formatConsent(locale, detail.customer?.marketing_consent ?? request?.marketing_consent ?? null))}
+        </dl>
       </div>
     </PortalCard>
   );
@@ -481,7 +500,7 @@ function ProcessingTimeline({
 
   return (
     <PortalCard className="admin-booking-detail__surface-card">
-      <h3 className="admin-booking-detail__card-title">{locale === "en" ? "Processing status" : "Trạng thái xử lý"}</h3>
+      <h3 className="admin-booking-detail__card-title">{locale === "en" ? "History" : "Lịch sử"}</h3>
       <div className="admin-booking-detail__timeline">
         {steps.map((step) => (
           <div className={`admin-booking-detail__timeline-step admin-booking-detail__timeline-step--${step.state}`} key={step.label}>
@@ -495,6 +514,13 @@ function ProcessingTimeline({
             </div>
           </div>
         ))}
+      </div>
+
+      <div style={{ marginTop: "2rem", paddingTop: "1.5rem", borderTop: "1px dashed rgba(0, 12, 30, 0.12)" }}>
+        <h4 className="admin-booking-detail__card-title" style={{ fontSize: "1rem", marginBottom: "0.8rem" }}>
+          {locale === "en" ? "Deposit history" : "Lịch sử thanh toán cọc"}
+        </h4>
+        <PaymentHistoryTable locale={locale} paymentRequests={detail.payment_requests} />
       </div>
     </PortalCard>
   );
@@ -855,84 +881,6 @@ function FinancialSummaryCard({
   );
 }
 
-function FinalActionCard({
-  detail,
-  locale,
-  returnTo
-}: {
-  detail: BookingDetailData;
-  locale: Locale;
-  returnTo: string;
-}) {
-  const reservation = detail.reservation;
-  const request = detail.request;
-  const canCancelReservation = reservation && !["cancelled", "completed", "expired"].includes(reservation.status);
-  const canCompleteReservation = reservation?.status === "confirmed";
-  const canRejectRequest = !reservation && request && !["rejected", "closed", "expired"].includes(request.status);
-
-  if (!canCancelReservation && !canCompleteReservation && !canRejectRequest) {
-    return null;
-  }
-
-  return (
-    <PortalCard className="admin-booking-detail__final-card">
-      <div className="admin-booking-detail__action-head">
-        <span className="admin-booking-detail__action-icon" aria-hidden="true">
-          ✓
-        </span>
-        <h3 className="admin-booking-detail__action-title">{locale === "en" ? "Final actions" : "Kết quả cuối cùng"}</h3>
-      </div>
-
-      {canCompleteReservation ? (
-        <form action={updateReservationLifecycleAction} className="portal-form">
-          <input name="reservationId" type="hidden" value={reservation.id} />
-          <input name="status" type="hidden" value="completed" />
-          <input name="returnTo" type="hidden" value={returnTo} />
-          <textarea className="portal-field__control" name="reason" placeholder={locale === "en" ? "Optional completion note" : "Ghi chú khi hoàn tất booking"} rows={3} />
-          <button className="button admin-booking-detail__primary-action" type="submit">
-            {locale === "en" ? "Mark booking completed" : "Hoàn tất booking"}
-          </button>
-        </form>
-      ) : null}
-
-      {canCancelReservation ? (
-        <form action={updateReservationLifecycleAction} className="portal-form">
-          <input name="reservationId" type="hidden" value={reservation.id} />
-          <input name="status" type="hidden" value="cancelled" />
-          <input name="returnTo" type="hidden" value={returnTo} />
-          <textarea
-            className="portal-field__control"
-            name="reason"
-            placeholder={locale === "en" ? "Required cancellation reason" : "Bắt buộc nhập lý do hủy booking"}
-            required
-            rows={3}
-          />
-          <button className="button admin-booking-detail__ghost-danger" type="submit">
-            {locale === "en" ? "Cancel booking" : "Hủy booking"}
-          </button>
-        </form>
-      ) : null}
-
-      {canRejectRequest ? (
-        <form action={updateAvailabilityRequestStatusAction} className="portal-form">
-          <input name="availabilityRequestId" type="hidden" value={request.id} />
-          <input name="status" type="hidden" value="rejected" />
-          <input name="returnTo" type="hidden" value={returnTo} />
-          <textarea
-            className="portal-field__control"
-            name="note"
-            placeholder={locale === "en" ? "Required rejection reason" : "Bắt buộc nhập lý do từ chối"}
-            required
-            rows={3}
-          />
-          <button className="button admin-booking-detail__ghost-danger" type="submit">
-            {locale === "en" ? "Reject request" : "Từ chối yêu cầu"}
-          </button>
-        </form>
-      ) : null}
-    </PortalCard>
-  );
-}
 
 function PaymentRequestActions({
   locale,
@@ -986,37 +934,6 @@ function PaymentRequestActions({
   );
 }
 
-function BookingSnapshotCard({
-  detail,
-  locale
-}: {
-  detail: BookingDetailData;
-  locale: Locale;
-}) {
-  const booking = detail.booking;
-  const request = detail.request;
-  const guestName = detail.customer?.full_name ?? booking.customer_name;
-  const guestEmail = detail.customer?.email ?? booking.customer_email;
-  const guestPhone = detail.customer?.phone ?? request?.contact_phone ?? null;
-  const branchLabel = locale === "en" ? booking.branch_name_en : booking.branch_name_vi;
-  const roomTypeLabel = locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi;
-
-  return (
-    <PortalCard className="admin-booking-detail__surface-card">
-      <h3 className="admin-booking-detail__card-title">{locale === "en" ? "Booking snapshot" : "Thông tin booking"}</h3>
-      <dl className="portal-profile-list portal-profile-list--dense">
-        {renderField(locale === "en" ? "Guest" : "Khách đặt", guestName)}
-        {renderField(locale === "en" ? "Email" : "Email", guestEmail)}
-        {renderField(locale === "en" ? "Phone" : "Điện thoại", guestPhone)}
-        {renderField(locale === "en" ? "Branch" : "Chi nhánh", branchLabel)}
-        {renderField(locale === "en" ? "Room type" : "Loại phòng", roomTypeLabel)}
-        {renderField(locale === "en" ? "Assigned room" : "Phòng", detail.room_code ?? "—")}
-        {renderField(locale === "en" ? "Created at" : "Tạo lúc", formatDateTime(locale, booking.created_at))}
-        {renderField(locale === "en" ? "Marketing consent" : "Marketing consent", formatConsent(locale, detail.customer?.marketing_consent ?? request?.marketing_consent ?? null))}
-      </dl>
-    </PortalCard>
-  );
-}
 
 function PaymentHistoryTable({
   locale,
@@ -1091,6 +1008,11 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
         ? request.response_due_at
         : null;
 
+  const canCancelReservation = reservation && !["cancelled", "completed", "expired"].includes(reservation.status);
+  const canCompleteReservation = reservation?.status === "confirmed";
+  const canRejectRequest = !reservation && request && !["rejected", "closed", "expired"].includes(request.status);
+  const shouldHidePaymentCards = activePaymentRequest?.status === "verified" || reservation?.status === "confirmed" || reservation?.status === "completed";
+
   return (
     <div className="admin-page admin-booking-detail">
       <PortalCard className="admin-booking-detail__hero-card">
@@ -1111,11 +1033,18 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
         <AdminBookingDetailToolbar
           backHref={backHref}
           backLabel={localize(locale, { vi: "Quay lại", en: "Back" })}
-          copyLabel={localize(locale, { vi: "Sao chép link", en: "Copy link" })}
+          canCancel={canCancelReservation ?? false}
+          canComplete={canCompleteReservation}
+          canReject={canRejectRequest ?? false}
           copiedLabel={localize(locale, { vi: "Đã sao chép", en: "Copied" })}
+          copyLabel={localize(locale, { vi: "Sao chép link", en: "Copy link" })}
           emailHref={booking.customer_email ? `mailto:${booking.customer_email}` : null}
           emailLabel={localize(locale, { vi: "Email khách", en: "Email guest" })}
+          locale={locale}
           printLabel={localize(locale, { vi: "In", en: "Print" })}
+          requestId={request?.id}
+          reservationId={reservation?.id}
+          returnTo={detailHref}
           workflowHref={workflowHref}
           workflowLabel={localize(locale, { vi: "Mở workflow", en: "Open workflow" })}
         />
@@ -1131,31 +1060,13 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
 
         <div className="admin-booking-detail__bento-side">
           <ConfirmAvailabilityCard detail={detail} locale={locale} returnTo={detailHref} />
-          <DepositCard activePaymentRequest={activePaymentRequest} detail={detail} locale={locale} returnTo={detailHref} />
-          <VerifyDepositCard activePaymentRequest={activePaymentRequest} detail={detail} locale={locale} returnTo={detailHref} />
+          {!shouldHidePaymentCards && (
+            <>
+              <DepositCard activePaymentRequest={activePaymentRequest} detail={detail} locale={locale} returnTo={detailHref} />
+              <VerifyDepositCard activePaymentRequest={activePaymentRequest} detail={detail} locale={locale} returnTo={detailHref} />
+            </>
+          )}
           <FinancialSummaryCard detail={detail} locale={locale} />
-          <FinalActionCard detail={detail} locale={locale} returnTo={detailHref} />
-        </div>
-      </div>
-
-      <div className="admin-booking-detail__detail-grid">
-        <div className="admin-booking-detail__detail-main">
-          <PortalSectionHeading
-            description={{
-              vi: "Lịch sử các lần phát hành QR cọc, proof, và trạng thái xử lý thanh toán cho booking này.",
-              en: "History of issued deposit QRs, uploaded proofs, and manual payment handling for this booking."
-            }}
-            eyebrow={{ vi: "Payments", en: "Payments" }}
-            locale={locale}
-            title={{ vi: "Lịch sử thanh toán cọc", en: "Deposit history" }}
-          />
-          <PortalCard className="admin-booking-detail__surface-card">
-            <PaymentHistoryTable locale={locale} paymentRequests={detail.payment_requests} />
-          </PortalCard>
-        </div>
-
-        <div className="admin-booking-detail__detail-side">
-          <BookingSnapshotCard detail={detail} locale={locale} />
         </div>
       </div>
     </div>

@@ -183,6 +183,7 @@ function toPaymentRequestView(
     latest_proof_id: latestProof?.id ?? null,
     latest_proof_review_note: latestProof?.review_note ?? null,
     latest_proof_status: latestProof?.status ?? null,
+    latest_proof_url: null,
     latest_proof_uploaded_at: latestProof?.created_at ?? null,
     payment_upload_path: buildPaymentUploadPath(request),
     qr_image_url: buildVietQrImageUrl(request),
