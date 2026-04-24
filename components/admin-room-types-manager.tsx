@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { resolveMediaSource } from "@/lib/media/library";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { formatAreaText } from "@/lib/supabase/content";
@@ -43,7 +44,8 @@ function splitLines(value: string | null | undefined) {
 }
 
 function previewImageFor(roomType: RoomTypeRow) {
-  return roomType.cover_image_path || previewFallbacks[roomType.slug] || "/home/pool3.jpg";
+  const rawPath = roomType.cover_image_path || previewFallbacks[roomType.slug] || "/home/pool3.jpg";
+  return resolveMediaSource(rawPath, {}) || "/home/pool3.jpg";
 }
 
 export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManagerProps) {

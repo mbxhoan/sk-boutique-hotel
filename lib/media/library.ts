@@ -33,6 +33,16 @@ export function parseMediaReference(source: string | null | undefined): MediaRef
   };
 }
 
+function ensureLeadingSlash(path: string | null | undefined): string | null {
+  if (!path) return null;
+  const trimmed = path.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("http") || trimmed.startsWith("/") || trimmed.startsWith("media://")) {
+    return trimmed;
+  }
+  return `/${trimmed}`;
+}
+
 export function resolveMediaSource(source: string | null | undefined, lookup: MediaLookup) {
   if (!source) {
     return null;
@@ -41,11 +51,11 @@ export function resolveMediaSource(source: string | null | undefined, lookup: Me
   const reference = parseMediaReference(source);
 
   if (!reference) {
-    return lookup[source] ?? source;
+    return ensureLeadingSlash(lookup[source] ?? source);
   }
 
   const key = `media://${reference.collectionSlug}/${reference.assetSlug}`;
-  return lookup[key] ?? reference.fallbackUrl ?? null;
+  return ensureLeadingSlash(lookup[key] ?? reference.fallbackUrl ?? null);
 }
 
 export function buildMediaLookupKey(collectionSlug: string, assetSlug: string) {

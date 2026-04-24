@@ -1,5 +1,5 @@
 import type { BranchRow, PaymentProofRow, PaymentRequestRow, ReservationRow, RoomTypeRow } from "@/lib/supabase/database.types";
-import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
+import { getCustomerByAuthUserId, getCustomerByEmail, listCustomersByEmail } from "@/lib/supabase/queries/customers";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
@@ -154,7 +154,8 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
       }
 
       const authCustomer = await getCustomerByAuthUserId(authUserId);
-      const emailCustomer = authUserEmail ? await getCustomerByEmail(authUserEmail) : null;
+      const emailCustomers = authUserEmail ? await listCustomersByEmail(authUserEmail) : [];
+      const emailCustomer = emailCustomers[0] ?? null;
       const primaryCustomer = authCustomer ?? emailCustomer ??
         (authUserEmail
           ? ({
@@ -183,7 +184,7 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
 
       const customerIds = Array.from(
         new Set(
-          [primaryCustomer.id, authCustomer?.id, emailCustomer?.id].filter(
+          [primaryCustomer.id, authCustomer?.id, ...emailCustomers.map((c) => c.id)].filter(
             (value): value is string => typeof value === "string" && value.trim().length > 0
           )
         )

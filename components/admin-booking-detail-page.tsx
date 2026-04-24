@@ -308,26 +308,21 @@ function GuestBookingCard({
         </div>
       </div>
 
+      <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(0,12,30,0.08)" }}>
+        <dl className="portal-profile-list portal-profile-list--dense">
+          {renderField(locale === "en" ? "Branch" : "Chi nhánh", branchLabel)}
+          {renderField(locale === "en" ? "Assigned room" : "Phòng", detail.room_code ?? "—")}
+          {renderField(locale === "en" ? "Created at" : "Tạo lúc", formatDateTime(locale, booking.created_at))}
+          {renderField(locale === "en" ? "Marketing consent" : "Marketing consent", formatConsent(locale, detail.customer?.marketing_consent ?? request?.marketing_consent ?? null))}
+        </dl>
+      </div>
+
       {specialRequest ? (
         <div className="admin-booking-detail__special-request">
           <p className="admin-booking-detail__meta-label">{locale === "en" ? "Special request" : "Yêu cầu đặc biệt"}</p>
           <p className="admin-booking-detail__special-request-copy">{specialRequest}</p>
         </div>
       ) : null}
-
-      <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(0,12,30,0.08)" }}>
-        <h3 className="admin-booking-detail__card-title" style={{ marginBottom: "1rem" }}>{locale === "en" ? "Booking info" : "Thông tin booking"}</h3>
-        <dl className="portal-profile-list portal-profile-list--dense">
-          {renderField(locale === "en" ? "Guest" : "Khách đặt", guestName)}
-          {renderField(locale === "en" ? "Email" : "Email", guestEmail)}
-          {renderField(locale === "en" ? "Phone" : "Điện thoại", guestPhone)}
-          {renderField(locale === "en" ? "Branch" : "Chi nhánh", branchLabel)}
-          {renderField(locale === "en" ? "Room type" : "Loại phòng", roomTypeLabel)}
-          {renderField(locale === "en" ? "Assigned room" : "Phòng", detail.room_code ?? "—")}
-          {renderField(locale === "en" ? "Created at" : "Tạo lúc", formatDateTime(locale, booking.created_at))}
-          {renderField(locale === "en" ? "Marketing consent" : "Marketing consent", formatConsent(locale, detail.customer?.marketing_consent ?? request?.marketing_consent ?? null))}
-        </dl>
-      </div>
     </PortalCard>
   );
 }
@@ -685,7 +680,7 @@ function DepositCard({
   );
   const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.default_deposit_percentage;
 
-  if (!reservation) {
+  if (!reservation || reservation.status === "confirmed" || reservation.status === "completed") {
     return null;
   }
 
@@ -779,7 +774,7 @@ function VerifyDepositCard({
   const reservation = detail.reservation;
   const canVerify = activePaymentRequest && ["sent", "pending_verification"].includes(activePaymentRequest.status);
 
-  if (!reservation) {
+  if (!reservation || reservation.status === "confirmed" || reservation.status === "completed") {
     return null;
   }
 
@@ -1030,15 +1025,18 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
           <div className="admin-booking-detail__hero-actions">
             {countdownTarget ? <CountdownPill expiresAt={countdownTarget} locale={locale} /> : null}
             <AdminBookingDetailToolbar
-              canCancel={canCancelReservation ?? false}
-              canComplete={canCompleteReservation}
-              canReject={canRejectRequest ?? false}
-              copiedLabel={localize(locale, { vi: "Đã sao chép", en: "Copied" })}
-              copyLabel={localize(locale, { vi: "Sao chép link", en: "Copy link" })}
+              canCancel={!!reservation && ["confirmed", "pending_deposit"].includes(reservation.status)}
+              canComplete={!!reservation && reservation.status === "confirmed"}
+              canReject={booking.status === "new" || booking.status === "in_review"}
+              canResendEmail={!!activePaymentRequest && activePaymentRequest.status !== "verified"}
+              canVerify={!!activePaymentRequest && ["sent", "pending_verification"].includes(activePaymentRequest.status)}
+              copiedLabel={locale === "en" ? "Link copied!" : "Đã sao chép link!"}
+              copyLabel={locale === "en" ? "Copy link" : "Sao chép link"}
               emailHref={booking.customer_email ? `mailto:${booking.customer_email}` : null}
-              emailLabel={localize(locale, { vi: "Email khách", en: "Email guest" })}
+              emailLabel={locale === "en" ? "Email guest" : "Gửi email khách"}
               locale={locale}
-              printLabel={localize(locale, { vi: "In", en: "Print" })}
+              paymentRequestId={activePaymentRequest?.id}
+              printLabel={locale === "en" ? "Print" : "In"}
               requestId={request?.id}
               reservationId={reservation?.id}
               returnTo={detailHref}

@@ -64,6 +64,32 @@ export async function getCustomerByEmail(email: string) {
   );
 }
 
+export async function listCustomersByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    return [] as CustomerRow[];
+  }
+
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client
+        .from("customers")
+        .select(
+          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
+        )
+        .ilike("email", normalizedEmail);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []) as CustomerRow[];
+    },
+    [] as CustomerRow[]
+  );
+}
+
 export async function listCustomersByIds(customerIds: string[]) {
   const uniqueIds = [...new Set(customerIds.filter(Boolean))];
 
