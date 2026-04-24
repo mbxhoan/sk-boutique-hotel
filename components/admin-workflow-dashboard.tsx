@@ -1267,8 +1267,8 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
           <p className="portal-panel__eyebrow">{locale === "en" ? "Service unavailable" : "Chưa nối Supabase service role"}</p>
           <p className="portal-panel__note-copy">
             {locale === "en"
-              ? "The workflow console is in read-only mode until SUPABASE_SERVICE_ROLE_KEY is available."
-              : "Bảng vận hành đang ở chế độ đọc cho tới khi có SUPABASE_SERVICE_ROLE_KEY."}
+              ? "The workflow console is in read-only mode."
+              : "Bảng vận hành đang ở chế độ đọc."}
           </p>
         </PortalCard>
       ) : null}
