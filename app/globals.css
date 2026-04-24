@@ -9604,6 +9604,7 @@ textarea {
 
 .admin-shell__logo {
   flex: none;
+  margin: auto;
   max-width: 9.6rem;
 }
 

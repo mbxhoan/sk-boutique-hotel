@@ -358,10 +358,10 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
         <aside className="admin-shell__sidebar">
         <div className="admin-shell__brand">
           <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
-          <div className="admin-shell__brand-copy">
+          {/* <div className="admin-shell__brand-copy">
             <p className="admin-shell__brand-title">SK Boutique</p>
             <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
-          </div>
+          </div> */}
         </div>
 
         <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="admin-shell__nav">
