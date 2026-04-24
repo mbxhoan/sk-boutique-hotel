@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { startTransition, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { createContext, startTransition, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { PortalCard } from "@/components/portal-ui";
 import { appendLocaleQuery, type Locale } from "@/lib/locale";
@@ -11,17 +11,32 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { AdminNotificationIcon, AdminNotificationItem, AdminNotificationTone } from "@/lib/supabase/queries/admin-notifications";
 
 type AdminNotificationsMenuProps = {
-  items: AdminNotificationItem[];
   locale: Locale;
   viewAllHref: string;
 };
 
 type AdminNotificationsPageSectionProps = {
-  items: AdminNotificationItem[];
   locale: Locale;
 };
 
+type AdminNotificationCenterValue = {
+  closeNotification: () => void;
+  dismissToast: (id: string) => void;
+  isRead: (id: string) => boolean;
+  items: AdminNotificationItem[];
+  locale: Locale;
+  markAllAsRead: () => void;
+  openNotification: (item: AdminNotificationItem) => void;
+  selectedNotification: AdminNotificationItem | null;
+  toasts: AdminNotificationItem[];
+};
+
 const readStorageKey = "sk-admin-notifications-read";
+const localStorageKey = "sk-admin-notifications-local";
+const maxStoredNotifications = 24;
+const maxToastCount = 3;
+
+const AdminNotificationCenterContext = createContext<AdminNotificationCenterValue | null>(null);
 
 function NotificationIcon({
   icon,
@@ -103,22 +118,195 @@ function readStoredNotificationIds() {
   }
 }
 
-function useNotificationReadState(items: AdminNotificationItem[]) {
+function readStoredLocalNotifications() {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(localStorageKey);
+
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((item): item is AdminNotificationItem => Boolean(item) && typeof item.id === "string");
+  } catch {
+    return [];
+  }
+}
+
+function persistLocalNotifications(items: AdminNotificationItem[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(localStorageKey, JSON.stringify(items));
+}
+
+function persistReadIds(items: string[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(readStorageKey, JSON.stringify(items));
+}
+
+function sortNotifications(items: AdminNotificationItem[]) {
+  return [...items].sort((left, right) => {
+    const leftTime = new Date(left.happened_at).getTime();
+    const rightTime = new Date(right.happened_at).getTime();
+
+    if (leftTime === rightTime) {
+      return right.id.localeCompare(left.id);
+    }
+
+    return rightTime - leftTime;
+  });
+}
+
+function mergeNotifications(serverItems: AdminNotificationItem[], localItems: AdminNotificationItem[]) {
+  const merged = new Map<string, AdminNotificationItem>();
+
+  for (const item of [...localItems, ...serverItems]) {
+    merged.set(item.id, item);
+  }
+
+  return sortNotifications(Array.from(merged.values()));
+}
+
+function createFlashNotification({
+  href,
+  message,
+  status
+}: {
+  href: string;
+  message: string;
+  status: "error" | "success";
+}): AdminNotificationItem {
+  const now = new Date().toISOString();
+
+  return {
+    action: `flash.${status}`,
+    body_en: message,
+    body_vi: message,
+    branch_name_en: null,
+    branch_name_vi: null,
+    happened_at: now,
+    href,
+    icon: status === "success" ? "system" : "warning",
+    id: `flash-${status}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    title_en: status === "success" ? "Action successful" : "Action failed",
+    title_vi: status === "success" ? "Thao tác thành công" : "Thao tác chưa thành công",
+    tone: status === "success" ? "accent" : "danger"
+  };
+}
+
+function buildCleanHref(pathname: string, searchParams: URLSearchParams) {
+  const nextParams = new URLSearchParams(searchParams.toString());
+  nextParams.delete("actionStatus");
+  nextParams.delete("actionMessage");
+
+  const query = nextParams.toString();
+
+  return `${pathname}${query ? `?${query}` : ""}`;
+}
+
+function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotificationItem[]) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [readIds, setReadIds] = useState<string[]>([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [localItems, setLocalItems] = useState<AdminNotificationItem[]>([]);
+  const [selectedNotification, setSelectedNotification] = useState<AdminNotificationItem | null>(null);
+  const [toasts, setToasts] = useState<AdminNotificationItem[]>([]);
+  const hasLoadedRef = useRef(false);
+  const handledFlashRef = useRef<string | null>(null);
 
   useEffect(() => {
     setReadIds(readStoredNotificationIds());
-    setHasLoaded(true);
+    setLocalItems(readStoredLocalNotifications());
+    hasLoadedRef.current = true;
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !hasLoaded) {
+    if (!hasLoadedRef.current || typeof window === "undefined") {
       return;
     }
 
-    window.localStorage.setItem(readStorageKey, JSON.stringify(readIds));
-  }, [hasLoaded, readIds]);
+    persistReadIds(readIds);
+  }, [readIds]);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    persistLocalNotifications(localItems.slice(0, maxStoredNotifications));
+  }, [localItems]);
+
+  useEffect(() => {
+    const actionStatus = searchParams.get("actionStatus");
+    const actionMessage = searchParams.get("actionMessage");
+
+    if (!actionStatus || !actionMessage) {
+      handledFlashRef.current = null;
+      return;
+    }
+
+    const flashStatus = actionStatus === "success" ? "success" : "error";
+    const flashSignature = `${pathname}|${flashStatus}|${actionMessage}`;
+
+    if (handledFlashRef.current === flashSignature) {
+      return;
+    }
+
+    handledFlashRef.current = flashSignature;
+
+    const cleanHref = buildCleanHref(pathname, new URLSearchParams(searchParams.toString()));
+    const flashItem = createFlashNotification({
+      href: cleanHref,
+      message: actionMessage,
+      status: flashStatus
+    });
+
+    setLocalItems((current) => {
+      const next = mergeNotifications([], [flashItem, ...current]);
+      return next.slice(0, maxStoredNotifications);
+    });
+    setToasts((current) => [flashItem, ...current.filter((item) => item.id !== flashItem.id)].slice(0, maxToastCount));
+    setSelectedNotification(flashItem);
+
+    router.replace(cleanHref);
+  }, [locale, pathname, router, searchParams]);
+
+  useEffect(() => {
+    if (!toasts.length) {
+      return;
+    }
+
+    const timers = toasts.map((toast) =>
+      window.setTimeout(() => {
+        setToasts((current) => current.filter((item) => item.id !== toast.id));
+      }, 5500)
+    );
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [toasts]);
+
+  const items = useMemo(() => mergeNotifications(serverItems, localItems), [localItems, serverItems]);
+
+  function isRead(id: string) {
+    return readIds.includes(id);
+  }
 
   function markAsRead(id: string) {
     setReadIds((current) => (current.includes(id) ? current : [...current, id]));
@@ -136,64 +324,223 @@ function useNotificationReadState(items: AdminNotificationItem[]) {
     });
   }
 
+  function openNotification(item: AdminNotificationItem) {
+    markAsRead(item.id);
+    setSelectedNotification(item);
+  }
+
+  function closeNotification() {
+    setSelectedNotification(null);
+  }
+
+  function dismissToast(id: string) {
+    setToasts((current) => current.filter((item) => item.id !== id));
+  }
+
   return {
-    isRead(id: string) {
-      return readIds.includes(id);
-    },
+    closeNotification,
+    dismissToast,
+    isRead,
+    items,
+    locale,
     markAllAsRead,
-    markAsRead
-  };
+    openNotification,
+    selectedNotification,
+    toasts
+  } satisfies AdminNotificationCenterValue;
 }
 
-function NotificationRow({
-  compact = false,
-  isRead,
+export function AdminNotificationProvider({
+  children,
+  locale,
+  serverItems
+}: {
+  children: ReactNode;
+  locale: Locale;
+  serverItems: AdminNotificationItem[];
+}) {
+  const value = useAdminNotificationCenterState(locale, serverItems);
+
+  return <AdminNotificationCenterContext.Provider value={value}>{children}</AdminNotificationCenterContext.Provider>;
+}
+
+export function useAdminNotificationCenter() {
+  const context = useContext(AdminNotificationCenterContext);
+
+  if (!context) {
+    throw new Error("useAdminNotificationCenter must be used within AdminNotificationProvider.");
+  }
+
+  return context;
+}
+
+function NotificationItemButton({
   item,
   locale,
-  onClick
+  onOpen,
+  unread
 }: {
-  compact?: boolean;
-  isRead: boolean;
   item: AdminNotificationItem;
   locale: Locale;
-  onClick?: () => void;
+  onOpen: () => void;
+  unread: boolean;
 }) {
   const title = localize(locale, { en: item.title_en, vi: item.title_vi });
   const body = localize(locale, { en: item.body_en, vi: item.body_vi });
 
   return (
-    <Link
-      className={`admin-notifications__item${isRead ? "" : " admin-notifications__item--unread"}${compact ? " admin-notifications__item--compact" : ""}`}
-      href={appendLocaleQuery(item.href, locale)}
-      onClick={onClick}
+    <button
+      className={`admin-notifications__item${unread ? " admin-notifications__item--unread" : ""}`}
+      onClick={onOpen}
+      type="button"
     >
       <NotificationIcon icon={item.icon} tone={item.tone} />
       <div className="admin-notifications__item-copy">
         <div className="admin-notifications__item-head">
           <p className="admin-notifications__item-title">{title}</p>
-          {!isRead ? <span aria-hidden="true" className="admin-notifications__item-dot" /> : null}
+          {unread ? <span aria-hidden="true" className="admin-notifications__item-dot" /> : null}
         </div>
         <p className="admin-notifications__item-body">{body}</p>
         <div className="admin-notifications__item-meta">
           <span>{formatRelativeTime(locale, item.happened_at)}</span>
-          {item.branch_name_en || item.branch_name_vi ? (
-            <span>{locale === "en" ? item.branch_name_en : item.branch_name_vi}</span>
-          ) : null}
+          {item.branch_name_en || item.branch_name_vi ? <span>{locale === "en" ? item.branch_name_en : item.branch_name_vi}</span> : null}
         </div>
       </div>
-    </Link>
+    </button>
   );
 }
 
-export function AdminNotificationsMenu({
-  items,
-  locale,
-  viewAllHref
-}: AdminNotificationsMenuProps) {
+function NotificationDialog() {
+  const { closeNotification, selectedNotification, locale } = useAdminNotificationCenter();
+
+  useEffect(() => {
+    if (!selectedNotification) {
+      return;
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeNotification();
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [closeNotification, selectedNotification]);
+
+  if (!selectedNotification) {
+    return null;
+  }
+
+  const title = localize(locale, { en: selectedNotification.title_en, vi: selectedNotification.title_vi });
+  const body = localize(locale, { en: selectedNotification.body_en, vi: selectedNotification.body_vi });
+  const href = appendLocaleQuery(selectedNotification.href, locale);
+
+  return (
+    <div
+      aria-hidden="false"
+      aria-modal="true"
+      className="admin-notifications__dialog-backdrop"
+      onClick={closeNotification}
+      role="presentation"
+    >
+      <div className="admin-notifications__dialog" onClick={(event) => event.stopPropagation()} role="dialog">
+        <div className="admin-notifications__dialog-head">
+          <div>
+            <p className="admin-notifications__eyebrow">{locale === "en" ? "Notification detail" : "Chi tiết thông báo"}</p>
+            <h3 className="admin-notifications__dialog-title">{title}</h3>
+          </div>
+          <button aria-label={locale === "en" ? "Close notification" : "Đóng thông báo"} className="admin-notifications__dialog-close" onClick={closeNotification} type="button">
+            ×
+          </button>
+        </div>
+
+        <div className="admin-notifications__dialog-body">
+          <NotificationIcon icon={selectedNotification.icon} tone={selectedNotification.tone} />
+          <div className="admin-notifications__dialog-copy">
+            <p className="admin-notifications__dialog-message">{body}</p>
+            <div className="admin-notifications__dialog-meta">
+              <span>{formatRelativeTime(locale, selectedNotification.happened_at)}</span>
+              {selectedNotification.branch_name_en || selectedNotification.branch_name_vi ? (
+                <span>{locale === "en" ? selectedNotification.branch_name_en : selectedNotification.branch_name_vi}</span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-notifications__dialog-actions">
+          <button className="button button--text-light" onClick={closeNotification} type="button">
+            {locale === "en" ? "Close" : "Đóng"}
+          </button>
+          {selectedNotification.href !== "/admin" ? (
+            <Link className="button button--solid" href={href} onClick={closeNotification}>
+              {locale === "en" ? "Open related page" : "Mở trang liên quan"}
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ToastStack() {
+  const { dismissToast, locale, openNotification, toasts } = useAdminNotificationCenter();
+
+  if (!toasts.length) {
+    return null;
+  }
+
+  return (
+    <div className="admin-notifications__toast-stack" aria-live="polite" aria-relevant="additions removals">
+      {toasts.map((toast) => {
+        const title = localize(locale, { en: toast.title_en, vi: toast.title_vi });
+        const body = localize(locale, { en: toast.body_en, vi: toast.body_vi });
+
+        return (
+          <div
+            className={`admin-notifications__toast admin-notifications__toast--${toast.tone}`}
+            key={toast.id}
+            onClick={() => openNotification(toast)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openNotification(toast);
+              }
+            }}
+          >
+            <NotificationIcon icon={toast.icon} tone={toast.tone} />
+            <div className="admin-notifications__toast-copy">
+              <p className="admin-notifications__toast-title">{title}</p>
+              <p className="admin-notifications__toast-body">{body}</p>
+            </div>
+            <button
+              aria-label={locale === "en" ? "Dismiss notification" : "Đóng thông báo"}
+              className="admin-notifications__toast-close"
+              onClick={(event) => {
+                event.stopPropagation();
+                dismissToast(toast.id);
+              }}
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificationsMenuProps) {
   const router = useRouter();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
-  const { isRead, markAllAsRead, markAsRead } = useNotificationReadState(items);
+  const { items, isRead, markAllAsRead, openNotification } = useAdminNotificationCenter();
   const unreadCount = items.filter((item) => !isRead(item.id)).length;
 
   useEffect(() => {
@@ -278,21 +625,20 @@ export function AdminNotificationsMenu({
           </div>
 
           <div className="admin-notifications__panel-list">
-            {items.length ? (
-              items.map((item) => (
-                <NotificationRow
-                  compact
-                  isRead={isRead(item.id)}
-                  item={item}
-                  key={item.id}
-                  locale={locale}
-                  onClick={() => {
-                    markAsRead(item.id);
-                    setOpen(false);
-                  }}
-                />
-              ))
-            ) : (
+              {items.length ? (
+                items.map((item) => (
+                  <NotificationItemButton
+                    item={item}
+                    key={item.id}
+                    locale={locale}
+                    onOpen={() => {
+                      setOpen(false);
+                      openNotification(item);
+                    }}
+                    unread={!isRead(item.id)}
+                  />
+                ))
+              ) : (
               <div className="admin-notifications__empty">
                 <p>{locale === "en" ? "No recent notifications." : "Chưa có thông báo mới."}</p>
               </div>
@@ -310,11 +656,16 @@ export function AdminNotificationsMenu({
   );
 }
 
-export function AdminNotificationsPageSection({
-  items,
-  locale
-}: AdminNotificationsPageSectionProps) {
-  const { isRead, markAllAsRead, markAsRead } = useNotificationReadState(items);
+export function AdminNotificationToastHost() {
+  return <ToastStack />;
+}
+
+export function AdminNotificationDialogHost() {
+  return <NotificationDialog />;
+}
+
+export function AdminNotificationsPageSection({ locale }: AdminNotificationsPageSectionProps) {
+  const { isRead, items, markAllAsRead, openNotification } = useAdminNotificationCenter();
 
   return (
     <div className="admin-page admin-notifications-page">
@@ -341,13 +692,7 @@ export function AdminNotificationsPageSection({
       <div className="admin-notifications-page__list">
         {items.length ? (
           items.map((item) => (
-            <NotificationRow
-              isRead={isRead(item.id)}
-              item={item}
-              key={item.id}
-              locale={locale}
-              onClick={() => markAsRead(item.id)}
-            />
+            <NotificationItemButton item={item} key={item.id} locale={locale} onOpen={() => openNotification(item)} unread={!isRead(item.id)} />
           ))
         ) : (
           <PortalCard className="admin-notifications-page__empty">

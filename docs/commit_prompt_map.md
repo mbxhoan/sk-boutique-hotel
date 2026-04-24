@@ -1289,3 +1289,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-shell.tsx`
   - `lib/supabase/queries/admin-notifications.ts`
   - `docs/commit_prompt_map.md`
+
+### Entry 114
+- `time`: 2026-04-24T10:49:56+07:00
+- `prompt_summary`: Chuyển thông báo success/error sang popup góc trên bên phải, đồng bộ các thông báo flash đó vào notifications center, và mở popup chi tiết có nút đóng khi bấm vào một notification.
+- `commit_message`: `feat(admin-notifications): add toast popup and detail dialog`
+- `main_files`:
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-notifications-center.tsx`
+  - `components/admin-shell.tsx`
+  - `app/(admin)/admin/notifications/page.tsx`
+  - `docs/commit_prompt_map.md`

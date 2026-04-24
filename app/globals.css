@@ -9206,7 +9206,14 @@ textarea {
   align-items: flex-start;
   padding: 1rem 1.05rem;
   border-bottom: 1px solid rgba(0, 12, 30, 0.05);
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
   background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
   transition: background-color 0.18s ease, transform 0.18s ease;
 }
 
@@ -9354,6 +9361,159 @@ textarea {
 
 .admin-notifications-page__empty {
   padding: 1.2rem 1.25rem;
+}
+
+.admin-notifications__toast-stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 80;
+  display: grid;
+  gap: 0.65rem;
+  width: min(24rem, calc(100vw - 1.5rem));
+}
+
+.admin-notifications__toast {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(0, 12, 30, 0.16);
+  cursor: pointer;
+}
+
+.admin-notifications__toast--accent {
+  border-color: rgba(72, 145, 94, 0.24);
+  background: linear-gradient(180deg, rgba(237, 247, 240, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.admin-notifications__toast--danger {
+  border-color: rgba(216, 84, 84, 0.22);
+  background: linear-gradient(180deg, rgba(255, 241, 241, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.admin-notifications__toast-copy {
+  min-width: 0;
+}
+
+.admin-notifications__toast-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.admin-notifications__toast-body {
+  margin: 0.25rem 0 0;
+  color: #5d6675;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.admin-notifications__toast-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(16, 35, 62, 0.06);
+  color: #4c5c72;
+  font-size: 1rem;
+  font-weight: 700;
+  flex: none;
+}
+
+.admin-notifications__dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 12, 22, 0.48);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.admin-notifications__dialog {
+  width: min(36rem, 100%);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 1.15rem;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7f0 100%);
+  box-shadow: 0 26px 58px rgba(0, 12, 30, 0.22);
+  overflow: hidden;
+}
+
+.admin-notifications__dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0.9rem;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.06);
+}
+
+.admin-notifications__dialog-title {
+  margin: 0.2rem 0 0;
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.admin-notifications__dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(16, 35, 62, 0.06);
+  color: #4c5c72;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.admin-notifications__dialog-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.admin-notifications__dialog-copy {
+  min-width: 0;
+}
+
+.admin-notifications__dialog-message {
+  margin: 0;
+  color: #3f4958;
+  line-height: 1.7;
+}
+
+.admin-notifications__dialog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+  color: #8791a0;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.admin-notifications__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding: 0 1rem 1rem;
 }
 
 .admin-booking-detail {
@@ -9859,6 +10019,11 @@ textarea {
   .admin-booking-detail__metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .admin-notifications__toast-stack {
+    right: 0.85rem;
+    top: 0.85rem;
+  }
 }
 
 @media (max-width: 720px) {
@@ -9867,8 +10032,17 @@ textarea {
     width: min(22rem, calc(100vw - 1rem));
   }
 
+  .admin-notifications__toast-stack {
+    width: min(22rem, calc(100vw - 1rem));
+  }
+
   .admin-notifications-page__hero-actions {
     justify-content: flex-start;
+  }
+
+  .admin-notifications__dialog-body,
+  .admin-notifications__toast {
+    grid-template-columns: 1fr;
   }
 
   .admin-booking-detail__hero-card,

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { AdminNotificationsPageSection } from "@/components/admin-notifications-center";
 import { resolveLocale } from "@/lib/locale";
-import { loadAdminNotifications } from "@/lib/supabase/queries/admin-notifications";
 
 type PageProps = {
   searchParams?: Promise<{
@@ -27,10 +26,6 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function AdminNotificationsRoute({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
-  const notifications = await loadAdminNotifications({
-    branchId: resolvedSearchParams.branch ?? null,
-    limit: 24
-  });
 
-  return <AdminNotificationsPageSection items={notifications} locale={locale} />;
+  return <AdminNotificationsPageSection locale={locale} />;
 }

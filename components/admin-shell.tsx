@@ -4,7 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { AdminNotificationsMenu } from "@/components/admin-notifications-center";
+import {
+  AdminNotificationDialogHost,
+  AdminNotificationProvider,
+  AdminNotificationToastHost,
+  AdminNotificationsMenu
+} from "@/components/admin-notifications-center";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
 import type { AdminNotificationItem } from "@/lib/supabase/queries/admin-notifications";
@@ -298,8 +303,9 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
   }
 
   return (
-    <div className="portal-shell portal-shell--admin admin-shell">
-      <aside className="admin-shell__sidebar">
+    <AdminNotificationProvider locale={locale} serverItems={notifications}>
+      <div className="portal-shell portal-shell--admin admin-shell">
+        <aside className="admin-shell__sidebar">
         <div className="admin-shell__brand">
           <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
           <div className="admin-shell__brand-copy">
@@ -342,10 +348,10 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
             <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
           </button>
         </div>
-      </aside>
+        </aside>
 
-      <div className="admin-shell__workspace">
-        <header className="admin-shell__topbar">
+        <div className="admin-shell__workspace">
+          <header className="admin-shell__topbar">
           {showSearchTopbar ? (
             <label className="admin-shell__search">
               <span className="admin-shell__search-icon" aria-hidden="true">
@@ -365,7 +371,7 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
             </div>
           )}
 
-          <div className="admin-shell__actions">
+            <div className="admin-shell__actions">
             <details className="admin-shell__branch-menu">
               <summary className="admin-shell__branch-selector">
                 <span className="admin-shell__branch-selector-icon" aria-hidden="true">
@@ -398,13 +404,13 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
               </div>
             </details>
 
-            <span className="admin-shell__divider" aria-hidden="true" />
+              <span className="admin-shell__divider" aria-hidden="true" />
 
-            <AdminNotificationsMenu items={notifications} locale={locale} viewAllHref="/admin/notifications" />
+              <AdminNotificationsMenu locale={locale} viewAllHref="/admin/notifications" />
 
-            <a className="admin-shell__icon-button" href="mailto:ops@skboutiquehotel.vn">
-              <ShellIcon icon="support" />
-            </a>
+              <a className="admin-shell__icon-button" href="mailto:ops@skboutiquehotel.vn">
+                <ShellIcon icon="support" />
+              </a>
 
             <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
               {localeLabel(localeToggle)}
@@ -413,11 +419,14 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
             <button className="admin-shell__avatar" type="button">
               AD
             </button>
-          </div>
-        </header>
+            </div>
+          </header>
 
-        <main className="admin-shell__content">{children}</main>
+          <main className="admin-shell__content">{children}</main>
+        </div>
       </div>
-    </div>
+      <AdminNotificationToastHost />
+      <AdminNotificationDialogHost />
+    </AdminNotificationProvider>
   );
 }

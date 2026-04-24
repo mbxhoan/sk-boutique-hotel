@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 import {
   confirmAvailabilityRequestAction,
@@ -213,25 +212,6 @@ function getPaymentTone(status: WorkflowPaymentRequest["status"]) {
     default:
       return "neutral" as const;
   }
-}
-
-function ActionNotice({ locale }: { locale: Locale }) {
-  const searchParams = useSearchParams();
-  const actionStatus = searchParams.get("actionStatus");
-  const actionMessage = searchParams.get("actionMessage");
-
-  if (!actionStatus || !actionMessage) {
-    return null;
-  }
-
-  return (
-    <PortalCard className={`admin-booking-detail__notice admin-booking-detail__notice--${actionStatus === "success" ? "success" : "error"}`}>
-      <div className="admin-booking-detail__notice-copy">
-        <p className="admin-booking-detail__notice-label">{actionStatus === "success" ? (locale === "en" ? "Updated" : "Đã cập nhật") : locale === "en" ? "Action failed" : "Thao tác chưa thành công"}</p>
-        <p className="admin-booking-detail__notice-message">{actionMessage}</p>
-      </div>
-    </PortalCard>
-  );
 }
 
 function CountdownPill({
@@ -1046,47 +1026,6 @@ function PaymentHistoryTable({
   );
 }
 
-function ActivityTimelineTable({
-  locale,
-  logs
-}: {
-  locale: Locale;
-  logs: BookingDetailData["audit_logs"];
-}) {
-  if (!logs.length) {
-    return <p className="portal-panel__note-copy">{locale === "en" ? "No audit logs for this booking yet." : "Chưa có audit log cho booking này."}</p>;
-  }
-
-  return (
-    <div className="portal-table-shell">
-      <table className="portal-data-table">
-        <thead>
-          <tr>
-            <th>{locale === "en" ? "Time" : "Thời gian"}</th>
-            <th>{locale === "en" ? "Event" : "Sự kiện"}</th>
-            <th>{locale === "en" ? "Summary" : "Mô tả"}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {logs.map((event) => (
-            <tr key={event.id}>
-              <td>
-                <p className="portal-data-table__meta">{formatDateTime(locale, event.happened_at)}</p>
-              </td>
-              <td>
-                <strong className="portal-data-table__title">{event.action}</strong>
-              </td>
-              <td>
-                <p className="portal-data-table__meta">{event.summary}</p>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPageProps) {
   const booking = detail.booking;
   const request = detail.request;
@@ -1107,8 +1046,6 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
 
   return (
     <div className="admin-page admin-booking-detail">
-      <ActionNotice locale={locale} />
-
       <PortalCard className="admin-booking-detail__hero-card">
         <div className="admin-booking-detail__hero-top">
           <div>
