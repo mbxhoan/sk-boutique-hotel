@@ -1,5 +1,5 @@
 import type { BranchRow, PaymentProofRow, PaymentRequestRow, ReservationRow, RoomTypeRow } from "@/lib/supabase/database.types";
-import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
+import { getCustomerByAuthUserId, getCustomerByEmail, listCustomersByEmail } from "@/lib/supabase/queries/customers";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
@@ -83,6 +83,7 @@ function toPaymentRequestView(
     latest_proof_id: latestProof?.id ?? null,
     latest_proof_review_note: latestProof?.review_note ?? null,
     latest_proof_status: latestProof?.status ?? null,
+    latest_proof_url: null,
     latest_proof_uploaded_at: latestProof?.created_at ?? null,
     payment_upload_path: paymentUploadPath,
     qr_image_url: buildVietQrImageUrl(request),
@@ -152,9 +153,10 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
         });
       }
 
-      const customer =
-        (await getCustomerByAuthUserId(authUserId)) ??
-        (authUserEmail ? await getCustomerByEmail(authUserEmail) : null) ??
+      const authCustomer = await getCustomerByAuthUserId(authUserId);
+      const emailCustomers = authUserEmail ? await listCustomersByEmail(authUserEmail) : [];
+      const emailCustomer = emailCustomers[0] ?? null;
+      const primaryCustomer = authCustomer ?? emailCustomer ??
         (authUserEmail
           ? ({
               auth_user_id: authUserId,
@@ -174,21 +176,37 @@ export async function loadMemberHistoryDashboardByUser(authUserId: string, authU
             } satisfies CustomerRow)
           : null);
 
-      if (!customer) {
+      if (!primaryCustomer) {
         return null;
       }
 
-      const [branches, roomTypes, customerAvailabilityRequests, emailAvailabilityRequests, reservations, paymentRequests, paymentProofs, auditLogs] =
+      const customer = primaryCustomer;
+
+      const customerIds = Array.from(
+        new Set(
+          [primaryCustomer.id, authCustomer?.id, ...emailCustomers.map((c) => c.id)].filter(
+            (value): value is string => typeof value === "string" && value.trim().length > 0
+          )
+        )
+      );
+
+      const [branches, roomTypes, customerAvailabilityRequestsByCustomerId, emailAvailabilityRequests, reservationsByCustomerId, paymentRequestsByCustomerId, paymentProofsByCustomerId, auditLogsByCustomerId] =
         await Promise.all([
-        listBranches(),
-        listRoomTypes(),
-        listAvailabilityRequests({ customerId: customer.id, limit: 8 }),
-        authUserEmail ? listAvailabilityRequests({ contactEmail: authUserEmail, limit: 8 }) : Promise.resolve([] as WorkflowAvailabilityRequest[]),
-        listReservations({ customerId: customer.id, limit: 8 }),
-        listPaymentRequests({ customerId: customer.id, limit: 8 }),
-        listPaymentProofs({ customerId: customer.id, limit: 16 }),
-        listAuditLogs({ customerId: customer.id, limit: 12 })
-      ]);
+          listBranches(),
+          listRoomTypes(),
+          Promise.all(customerIds.map((customerId) => listAvailabilityRequests({ customerId, limit: 8 }))),
+          authUserEmail ? listAvailabilityRequests({ contactEmail: authUserEmail, limit: 8 }) : Promise.resolve([] as WorkflowAvailabilityRequest[]),
+          Promise.all(customerIds.map((customerId) => listReservations({ customerId, limit: 8 }))),
+          Promise.all(customerIds.map((customerId) => listPaymentRequests({ customerId, limit: 8 }))),
+          Promise.all(customerIds.map((customerId) => listPaymentProofs({ customerId, limit: 16 }))),
+          Promise.all(customerIds.map((customerId) => listAuditLogs({ customerId, limit: 12 })))
+        ]);
+
+      const customerAvailabilityRequests = customerAvailabilityRequestsByCustomerId.flat();
+      const reservations = reservationsByCustomerId.flat();
+      const paymentRequests = paymentRequestsByCustomerId.flat();
+      const paymentProofs = paymentProofsByCustomerId.flat();
+      const auditLogs = auditLogsByCustomerId.flat();
 
       const availabilityRequests = (() => {
         const merged = new Map<string, WorkflowAvailabilityRequest>();

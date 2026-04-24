@@ -17,6 +17,37 @@ function dateKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+function parseDateKey(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(`${value}T00:00:00`);
+
+  return Number.isNaN(parsed.getTime()) ? null : new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+}
+
+function addDays(date: Date, amount: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return new Date(next.getFullYear(), next.getMonth(), next.getDate());
+}
+
+function normalizeRoomDateRange(checkin?: string | null, checkout?: string | null) {
+  const today = new Date();
+  const minCheckin = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const parsedCheckin = parseDateKey(checkin);
+  const parsedCheckout = parseDateKey(checkout);
+  const normalizedCheckin = parsedCheckin && parsedCheckin.getTime() >= minCheckin.getTime() ? parsedCheckin : minCheckin;
+  const minimumCheckout = addDays(normalizedCheckin, 1);
+  const normalizedCheckout = parsedCheckout && parsedCheckout.getTime() > normalizedCheckin.getTime() ? parsedCheckout : minimumCheckout;
+
+  return {
+    checkin: dateKey(normalizedCheckin),
+    checkout: dateKey(normalizedCheckout)
+  };
+}
+
 function getDefaultFilters() {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -102,11 +133,12 @@ export default async function RoomsPage({ searchParams }: PageProps) {
   : null;
   const defaultBranchId = branches[0]?.id ?? null;
   const defaultFilters = getDefaultFilters();
+  const normalizedStayRange = normalizeRoomDateRange(resolvedSearchParams.checkin ?? defaultFilters.checkin, resolvedSearchParams.checkout ?? defaultFilters.checkout);
   const initialFilters = {
     adults: resolvedSearchParams.adults ?? defaultFilters.adults,
-    checkin: resolvedSearchParams.checkin ?? defaultFilters.checkin,
+    checkin: normalizedStayRange.checkin,
     children: resolvedSearchParams.children ?? defaultFilters.children,
-    checkout: resolvedSearchParams.checkout ?? defaultFilters.checkout,
+    checkout: normalizedStayRange.checkout,
     lang: resolvedSearchParams.lang,
     room: resolvedSearchParams.room
   };

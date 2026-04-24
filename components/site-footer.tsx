@@ -110,7 +110,7 @@ export function SiteFooter() {
               <div className="site-footer__detail">
                 <dt>Email</dt>
                 <dd>
-                  <a className="site-footer__detail-link" href={`mailto:${siteInfo.email}`}>
+                  <a target="_blank" className="site-footer__detail-link" href={`mailto:${siteInfo.email}`}>
                     {siteInfo.email}
                   </a>
                 </dd>

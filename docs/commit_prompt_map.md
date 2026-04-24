@@ -1259,3 +1259,128 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-booking-detail-page.tsx`
   - `components/admin-dashboard.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 112
+- `time`: 2026-04-24T08:54:17+07:00
+- `prompt_summary`: Refactor lại toàn bộ flow quản lý xác nhận booking trong admin detail: chốt request thành booking chờ cọc với mặc định cọc 20%, tạo và phát hành lại QR cọc theo % hoặc số tiền mới, countdown 30 phút đồng bộ với booking/payment, xác nhận cọc thủ công để tính số tiền còn lại, và thêm thao tác hủy hoặc hoàn tất booking với audit rõ ràng.
+- `commit_message`: `refactor(booking-confirmation): rebuild admin deposit and lifecycle flow`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `lib/supabase/booking-finance.ts`
+  - `lib/supabase/booking-lifecycle.ts`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/workflows.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 113
+- `time`: 2026-04-24T09:29:12+07:00
+- `prompt_summary`: Sửa lỗi runtime khi admin bấm chốt booking ở trang chi tiết, làm lại giao diện booking detail theo mockup, và triển khai luôn UI/UX + flow notifications trong admin shell và trang danh sách thông báo.
+- `commit_message`: `feat(admin-ops): rebuild booking detail and notifications flow`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/layout.tsx`
+  - `app/(admin)/admin/notifications/page.tsx`
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-notifications-center.tsx`
+  - `components/admin-shell.tsx`
+  - `lib/supabase/queries/admin-notifications.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 114
+- `time`: 2026-04-24T10:49:56+07:00
+- `prompt_summary`: Chuyển thông báo success/error sang popup góc trên bên phải, đồng bộ các thông báo flash đó vào notifications center, và mở popup chi tiết có nút đóng khi bấm vào một notification.
+- `commit_message`: `feat(admin-notifications): add toast popup and detail dialog`
+- `main_files`:
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-notifications-center.tsx`
+  - `components/admin-shell.tsx`
+  - `app/(admin)/admin/notifications/page.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 115
+- `time`: 2026-04-24T11:32:00+07:00
+- `prompt_summary`: Không auto popup cửa sổ thông báo ở giữa màn hình mà chỉ hiện toast ở góc, khi nào click vào toast thì mới hiện popup.
+- `commit_message`: `fix(admin-notifications): disable auto-popup for flash notifications`
+- `main_files`:
+  - `components/admin-notifications-center.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 116
+- `time`: 2026-04-24T11:44:00+07:00
+- `prompt_summary`: Sửa lỗi member portal không hiển thị reservation và payment request do lỗi query customer lookup bằng anonymous read client bị chặn bởi RLS. Chuyển sang dùng service role fallback.
+- `commit_message`: `fix(member-portal): bypass RLS during customer resolution to fetch reservations`
+- `main_files`:
+  - `lib/supabase/queries/customers.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 117
+- `time`: 2026-04-24T12:08:00+07:00
+- `prompt_summary`: Bấm xác nhận thanh toán cọc bị lỗi màn hình 500 do Missing file field: proofFile khi người dùng không chọn ảnh hóa đơn.
+- `commit_message`: `fix(payments): gracefully handle missing payment proof file and form validation errors`
+- `main_files`:
+  - `app/actions/payments.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 118
+- `time`: 2026-04-24T12:37:00+07:00
+- `prompt_summary`: Admin không xem được ảnh chụp màn hình thanh toán cọc (proof) mà khách đã upload và trạng thái xử lý không hiển thị việc khách đã gửi proof.
+- `commit_message`: `fix(admin-portal): render payment proof image and update processing timeline description for uploaded proofs`
+- `main_files`:
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `components/admin-booking-detail-page.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 119
+**Date:** 2026-04-24
+**Prompt:** "1. nếu như admin đã xác nhận thanh toán cọc thì ẩn "Bước 2: Thanh toán cọc" và "Bước 3: Xác nhận nhận cọc đi". 
+2. thay "Trạng thái xử lý" là "Lịch sử", gồm Trạng thái xử lý gộp Lịch sử thanh toán cọc vào đó luôn
+3. phần "Lịch sử thanh toán cọc" đưa gộp vào trong "Trạng thái xử lý" luôn.
+4. sau đó, đưa "Thông tin booking" gộp vào trong "Thông tin khách hàng & Đặt phòng" cho gọn
+5. Đưa các nút chuyển trạng thái, actions, thao tác lên trên giống nhưu ảnh minh hoạ đính kèm"
+**Commit Message:** `refactor(admin-booking-detail): reorganize booking details UI, hide verified deposit steps, and move primary actions to header toolbar`
+**Files Modified:**
+- `components/admin-booking-detail-page.tsx`
+- `components/admin-booking-detail-toolbar.tsx`
+- `lib/supabase/queries/operations.ts`
+- `lib/supabase/queries/member-history.ts`
+
+### Entry 120
+- `time`: 2026-04-24T14:08:23+07:00
+- `prompt_summary`: Tạm thời miễn phí bữa sáng cho mọi hạng phòng, đưa actions của trang chi tiết booking admin lên header, khóa bộ lọc ngày không cho chọn ngày cũ, và refactor login member portal theo mockup với nền ảnh có overlay.
+- `commit_message`: `fix(ui): make breakfast free and refresh booking/member auth flows`
+- `main_files`:
+  - `lib/rooms/catalog.ts`
+  - `components/room-canvas-modal.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-booking-detail-toolbar.tsx`
+  - `components/availability-check-bar.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `components/member-auth-page.tsx`
+  - `components/member-auth-form.tsx`
+  - `app/(member-auth)/member/sign-in/page.tsx`
+  - `app/(member-auth)/member/sign-up/page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
+
+### Entry 121
+- `time`: 2026-04-24T15:01:44+07:00
+- `prompt_summary`: Sơ đồ phòng phải có bộ lọc ngày mặc định là hôm nay và chặn ngày cũ, tách thư viện media thành một menu tính năng riêng theo tab, và xây dựng CMS quản lý toàn bộ nội dung/hình ảnh/tiện ích/giá của hạng phòng theo mockup.
+- `commit_message`: `feat(admin-portal): add media tabs, room type CMS, and room plan date filter`
+- `main_files`:
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `app/(admin)/admin/media/page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `app/(admin)/admin/room-types/page.tsx`
+  - `app/(admin)/admin/room-types/actions.ts`
+  - `components/admin-room-types-manager.tsx`
+  - `lib/supabase/queries/room-types.ts`
+  - `components/admin-shell.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`

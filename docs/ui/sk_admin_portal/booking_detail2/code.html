@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SK Boutique Hotel - Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#775928",
+                      "secondary-container": "#c5dcfd",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#d1c5b6",
+                      "on-tertiary-container": "#292c2d",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed-dim": "#c5c7c8",
+                      "secondary-fixed-dim": "#b1c8e9",
+                      "on-background": "#0b1c30",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#454748",
+                      "on-error": "#ffffff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-container": "#e5eeff",
+                      "primary-fixed-dim": "#e8c086",
+                      "tertiary-fixed": "#e1e3e4",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary": "#4a607c",
+                      "primary-fixed": "#ffdeae",
+                      "on-surface-variant": "#4e453a",
+                      "surface-variant": "#d3e4fe",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-dim": "#cbdbf5",
+                      "on-secondary-container": "#4b617d",
+                      "surface-container-high": "#dce9ff",
+                      "surface": "#f8f9ff",
+                      "secondary-fixed": "#d2e4ff",
+                      "on-secondary-fixed-variant": "#324863",
+                      "surface-bright": "#f8f9ff",
+                      "background": "#f8f9ff",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#5c5f60",
+                      "on-primary-fixed": "#281800",
+                      "tertiary-container": "#919394",
+                      "primary-container": "#b08d57",
+                      "inverse-surface": "#213145",
+                      "on-primary-container": "#3d2700",
+                      "on-tertiary-fixed": "#191c1d",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline": "#807569",
+                      "inverse-primary": "#e8c086",
+                      "on-secondary-fixed": "#021c36",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#775928",
+                      "on-primary-fixed-variant": "#5d4213"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "20px",
+                      "sm": "8px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "sidebar-width": "260px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "table-data": [
+                              "Inter"
+                      ],
+                      "h1": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "h2": [
+                              "Inter"
+                      ],
+                      "h3": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "table-data": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "h1": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h2": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h3": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen overflow-hidden flex">
+<!-- SideNavBar Component (Hidden on mobile, flex on md+) -->
+<nav class="hidden md:flex bg-[#0F172A] dark:bg-black font-['Inter'] text-[13px] font-medium fixed left-0 top-0 h-screen w-[260px] z-50 shadow-2xl flex-col py-6 px-4">
+<!-- Brand / Header -->
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">
+<img alt="SK Boutique Logo" class="w-full h-full object-cover" data-alt="minimalist gold monogram logo on white background for luxury boutique hotel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnSFU0RKDLpCKOP_bYeIS4mP16DqSjuc4hJ033Q6rsJhzp5hFwYFwyv8L6XPA5qULBqWyKz5z-So9kHUf66g9nQWSrmRhr5FeZx2YcgETdbXI9IDHjNAi8yo3hszX0D2UVQPqCrq5f4nRoOIbRxwCZs7sLhsqXr6IKJczRH68lsGzy_QOWfaNeD0RF-gnTPel1dYZ7akNhvzf2A8lVVqee0_TKY_rJW57TT76Wf97cYMLZ87vHtnbyzTKX4yx8Q8aZSZKp50zZuPYW"/>
+</div>
+<div class="flex flex-col">
+<span class="text-white font-black tracking-widest uppercase text-sm">SK Boutique</span>
+<span class="text-slate-400 text-xs">Admin Portal</span>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full bg-[#B08D57] hover:bg-[#c5a16d] text-white py-2.5 rounded mb-6 flex items-center justify-center gap-2 font-semibold shadow-sm transition-colors scale-100 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            New Reservation
+        </button>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-1 flex-1">
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[#B08D57] group-hover:text-white transition-colors">dashboard</span>
+                Dashboard
+            </a>
+<a class="bg-white/10 text-[#B08D57] border-r-2 border-[#B08D57] hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[#B08D57]">calendar_month</span>
+                Bookings
+            </a>
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[#B08D57] group-hover:text-white transition-colors">group</span>
+                Guest Ledger
+            </a>
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[#B08D57] group-hover:text-white transition-colors">payments</span>
+                Financials
+            </a>
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[#B08D57] group-hover:text-white transition-colors">settings</span>
+                System Settings
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="mt-auto flex flex-col gap-1 pt-6 border-t border-slate-800">
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors">contact_support</span>
+                Support
+            </a>
+<a class="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 flex items-center gap-3 px-3 py-2 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors">logout</span>
+                Log Out
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-[260px] h-screen overflow-hidden bg-surface">
+<!-- TopNavBar Component (Hidden on desktop, flex on mobile) -->
+<header class="md:hidden flex justify-between items-center w-full px-6 h-16 bg-[#F8FAFC] dark:bg-slate-950 font-['Inter'] antialiased text-sm docked full-width top-0 border-b border-slate-200 dark:border-slate-800 z-40 shadow-sm">
+<div class="flex items-center gap-3">
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">SK Boutique Hotel</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#B08D57] dark:text-amber-500 cursor-pointer active:opacity-80 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded-full">notifications</span>
+<span class="material-symbols-outlined text-[#B08D57] dark:text-amber-500 cursor-pointer active:opacity-80 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded-full">help</span>
+<span class="material-symbols-outlined text-[#B08D57] dark:text-amber-500 cursor-pointer active:opacity-80 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded-full">account_circle</span>
+</div>
+</header>
+<!-- Page Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div>
+<a class="text-secondary hover:text-on-surface flex items-center gap-1 font-body-sm mb-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                        Back to Bookings
+                    </a>
+<h1 class="font-h1 text-h1 text-on-surface flex items-center gap-3">
+                        Chi tiết yêu cầu đặt phòng
+                        <span class="inline-flex items-center rounded-full bg-surface-container px-2 py-1 font-label-caps text-label-caps text-on-surface-variant">REQ-8492</span>
+</h1>
+</div>
+<!-- Countdown Timer -->
+<div class="flex items-center gap-2 bg-error-container/20 px-4 py-2 rounded-full border border-error/20">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-body-sm text-error font-medium">Thời gian xử lý còn lại: <span class="font-bold">24:15</span></span>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+<!-- Left Column (Main Info) -->
+<div class="xl:col-span-8 flex flex-col gap-6">
+<!-- Guest & Booking Info Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.05)] p-6">
+<div class="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
+<h2 class="font-h2 text-h2 text-on-surface">Thông tin khách hàng &amp; Đặt phòng</h2>
+<span class="inline-flex items-center rounded-full bg-primary-container/10 px-3 py-1 font-label-caps text-label-caps text-primary">Pending Deposit</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+<!-- Guest Details -->
+<div class="flex gap-4 items-start">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Khách hàng</p>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Nguyen Van A</p>
+<div class="flex flex-col gap-1 mt-2">
+<div class="flex items-center gap-2 text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">phone</span>
+                                            +84 987 654 321
+                                        </div>
+<div class="flex items-center gap-2 text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">mail</span>
+                                            nguyenvana@email.com
+                                        </div>
+</div>
+</div>
+</div>
+<!-- Booking Details -->
+<div class="flex flex-col gap-4">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Ngày lưu trú</p>
+<div class="flex items-center gap-2 font-body-md text-body-md text-on-surface">
+<span class="font-medium">15 Oct 2023</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">arrow_forward</span>
+<span class="font-medium">18 Oct 2023</span>
+<span class="text-secondary ml-2">(3 nights)</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Loại phòng</p>
+<p class="font-body-md text-body-md font-medium text-on-surface">Deluxe Suite</p>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Tổng giá trị</p>
+<p class="font-body-md text-body-md font-bold text-primary">$1,000</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Special Requests -->
+<div class="mt-6 pt-4 border-t border-outline-variant">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2 uppercase tracking-wider">Yêu cầu đặc biệt</p>
+<p class="font-body-sm text-body-sm text-on-surface bg-surface-container-low p-3 rounded-lg border border-outline-variant/50">
+                                Late check-in around 8 PM. Please arrange a quiet room away from the elevator.
+                            </p>
+</div>
+</div>
+<!-- Status Timeline Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.05)] p-6">
+<h3 class="font-h3 text-h3 text-on-surface mb-6">Trạng thái xử lý</h3>
+<div class="relative">
+<!-- Timeline Line -->
+<div class="absolute left-[15px] top-4 bottom-4 w-0.5 bg-surface-container"></div>
+<div class="flex flex-col gap-6">
+<!-- Step 1: Pending (Completed) -->
+<div class="relative flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center z-10 shrink-0 border-2 border-surface-container-lowest">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex-1 pt-1">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Yêu cầu mới (Pending)</p>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Hệ thống ghi nhận yêu cầu lúc 10:30, 10 Oct 2023</p>
+</div>
+</div>
+<!-- Step 2: Confirm Availability (Active) -->
+<div class="relative flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-primary text-primary flex items-center justify-center z-10 shrink-0">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+</div>
+<div class="flex-1 pt-1">
+<p class="font-body-md text-body-md font-semibold text-primary">Xác nhận còn phòng (Confirmed Availability)</p>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Đang chờ nhân viên kiểm tra và xác nhận</p>
+</div>
+</div>
+<!-- Step 3: Deposit (Upcoming) -->
+<div class="relative flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-outline-variant text-outline-variant flex items-center justify-center z-10 shrink-0">
+<span class="material-symbols-outlined text-[16px]">payments</span>
+</div>
+<div class="flex-1 pt-1 opacity-50">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Đã thanh toán cọc (Deposit Paid)</p>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Chờ khách hàng thanh toán qua QR</p>
+</div>
+</div>
+<!-- Step 4: Final (Upcoming) -->
+<div class="relative flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-outline-variant text-outline-variant flex items-center justify-center z-10 shrink-0">
+<span class="material-symbols-outlined text-[16px]">task_alt</span>
+</div>
+<div class="flex-1 pt-1 opacity-50">
+<p class="font-body-md text-body-md font-semibold text-on-surface">Xác nhận cuối cùng (Final Confirmation)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Actions & Workflow) -->
+<div class="xl:col-span-4 flex flex-col gap-6">
+<!-- Phase 1: Confirm Availability -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.05)] p-6">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary">fact_check</span>
+<h3 class="font-h3 text-h3 text-on-surface">Bước 1: Xác nhận phòng</h3>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">Vui lòng kiểm tra tình trạng phòng trên hệ thống PMS trước khi xác nhận.</p>
+<button class="w-full bg-primary hover:bg-[#8e6b30] text-on-primary py-2.5 px-4 rounded-lg font-body-md text-body-md font-semibold shadow-sm transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+                            Xác nhận còn phòng
+                        </button>
+</div>
+<!-- Phase 2: Deposit QR (Simulated Active State) -->
+<div class="bg-surface-container-lowest border border-primary/30 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] p-6 relative overflow-hidden">
+<!-- Accent Bar -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+<div class="flex items-center gap-2 mb-6 mt-1">
+<span class="material-symbols-outlined text-primary">qr_code_scanner</span>
+<h3 class="font-h3 text-h3 text-on-surface">Bước 2: Thanh toán cọc (20%)</h3>
+</div>
+<div class="flex flex-col gap-4">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-1">Số tiền cọc ($)</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary font-body-md">$</span>
+<input class="block w-full pl-8 pr-3 py-2 border border-outline-variant rounded-lg text-on-surface font-body-md focus:ring-1 focus:ring-primary focus:border-primary transition-colors bg-surface-container-lowest" type="number" value="200"/>
+</div>
+</div>
+<div class="bg-surface-container flex flex-col items-center justify-center p-4 rounded-lg border border-outline-variant/50">
+<div class="w-32 h-32 bg-white rounded flex items-center justify-center border border-outline-variant mb-3">
+<span class="material-symbols-outlined text-outline-variant text-[48px]">qr_code_2</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary text-center mb-3">VietQR - Quét để thanh toán</p>
+<button class="text-primary hover:text-[#5d4213] font-body-sm text-body-sm font-medium flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+                                    Tạo lại mã QR
+                                </button>
+</div>
+</div>
+</div>
+<!-- Phase 3: Confirm Deposit -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.05)] p-6 opacity-60 pointer-events-none">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary">price_check</span>
+<h3 class="font-h3 text-h3 text-on-surface">Bước 3: Xác nhận nhận cọc</h3>
+</div>
+<button class="w-full bg-surface-container hover:bg-surface-container-high text-on-surface py-2.5 px-4 rounded-lg font-body-md text-body-md font-medium border border-outline-variant transition-colors flex justify-center items-center gap-2">
+                            Xác nhận đã nhận cọc
+                        </button>
+</div>
+<!-- Financial Summary -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-xl p-6 shadow-md">
+<h3 class="font-h3 text-h3 mb-4 text-white">Tóm tắt tài chính</h3>
+<div class="flex flex-col gap-3 font-body-md text-body-md">
+<div class="flex justify-between items-center">
+<span class="text-tertiary-fixed-dim">Tổng cộng</span>
+<span class="font-medium">$1,000</span>
+</div>
+<div class="flex justify-between items-center text-primary-fixed">
+<span>Tiền cọc (20%)</span>
+<span>$200</span>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/20 my-1"></div>
+<div class="flex justify-between items-center text-white">
+<span class="font-semibold">Còn lại</span>
+<span class="font-bold text-lg">$800</span>
+</div>
+</div>
+</div>
+<!-- Final Step: Email -->
+<button class="w-full bg-surface-container-lowest hover:bg-surface-container border-2 border-primary text-primary py-3 px-4 rounded-xl font-body-md text-body-md font-semibold transition-colors flex justify-center items-center gap-2 opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined">mail</span>
+                        Gửi Email xác nhận
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

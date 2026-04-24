@@ -1,9 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
+import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
 import { sendEmail } from "@/lib/supabase/email";
 import { sendDepositRequestCustomerEmail } from "@/lib/supabase/email";
+import { updateReservationLifecycle } from "@/lib/supabase/booking-lifecycle";
+import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
+import { getErrorMessage } from "@/lib/supabase/errors";
 import {
   confirmAvailabilityRequest,
   createReservation,
@@ -27,7 +32,7 @@ import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/lib/supabase/env";
 import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
-import { buildMemberPortalUrl, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { buildMemberPortalUrl, buildVietQrImageUrl, createPaymentRequest } from "@/lib/supabase/payments";
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -49,6 +54,14 @@ function readOptionalString(formData: FormData, key: string) {
   const trimmed = value.trim();
 
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function redirectWithActionResult(returnTo: string | null, kind: "error" | "success", message: string) {
+  if (!returnTo) {
+    return;
+  }
+
+  redirect(buildActionResultHref(returnTo, { kind, message }));
 }
 
 function readOptionalNumber(formData: FormData, key: string) {
@@ -156,6 +169,7 @@ export async function submitAvailabilityRequestAction(formData: FormData) {
 
 export async function updateAvailabilityRequestStatusAction(formData: FormData) {
   const status = readRequiredString(formData, "status");
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
 
   if (!availabilityRequestStatusOptions.includes(status as AvailabilityRequestStatusOption)) {
     throw new Error(`Unsupported availability request status: ${status}`);
@@ -164,16 +178,26 @@ export async function updateAvailabilityRequestStatusAction(formData: FormData) 
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
 
-  await updateAvailabilityRequestStatus({
-    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
-    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
-    availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
-    note: readOptionalString(formData, "note"),
-    status: status as AvailabilityRequestStatusOption
-  });
+  try {
+    await updateAvailabilityRequestStatus({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+      availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
+      note: readOptionalString(formData, "note"),
+      status: status as AvailabilityRequestStatusOption
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to update booking request."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(
+    returnTo,
+    "success",
+    status === "rejected" ? "Booking request was rejected." : "Booking request was updated."
+  );
 }
 
 export async function createPaymentRequestAction(formData: FormData) {
@@ -238,22 +262,125 @@ export async function createReservationAction(formData: FormData) {
 export async function confirmAvailabilityRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
 
-  await confirmAvailabilityRequest({
-    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
-    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
-    availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
-    depositAmount: readOptionalNumber(formData, "depositAmount") ?? 0,
-    guestCount: readOptionalNumber(formData, "guestCount") ?? 1,
-    notes: readOptionalString(formData, "notes") ?? "",
-    roomId: readRequiredString(formData, "roomId"),
-    roomTypeId: readRequiredString(formData, "roomTypeId"),
-    stayEndAt: readRequiredString(formData, "stayEndAt"),
-    stayStartAt: readRequiredString(formData, "stayStartAt")
-  });
+  try {
+    await confirmAvailabilityRequest({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+      availabilityRequestId: readRequiredString(formData, "availabilityRequestId"),
+      branchBankAccountId: readOptionalString(formData, "branchBankAccountId"),
+      depositAmount: readOptionalNumber(formData, "depositAmount"),
+      depositPercent: readOptionalNumber(formData, "depositPercent"),
+      guestCount: readOptionalNumber(formData, "guestCount") ?? 1,
+      notes: readOptionalString(formData, "notes") ?? "",
+      roomId: readRequiredString(formData, "roomId"),
+      roomTypeId: readRequiredString(formData, "roomTypeId"),
+      stayEndAt: readRequiredString(formData, "stayEndAt"),
+      stayStartAt: readRequiredString(formData, "stayStartAt")
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to confirm booking."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", "Booking confirmed and deposit QR issued.");
+}
+
+export async function reissueDepositPaymentRequestAction(formData: FormData) {
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const reservationId = readRequiredString(formData, "reservationId");
+  const reservation = await getReservationById(reservationId);
+
+  if (!reservation) {
+    throw new Error("Booking was not found.");
+  }
+
+  const depositAmount = calculateDepositAmount({
+    depositAmount: readOptionalNumber(formData, "depositAmount"),
+    depositPercent: readOptionalNumber(formData, "depositPercent"),
+    totalAmount: reservation.total_amount
+  });
+
+  if (depositAmount <= 0) {
+    throw new Error("Deposit amount must be greater than zero.");
+  }
+
+  try {
+    const paymentRequest = await createPaymentRequest({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      amount: depositAmount,
+      branchBankAccountId: readOptionalString(formData, "branchBankAccountId"),
+      createdBy: user?.id ?? readOptionalString(formData, "actorUserId"),
+      note: readOptionalString(formData, "note") ?? "",
+      reservationId,
+      source: readOptionalString(formData, "source") ?? "admin_console"
+    });
+
+    await logAuditEvent({
+      action: "payment_request.reissued",
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+      branchId: reservation.branch_id,
+      customerId: reservation.customer_id,
+      entityId: paymentRequest.id,
+      entityType: "payment_request",
+      reservationId: reservation.id,
+      summary: `Deposit QR reissued for booking ${reservation.booking_code}.`,
+      metadata: {
+        amount: paymentRequest.amount,
+        branch_bank_account_id: paymentRequest.branch_bank_account_id,
+        deposit_percent: readOptionalNumber(formData, "depositPercent")
+      }
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to regenerate deposit QR."));
+    throw error;
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", "A new deposit QR has been issued.");
+}
+
+export async function updateReservationLifecycleAction(formData: FormData) {
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const status = readRequiredString(formData, "status");
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+
+  if (status !== "cancelled" && status !== "completed") {
+    throw new Error(`Unsupported booking lifecycle status: ${status}`);
+  }
+
+  try {
+    await updateReservationLifecycle({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+      reason: readOptionalString(formData, "reason"),
+      reservationId: readRequiredString(formData, "reservationId"),
+      status
+    });
+  } catch (error) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      getErrorMessage(error, status === "cancelled" ? "Unable to cancel booking." : "Unable to complete booking.")
+    );
+    throw error;
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/member");
+  redirectWithActionResult(
+    returnTo,
+    "success",
+    status === "cancelled" ? "Booking cancelled successfully." : "Booking marked as completed."
+  );
 }
 
 export async function releaseExpiredHoldsAction(formData: FormData) {
@@ -297,64 +424,80 @@ export async function sendEmailTestAction(formData: FormData) {
 
 export async function resendDepositRequestEmailAction(formData: FormData) {
   const paymentRequestId = readRequiredString(formData, "paymentRequestId");
-  const { branch, customer, paymentRequest, reservation, roomType } = await loadPaymentRequestDetail(paymentRequestId);
-  const nights = calculateNights(reservation.stay_start_at, reservation.stay_end_at);
-  const depositAmount = formatMoneyVnd(paymentRequest.amount);
-  const branchName = branch?.name_vi ?? branch?.name_en ?? paymentRequest.branch_id;
-  const roomTypeName = roomType?.name_vi ?? roomType?.name_en ?? reservation.primary_room_type_id;
-  const paymentDeadline = paymentRequest.public_upload_link_expires_at
-    ? formatDateTimeVn(paymentRequest.public_upload_link_expires_at)
-    : formatDateTimeVn(new Date(Date.now() + 30 * 60 * 1000).toISOString());
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
 
-  await sendDepositRequestCustomerEmail({
-    bookingCode: reservation.booking_code,
-    bookingUrl: buildMemberPortalUrl(),
-    branchName,
-    checkInDate: formatDateTimeVn(reservation.stay_start_at),
-    checkOutDate: formatDateTimeVn(reservation.stay_end_at),
-    depositAmount,
-    guestEmail: customer.email,
-    guestName: customer.full_name,
-    nights: String(nights),
-    paymentAccountName: paymentRequest.account_name,
-    paymentAccountNumber: paymentRequest.account_number,
-    paymentBankName: paymentRequest.bank_name,
-    paymentDeadline,
-    paymentQrUrl: buildVietQrImageUrl(paymentRequest),
-    paymentTransferNote: paymentRequest.transfer_content,
-    roomType: roomTypeName
-  });
+  try {
+    const { branch, customer, paymentRequest, reservation, roomType } = await loadPaymentRequestDetail(paymentRequestId);
+    const nights = calculateNights(reservation.stay_start_at, reservation.stay_end_at);
+    const depositAmount = formatMoneyVnd(paymentRequest.amount);
+    const branchName = branch?.name_vi ?? branch?.name_en ?? paymentRequest.branch_id;
+    const roomTypeName = roomType?.name_vi ?? roomType?.name_en ?? reservation.primary_room_type_id;
+    const paymentDeadline = paymentRequest.public_upload_link_expires_at
+      ? formatDateTimeVn(paymentRequest.public_upload_link_expires_at)
+      : formatDateTimeVn(new Date(Date.now() + 30 * 60 * 1000).toISOString());
 
-  await logAuditEvent({
-    action: "payment_request.deposit_email_resent",
-    actorRole: "admin",
-    branchId: paymentRequest.branch_id,
-    customerId: customer.id,
-    entityId: paymentRequest.id,
-    entityType: "payment_request",
-    reservationId: reservation.id,
-    summary: `Deposit request email resent to ${customer.email}.`
-  });
+    await sendDepositRequestCustomerEmail({
+      bookingCode: reservation.booking_code,
+      bookingUrl: buildMemberPortalUrl(),
+      branchName,
+      checkInDate: formatDateTimeVn(reservation.stay_start_at),
+      checkOutDate: formatDateTimeVn(reservation.stay_end_at),
+      depositAmount,
+      guestEmail: customer.email,
+      guestName: customer.full_name,
+      nights: String(nights),
+      paymentAccountName: paymentRequest.account_name,
+      paymentAccountNumber: paymentRequest.account_number,
+      paymentBankName: paymentRequest.bank_name,
+      paymentDeadline,
+      paymentQrUrl: buildVietQrImageUrl(paymentRequest),
+      paymentTransferNote: paymentRequest.transfer_content,
+      roomType: roomTypeName
+    });
+
+    await logAuditEvent({
+      action: "payment_request.deposit_email_resent",
+      actorRole: "admin",
+      branchId: paymentRequest.branch_id,
+      customerId: customer.id,
+      entityId: paymentRequest.id,
+      entityType: "payment_request",
+      reservationId: reservation.id,
+      summary: `Deposit request email resent to ${customer.email}.`
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to resend deposit email."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", "Deposit email sent again.");
 }
 
 export async function notifyPaymentRequestMemberAction(formData: FormData) {
   const paymentRequestId = readRequiredString(formData, "paymentRequestId");
-  const { customer, paymentRequest, reservation } = await loadPaymentRequestDetail(paymentRequestId);
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
 
-  await logAuditEvent({
-    action: "payment_request.notification_sent",
-    actorRole: "admin",
-    branchId: paymentRequest.branch_id,
-    customerId: customer.id,
-    entityId: paymentRequest.id,
-    entityType: "payment_request",
-    reservationId: reservation.id,
-    summary: `Member notification sent for payment request ${paymentRequest.payment_code}.`
-  });
+  try {
+    const { customer, paymentRequest, reservation } = await loadPaymentRequestDetail(paymentRequestId);
+
+    await logAuditEvent({
+      action: "payment_request.notification_sent",
+      actorRole: "admin",
+      branchId: paymentRequest.branch_id,
+      customerId: customer.id,
+      entityId: paymentRequest.id,
+      entityType: "payment_request",
+      reservationId: reservation.id,
+      summary: `Member notification sent for payment request ${paymentRequest.payment_code}.`
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to send member notification."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", "Member notification sent.");
 }

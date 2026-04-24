@@ -98,12 +98,12 @@ const copy = {
   },
   prompts: {
     signIn: {
-      vi: "Đăng nhập để xem lịch sử request, booking và thông báo.",
-      en: "Sign in to see your requests, bookings, and notifications."
+      vi: "Đăng nhập để xem lịch sử booking và nhận ưu đãi.",
+      en: "Sign in to see your booking history and receive offers."
     } satisfies LocalizedText,
     signUp: {
-      vi: "Tạo tài khoản nhanh để hệ thống lưu lịch sử và gửi thông báo đúng email.",
-      en: "Create a quick account so the system can store your history and send notifications to the right email."
+      vi: "Tạo tài khoản nhanh để nhận ưu đãi.",
+      en: "Create an account quickly to receive offers."
     } satisfies LocalizedText
   }
 } as const;
@@ -297,17 +297,17 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
   }
 
   return (
-    <form className="admin-auth-form" onSubmit={handleSubmit}>
-      <p className="admin-auth-form__title">{title}</p>
-      <p className="admin-auth-form__hint">{prompt}</p>
+    <form className="member-auth-form" onSubmit={handleSubmit}>
+      <p className="member-auth-form__title">{title}</p>
+      <p className="member-auth-form__description">{prompt}</p>
 
-      <div className="admin-auth-form__fields">
+      <div className="member-auth-form__fields">
         {isSignUp ? (
-          <label className="admin-auth-form__field">
+          <label className="member-auth-form__field">
             <span>{localize(locale, copy.common.fullName)}</span>
             <input
               autoComplete="name"
-              className="admin-auth-form__input"
+              className="member-auth-form__input"
               name="fullName"
               onChange={(event) => setFullName(event.target.value)}
               placeholder={locale === "en" ? "Your full name" : "Họ và tên"}
@@ -318,11 +318,11 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
           </label>
         ) : null}
 
-        <label className="admin-auth-form__field">
+        <label className="member-auth-form__field">
           <span>{localize(locale, copy.common.email)}</span>
             <input
               autoComplete="email"
-              className="admin-auth-form__input"
+              className="member-auth-form__input"
               inputMode="email"
               name="email"
               onChange={(event) => setEmail(event.target.value)}
@@ -334,11 +334,11 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         </label>
 
         {isSignUp ? (
-          <label className="admin-auth-form__field">
+          <label className="member-auth-form__field">
             <span>{localize(locale, copy.common.phone)}</span>
             <input
               autoComplete="tel"
-              className="admin-auth-form__input"
+              className="member-auth-form__input"
               inputMode="tel"
               name="phone"
               onChange={(event) => setPhone(event.target.value)}
@@ -351,11 +351,11 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         ) : null}
 
         {!isSignUp ? (
-          <label className="admin-auth-form__field">
+          <label className="member-auth-form__field">
             <span>{localize(locale, copy.common.password)}</span>
             <input
               autoComplete="current-password"
-              className="admin-auth-form__input"
+              className="member-auth-form__input"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               placeholder={DEFAULT_MEMBER_PASSWORD}
@@ -367,21 +367,21 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         ) : null}
       </div>
 
-      <div className="admin-auth-form__actions">
-        <button className="button button--solid" disabled={isSubmitting} type="submit">
+      <div className="member-auth-form__actions member-auth-form__actions--primary">
+        <button className="button button--solid member-auth-form__submit" disabled={isSubmitting} type="submit">
           {isSubmitting ? submitPendingLabel : submitLabel}
         </button>
       </div>
 
-      <p className="admin-auth-form__hint">{hint}</p>
+      {error ? <p className="member-auth-form__error">{error}</p> : null}
 
-      <div className="admin-auth-form__actions" style={{ justifyContent: "space-between" }}>
-        <Link className="button button--text-light" href={alternateHref}>
+      <p className="member-auth-form__hint">{hint}</p>
+
+      <div className="member-auth-form__actions member-auth-form__actions--secondary">
+        <Link className="member-auth-form__link" href={alternateHref}>
           {alternateLabel}
         </Link>
       </div>
-
-      {error ? <p className="admin-auth-form__error">{error}</p> : null}
     </form>
   );
 }

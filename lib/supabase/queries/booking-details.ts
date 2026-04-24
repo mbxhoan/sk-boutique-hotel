@@ -3,6 +3,7 @@ import { listBranchBankAccounts } from "@/lib/supabase/queries/branch-bank-accou
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { getCustomerByEmail, listCustomersByIds } from "@/lib/supabase/queries/customers";
 import { listAuditLogs } from "@/lib/supabase/queries/audit-logs";
+import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { getAvailabilityRequestById, getAvailabilityRequestByRequestCode } from "@/lib/supabase/queries/availability-requests";
 import { getLatestPaymentProofByRequestId } from "@/lib/supabase/queries/payment-proofs";
 import { listPaymentRequests } from "@/lib/supabase/queries/payment-requests";
@@ -11,7 +12,10 @@ import { getReservationByBookingCode, listReservations } from "@/lib/supabase/qu
 import { getRoomById } from "@/lib/supabase/queries/rooms";
 import { listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
+import { calculateDepositAmount, calculateRemainingBalance, calculateVerifiedDepositAmount, DEFAULT_BOOKING_DEPOSIT_PERCENT } from "@/lib/supabase/booking-finance";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
+import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   BranchRow,
   PaymentProofRow,
@@ -161,6 +165,7 @@ function mapPaymentRequest(
     latest_proof_review_note: latestProof?.review_note ?? null,
     latest_proof_status: latestProof?.status ?? null,
     latest_proof_uploaded_at: latestProof?.created_at ?? null,
+    latest_proof_url: null,
     payment_upload_path: buildPaymentUploadPath(request),
     qr_image_url: buildVietQrImageUrl(request),
     reservation_booking_code: reservation?.booking_code ?? request.reservation_id,
@@ -216,23 +221,57 @@ function mapAuditLog(
   };
 }
 
+function mapRoomSuggestion(
+  room: RoomRow,
+  branchMap: Record<string, BranchRow>,
+  roomTypeMap: Record<string, RoomTypeRow>
+) {
+  const branch = branchMap[room.branch_id];
+  const roomType = roomTypeMap[room.room_type_id];
+
+  return {
+    ...room,
+    branch_name_en: branch?.name_en ?? room.branch_id,
+    branch_name_vi: branch?.name_vi ?? room.branch_id,
+    room_type_name_en: roomType?.name_en ?? room.room_type_id,
+    room_type_name_vi: roomType?.name_vi ?? room.room_type_id
+  };
+}
+
+export type BookingDetailRoomSuggestion = ReturnType<typeof mapRoomSuggestion>;
+
+export type BookingDetailFinancialSummary = {
+  active_payment_request_id: string | null;
+  default_deposit_amount: number;
+  default_deposit_percentage: number;
+  pending_deposit_amount: number;
+  remaining_balance_amount: number;
+  requested_deposit_amount: number;
+  total_amount: number;
+  verified_deposit_amount: number;
+};
+
 export type BookingDetailData = {
   audit_logs: WorkflowAuditLog[];
   branch_bank_accounts: WorkflowBranchBankAccountOption[];
   branch_options: WorkflowBranchOption[];
   booking: WorkflowBookingRow;
   customer: CustomerRow | null;
+  financial_summary: BookingDetailFinancialSummary;
   payment_proofs: WorkflowPaymentProof[];
   payment_requests: WorkflowPaymentRequest[];
   request: WorkflowAvailabilityRequest | null;
   reservation: WorkflowReservation | null;
   room_code: string | null;
   room_holds: WorkflowRoomHold[];
+  room_suggestions: BookingDetailRoomSuggestion[];
   room_type: WorkflowRoomTypeOption | null;
   room_type_options: WorkflowRoomTypeOption[];
 };
 
 export async function loadBookingDetailByCode(bookingCode: string): Promise<BookingDetailData | null> {
+  await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+
   const [branches, roomTypes, reservationByCode, requestByCode] = await Promise.all([
     listBranches(),
     listRoomTypes(),
@@ -385,6 +424,40 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     branch_name_vi: branchMap[account.branch_id]?.name_vi ?? account.branch_id
   }));
   const selectedRoomType = roomTypeMap[booking.room_type_id] ?? null;
+  const roomSuggestions =
+    !reservation && branchId
+      ? (
+          await findAvailableRooms({
+            branchId,
+            limit: 36,
+            stayEndAt: booking.stay_end_at,
+            stayStartAt: booking.stay_start_at
+          })
+        ).map((availableRoom) => mapRoomSuggestion(availableRoom, branchMap, roomTypeMap))
+      : [];
+  const totalAmount = booking.total_amount;
+  const verifiedDepositAmount = calculateVerifiedDepositAmount(paymentRequestViews);
+  const activePaymentRequest =
+    paymentRequestViews.find((paymentRequest) => ["pending_verification", "sent"].includes(paymentRequest.status)) ??
+    paymentRequestViews[0] ??
+    null;
+  const supabase = createSupabaseServiceClient();
+
+  for (const pr of paymentRequestViews) {
+    if (pr.latest_proof_file_path) {
+      const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(pr.latest_proof_file_path, 3600);
+      pr.latest_proof_url = data?.signedUrl ?? null;
+    }
+  }
+
+  const defaultDepositAmount = calculateDepositAmount({
+    totalAmount
+  });
+  const requestedDepositAmount =
+    reservation?.deposit_amount && reservation.deposit_amount > 0
+      ? reservation.deposit_amount
+      : activePaymentRequest?.amount ?? defaultDepositAmount;
+  const pendingDepositAmount = activePaymentRequest?.status === "verified" ? 0 : activePaymentRequest?.amount ?? 0;
 
   return {
     audit_logs: Array.from(auditLogs),
@@ -399,12 +472,23 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     })),
     booking,
     customer,
+    financial_summary: {
+      active_payment_request_id: activePaymentRequest?.id ?? null,
+      default_deposit_amount: defaultDepositAmount,
+      default_deposit_percentage: DEFAULT_BOOKING_DEPOSIT_PERCENT,
+      pending_deposit_amount: pendingDepositAmount,
+      remaining_balance_amount: calculateRemainingBalance(totalAmount, verifiedDepositAmount),
+      requested_deposit_amount: requestedDepositAmount,
+      total_amount: totalAmount,
+      verified_deposit_amount: verifiedDepositAmount
+    },
     payment_proofs: paymentProofViews,
     payment_requests: paymentRequestViews,
     request: mappedRequest,
     reservation: mappedReservation,
     room_code: roomCode,
     room_holds: roomHoldList,
+    room_suggestions: roomSuggestions,
     room_type: selectedRoomType
       ? {
           base_price: selectedRoomType.base_price,

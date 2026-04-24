@@ -442,7 +442,7 @@ function PaymentRequestPanel({
             <input name="uploadedVia" type="hidden" value="member_portal" />
 
             <label className="portal-field">
-              <span className="portal-field__label">{locale === "en" ? "Proof file" : "File chứng từ"}</span>
+              <span className="portal-field__label">{locale === "en" ? "Payment screenshot" : "Ảnh chụp màn hình thanh toán"}</span>
               <input className="portal-field__control member-payment-panel__input" name="proofFile" type="file" accept="image/*,.pdf" />
             </label>
 

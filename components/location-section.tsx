@@ -13,7 +13,7 @@ type LocationSectionProps = {
 };
 
 function mapEmbedUrl(locale: Locale) {
-  return `https://www.google.com/maps?q=${encodeURIComponent(translate(locale, siteInfo.address))}&output=embed`;
+  return `https://www.google.com/maps?q=${encodeURIComponent(translate(locale, siteInfo.gg_map_address))}&output=embed`;
 }
 
 export function LocationSection({ className, id = "vi-tri", locale }: LocationSectionProps) {
@@ -29,7 +29,7 @@ export function LocationSection({ className, id = "vi-tri", locale }: LocationSe
         <div className="location-band__copy">
           <p className="location-band__eyebrow">{title}</p>
           <h2 className="location-band__title">{title}</h2>
-          <p className="location-band__description">{description}</p>
+          {/* <p className="location-band__description">{description}</p> */}
 
           <div className="location-band__address">
             <p className="location-band__address-label">{locale === "en" ? "Address" : "Địa chỉ"}</p>

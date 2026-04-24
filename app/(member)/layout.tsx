@@ -3,13 +3,19 @@ import { Suspense } from "react";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { MemberNotificationProvider } from "@/components/member-notifications-provider";
+import { resolveLocale } from "@/lib/locale";
 import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 
 export default async function MemberLayout({
-  children
+  children,
+  params
 }: Readonly<{
   children: ReactNode;
+  params: Promise<{ lang?: string }>;
 }>) {
+  const { lang } = await params;
+  const locale = resolveLocale(lang);
   if (process.env.NEXT_PHASE !== "phase-production-build") {
     const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
 
@@ -22,7 +28,7 @@ export default async function MemberLayout({
   }
 
   return (
-    <>
+    <MemberNotificationProvider locale={locale}>
       <Suspense fallback={null}>
         <SiteHeader />
       </Suspense>
@@ -30,6 +36,6 @@ export default async function MemberLayout({
       <Suspense fallback={null}>
         <SiteFooter />
       </Suspense>
-    </>
+    </MemberNotificationProvider>
   );
 }

@@ -4,18 +4,26 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
+import {
+  AdminNotificationDialogHost,
+  AdminNotificationProvider,
+  AdminNotificationToastHost,
+  AdminNotificationsMenu
+} from "@/components/admin-notifications-center";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
+import type { AdminNotificationItem } from "@/lib/supabase/queries/admin-notifications";
 import type { BranchRow } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AdminShellProps = {
   children: ReactNode;
   branches: Pick<BranchRow, "id" | "name_en" | "name_vi" | "slug">[];
+  notifications: AdminNotificationItem[];
 };
 
 type AdminNavItem = {
-  icon: "bookings" | "content" | "customers" | "dashboard" | "logout" | "rooms" | "settings" | "support";
+  icon: "bookings" | "content" | "customers" | "dashboard" | "logout" | "media" | "rooms" | "roomTypes" | "settings" | "support";
   href: string;
   label: {
     en: string;
@@ -46,6 +54,22 @@ const adminNavItems: AdminNavItem[] = [
     label: {
       vi: "Quản lý phòng",
       en: "Room Management"
+    }
+  },
+  {
+    icon: "roomTypes",
+    href: "/admin/room-types",
+    label: {
+      vi: "Hạng phòng",
+      en: "Room Types"
+    }
+  },
+  {
+    icon: "media",
+    href: "/admin/media",
+    label: {
+      vi: "Thư viện ảnh",
+      en: "Media Library"
     }
   },
   {
@@ -84,8 +108,10 @@ function ShellIcon({
     | "customers"
     | "dashboard"
     | "logout"
+    | "media"
     | "notifications"
     | "rooms"
+    | "roomTypes"
     | "search"
     | "settings"
     | "storefront"
@@ -144,6 +170,26 @@ function ShellIcon({
       <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <rect height="11.2" rx="1.5" stroke="currentColor" strokeWidth="1.2" width="12.2" x="2.9" y="3.2" />
         <path d="M5.1 2.6v2.3M12.9 2.6v2.3M4.2 7.2h9.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === "media") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <rect height="11.6" rx="1.8" stroke="currentColor" strokeWidth="1.2" width="13.2" x="2.4" y="3.2" />
+        <path d="M5 11.4 7.4 8.8l2.1 2 1.9-1.8 2.2 2.4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <circle cx="6" cy="6.4" fill="currentColor" r=".8" />
+      </svg>
+    );
+  }
+
+  if (icon === "roomTypes") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M3.5 6.1 9 3l5.5 3.1-5.5 3.1L3.5 6.1Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M3.5 10.1 9 13l5.5-2.9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
+        <path d="M3.5 8.1 9 11l5.5-2.9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" />
       </svg>
     );
   }
@@ -246,6 +292,14 @@ function getSearchPlaceholder(pathname: string, locale: "en" | "vi") {
     return locale === "en" ? "Search rooms, types..." : "Tìm phòng, loại phòng...";
   }
 
+  if (pathname.startsWith("/admin/room-types")) {
+    return locale === "en" ? "Search room types..." : "Tìm hạng phòng...";
+  }
+
+  if (pathname.startsWith("/admin/media")) {
+    return locale === "en" ? "Search media, folders..." : "Tìm media, thư mục...";
+  }
+
   if (pathname.startsWith("/admin/content-pages")) {
     return locale === "en" ? "Search pages, banners..." : "Tìm trang, banner...";
   }
@@ -273,7 +327,7 @@ function buildBranchHref(
   return appendLocaleQuery(`${pathname}${query ? `?${query}` : ""}`, locale);
 }
 
-export function AdminShell({ children, branches }: AdminShellProps) {
+export function AdminShell({ children, branches, notifications }: AdminShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -285,7 +339,11 @@ export function AdminShell({ children, branches }: AdminShellProps) {
   const currentBranch =
     branches.find((branch) => branch.id === branchId) ?? branches[0] ?? null;
   const showSearchTopbar =
-    pathname === "/admin" || pathname.startsWith("/admin/bookings") || pathname.startsWith("/admin/rooms");
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/bookings") ||
+    pathname.startsWith("/admin/rooms") ||
+    pathname.startsWith("/admin/room-types") ||
+    pathname.startsWith("/admin/media");
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -295,14 +353,15 @@ export function AdminShell({ children, branches }: AdminShellProps) {
   }
 
   return (
-    <div className="portal-shell portal-shell--admin admin-shell">
-      <aside className="admin-shell__sidebar">
+    <AdminNotificationProvider locale={locale} serverItems={notifications}>
+      <div className="portal-shell portal-shell--admin admin-shell">
+        <aside className="admin-shell__sidebar">
         <div className="admin-shell__brand">
           <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
-          <div className="admin-shell__brand-copy">
+          {/* <div className="admin-shell__brand-copy">
             <p className="admin-shell__brand-title">SK Boutique</p>
             <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
-          </div>
+          </div> */}
         </div>
 
         <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="admin-shell__nav">
@@ -339,10 +398,10 @@ export function AdminShell({ children, branches }: AdminShellProps) {
             <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
           </button>
         </div>
-      </aside>
+        </aside>
 
-      <div className="admin-shell__workspace">
-        <header className="admin-shell__topbar">
+        <div className="admin-shell__workspace">
+          <header className="admin-shell__topbar">
           {showSearchTopbar ? (
             <label className="admin-shell__search">
               <span className="admin-shell__search-icon" aria-hidden="true">
@@ -362,7 +421,7 @@ export function AdminShell({ children, branches }: AdminShellProps) {
             </div>
           )}
 
-          <div className="admin-shell__actions">
+            <div className="admin-shell__actions">
             <details className="admin-shell__branch-menu">
               <summary className="admin-shell__branch-selector">
                 <span className="admin-shell__branch-selector-icon" aria-hidden="true">
@@ -395,16 +454,13 @@ export function AdminShell({ children, branches }: AdminShellProps) {
               </div>
             </details>
 
-            <span className="admin-shell__divider" aria-hidden="true" />
+              <span className="admin-shell__divider" aria-hidden="true" />
 
-            <button className="admin-shell__icon-button admin-shell__icon-button--notification" type="button">
-              <ShellIcon icon="notifications" />
-              <span className="admin-shell__notification-dot" aria-hidden="true" />
-            </button>
+              <AdminNotificationsMenu locale={locale} viewAllHref="/admin/notifications" />
 
-            <button className="admin-shell__icon-button" type="button">
-              <ShellIcon icon="storefront" />
-            </button>
+              <a className="admin-shell__icon-button" href="mailto:ops@skboutiquehotel.vn">
+                <ShellIcon icon="support" />
+              </a>
 
             <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
               {localeLabel(localeToggle)}
@@ -413,11 +469,14 @@ export function AdminShell({ children, branches }: AdminShellProps) {
             <button className="admin-shell__avatar" type="button">
               AD
             </button>
-          </div>
-        </header>
+            </div>
+          </header>
 
-        <main className="admin-shell__content">{children}</main>
+          <main className="admin-shell__content">{children}</main>
+        </div>
       </div>
-    </div>
+      <AdminNotificationToastHost />
+      <AdminNotificationDialogHost />
+    </AdminNotificationProvider>
   );
 }

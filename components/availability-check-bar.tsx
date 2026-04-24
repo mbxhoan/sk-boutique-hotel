@@ -68,6 +68,21 @@ function parseDateInput(value?: string | null) {
   return Number.isNaN(parsed.getTime()) ? null : toStartOfDay(parsed);
 }
 
+function normalizeInitialRange(initialCheckin?: string, initialCheckout?: string) {
+  const today = toStartOfDay(new Date());
+  const parsedCheckin = parseDateInput(initialCheckin);
+  const parsedCheckout = parseDateInput(initialCheckout);
+  const checkin = parsedCheckin && !isBeforeDay(parsedCheckin, today) ? parsedCheckin : today;
+  const minimumCheckout = addDays(checkin, 1);
+  const checkout = parsedCheckout && parsedCheckout.getTime() > checkin.getTime() ? parsedCheckout : minimumCheckout;
+
+  return {
+    checkin,
+    checkout,
+    today
+  };
+}
+
 function formatStayDate(locale: Locale, date: Date) {
   if (locale === "en") {
     return new Intl.DateTimeFormat("en-US", {
@@ -198,6 +213,7 @@ function CalendarDay({
   currentMonth,
   day,
   locale,
+  minimumDate,
   onSelect,
   selectedEnd,
   selectedStart
@@ -205,11 +221,13 @@ function CalendarDay({
   currentMonth: number;
   day: Date;
   locale: Locale;
+  minimumDate: Date;
   onSelect: (day: Date) => void;
   selectedEnd: Date;
   selectedStart: Date;
 }) {
   const isInCurrentMonth = day.getMonth() === currentMonth;
+  const isDisabled = isBeforeDay(day, minimumDate);
   const isStart = isSameDay(day, selectedStart);
   const isEnd = isSameDay(day, selectedEnd);
   const isInRange = day > selectedStart && day < selectedEnd;
@@ -220,13 +238,15 @@ function CalendarDay({
       className={[
         "availability-calendar__day",
         isInCurrentMonth ? "" : "availability-calendar__day--muted",
+        isDisabled ? "availability-calendar__day--disabled" : "",
         isInRange ? "availability-calendar__day--range" : "",
         isStart ? "availability-calendar__day--start" : "",
         isEnd ? "availability-calendar__day--end" : "",
         isToday ? "availability-calendar__day--today" : ""
       ]
         .filter(Boolean)
-        .join(" ")}
+      .join(" ")}
+      disabled={isDisabled}
       onClick={() => onSelect(day)}
       type="button"
     >
@@ -250,10 +270,13 @@ export function AvailabilityCheckBar({
   const [activePanel, setActivePanel] = useState<"dates" | "guests" | null>(null);
   const [dateSelectionMode, setDateSelectionMode] = useState<"start" | "end">("start");
   const [monthOffset, setMonthOffset] = useState(0);
-  const [checkin, setCheckin] = useState(() => parseDateInput(initialCheckin) ?? toStartOfDay(new Date()));
-  const [checkout, setCheckout] = useState(() => parseDateInput(initialCheckout) ?? addDays(toStartOfDay(new Date()), 1));
+  const initialRange = normalizeInitialRange(initialCheckin, initialCheckout);
+  const [checkin, setCheckin] = useState(() => initialRange.checkin);
+  const [checkout, setCheckout] = useState(() => initialRange.checkout);
   const [adults, setAdults] = useState(() => Math.max(1, initialAdults));
   const [children, setChildren] = useState(() => Math.max(0, initialChildren));
+  const today = initialRange.today;
+  const minimumMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
@@ -306,6 +329,10 @@ export function AvailabilityCheckBar({
   const updateRange = (day: Date) => {
     const normalized = toStartOfDay(day);
 
+    if (isBeforeDay(normalized, today)) {
+      return;
+    }
+
     if (dateSelectionMode === "start" || normalized <= checkin) {
       setCheckin(normalized);
       setCheckout(addDays(normalized, 1));
@@ -326,6 +353,7 @@ export function AvailabilityCheckBar({
 
   const renderMonth = (month: Date, navigation: { next?: boolean; prev?: boolean }) => {
     const days = buildMonthMatrix(month);
+    const canNavigatePrev = month.getTime() > minimumMonth.getTime();
 
     return (
       <div className="availability-calendar__month">
@@ -333,6 +361,7 @@ export function AvailabilityCheckBar({
           {navigation.prev ? (
             <button
               className="availability-calendar__month-nav"
+              disabled={!canNavigatePrev}
               onClick={() => setMonthOffset((current) => current - 1)}
               type="button"
             >
@@ -366,16 +395,17 @@ export function AvailabilityCheckBar({
         <div className="availability-calendar__grid">
           {days.map((week) =>
             week.map((day) => (
-              <CalendarDay
-                currentMonth={month.getMonth()}
-                day={day}
-                key={day.toISOString()}
-                locale={locale}
-                onSelect={updateRange}
-                selectedEnd={checkout}
-                selectedStart={checkin}
-              />
-            ))
+                <CalendarDay
+                  currentMonth={month.getMonth()}
+                  day={day}
+                  key={day.toISOString()}
+                  locale={locale}
+                  minimumDate={today}
+                  onSelect={updateRange}
+                  selectedEnd={checkout}
+                  selectedStart={checkin}
+                />
+              ))
           )}
         </div>
       </div>

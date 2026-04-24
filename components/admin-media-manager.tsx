@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import type { Locale } from "@/lib/locale";
+import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { MediaAssetRowWithUrl, MediaCollectionRow } from "@/lib/supabase/queries/media";
@@ -12,6 +15,7 @@ import {
 type AdminMediaManagerProps = {
   assets: MediaAssetRowWithUrl[];
   collections: MediaCollectionRow[];
+  activeCollectionSlug?: string | null;
   locale: Locale;
 };
 
@@ -41,6 +45,17 @@ function formatBytes(value: number) {
   }
 
   return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+}
+
+function buildMediaHref(locale: Locale, collectionSlug: string | null) {
+  const params = new URLSearchParams();
+
+  if (collectionSlug && collectionSlug !== "all") {
+    params.set("collection", collectionSlug);
+  }
+
+  const query = params.toString();
+  return appendLocaleQuery(`/admin/media${query ? `?${query}` : ""}`, locale);
 }
 
 function NewCollectionForm({ locale }: { locale: Locale }) {
@@ -383,9 +398,19 @@ function NewAssetForm({
 export function AdminMediaManager({
   assets,
   collections,
+  activeCollectionSlug,
   locale
 }: AdminMediaManagerProps) {
   const groupedAssets = groupAssetsByCollectionSlug(assets);
+  const selectedCollection =
+    activeCollectionSlug && activeCollectionSlug !== "all"
+      ? collections.find((collection) => collection.slug === activeCollectionSlug) ?? null
+      : null;
+  const visibleCollections = selectedCollection ? [selectedCollection] : collections;
+  const collectionAssetCounts = collections.reduce<Record<string, number>>((accumulator, collection) => {
+    accumulator[collection.slug] = groupedAssets[collection.slug]?.length ?? 0;
+    return accumulator;
+  }, {});
 
   return (
     <div className="portal-content admin-media">
@@ -399,10 +424,53 @@ export function AdminMediaManager({
         title={{ en: "Collections & assets", vi: "Danh mục và ảnh" }}
       />
 
+      <div className="admin-media__tabs" role="tablist" aria-label={locale === "en" ? "Media folders" : "Thư mục media"}>
+        <Link
+          aria-current={!selectedCollection ? "page" : undefined}
+          className={`admin-media__tab${!selectedCollection ? " admin-media__tab--active" : ""}`}
+          href={buildMediaHref(locale, null)}
+        >
+          <span>{locale === "en" ? "All" : "Tất cả"}</span>
+          <span className="admin-media__tab-count">{assets.length}</span>
+        </Link>
+        {collections.map((collection) => {
+          const active = selectedCollection?.slug === collection.slug;
+
+          return (
+            <Link
+              aria-current={active ? "page" : undefined}
+              className={`admin-media__tab${active ? " admin-media__tab--active" : ""}`}
+              href={buildMediaHref(locale, collection.slug)}
+              key={collection.slug}
+            >
+              <span>{collection.slug}</span>
+              <span className="admin-media__tab-count">{collectionAssetCounts[collection.slug] ?? 0}</span>
+            </Link>
+          );
+        })}
+      </div>
+
+      <PortalCard className="admin-media__summary" tone="soft">
+        <div className="admin-media__summary-grid">
+          <div>
+            <p className="portal-panel__eyebrow">{locale === "en" ? "Current folder" : "Thư mục hiện tại"}</p>
+            <p className="portal-description">{selectedCollection ? selectedCollection.slug : locale === "en" ? "All media" : "Toàn bộ media"}</p>
+          </div>
+          <div>
+            <p className="portal-panel__eyebrow">{locale === "en" ? "Collections" : "Danh mục"}</p>
+            <p className="portal-description">{collections.length}</p>
+          </div>
+          <div>
+            <p className="portal-panel__eyebrow">{locale === "en" ? "Assets" : "Ảnh"}</p>
+            <p className="portal-description">{assets.length}</p>
+          </div>
+        </div>
+      </PortalCard>
+
       <NewCollectionForm locale={locale} />
 
       <div className="admin-media__collection-list">
-        {collections.map((collection) => {
+        {visibleCollections.map((collection) => {
           const collectionAssets = groupedAssets[collection.slug] ?? [];
 
           return (

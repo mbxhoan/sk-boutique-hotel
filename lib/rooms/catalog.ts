@@ -129,19 +129,15 @@ function buildAvailabilityLabel(availableRooms: number) {
 
 function buildPriceOptions(roomType: RoomTypeRow) {
   const price = roomType.manual_override_price ?? roomType.base_price;
-  const breakfastDelta = Math.round(price * 0.205);
   const flexibleCancelDelta = Math.round(price * 0.144);
 
   return {
     breakfast: [
       {
         delta: 0,
-        label: text("Không có bữa sáng", "No breakfast"),
+        label: text("Bao gồm bữa sáng", "Breakfast included"),
+        note: text("Đã bao gồm trong giá phòng", "Included in the room rate"),
         selected: true
-      },
-      {
-        delta: breakfastDelta,
-        label: text("Bao gồm bữa sáng", "Breakfast included")
       }
     ] satisfies RoomPriceOption[],
     cancellation: [

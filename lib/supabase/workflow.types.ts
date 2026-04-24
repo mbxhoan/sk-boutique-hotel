@@ -54,6 +54,7 @@ export type WorkflowPaymentRequest = PaymentRequestRow & {
   latest_proof_review_note: string | null;
   latest_proof_status: PaymentProofRow["status"] | null;
   latest_proof_uploaded_at: string | null;
+  latest_proof_url: string | null;
   payment_upload_path: string | null;
   qr_image_url: string;
   reservation_booking_code: string;

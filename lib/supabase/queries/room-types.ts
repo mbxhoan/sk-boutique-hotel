@@ -6,11 +6,14 @@ import {
 import type { CmsCollectionItem, CmsPageCopy } from "@/lib/mock/public-cms";
 import { buildRoomDetailHref } from "@/lib/room-routes";
 import { translate } from "@/lib/locale";
-import type { RoomTypeRow } from "@/lib/supabase/database.types";
+import type { RoomTypeInsert, RoomTypeRow } from "@/lib/supabase/database.types";
 import { formatAreaText, formatCurrencyText, text } from "@/lib/supabase/content";
 import { queryWithServiceFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 const roomCollectionTemplate = roomCollectionPageCopy;
+const roomTypeSelect =
+  "id, slug, code, name_vi, name_en, summary_vi, summary_en, description_vi, description_en, story_vi, story_en, highlights_vi, highlights_en, occupancy_adults, occupancy_children, size_sqm, bed_type, base_price, weekend_surcharge, manual_override_price, show_public_price, cover_image_path, seo_title_vi, seo_title_en, seo_description_vi, seo_description_en, is_active, sort_order, created_at, updated_at";
 
 function pickRoomDescription(roomType: RoomTypeRow) {
   return roomType.summary_vi || roomType.description_vi || roomType.story_vi;
@@ -260,17 +263,16 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
   };
 }
 
-export async function listRoomTypes() {
+export async function listRoomTypes(options: { includeInactive?: boolean } = {}) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("room_types")
-        .select(
-          "id, slug, code, name_vi, name_en, summary_vi, summary_en, description_vi, description_en, story_vi, story_en, highlights_vi, highlights_en, occupancy_adults, occupancy_children, size_sqm, bed_type, base_price, weekend_surcharge, manual_override_price, show_public_price, cover_image_path, seo_title_vi, seo_title_en, seo_description_vi, seo_description_en, is_active, sort_order, created_at, updated_at"
-        )
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true })
-        .order("name_vi", { ascending: true });
+      let query = client.from("room_types").select(roomTypeSelect);
+
+      if (!options.includeInactive) {
+        query = query.eq("is_active", true);
+      }
+
+      const { data, error } = await query.order("sort_order", { ascending: true }).order("name_vi", { ascending: true });
 
       if (error) {
         throw error;
@@ -287,9 +289,7 @@ async function getRoomTypeBySlug(slug: string) {
     async (client) => {
       const { data, error } = await client
         .from("room_types")
-        .select(
-          "id, slug, code, name_vi, name_en, summary_vi, summary_en, description_vi, description_en, story_vi, story_en, highlights_vi, highlights_en, occupancy_adults, occupancy_children, size_sqm, bed_type, base_price, weekend_surcharge, manual_override_price, show_public_price, cover_image_path, seo_title_vi, seo_title_en, seo_description_vi, seo_description_en, is_active, sort_order, created_at, updated_at"
-        )
+        .select(roomTypeSelect)
         .eq("slug", slug)
         .maybeSingle();
 
@@ -301,6 +301,17 @@ async function getRoomTypeBySlug(slug: string) {
     },
     null as RoomTypeRow | null
   );
+}
+
+export async function upsertRoomType(input: RoomTypeInsert) {
+  const client = createSupabaseServiceClient();
+  const { data, error } = await client.from("room_types").upsert(input, { onConflict: "id" }).select(roomTypeSelect).single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as RoomTypeRow;
 }
 
 export async function loadRoomCollectionPageCopy() {
