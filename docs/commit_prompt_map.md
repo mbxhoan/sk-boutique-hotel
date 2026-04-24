@@ -1317,3 +1317,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `lib/supabase/queries/customers.ts`
   - `docs/commit_prompt_map.md`
+
+### Entry 117
+- `time`: 2026-04-24T12:08:00+07:00
+- `prompt_summary`: Bấm xác nhận thanh toán cọc bị lỗi màn hình 500 do Missing file field: proofFile khi người dùng không chọn ảnh hóa đơn.
+- `commit_message`: `fix(payments): gracefully handle missing payment proof file and form validation errors`
+- `main_files`:
+  - `app/actions/payments.ts`
+  - `docs/commit_prompt_map.md`

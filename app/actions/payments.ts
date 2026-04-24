@@ -106,33 +106,39 @@ function readRequiredNumber(formData: FormData, key: string) {
 }
 
 export async function submitPaymentProofAction(formData: FormData) {
-  const token = readOptionalString(formData, "paymentToken");
-  const paymentRequestId = readOptionalString(formData, "paymentRequestId");
-  const proofFile = readRequiredFile(formData, "proofFile");
-  const note = readOptionalString(formData, "note") ?? "";
   const returnTo = readReturnTo(formData);
-  const uploadedVia = readOptionalString(formData, "uploadedVia") ?? (token ? "public_link" : "member_portal");
-
-  if (!token && !paymentRequestId) {
-    throw new Error("Missing payment token or payment request id.");
-  }
-
-  if (paymentRequestId) {
-    const user = await getSupabaseUser();
-    const customer = user ? await getCustomerByAuthUserId(user.id) : null;
-
-    if (!customer) {
-      throw new Error("Member profile is required to upload payment proof.");
-    }
-
-    const paymentRequest = await getPaymentRequestById(paymentRequestId);
-
-    if (!paymentRequest || paymentRequest.customer_id !== customer.id) {
-      throw new Error("Payment request does not belong to the current member.");
-    }
-  }
 
   try {
+    const token = readOptionalString(formData, "paymentToken");
+    const paymentRequestId = readOptionalString(formData, "paymentRequestId");
+    const note = readOptionalString(formData, "note") ?? "";
+    const uploadedVia = readOptionalString(formData, "uploadedVia") ?? (token ? "public_link" : "member_portal");
+
+    const proofFileRaw = formData.get("proofFile");
+    if (!(proofFileRaw instanceof File) || proofFileRaw.size <= 0) {
+      throw new Error("Please select a valid payment proof file.");
+    }
+    const proofFile = proofFileRaw;
+
+    if (!token && !paymentRequestId) {
+      throw new Error("Missing payment token or payment request id.");
+    }
+
+    if (paymentRequestId) {
+      const user = await getSupabaseUser();
+      const customer = user ? await getCustomerByAuthUserId(user.id) : null;
+
+      if (!customer) {
+        throw new Error("Member profile is required to upload payment proof.");
+      }
+
+      const paymentRequest = await getPaymentRequestById(paymentRequestId);
+
+      if (!paymentRequest || paymentRequest.customer_id !== customer.id) {
+        throw new Error("Payment request does not belong to the current member.");
+      }
+    }
+
     await uploadPaymentProof({
       note,
       paymentRequestId: paymentRequestId ?? undefined,
@@ -154,12 +160,14 @@ export async function submitPaymentProofAction(formData: FormData) {
 }
 
 export async function verifyPaymentRequestAction(formData: FormData) {
-  const user = await getSupabaseUser().catch(() => null);
-  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
   const returnTo = readReturnTo(formData);
-  const status = readRequiredString(formData, "status") as "verified" | "rejected";
+  let status: "verified" | "rejected" | null = null;
 
   try {
+    const user = await getSupabaseUser().catch(() => null);
+    const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+    status = readRequiredString(formData, "status") as "verified" | "rejected";
+
     await verifyPaymentRequest({
       actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
       actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
