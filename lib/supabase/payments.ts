@@ -12,6 +12,7 @@ import type {
 } from "@/lib/supabase/database.types";
 import { getPaymentUploadTokenSecret, hasPaymentUploadTokenSecret } from "@/lib/supabase/env";
 import { logAuditEvent } from "@/lib/supabase/audit";
+import { toError } from "@/lib/supabase/errors";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { listCustomersByIds } from "@/lib/supabase/queries/customers";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
@@ -183,6 +184,10 @@ export async function getPaymentRequestByPublicToken(token: string) {
     return null;
   }
 
+  if (!["sent", "pending_verification"].includes(paymentRequest.status)) {
+    return null;
+  }
+
   if (paymentRequest.public_upload_link_expires_at && new Date(paymentRequest.public_upload_link_expires_at).getTime() < Date.now()) {
     return null;
   }
@@ -214,11 +219,15 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
     .maybeSingle();
 
   if (reservationError) {
-    throw reservationError;
+    throw toError(reservationError, "Unable to load booking for payment.");
   }
 
   if (!reservation) {
     throw new Error("Reservation not found for payment request.");
+  }
+
+  if (["cancelled", "completed", "expired"].includes(reservation.status)) {
+    throw new Error("This booking can no longer issue a deposit QR.");
   }
 
   const bankAccountQuery = input.branchBankAccountId
@@ -240,7 +249,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
   const { data: bankAccount, error: bankAccountError } = await bankAccountQuery;
 
   if (bankAccountError) {
-    throw bankAccountError;
+    throw toError(bankAccountError, "Unable to load branch bank account.");
   }
 
   if (!bankAccount) {
@@ -252,7 +261,35 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
   }
 
   const amount = normalizeAmount(input.amount);
+  const uploadLinkExpiresAt = reservation.expires_at ?? new Date(Date.now() + 30 * 60 * 1000).toISOString();
   const transferContent = reservation.booking_code;
+  const { error: cancelActiveRequestError } = await supabase
+    .from("payment_requests")
+    .update({
+      rejected_reason: "",
+      status: "cancelled",
+      updated_by: input.createdBy ?? null
+    })
+    .eq("reservation_id", reservation.id)
+    .in("status", ["sent", "pending_verification"]);
+
+  if (cancelActiveRequestError) {
+    throw toError(cancelActiveRequestError, "Unable to retire the previous deposit QR.");
+  }
+
+  const { error: reservationUpdateError } = await supabase
+    .from("reservations")
+    .update({
+      deposit_amount: amount,
+      status: reservation.status === "draft" ? "pending_deposit" : reservation.status,
+      updated_by: input.createdBy ?? null
+    })
+    .eq("id", reservation.id);
+
+  if (reservationUpdateError) {
+    throw toError(reservationUpdateError, "Unable to update booking deposit amount.");
+  }
+
   const { data, error } = await supabase
     .from("payment_requests")
     .insert({
@@ -272,7 +309,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
       customer_id: reservation.customer_id,
       note: input.note ?? "",
       proof_uploaded_at: null,
-      public_upload_link_expires_at: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+      public_upload_link_expires_at: uploadLinkExpiresAt,
       rejected_at: null,
       rejected_reason: "",
       reservation_id: reservation.id,
@@ -288,7 +325,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
     .single();
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to create deposit QR.");
   }
 
   await logAuditEvent({
@@ -330,7 +367,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
         paymentAccountName: bankAccount.account_name,
         paymentAccountNumber: bankAccount.account_number,
         paymentBankName: bankAccount.bank_name,
-        paymentDeadline: formatEmailDate(new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString()),
+        paymentDeadline: formatEmailDate(uploadLinkExpiresAt),
         paymentQrUrl: buildVietQrImageUrl({
           account_name: bankAccount.account_name,
           account_number: bankAccount.account_number,
@@ -369,7 +406,7 @@ export async function uploadPaymentProof(input: UploadPaymentProofInput) {
       .maybeSingle();
 
     if (error) {
-      throw error;
+      throw toError(error, "Unable to load payment request.");
     }
 
     paymentRequest = data ?? null;
@@ -381,6 +418,10 @@ export async function uploadPaymentProof(input: UploadPaymentProofInput) {
     throw new Error("Payment request not found.");
   }
 
+  if (!["sent", "pending_verification"].includes(paymentRequest.status)) {
+    throw new Error("This payment request is no longer accepting proof uploads.");
+  }
+
   const fileName = input.proofFile.name || "payment-proof";
   const filePath = `${paymentRequest.payment_code}/${Date.now()}-${randomUUID()}${extname(fileName).toLowerCase()}`;
   const uploadResult = await supabase.storage.from("payment-proofs").upload(filePath, input.proofFile, {
@@ -390,7 +431,7 @@ export async function uploadPaymentProof(input: UploadPaymentProofInput) {
   });
 
   if (uploadResult.error) {
-    throw uploadResult.error;
+    throw toError(uploadResult.error, "Unable to upload payment proof.");
   }
 
   const { data: proof, error: proofError } = await supabase
@@ -417,7 +458,7 @@ export async function uploadPaymentProof(input: UploadPaymentProofInput) {
     .single();
 
   if (proofError) {
-    throw proofError;
+    throw toError(proofError, "Unable to save payment proof.");
   }
 
   await logAuditEvent({
@@ -444,7 +485,7 @@ export async function uploadPaymentProof(input: UploadPaymentProofInput) {
     .maybeSingle();
 
   if (requestError) {
-    throw requestError;
+    throw toError(requestError, "Unable to refresh payment request.");
   }
 
   return {
@@ -464,11 +505,15 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
     .maybeSingle();
 
   if (requestError) {
-    throw requestError;
+    throw toError(requestError, "Unable to load payment request.");
   }
 
   if (!paymentRequest) {
     throw new Error("Payment request not found.");
+  }
+
+  if (!["sent", "pending_verification"].includes(paymentRequest.status)) {
+    throw new Error("This payment request can no longer be verified.");
   }
 
   const { data: latestProof, error: proofError } = await supabase
@@ -480,7 +525,7 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
     .maybeSingle();
 
   if (proofError) {
-    throw proofError;
+    throw toError(proofError, "Unable to load the latest payment proof.");
   }
 
   const reviewedAt = new Date().toISOString();
@@ -499,7 +544,7 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
       .eq("id", latestProof.id);
 
     if (error) {
-      throw error;
+      throw toError(error, "Unable to review payment proof.");
     }
   }
 
@@ -519,21 +564,38 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
   const { error: updateError } = await supabase.from("payment_requests").update(requestPatch).eq("id", paymentRequest.id);
 
   if (updateError) {
-    throw updateError;
+    throw toError(updateError, "Unable to update payment request.");
   }
 
   if (input.status === "verified") {
+    const { error: cancelOtherRequestsError } = await supabase
+      .from("payment_requests")
+      .update({
+        rejected_reason: "",
+        status: "cancelled",
+        updated_by: input.actorUserId ?? paymentRequest.updated_by
+      })
+      .eq("reservation_id", paymentRequest.reservation_id)
+      .neq("id", paymentRequest.id)
+      .in("status", ["sent", "pending_verification"]);
+
+    if (cancelOtherRequestsError) {
+      throw toError(cancelOtherRequestsError, "Unable to retire the previous deposit QR.");
+    }
+
     const { error: reservationError } = await supabase
       .from("reservations")
       .update({
         confirmed_at: reviewedAt,
+        deposit_amount: paymentRequest.amount,
+        expires_at: null,
         status: "confirmed",
         updated_by: input.actorUserId ?? paymentRequest.updated_by
       })
       .eq("id", paymentRequest.reservation_id);
 
     if (reservationError) {
-      throw reservationError;
+      throw toError(reservationError, "Unable to confirm booking after deposit verification.");
     }
   }
 
@@ -545,7 +607,7 @@ export async function verifyPaymentRequest(input: VerifyPaymentRequestInput) {
       .maybeSingle();
 
     if (reservationLookupError) {
-      throw reservationLookupError;
+      throw toError(reservationLookupError, "Unable to reload booking confirmation data.");
     }
 
     const [branchRows, roomTypeRows, customerRows] = await Promise.all([

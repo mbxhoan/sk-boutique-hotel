@@ -7,8 +7,11 @@ import type {
   RoomRow
 } from "@/lib/supabase/database.types";
 import { logAuditEvent } from "@/lib/supabase/audit";
+import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
+import { toError } from "@/lib/supabase/errors";
 import { getCustomerByEmail } from "@/lib/supabase/queries/customers";
+import { listReservations } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { createPaymentRequest } from "@/lib/supabase/payments";
 import { sendAvailabilityRequestEmails } from "@/lib/supabase/email";
@@ -61,6 +64,7 @@ export type CreateReservationInput = {
   manualOverridePrice?: number | null;
   nightlyRate?: number;
   notes?: string;
+  expiresAt?: string | null;
   primaryRoomTypeId: string;
   roomId: string;
   status?: ReservationStatus;
@@ -82,8 +86,11 @@ export type ConfirmAvailabilityRequestInput = {
   actorRole?: string | null;
   actorUserId?: string | null;
   availabilityRequestId: string;
-  depositAmount: number;
+  branchBankAccountId?: string | null;
+  depositAmount?: number | null;
+  depositPercent?: number | null;
   guestCount?: number;
+  expiresAt?: string | null;
   notes?: string;
   roomId: string;
   roomTypeId: string;
@@ -230,6 +237,22 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
     throw new Error("Availability request not found.");
   }
 
+  if (["closed", "rejected", "expired"].includes(request.status)) {
+    throw new Error("This booking request can no longer be confirmed.");
+  }
+
+  const existingReservations = await listReservations({
+    availabilityRequestId: request.id,
+    limit: 10
+  });
+  const activeReservation = existingReservations.find((reservation) =>
+    ["draft", "pending_deposit", "confirmed"].includes(reservation.status)
+  );
+
+  if (activeReservation) {
+    throw new Error("This booking request already has an active reservation.");
+  }
+
   const { data: roomType, error: roomTypeError } = await supabase
     .from("room_types")
     .select("id, base_price, manual_override_price, weekend_surcharge")
@@ -268,7 +291,11 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
   const totalAmount =
     normalizeQuotedAmount(request.quoted_total_amount) ??
     Number((nightlyRate * nights + roomType.weekend_surcharge).toFixed(2));
-  const depositAmount = Math.max(0, Number.isFinite(input.depositAmount) ? input.depositAmount : 0);
+  const depositAmount = calculateDepositAmount({
+    depositAmount: input.depositAmount,
+    depositPercent: input.depositPercent,
+    totalAmount
+  });
   const guestCount = Math.max(1, Number.isFinite(input.guestCount ?? request.guest_count) ? Number(input.guestCount ?? request.guest_count) : 1);
   const notes = input.notes?.trim() || request.note || "";
   const now = new Date().toISOString();
@@ -308,6 +335,7 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
     manualOverridePrice: roomType.manual_override_price,
     nightlyRate,
     notes,
+    expiresAt: input.expiresAt ?? request.response_due_at ?? null,
     primaryRoomTypeId: input.roomTypeId,
     roomId: input.roomId,
     status: "pending_deposit",
@@ -319,6 +347,7 @@ export async function confirmAvailabilityRequest(input: ConfirmAvailabilityReque
 
   const paymentRequest = await createPaymentRequest({
     amount: depositAmount || totalAmount,
+    branchBankAccountId: input.branchBankAccountId ?? null,
     createdBy: input.actorUserId ?? null,
     note: notes,
     reservationId: reservation.id,
@@ -447,7 +476,7 @@ export async function holdRoom(input: HoldRoomInput) {
   });
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to create room hold.");
   }
 
   return data as RoomHoldRow;
@@ -467,6 +496,7 @@ export async function createReservation(input: CreateReservationInput) {
     p_hold_id: input.holdId ?? null,
     p_manual_override_price: input.manualOverridePrice ?? null,
     p_metadata: {},
+    p_expires_at: input.expiresAt ? normalizeTimestamptzInput(input.expiresAt) : null,
     p_nightly_rate: input.nightlyRate ?? 0,
     p_notes: input.notes ?? "",
     p_primary_room_type_id: input.primaryRoomTypeId,
@@ -479,7 +509,7 @@ export async function createReservation(input: CreateReservationInput) {
   });
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to create booking.");
   }
 
   return data as ReservationRow;
@@ -496,7 +526,7 @@ export async function releaseExpiredHolds(input: ReleaseExpiredHoldsInput = {}) 
   });
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to release expired holds.");
   }
 
   return (data ?? []) as ReleasedHoldRow[];
@@ -513,7 +543,7 @@ export async function releaseExpiredReservations(input: ReleaseExpiredReservatio
   });
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to release expired bookings.");
   }
 
   return (data ?? []) as ReleasedReservationRow[];

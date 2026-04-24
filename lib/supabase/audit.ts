@@ -1,4 +1,5 @@
 import type { AuditLogRow, Json } from "@/lib/supabase/database.types";
+import { toError } from "@/lib/supabase/errors";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type LogAuditEventInput = {
@@ -36,7 +37,7 @@ export async function logAuditEvent(input: LogAuditEventInput) {
   });
 
   if (error) {
-    throw error;
+    throw toError(error, "Unable to write audit log.");
   }
 
   return data as AuditLogRow;

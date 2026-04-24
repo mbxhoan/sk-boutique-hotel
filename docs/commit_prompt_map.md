@@ -1259,3 +1259,33 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-booking-detail-page.tsx`
   - `components/admin-dashboard.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 112
+- `time`: 2026-04-24T08:54:17+07:00
+- `prompt_summary`: Refactor lại toàn bộ flow quản lý xác nhận booking trong admin detail: chốt request thành booking chờ cọc với mặc định cọc 20%, tạo và phát hành lại QR cọc theo % hoặc số tiền mới, countdown 30 phút đồng bộ với booking/payment, xác nhận cọc thủ công để tính số tiền còn lại, và thêm thao tác hủy hoặc hoàn tất booking với audit rõ ràng.
+- `commit_message`: `refactor(booking-confirmation): rebuild admin deposit and lifecycle flow`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `lib/supabase/booking-finance.ts`
+  - `lib/supabase/booking-lifecycle.ts`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/workflows.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 113
+- `time`: 2026-04-24T09:29:12+07:00
+- `prompt_summary`: Sửa lỗi runtime khi admin bấm chốt booking ở trang chi tiết, làm lại giao diện booking detail theo mockup, và triển khai luôn UI/UX + flow notifications trong admin shell và trang danh sách thông báo.
+- `commit_message`: `feat(admin-ops): rebuild booking detail and notifications flow`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/layout.tsx`
+  - `app/(admin)/admin/notifications/page.tsx`
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-notifications-center.tsx`
+  - `components/admin-shell.tsx`
+  - `lib/supabase/queries/admin-notifications.ts`
+  - `docs/commit_prompt_map.md`

@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
+import { getErrorMessage } from "@/lib/supabase/errors";
 import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
 import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { createPaymentRequest, uploadPaymentProof, verifyPaymentRequest } from "@/lib/supabase/payments";
@@ -57,31 +59,40 @@ function readRequiredFile(formData: FormData, key: string) {
 }
 
 function readReturnTo(formData: FormData) {
-  const returnTo = readOptionalString(formData, "returnTo");
+  return readSafeReturnTo(readOptionalString(formData, "returnTo"));
+}
 
+function redirectWithActionResult(returnTo: string | null, kind: "error" | "success", message: string) {
   if (!returnTo) {
-    return null;
+    return;
   }
 
-  return returnTo.startsWith("/") ? returnTo : null;
+  redirect(buildActionResultHref(returnTo, { kind, message }));
 }
 
 export async function createPaymentRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const returnTo = readReturnTo(formData);
 
-  await createPaymentRequest({
-    actorRole: actorRole ?? "staff",
-    amount: readRequiredNumber(formData, "amount"),
-    branchBankAccountId: readOptionalString(formData, "branchBankAccountId"),
-    createdBy: user?.id ?? readOptionalString(formData, "createdBy"),
-    note: readOptionalString(formData, "note") ?? "",
-    reservationId: readRequiredString(formData, "reservationId"),
-    source: readOptionalString(formData, "source") ?? "admin_console"
-  });
+  try {
+    await createPaymentRequest({
+      actorRole: actorRole ?? "staff",
+      amount: readRequiredNumber(formData, "amount"),
+      branchBankAccountId: readOptionalString(formData, "branchBankAccountId"),
+      createdBy: user?.id ?? readOptionalString(formData, "createdBy"),
+      note: readOptionalString(formData, "note") ?? "",
+      reservationId: readRequiredString(formData, "reservationId"),
+      source: readOptionalString(formData, "source") ?? "admin_console"
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to create payment request."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", "Payment request created.");
 }
 
 function readRequiredNumber(formData: FormData, key: string) {
@@ -121,34 +132,55 @@ export async function submitPaymentProofAction(formData: FormData) {
     }
   }
 
-  await uploadPaymentProof({
-    note,
-    paymentRequestId: paymentRequestId ?? undefined,
-    paymentToken: token ?? undefined,
-    proofFile,
-    uploadedVia
-  });
+  try {
+    await uploadPaymentProof({
+      note,
+      paymentRequestId: paymentRequestId ?? undefined,
+      paymentToken: token ?? undefined,
+      proofFile,
+      uploadedVia
+    });
+  } catch (error) {
+    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to upload payment proof."));
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
 
   if (returnTo) {
-    redirect(returnTo);
+    redirect(buildActionResultHref(returnTo, { kind: "success", message: "Payment proof uploaded." }));
   }
 }
 
 export async function verifyPaymentRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const returnTo = readReturnTo(formData);
+  const status = readRequiredString(formData, "status") as "verified" | "rejected";
 
-  await verifyPaymentRequest({
-    actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
-    actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
-    paymentRequestId: readRequiredString(formData, "paymentRequestId"),
-    reviewNote: readOptionalString(formData, "reviewNote") ?? "",
-    status: (readRequiredString(formData, "status") as "verified" | "rejected")
-  });
+  try {
+    await verifyPaymentRequest({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+      paymentRequestId: readRequiredString(formData, "paymentRequestId"),
+      reviewNote: readOptionalString(formData, "reviewNote") ?? "",
+      status
+    });
+  } catch (error) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      getErrorMessage(error, status === "verified" ? "Unable to confirm deposit." : "Unable to reject payment proof.")
+    );
+    throw error;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/member");
+  redirectWithActionResult(
+    returnTo,
+    "success",
+    status === "verified" ? "Deposit confirmed successfully." : "Payment proof rejected."
+  );
 }

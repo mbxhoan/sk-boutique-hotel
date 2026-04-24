@@ -4,14 +4,17 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { AdminNotificationsMenu } from "@/components/admin-notifications-center";
 import { LogoMark } from "@/components/logo-mark";
 import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
+import type { AdminNotificationItem } from "@/lib/supabase/queries/admin-notifications";
 import type { BranchRow } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AdminShellProps = {
   children: ReactNode;
   branches: Pick<BranchRow, "id" | "name_en" | "name_vi" | "slug">[];
+  notifications: AdminNotificationItem[];
 };
 
 type AdminNavItem = {
@@ -273,7 +276,7 @@ function buildBranchHref(
   return appendLocaleQuery(`${pathname}${query ? `?${query}` : ""}`, locale);
 }
 
-export function AdminShell({ children, branches }: AdminShellProps) {
+export function AdminShell({ children, branches, notifications }: AdminShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -397,14 +400,11 @@ export function AdminShell({ children, branches }: AdminShellProps) {
 
             <span className="admin-shell__divider" aria-hidden="true" />
 
-            <button className="admin-shell__icon-button admin-shell__icon-button--notification" type="button">
-              <ShellIcon icon="notifications" />
-              <span className="admin-shell__notification-dot" aria-hidden="true" />
-            </button>
+            <AdminNotificationsMenu items={notifications} locale={locale} viewAllHref="/admin/notifications" />
 
-            <button className="admin-shell__icon-button" type="button">
-              <ShellIcon icon="storefront" />
-            </button>
+            <a className="admin-shell__icon-button" href="mailto:ops@skboutiquehotel.vn">
+              <ShellIcon icon="support" />
+            </a>
 
             <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
               {localeLabel(localeToggle)}
