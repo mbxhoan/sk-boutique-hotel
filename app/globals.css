@@ -2112,7 +2112,7 @@ textarea {
 }
 
 .portal-section-heading__title-row {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   gap: 0.65rem;
   flex-wrap: wrap;

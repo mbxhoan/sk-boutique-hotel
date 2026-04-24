@@ -33,13 +33,13 @@ Mở `http://localhost:3000`.
 ## Cấu trúc trang
 
 - `/` - Marketing home shell
-- `/thuong-hieu` - Thương hiệu
+<!-- - `/thuong-hieu` - Thương hiệu -->
 - `/rooms` - Chọn phòng / danh sách phòng
 - `/about-us` - Về chúng tôi
 - `/chi-nhanh` - Legacy redirect từ slug cũ
 - `/lien-he` - Liên hệ
-- `/tuyen-dung` - Tuyển dụng
-- `/ho-tro` - Hỗ trợ
+<!-- - `/tuyen-dung` - Tuyển dụng -->
+<!-- - `/ho-tro` - Hỗ trợ -->
 - `/member` - Member area shell
 - `/admin` - Admin area shell
 
