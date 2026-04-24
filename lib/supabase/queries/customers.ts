@@ -17,7 +17,7 @@ export type CustomerProfileInput = {
 };
 
 export async function getCustomerByAuthUserId(authUserId: string) {
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("customers")
@@ -44,7 +44,7 @@ export async function getCustomerByEmail(email: string) {
     return null as CustomerRow | null;
   }
 
-  return queryWithFallback(
+  return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client
         .from("customers")

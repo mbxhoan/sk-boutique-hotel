@@ -12,6 +12,7 @@ import {
   updateReservationLifecycleAction
 } from "@/app/(admin)/admin/actions";
 import { verifyPaymentRequestAction } from "@/app/actions/payments";
+import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import { AdminBookingDetailToolbar } from "@/components/admin-booking-detail-toolbar";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
@@ -643,6 +644,15 @@ function DepositCard({
   returnTo: string;
 }) {
   const reservation = detail.reservation;
+  const [depositPercent, setDepositPercent] = useState(detail.financial_summary.default_deposit_percentage);
+  const depositAmount = useMemo(
+    () => calculateDepositAmount({
+      depositPercent,
+      totalAmount: detail.financial_summary.total_amount
+    }),
+    [depositPercent, detail.financial_summary.total_amount]
+  );
+  const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.default_deposit_percentage;
 
   if (!reservation) {
     return null;
@@ -665,16 +675,29 @@ function DepositCard({
         <div className="portal-grid portal-grid--two">
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Deposit %" : "% cọc"}</span>
-            <input className="portal-field__control" defaultValue={detail.financial_summary.default_deposit_percentage} min={0} name="depositPercent" type="number" />
+            <input
+              className="portal-field__control"
+              min={0}
+              name="depositPercent"
+              step={1}
+              type="number"
+              value={depositPercent}
+              onChange={(event) => {
+                const rawValue = event.currentTarget.value;
+                const nextValue = rawValue === "" ? 0 : Number(rawValue);
+                setDepositPercent(Number.isFinite(nextValue) ? nextValue : 0);
+              }}
+            />
           </label>
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Deposit amount" : "Số tiền cọc"}</span>
             <input
               className="portal-field__control"
-              defaultValue={activePaymentRequest?.amount ?? detail.financial_summary.requested_deposit_amount}
               min={0}
               name="depositAmount"
+              readOnly
               type="number"
+              value={depositAmount}
             />
           </label>
         </div>
@@ -703,7 +726,7 @@ function DepositCard({
           {activePaymentRequest ? <PaymentRequestActions locale={locale} paymentRequest={activePaymentRequest} returnTo={returnTo} /> : null}
         </div>
 
-        <button className="button button--text-light" type="submit">
+        <button className={`button button--text-light ${shouldHighlightRegenerate ? "admin-booking-detail__button--attention" : ""}`} type="submit">
           {activePaymentRequest ? (locale === "en" ? "Regenerate QR" : "Tạo lại mã QR") : locale === "en" ? "Issue QR" : "Tạo mã QR"}
         </button>
       </form>

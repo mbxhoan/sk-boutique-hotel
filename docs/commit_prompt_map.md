@@ -1301,3 +1301,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-shell.tsx`
   - `app/(admin)/admin/notifications/page.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 115
+- `time`: 2026-04-24T11:32:00+07:00
+- `prompt_summary`: Không auto popup cửa sổ thông báo ở giữa màn hình mà chỉ hiện toast ở góc, khi nào click vào toast thì mới hiện popup.
+- `commit_message`: `fix(admin-notifications): disable auto-popup for flash notifications`
+- `main_files`:
+  - `components/admin-notifications-center.tsx`
+  - `docs/commit_prompt_map.md`
+
+### Entry 116
+- `time`: 2026-04-24T11:44:00+07:00
+- `prompt_summary`: Sửa lỗi member portal không hiển thị reservation và payment request do lỗi query customer lookup bằng anonymous read client bị chặn bởi RLS. Chuyển sang dùng service role fallback.
+- `commit_message`: `fix(member-portal): bypass RLS during customer resolution to fetch reservations`
+- `main_files`:
+  - `lib/supabase/queries/customers.ts`
+  - `docs/commit_prompt_map.md`

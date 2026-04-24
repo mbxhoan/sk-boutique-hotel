@@ -171,6 +171,10 @@ function sortNotifications(items: AdminNotificationItem[]) {
   });
 }
 
+function shouldOpenNotificationDialog(item: AdminNotificationItem) {
+  return item.icon === "system" || item.tone === "danger";
+}
+
 function mergeNotifications(serverItems: AdminNotificationItem[], localItems: AdminNotificationItem[]) {
   const merged = new Map<string, AdminNotificationItem>();
 
@@ -281,7 +285,6 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
       return next.slice(0, maxStoredNotifications);
     });
     setToasts((current) => [flashItem, ...current.filter((item) => item.id !== flashItem.id)].slice(0, maxToastCount));
-    setSelectedNotification(flashItem);
 
     router.replace(cleanHref);
   }, [locale, pathname, router, searchParams]);
@@ -326,7 +329,13 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
 
   function openNotification(item: AdminNotificationItem) {
     markAsRead(item.id);
-    setSelectedNotification(item);
+
+    if (shouldOpenNotificationDialog(item)) {
+      setSelectedNotification(item);
+      return;
+    }
+
+    router.push(appendLocaleQuery(item.href, locale));
   }
 
   function closeNotification() {
