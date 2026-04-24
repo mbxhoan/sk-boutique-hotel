@@ -20,6 +20,7 @@ type AdminNotificationsPageSectionProps = {
 };
 
 type AdminNotificationCenterValue = {
+  addFlash: (status: "success" | "error", message: string) => void;
   closeNotification: () => void;
   dismissToast: (id: string) => void;
   isRead: (id: string) => boolean;
@@ -224,14 +225,11 @@ function buildCleanHref(pathname: string, searchParams: URLSearchParams) {
 
 function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotificationItem[]) {
   const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [readIds, setReadIds] = useState<string[]>([]);
   const [localItems, setLocalItems] = useState<AdminNotificationItem[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<AdminNotificationItem | null>(null);
   const [toasts, setToasts] = useState<AdminNotificationItem[]>([]);
   const hasLoadedRef = useRef(false);
-  const handledFlashRef = useRef<string | null>(null);
 
   useEffect(() => {
     setReadIds(readStoredNotificationIds());
@@ -255,29 +253,11 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
     persistLocalNotifications(localItems.slice(0, maxStoredNotifications));
   }, [localItems]);
 
-  useEffect(() => {
-    const actionStatus = searchParams.get("actionStatus");
-    const actionMessage = searchParams.get("actionMessage");
-
-    if (!actionStatus || !actionMessage) {
-      handledFlashRef.current = null;
-      return;
-    }
-
-    const flashStatus = actionStatus === "success" ? "success" : "error";
-    const flashSignature = `${pathname}|${flashStatus}|${actionMessage}`;
-
-    if (handledFlashRef.current === flashSignature) {
-      return;
-    }
-
-    handledFlashRef.current = flashSignature;
-
-    const cleanHref = buildCleanHref(pathname, new URLSearchParams(searchParams.toString()));
+  function addFlash(status: "success" | "error", message: string) {
     const flashItem = createFlashNotification({
-      href: cleanHref,
-      message: actionMessage,
-      status: flashStatus
+      href: pathname,
+      message,
+      status
     });
 
     setLocalItems((current) => {
@@ -285,9 +265,7 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
       return next.slice(0, maxStoredNotifications);
     });
     setToasts((current) => [flashItem, ...current.filter((item) => item.id !== flashItem.id)].slice(0, maxToastCount));
-
-    router.replace(cleanHref);
-  }, [locale, pathname, router, searchParams]);
+  }
 
   useEffect(() => {
     if (!toasts.length) {
@@ -347,6 +325,7 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
   }
 
   return {
+    addFlash,
     closeNotification,
     dismissToast,
     isRead,
@@ -357,6 +336,38 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
     selectedNotification,
     toasts
   } satisfies AdminNotificationCenterValue;
+}
+
+function FlashHandler({ onFlash }: { onFlash: (status: "success" | "error", message: string) => void }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const handledFlashRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const actionStatus = searchParams.get("actionStatus");
+    const actionMessage = searchParams.get("actionMessage");
+
+    if (!actionStatus || !actionMessage) {
+      handledFlashRef.current = null;
+      return;
+    }
+
+    const flashStatus = actionStatus === "success" ? "success" : "error";
+    const flashSignature = `${pathname}|${flashStatus}|${actionMessage}`;
+
+    if (handledFlashRef.current === flashSignature) {
+      return;
+    }
+
+    handledFlashRef.current = flashSignature;
+    onFlash(flashStatus, actionMessage);
+
+    const cleanHref = buildCleanHref(pathname, new URLSearchParams(searchParams.toString()));
+    router.replace(cleanHref);
+  }, [onFlash, pathname, router, searchParams]);
+
+  return null;
 }
 
 export function AdminNotificationProvider({
@@ -370,7 +381,14 @@ export function AdminNotificationProvider({
 }) {
   const value = useAdminNotificationCenterState(locale, serverItems);
 
-  return <AdminNotificationCenterContext.Provider value={value}>{children}</AdminNotificationCenterContext.Provider>;
+  return (
+    <AdminNotificationCenterContext.Provider value={value}>
+      <Suspense fallback={null}>
+        <FlashHandler onFlash={value.addFlash} />
+      </Suspense>
+      {children}
+    </AdminNotificationCenterContext.Provider>
+  );
 }
 
 export function useAdminNotificationCenter() {

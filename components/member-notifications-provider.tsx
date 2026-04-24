@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -18,6 +18,7 @@ type MemberNotificationItem = {
 };
 
 type MemberNotificationContextValue = {
+  addToast: (status: string, message: string) => void;
   dismissToast: (id: string) => void;
   toasts: MemberNotificationItem[];
 };
@@ -45,11 +46,10 @@ function createFlashNotification(status: string, message: string): MemberNotific
   };
 }
 
-export function MemberNotificationProvider({ children, locale }: { children: ReactNode; locale: Locale }) {
+function FlashHandler({ onFlash }: { onFlash: (status: string, message: string) => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [toasts, setToasts] = useState<MemberNotificationItem[]>([]);
   const handledFlashRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -68,9 +68,7 @@ export function MemberNotificationProvider({ children, locale }: { children: Rea
     }
 
     handledFlashRef.current = flashSignature;
-
-    const flashItem = createFlashNotification(actionStatus, actionMessage);
-    setToasts((current) => [flashItem, ...current].slice(0, 3));
+    onFlash(actionStatus, actionMessage);
 
     // Clean URL
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -79,7 +77,13 @@ export function MemberNotificationProvider({ children, locale }: { children: Rea
     const query = nextParams.toString();
     const cleanHref = `${pathname}${query ? `?${query}` : ""}`;
     router.replace(cleanHref);
-  }, [pathname, router, searchParams]);
+  }, [onFlash, pathname, router, searchParams]);
+
+  return null;
+}
+
+export function MemberNotificationProvider({ children, locale }: { children: ReactNode; locale: Locale }) {
+  const [toasts, setToasts] = useState<MemberNotificationItem[]>([]);
 
   useEffect(() => {
     if (!toasts.length) return;
@@ -91,12 +95,20 @@ export function MemberNotificationProvider({ children, locale }: { children: Rea
     return () => timers.forEach(window.clearTimeout);
   }, [toasts]);
 
+  function addToast(status: string, message: string) {
+    const flashItem = createFlashNotification(status, message);
+    setToasts((current) => [flashItem, ...current].slice(0, 3));
+  }
+
   function dismissToast(id: string) {
     setToasts((current) => current.filter((item) => item.id !== id));
   }
 
   return (
-    <MemberNotificationContext.Provider value={{ dismissToast, toasts }}>
+    <MemberNotificationContext.Provider value={{ addToast, dismissToast, toasts }}>
+      <Suspense fallback={null}>
+        <FlashHandler onFlash={addToast} />
+      </Suspense>
       {children}
       <MemberToastStack dismissToast={dismissToast} locale={locale} toasts={toasts} />
     </MemberNotificationContext.Provider>
