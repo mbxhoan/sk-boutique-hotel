@@ -1408,3 +1408,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-shell.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 122
+- `time`: 2026-04-29T00:01:21+07:00
+- `prompt_summary`: Booking detail và danh sách booking phải hiện số phòng cụ thể, logic booking cần tránh trùng phòng; sơ đồ phòng cho phép lọc ngày cũ và range từ ngày đến ngày mặc định hôm nay; bấm phòng đã đặt phải xem được lịch booking theo range ở khung bên phải; notifications phải realtime không cần reload.
+- `commit_message`: `fix(admin-portal): show room codes, range filters, and realtime notifications`
+- `main_files`:
+  - `lib/supabase/workflow.types.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/reservation-room-items.ts`
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `components/admin-notifications-center.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`

@@ -94,7 +94,7 @@ function mapReservation(
     customer_name: customer?.full_name ?? reservation.customer_id,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
-    room_code: roomCode ?? reservation.booking_code
+    room_code: roomCode ?? null
   };
 }
 
@@ -313,25 +313,26 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
   const roomItem = reservation ? await getPrimaryReservationRoomItemByReservationId(reservation.id) : null;
   const room = roomItem ? await getRoomById(roomItem.room_id) : null;
 
-  const mappedReservation = mapReservation(reservation, branchMap, customerMap, room?.code ?? roomItem?.room_id ?? null, roomTypeMap);
+  const mappedReservation = mapReservation(reservation, branchMap, customerMap, room?.code ?? null, roomTypeMap);
   const mappedRequest = mapAvailabilityRequest(request, branchMap, roomTypeMap);
   const booking = mappedReservation
-    ? ({
-        booking_code: mappedReservation.booking_code,
-        branch_id: mappedReservation.branch_id,
-        branch_name_en: mappedReservation.branch_name_en,
-        branch_name_vi: mappedReservation.branch_name_vi,
-        created_at: mappedReservation.created_at,
-        customer_email: mappedReservation.customer_email,
-        customer_name: mappedReservation.customer_name,
-        guest_count: mappedReservation.guest_count,
-        id: mappedReservation.id,
-        notes: mappedReservation.notes,
-        room_type_id: mappedReservation.primary_room_type_id,
-        room_type_name_en: mappedReservation.primary_room_type_name_en,
-        room_type_name_vi: mappedReservation.primary_room_type_name_vi,
-        source: "reservation" as const,
-        status: mappedReservation.status,
+      ? ({
+          booking_code: mappedReservation.booking_code,
+          branch_id: mappedReservation.branch_id,
+          branch_name_en: mappedReservation.branch_name_en,
+          branch_name_vi: mappedReservation.branch_name_vi,
+          created_at: mappedReservation.created_at,
+          customer_email: mappedReservation.customer_email,
+          customer_name: mappedReservation.customer_name,
+          guest_count: mappedReservation.guest_count,
+          id: mappedReservation.id,
+          notes: mappedReservation.notes,
+          room_code: mappedReservation.room_code,
+          room_type_id: mappedReservation.primary_room_type_id,
+          room_type_name_en: mappedReservation.primary_room_type_name_en,
+          room_type_name_vi: mappedReservation.primary_room_type_name_vi,
+          source: "reservation" as const,
+          status: mappedReservation.status,
         stay_end_at: mappedReservation.stay_end_at,
         stay_start_at: mappedReservation.stay_start_at,
         total_amount: mappedReservation.total_amount,
@@ -349,6 +350,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
           guest_count: mappedRequest.guest_count,
           id: mappedRequest.id,
           notes: mappedRequest.note,
+          room_code: null,
           room_type_id: mappedRequest.room_type_id,
           room_type_name_en: mappedRequest.room_type_name_en,
           room_type_name_vi: mappedRequest.room_type_name_vi,

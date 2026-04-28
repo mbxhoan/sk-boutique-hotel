@@ -12996,6 +12996,35 @@ textarea {
   appearance: none;
 }
 
+.admin-rooms__date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.admin-rooms__date-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-rooms__date-field-label {
+  color: #6d7280;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.admin-rooms__date-grid .admin-rooms__input {
+  min-height: 2.95rem;
+  padding: 0.72rem 0.9rem;
+  border: 1px solid rgba(197, 160, 89, 0.36);
+  border-radius: 0.55rem;
+  background: #ffffff;
+  color: var(--ink);
+}
+
 .admin-rooms__divider {
   width: 1px;
   height: 2.4rem;
@@ -13359,6 +13388,117 @@ textarea {
   background: #eef4ff;
   color: var(--ink);
   resize: vertical;
+}
+
+.admin-rooms__booking-history {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 1.15rem 1.15rem;
+  padding: 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.26);
+  border-radius: 0.55rem;
+  background: linear-gradient(180deg, rgba(248, 250, 255, 0.95) 0%, rgba(255, 255, 255, 0.96) 100%);
+}
+
+.admin-rooms__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-rooms__booking-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.65rem;
+  height: 1.65rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--gold-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-rooms__booking-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-rooms__booking-item {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  border-radius: 0.45rem;
+  background: #ffffff;
+}
+
+.admin-rooms__booking-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-rooms__booking-code {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.admin-rooms__booking-link {
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.admin-rooms__booking-link:hover {
+  color: var(--gold-strong);
+}
+
+.admin-rooms__booking-meta,
+.admin-rooms__booking-range,
+.admin-rooms__booking-amount,
+.admin-rooms__booking-empty {
+  margin: 0;
+  color: #5f6776;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.admin-rooms__booking-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-rooms__booking-status--confirmed,
+.admin-rooms__booking-status--completed {
+  background: rgba(123, 186, 126, 0.16);
+  color: #4d9a55;
+}
+
+.admin-rooms__booking-status--pending_deposit,
+.admin-rooms__booking-status--draft {
+  background: rgba(197, 160, 89, 0.14);
+  color: #8a6421;
+}
+
+.admin-rooms__booking-status--cancelled {
+  background: rgba(216, 84, 84, 0.14);
+  color: #b23b3b;
 }
 
 .admin-rooms__save {
@@ -13940,6 +14080,10 @@ textarea {
     min-height: auto;
   }
 
+  .admin-rooms__date-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-content__media-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -14018,6 +14162,12 @@ textarea {
   .admin-content__form-grid--footer,
   .admin-rooms__status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-rooms__booking-main,
+  .admin-rooms__section-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .admin-bookings__filters {

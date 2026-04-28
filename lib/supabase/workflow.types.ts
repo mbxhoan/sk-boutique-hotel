@@ -85,7 +85,7 @@ export type WorkflowReservation = ReservationRow & {
   customer_name: string;
   primary_room_type_name_en: string;
   primary_room_type_name_vi: string;
-  room_code: string;
+  room_code: string | null;
 };
 
 export type WorkflowBookingSource = "availability_request" | "reservation";
@@ -101,6 +101,7 @@ export type WorkflowBookingRow = {
   guest_count: number;
   id: string;
   notes: string;
+  room_code: string | null;
   room_type_id: string;
   room_type_name_en: string;
   room_type_name_vi: string;

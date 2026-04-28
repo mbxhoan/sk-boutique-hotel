@@ -592,20 +592,36 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     const channel = supabase.channel("admin-notifications");
+    const trackedTables = [
+      "availability_requests",
+      "room_holds",
+      "reservations",
+      "payment_requests",
+      "payment_proofs",
+      "audit_logs"
+    ] as const;
 
-    channel.on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "audit_logs"
-      },
-      () => {
-        startTransition(() => {
-          router.refresh();
-        });
+    for (const table of trackedTables) {
+      for (const event of ["INSERT", "UPDATE", "DELETE"] as const) {
+        if (table === "audit_logs" && event !== "INSERT") {
+          continue;
+        }
+
+        channel.on(
+          "postgres_changes",
+          {
+            event,
+            schema: "public",
+            table
+          },
+          () => {
+            startTransition(() => {
+              router.refresh();
+            });
+          }
+        );
       }
-    );
+    }
 
     channel.subscribe();
 

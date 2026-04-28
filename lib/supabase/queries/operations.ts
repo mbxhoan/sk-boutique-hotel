@@ -138,7 +138,7 @@ function toReservationView(
     customer_name: customer?.full_name ?? reservation.customer_id,
     primary_room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     primary_room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
-    room_code: room?.code ?? reservation.id
+    room_code: room?.code ?? null
   };
 }
 
@@ -164,10 +164,14 @@ function toPaymentRequestView(
   roomTypeMap: Record<string, RoomTypeRow>,
   latestProofMap: Record<string, PaymentProofRow>,
   reservationMap: Record<string, ReservationRow>,
+  reservationRoomItemMap: Record<string, string>,
+  roomMap: Record<string, RoomRow>,
   customerMap: Record<string, { email: string; full_name: string }>
 ): WorkflowPaymentRequest {
   const branch = branchMap[request.branch_id];
   const reservation = reservationMap[request.reservation_id];
+  const roomId = reservation ? reservationRoomItemMap[reservation.id] : null;
+  const room = roomId ? roomMap[roomId] : null;
   const roomType = reservation ? roomTypeMap[reservation.primary_room_type_id] : null;
   const latestProof = latestProofMap[request.id] ?? null;
   const customer = customerMap[request.customer_id];
@@ -188,7 +192,7 @@ function toPaymentRequestView(
     payment_upload_path: buildPaymentUploadPath(request),
     qr_image_url: buildVietQrImageUrl(request),
     reservation_booking_code: reservation?.booking_code ?? request.reservation_id,
-    reservation_room_code: reservation?.booking_code ?? request.reservation_id,
+    reservation_room_code: room?.code ?? reservation?.booking_code ?? request.reservation_id,
     room_type_name_en: roomType?.name_en ?? null,
     room_type_name_vi: roomType?.name_vi ?? null
   };
@@ -198,10 +202,14 @@ function toPaymentProofView(
   proof: PaymentProofRow,
   branchMap: Record<string, BranchRow>,
   paymentRequestMap: Record<string, PaymentRequestRow>,
-  reservationMap: Record<string, ReservationRow>
+  reservationMap: Record<string, ReservationRow>,
+  reservationRoomItemMap: Record<string, string>,
+  roomMap: Record<string, RoomRow>
 ) {
   const paymentRequest = paymentRequestMap[proof.payment_request_id];
   const reservation = paymentRequest ? reservationMap[paymentRequest.reservation_id] : null;
+  const roomId = reservation ? reservationRoomItemMap[reservation.id] : null;
+  const room = roomId ? roomMap[roomId] : null;
   const branch = paymentRequest ? branchMap[paymentRequest.branch_id] : null;
 
   return {
@@ -210,7 +218,7 @@ function toPaymentProofView(
     branch_name_vi: branch?.name_vi ?? paymentRequest?.branch_id ?? proof.customer_id,
     payment_code: paymentRequest?.payment_code ?? proof.payment_request_id,
     reservation_booking_code: reservation?.booking_code ?? paymentRequest?.reservation_id ?? proof.payment_request_id,
-    reservation_room_code: reservation?.booking_code ?? paymentRequest?.reservation_id ?? proof.payment_request_id
+    reservation_room_code: room?.code ?? reservation?.booking_code ?? paymentRequest?.reservation_id ?? proof.payment_request_id
   };
 }
 
@@ -385,7 +393,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     branch_name_vi: branchMap[account.branch_id]?.name_vi ?? account.branch_id
   }));
   const paymentRequestViews = paymentRequests.map((request) =>
-    toPaymentRequestView(request, branchMap, roomTypeMap, latestPaymentProofMap, reservationMap, customerMap)
+    toPaymentRequestView(request, branchMap, roomTypeMap, latestPaymentProofMap, reservationMap, reservationRoomItemMap, roomMap, customerMap)
   );
 
   const explicitSelectionContext =

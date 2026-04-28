@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { PortalCard } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
+import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type { FloorRow, RoomRow, RoomTypeRow } from "@/lib/supabase/database.types";
 
@@ -19,6 +20,16 @@ type RoomView = RoomRow & {
 
 type FloorOption = Pick<FloorRow, "code" | "id" | "name_en" | "name_vi">;
 type RoomTypeOption = Pick<RoomTypeRow, "id" | "name_en" | "name_vi">;
+type RoomBookingSummary = {
+  bookingCode: string;
+  customerName: string;
+  id: string;
+  roomCode: string | null;
+  stayEndAt: string;
+  stayStartAt: string;
+  status: string;
+  totalAmount: number;
+};
 
 type AdminRoomsPageProps = {
   branchName: string;
@@ -26,10 +37,11 @@ type AdminRoomsPageProps = {
   floorId: string | null;
   floors: FloorOption[];
   locale: Locale;
-  minimumDate: string;
-  selectedDate: string;
   rooms: RoomView[];
   selectedRoomId: string | null;
+  selectedStartDate: string;
+  selectedEndDate: string;
+  roomBookings: RoomBookingSummary[];
   roomTypes: RoomTypeOption[];
 };
 
@@ -107,16 +119,47 @@ function buildRoomViews(rooms: RoomView[]) {
   return rooms;
 }
 
+function formatDateRange(locale: Locale, startAt: string, endAt: string) {
+  const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh"
+  });
+
+  return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
+}
+
+function bookingStatusLabel(locale: Locale, status: string) {
+  const labels: Record<Locale, Record<string, string>> = {
+    en: {
+      cancelled: "Cancelled",
+      completed: "Completed",
+      confirmed: "Confirmed",
+      draft: "Draft",
+      pending_deposit: "Pending deposit"
+    },
+    vi: {
+      cancelled: "Đã hủy",
+      completed: "Hoàn tất",
+      confirmed: "Đã xác nhận",
+      draft: "Nháp",
+      pending_deposit: "Chờ cọc"
+    }
+  };
+
+  return labels[locale][status] ?? status;
+}
+
 export function AdminRoomsPage({
   branchName,
   branchId,
   floorId,
   floors,
   locale,
-  minimumDate,
-  selectedDate,
   rooms,
   selectedRoomId,
+  selectedStartDate,
+  selectedEndDate,
+  roomBookings,
   roomTypes
 }: AdminRoomsPageProps) {
   const resolvedRooms = buildRoomViews(rooms);
@@ -183,7 +226,8 @@ export function AdminRoomsPage({
     }
 
     params.set("floor", floor.id);
-    params.set("date", selectedDate);
+    params.set("start", selectedStartDate);
+    params.set("end", selectedEndDate);
 
     if (locale === "en") {
       params.set("lang", "en");
@@ -201,7 +245,8 @@ export function AdminRoomsPage({
 
     params.set("floor", room.floor_id);
     params.set("room", room.id);
-    params.set("date", selectedDate);
+    params.set("start", selectedStartDate);
+    params.set("end", selectedEndDate);
 
     if (locale === "en") {
       params.set("lang", "en");
@@ -288,31 +333,36 @@ export function AdminRoomsPage({
           <div className="admin-rooms__divider" aria-hidden="true" />
 
           <div className="admin-rooms__filter admin-rooms__filter--date">
-            <label className="portal-field__label" htmlFor="room-date">
-              {localize(locale, { vi: "Ngày", en: "Date" })}
+            <label className="portal-field__label" htmlFor="room-date-start">
+              {localize(locale, { vi: "Từ ngày", en: "From date" })}
             </label>
-            <div className="admin-rooms__input-wrap">
-              <span className="admin-rooms__input-icon" aria-hidden="true">
-                <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 18 18" width="18">
-                  <rect height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" width="11.5" x="3.2" y="4.1" />
-                  <path d="M5.1 2.8v2.6M12.9 2.8v2.6M3.9 7.3h10.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.2" />
-                </svg>
-              </span>
-              <input
-                className="admin-rooms__input"
-                id="room-date"
-                onChange={(event) => {
-                  if (event.target.value < minimumDate) {
-                    router.push(buildCurrentHref({ date: minimumDate }));
-                    return;
-                  }
-
-                  router.push(buildCurrentHref({ date: event.target.value }));
-                }}
-                min={minimumDate}
-                value={selectedDate}
-                type="date"
-              />
+            <div className="admin-rooms__date-grid">
+              <label className="admin-rooms__date-field" htmlFor="room-date-start">
+                <span className="admin-rooms__date-field-label">{localize(locale, { vi: "Từ", en: "From" })}</span>
+                <input
+                  className="admin-rooms__input"
+                  id="room-date-start"
+                  onChange={(event) => {
+                    const nextStart = event.target.value;
+                    router.push(buildCurrentHref({ start: nextStart, end: nextStart > selectedEndDate ? nextStart : selectedEndDate }));
+                  }}
+                  value={selectedStartDate}
+                  type="date"
+                />
+              </label>
+              <label className="admin-rooms__date-field" htmlFor="room-date-end">
+                <span className="admin-rooms__date-field-label">{localize(locale, { vi: "Đến", en: "To" })}</span>
+                <input
+                  className="admin-rooms__input"
+                  id="room-date-end"
+                  onChange={(event) => {
+                    const nextEnd = event.target.value;
+                    router.push(buildCurrentHref({ start: selectedStartDate > nextEnd ? nextEnd : selectedStartDate, end: nextEnd }));
+                  }}
+                  value={selectedEndDate}
+                  type="date"
+                />
+              </label>
             </div>
           </div>
         </div>
@@ -487,6 +537,46 @@ export function AdminRoomsPage({
           <button className="button button--solid admin-rooms__save" type="button">
             {localize(locale, { vi: "LƯU THAY ĐỔI", en: "SAVE CHANGES" })}
           </button>
+
+          <div className="admin-rooms__booking-history">
+            <div className="admin-rooms__section-head">
+              <p className="admin-rooms__section-title">{localize(locale, { vi: "Booking trong khoảng lọc", en: "Bookings in range" })}</p>
+              <span className="admin-rooms__booking-count">{roomBookings.length}</span>
+            </div>
+            {roomBookings.length ? (
+              <ol className="admin-rooms__booking-list">
+                {roomBookings.map((booking) => (
+                  <li className="admin-rooms__booking-item" key={booking.id}>
+                    <div className="admin-rooms__booking-main">
+                      <div>
+                        <Link className="admin-rooms__booking-link" href={appendLocaleQuery(`/admin/bookings/${encodeURIComponent(booking.bookingCode)}`, locale)}>
+                          {booking.bookingCode}
+                        </Link>
+                        <p className="admin-rooms__booking-meta">
+                          {booking.customerName}
+                          {booking.roomCode ? ` • ${booking.roomCode}` : ""}
+                        </p>
+                      </div>
+                      <span className={`admin-rooms__booking-status admin-rooms__booking-status--${booking.status}`}>
+                        {bookingStatusLabel(locale, booking.status)}
+                      </span>
+                    </div>
+                    <p className="admin-rooms__booking-range">{formatDateRange(locale, booking.stayStartAt, booking.stayEndAt)}</p>
+                    <p className="admin-rooms__booking-amount">
+                      {new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", { maximumFractionDigits: 0 }).format(booking.totalAmount)} VND
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="admin-rooms__booking-empty">
+                {localize(locale, {
+                  vi: "Không có booking nào trong khoảng ngày đã lọc cho phòng này.",
+                  en: "No bookings were found for this room in the selected date range."
+                })}
+              </p>
+            )}
+          </div>
         </PortalCard>
       </div>
     </div>

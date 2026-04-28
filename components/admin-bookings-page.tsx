@@ -15,7 +15,7 @@ type AdminBookingsPageProps = {
   totalCount: number;
 };
 
-type BookingColumnKey = "booking_code" | "customer" | "room_type" | "stay_dates" | "status" | "total" | "actions";
+type BookingColumnKey = "booking_code" | "customer" | "room_code" | "room_type" | "stay_dates" | "status" | "total" | "actions";
 
 type DateRangeState = {
   end: string;
@@ -40,6 +40,13 @@ const bookingColumns: Array<{
     label: {
       en: "Guest name",
       vi: "Khách hàng"
+    }
+  },
+  {
+    key: "room_code",
+    label: {
+      en: "Room",
+      vi: "Phòng"
     }
   },
   {
@@ -240,6 +247,7 @@ function matchesSearch(row: WorkflowBookingRow, searchTerm: string) {
     row.booking_code,
     row.customer_name,
     row.customer_email,
+    row.room_code ?? "",
     row.branch_name_en,
     row.branch_name_vi,
     row.room_type_name_en,
@@ -271,6 +279,7 @@ function buildCsv(rows: WorkflowBookingRow[], locale: Locale) {
     localize(locale, { vi: "Mã booking", en: "Booking ID" }),
     localize(locale, { vi: "Khách hàng", en: "Guest name" }),
     localize(locale, { vi: "Email", en: "Email" }),
+    localize(locale, { vi: "Phòng", en: "Room" }),
     localize(locale, { vi: "Loại phòng", en: "Room type" }),
     localize(locale, { vi: "Ngày ở", en: "Stay dates" }),
     localize(locale, { vi: "Trạng thái", en: "Status" }),
@@ -282,6 +291,7 @@ function buildCsv(rows: WorkflowBookingRow[], locale: Locale) {
       escapeCsv(row.booking_code),
       escapeCsv(row.customer_name),
       escapeCsv(row.customer_email),
+      escapeCsv(row.room_code ?? "—"),
       escapeCsv(locale === "en" ? row.room_type_name_en : row.room_type_name_vi),
       escapeCsv(formatDateRange(locale, row.stay_start_at, row.stay_end_at)),
       escapeCsv(statusLabels[locale][row.status]),
@@ -338,13 +348,14 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
   const [dateRange, setDateRange] = useState<DateRangeState>(() => getInitialDateRange(bookings));
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleColumns, setVisibleColumns] = useState<Record<BookingColumnKey, boolean>>({
-    actions: true,
-    booking_code: true,
-    customer: true,
-    room_type: true,
-    stay_dates: true,
-    status: true,
-    total: true
+          actions: true,
+          booking_code: true,
+          customer: true,
+          room_code: true,
+          room_type: true,
+          stay_dates: true,
+          status: true,
+          total: true
   });
   const bookingsSignature = bookings.map((booking) => booking.id).join("|");
 
@@ -620,6 +631,7 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
                   actions: true,
                   booking_code: true,
                   customer: true,
+                  room_code: true,
                   room_type: true,
                   stay_dates: true,
                   status: true,
@@ -641,6 +653,7 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
               <tr>
                 {visibleColumns.booking_code ? <th>{localize(locale, { vi: "Mã booking", en: "Booking ID" })}</th> : null}
                 {visibleColumns.customer ? <th>{localize(locale, { vi: "Khách hàng", en: "Guest name" })}</th> : null}
+                {visibleColumns.room_code ? <th>{localize(locale, { vi: "Phòng", en: "Room" })}</th> : null}
                 {visibleColumns.room_type ? <th>{localize(locale, { vi: "Loại phòng", en: "Room type" })}</th> : null}
                 {visibleColumns.stay_dates ? (
                   <th>
@@ -676,6 +689,14 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
                         <td>
                           <div className={tone === "neutral" ? "admin-bookings__muted" : undefined}>{booking.customer_name}</div>
                           <div className="admin-bookings__secondary-value">{booking.customer_email}</div>
+                        </td>
+                      ) : null}
+                      {visibleColumns.room_code ? (
+                        <td>
+                          <div className="admin-bookings__primary-value">{booking.room_code ?? "—"}</div>
+                          <div className="admin-bookings__secondary-value">
+                            {booking.room_code ? localize(locale, { vi: "Phòng cụ thể", en: "Assigned room" }) : localize(locale, { vi: "Chưa phân phòng", en: "Unassigned" })}
+                          </div>
                         </td>
                       ) : null}
                       {visibleColumns.room_type ? (
