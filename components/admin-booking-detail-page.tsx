@@ -61,6 +61,16 @@ function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
 }
 
+function toAsiaSaigonDateInputValue(value: string) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(new Date(value));
+}
+
 function formatCountdown(locale: Locale, expiresAt: string, now = Date.now()) {
   const diffMs = new Date(expiresAt).getTime() - now;
 
@@ -604,11 +614,11 @@ function ConfirmAvailabilityCard({
         <div className="portal-grid portal-grid--two">
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Check-in" : "Check-in"}</span>
-            <input className="portal-field__control" defaultValue={request.stay_start_at.slice(0, 10)} name="stayStartAt" type="date" />
+            <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_start_at)} name="stayStartAt" type="date" />
           </label>
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Check-out" : "Check-out"}</span>
-            <input className="portal-field__control" defaultValue={request.stay_end_at.slice(0, 10)} name="stayEndAt" type="date" />
+            <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_end_at)} name="stayEndAt" type="date" />
           </label>
         </div>
 
@@ -937,50 +947,176 @@ function PaymentHistoryTable({
   locale: Locale;
   paymentRequests: BookingDetailData["payment_requests"];
 }) {
+  const [previewedProof, setPreviewedProof] = useState<{
+    url: string;
+    title: string;
+    fileName: string | null;
+    uploadedAt: string | null;
+  } | null>(null);
+
   if (!paymentRequests.length) {
     return <p className="portal-panel__note-copy">{locale === "en" ? "No deposit requests yet." : "Chưa có yêu cầu cọc nào."}</p>;
   }
 
   return (
-    <div className="portal-table-shell">
-      <table className="portal-data-table">
-        <thead>
-          <tr>
-            <th>{locale === "en" ? "Payment" : "Thanh toán"}</th>
-            <th>{locale === "en" ? "Amount" : "Số tiền"}</th>
-            <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
-            <th>{locale === "en" ? "Proof" : "Proof"}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paymentRequests.map((paymentRequest) => (
-            <tr key={paymentRequest.id}>
-              <td>
-                <div className="portal-data-table__primary">
-                  <strong className="portal-data-table__title">{paymentRequest.payment_code}</strong>
-                  <p className="portal-data-table__meta">{paymentRequest.transfer_content}</p>
-                </div>
-              </td>
-              <td>
-                <strong className="portal-data-table__title">{formatMoney(locale, paymentRequest.amount)}</strong>
-              </td>
-              <td>
-                <PortalBadge tone={getPaymentTone(paymentRequest.status)}>{statusLabel(locale, paymentRequest.status)}</PortalBadge>
-              </td>
-              <td>
-                <div className="portal-data-table__primary">
-                  <strong className="portal-data-table__title">
-                    {paymentRequest.latest_proof_status ? statusLabel(locale, paymentRequest.latest_proof_status) : locale === "en" ? "No proof yet" : "Chưa có proof"}
-                  </strong>
-                  <p className="portal-data-table__meta">
-                    {paymentRequest.latest_proof_uploaded_at ? formatDateTime(locale, paymentRequest.latest_proof_uploaded_at) : "—"}
-                  </p>
-                </div>
-              </td>
+    <>
+      <div className="portal-table-shell">
+        <table className="portal-data-table">
+          <thead>
+            <tr>
+              <th>{locale === "en" ? "Payment" : "Thanh toán"}</th>
+              <th>{locale === "en" ? "Amount" : "Số tiền"}</th>
+              <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
+              <th>{locale === "en" ? "Proof" : "Proof"}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paymentRequests.map((paymentRequest) => {
+              const hasProof = !!paymentRequest.latest_proof_url;
+              const proofLabel = paymentRequest.latest_proof_status
+                ? statusLabel(locale, paymentRequest.latest_proof_status)
+                : locale === "en"
+                  ? "No proof yet"
+                  : "Chưa có proof";
+              const isClickable = hasProof;
+
+              return (
+                <tr
+                  key={paymentRequest.id}
+                  className={isClickable ? "admin-booking-detail__proof-row" : undefined}
+                  onClick={
+                    isClickable
+                      ? () =>
+                          setPreviewedProof({
+                            url: paymentRequest.latest_proof_url as string,
+                            title: paymentRequest.payment_code,
+                            fileName: paymentRequest.latest_proof_file_name,
+                            uploadedAt: paymentRequest.latest_proof_uploaded_at
+                          })
+                      : undefined
+                  }
+                  role={isClickable ? "button" : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  onKeyDown={
+                    isClickable
+                      ? (event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setPreviewedProof({
+                              url: paymentRequest.latest_proof_url as string,
+                              title: paymentRequest.payment_code,
+                              fileName: paymentRequest.latest_proof_file_name,
+                              uploadedAt: paymentRequest.latest_proof_uploaded_at
+                            });
+                          }
+                        }
+                      : undefined
+                  }
+                >
+                  <td>
+                    <div className="portal-data-table__primary">
+                      <strong className="portal-data-table__title">{paymentRequest.payment_code}</strong>
+                      <p className="portal-data-table__meta">{paymentRequest.transfer_content}</p>
+                    </div>
+                  </td>
+                  <td>
+                    <strong className="portal-data-table__title">{formatMoney(locale, paymentRequest.amount)}</strong>
+                  </td>
+                  <td>
+                    <PortalBadge tone={getPaymentTone(paymentRequest.status)}>{statusLabel(locale, paymentRequest.status)}</PortalBadge>
+                  </td>
+                  <td>
+                    <div className="portal-data-table__primary">
+                      <strong className="portal-data-table__title">{proofLabel}</strong>
+                      <p className="portal-data-table__meta">
+                        {paymentRequest.latest_proof_uploaded_at ? formatDateTime(locale, paymentRequest.latest_proof_uploaded_at) : "—"}
+                        {hasProof ? (
+                          <>
+                            {" · "}
+                            <span className="admin-booking-detail__proof-link">{locale === "en" ? "View image" : "Xem ảnh"}</span>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {previewedProof ? (
+        <ProofImageModal
+          locale={locale}
+          fileName={previewedProof.fileName}
+          onClose={() => setPreviewedProof(null)}
+          title={previewedProof.title}
+          uploadedAt={previewedProof.uploadedAt}
+          url={previewedProof.url}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function ProofImageModal({
+  fileName,
+  locale,
+  onClose,
+  title,
+  uploadedAt,
+  url
+}: {
+  fileName: string | null;
+  locale: Locale;
+  onClose: () => void;
+  title: string;
+  uploadedAt: string | null;
+  url: string;
+}) {
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  const isPdf = url.toLowerCase().includes(".pdf") || (fileName ?? "").toLowerCase().endsWith(".pdf");
+
+  return (
+    <div className="proof-modal" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
+      <div className="proof-modal__card" onClick={(event) => event.stopPropagation()}>
+        <header className="proof-modal__head">
+          <div>
+            <p className="proof-modal__eyebrow">{locale === "en" ? "Payment proof" : "Ảnh thanh toán"}</p>
+            <h3 className="proof-modal__title">{title}</h3>
+            <p className="proof-modal__meta">
+              {fileName ? `${fileName} · ` : ""}
+              {uploadedAt ? formatDateTime(locale, uploadedAt) : ""}
+            </p>
+          </div>
+          <button className="proof-modal__close" onClick={onClose} type="button" aria-label={locale === "en" ? "Close" : "Đóng"}>
+            ×
+          </button>
+        </header>
+
+        <div className="proof-modal__body">
+          {isPdf ? (
+            <iframe className="proof-modal__pdf" src={url} title={title} />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="proof-modal__image" src={url} alt={title} />
+          )}
+        </div>
+
+        <footer className="proof-modal__foot">
+          <a className="button button--solid" href={url} rel="noreferrer" target="_blank">
+            {locale === "en" ? "Open in new tab" : "Mở trong tab mới"}
+          </a>
+        </footer>
+      </div>
     </div>
   );
 }
@@ -991,7 +1127,6 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
   const reservation = detail.reservation;
   const backHref = appendLocaleQuery("/admin/bookings", locale);
   const detailHref = appendLocaleQuery(`/admin/bookings/${booking.booking_code}`, locale);
-  const workflowHref = request ? appendLocaleQuery(`/admin?request=${request.id}#requests`, locale) : null;
   const activePaymentRequest =
     detail.payment_requests.find((paymentRequest) => ["sent", "pending_verification"].includes(paymentRequest.status)) ??
     detail.payment_requests.find((paymentRequest) => paymentRequest.status === "verified") ??
@@ -1030,18 +1165,12 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
               canReject={booking.status === "new" || booking.status === "in_review"}
               canResendEmail={!!activePaymentRequest && activePaymentRequest.status !== "verified"}
               canVerify={!!activePaymentRequest && ["sent", "pending_verification"].includes(activePaymentRequest.status)}
-              copiedLabel={locale === "en" ? "Link copied!" : "Đã sao chép link!"}
-              copyLabel={locale === "en" ? "Copy link" : "Sao chép link"}
-              emailHref={booking.customer_email ? `mailto:${booking.customer_email}` : null}
-              emailLabel={locale === "en" ? "Email guest" : "Gửi email khách"}
               locale={locale}
               paymentRequestId={activePaymentRequest?.id}
               printLabel={locale === "en" ? "Print" : "In"}
               requestId={request?.id}
               reservationId={reservation?.id}
               returnTo={detailHref}
-              workflowHref={workflowHref}
-              workflowLabel={localize(locale, { vi: "Mở workflow", en: "Open workflow" })}
             />
           </div>
         </div>

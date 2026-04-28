@@ -71,7 +71,8 @@ function formatDateTime(locale: Locale, value: string) {
 
 function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
-    dateStyle: "medium"
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh"
   });
 
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;

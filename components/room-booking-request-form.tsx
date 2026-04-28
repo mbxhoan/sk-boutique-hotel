@@ -406,16 +406,18 @@ export function RoomBookingRequestForm({
         />
       </label>
 
-      <label className="room-booking-panel__consent">
-        <input checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} type="checkbox" />
-        <span>
-          {localize(
-            locale,
-            "Tôi đồng ý nhận thông tin liên quan đến booking và ưu đãi từ khách sạn.",
-            "I agree to receive booking-related updates and hotel offers."
-          )}
-        </span>
-      </label>
+      {!memberProfile ? (
+        <label className="room-booking-panel__consent">
+          <input checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} type="checkbox" />
+          <span>
+            {localize(
+              locale,
+              "Tôi đồng ý nhận thông tin liên quan đến booking và ưu đãi từ khách sạn.",
+              "I agree to receive booking-related updates and hotel offers."
+            )}
+          </span>
+        </label>
+      ) : null}
 
       {!memberProfile ? (
         <p className="room-booking-panel__hint">

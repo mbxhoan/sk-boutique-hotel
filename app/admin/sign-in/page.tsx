@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminSignInForm } from "@/components/admin-sign-in-form";
-import { PortalBadge, PortalCard } from "@/components/portal-ui";
+import { LogoMark } from "@/components/logo-mark";
+import { PortalCard } from "@/components/portal-ui";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
-import { resolveLocale } from "@/lib/locale";
+import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { canAccessAdminPortal, getSupabaseUser } from "@/lib/supabase/auth";
 
 type PageProps = {
@@ -33,6 +35,8 @@ const pageCopy = {
     en: "The current account does not have admin access. Sign out or use an admin account to enter this portal."
   } satisfies LocalizedText
 } as const;
+
+const backgroundImageSrc = "/hero/hero-1.png";
 
 function buildSignInLocaleHref(locale: "vi" | "en", next?: string) {
   const url = new URL("/admin/sign-in", "https://sk-boutique-hotel.local");
@@ -70,35 +74,51 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="admin-auth-page">
-      <section className="admin-auth-card">
-        <div className="admin-auth-card__topbar">
-          <PortalBadge tone="accent">{localize(locale, pageCopy.eyebrow)}</PortalBadge>
-          <div className="admin-auth-card__locale-switch" aria-label={locale === "en" ? "Language switch" : "Chuyển ngôn ngữ"}>
+    <main className="member-auth-page">
+      <div className="member-auth-page__media" aria-hidden="true">
+        <Image
+          alt=""
+          className="member-auth-page__image"
+          fill
+          priority
+          sizes="100vw"
+          src={backgroundImageSrc}
+        />
+        <span className="member-auth-page__overlay" aria-hidden="true" />
+      </div>
+
+      <div className="member-auth-page__content">
+        <header className="member-auth-page__topbar">
+          <LogoMark className="member-auth-page__logo" href={appendLocaleQuery("/", locale)} priority variant="light" />
+
+          <div className="member-auth-page__locale-switch" aria-label={locale === "en" ? "Language switch" : "Chuyển ngôn ngữ"}>
             <Link
-              className={`admin-auth-card__locale-link${locale === "vi" ? " admin-auth-card__locale-link--active" : ""}`}
+              className={`member-auth-page__locale-link${locale === "vi" ? " member-auth-page__locale-link--active" : ""}`}
               href={buildSignInLocaleHref("vi", nextHref ?? undefined)}
             >
               VI
             </Link>
             <Link
-              className={`admin-auth-card__locale-link${locale === "en" ? " admin-auth-card__locale-link--active" : ""}`}
+              className={`member-auth-page__locale-link${locale === "en" ? " member-auth-page__locale-link--active" : ""}`}
               href={buildSignInLocaleHref("en", nextHref ?? undefined)}
             >
               EN
             </Link>
           </div>
-        </div>
-        <h1 className="admin-auth-card__title">{localize(locale, pageCopy.title)}</h1>
-        {/* <p className="admin-auth-card__description">{localize(locale, pageCopy.description)}</p> */}
-        {user ? (
-          <PortalCard className="admin-auth-card__notice" tone="soft">
-            <p className="admin-auth-card__notice-title">{locale === "en" ? "Signed in with a member account" : "Đang đăng nhập bằng tài khoản member"}</p>
-            <p className="admin-auth-card__notice-copy">{localize(locale, pageCopy.memberWarning)}</p>
-          </PortalCard>
-        ) : null}
-        <AdminSignInForm locale={locale} />
-      </section>
+        </header>
+
+        <section className="member-auth-card">
+          <p className="member-auth-card__eyebrow">{localize(locale, pageCopy.eyebrow)}</p>
+          <h1 className="sr-only">{localize(locale, pageCopy.title)}</h1>
+          {user ? (
+            <PortalCard className="admin-auth-card__notice" tone="soft">
+              <p className="admin-auth-card__notice-title">{locale === "en" ? "Signed in with a member account" : "Đang đăng nhập bằng tài khoản member"}</p>
+              <p className="admin-auth-card__notice-copy">{localize(locale, pageCopy.memberWarning)}</p>
+            </PortalCard>
+          ) : null}
+          <AdminSignInForm locale={locale} />
+        </section>
+      </div>
     </main>
   );
 }

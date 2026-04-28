@@ -429,6 +429,56 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
     URL.revokeObjectURL(url);
   }
 
+  const totalBookingsCount = bookings.length;
+  const confirmedRevenue = bookings
+    .filter((row) => row.status === "confirmed" || row.status === "completed")
+    .reduce((sum, row) => sum + (row.total_amount ?? 0), 0);
+  const pendingRevenue = bookings
+    .filter((row) => row.status === "pending_deposit" || row.status === "draft" || row.status === "in_review" || row.status === "new" || row.status === "quoted")
+    .reduce((sum, row) => sum + (row.total_amount ?? 0), 0);
+  const confirmedCount = bookings.filter((row) => row.status === "confirmed" || row.status === "completed").length;
+  const pendingCount = bookings.filter((row) => ["pending_deposit", "draft", "in_review", "new", "quoted"].includes(row.status as string)).length;
+  const cancelledCount = bookings.filter((row) => ["cancelled", "rejected", "expired", "closed"].includes(row.status as string)).length;
+
+  const statsCards = [
+    {
+      label: localize(locale, { vi: "Tổng đặt phòng", en: "Total bookings" }),
+      value: `${totalBookingsCount}`,
+      detail: localize(locale, {
+        vi: `${confirmedCount} đã xác nhận · ${pendingCount} đang treo · ${cancelledCount} đã hủy`,
+        en: `${confirmedCount} confirmed · ${pendingCount} in progress · ${cancelledCount} cancelled`
+      }),
+      tone: "default" as const
+    },
+    {
+      label: localize(locale, { vi: "Doanh thu đã xác nhận", en: "Confirmed revenue" }),
+      value: formatMoney(locale, confirmedRevenue),
+      detail: localize(locale, {
+        vi: `${confirmedCount} booking đã xác nhận hoặc hoàn tất`,
+        en: `${confirmedCount} confirmed or completed bookings`
+      }),
+      tone: "accent" as const
+    },
+    {
+      label: localize(locale, { vi: "Doanh thu đang treo", en: "Pending revenue" }),
+      value: formatMoney(locale, pendingRevenue),
+      detail: localize(locale, {
+        vi: `${pendingCount} booking chưa thanh toán đủ`,
+        en: `${pendingCount} bookings awaiting payment`
+      }),
+      tone: "soft" as const
+    },
+    {
+      label: localize(locale, { vi: "Booking đang xử lý", en: "Active in workflow" }),
+      value: `${pendingCount}`,
+      detail: localize(locale, {
+        vi: "Yêu cầu mới, đang xem xét, chờ cọc.",
+        en: "New requests, in review, pending deposit."
+      }),
+      tone: "default" as const
+    }
+  ];
+
   return (
     <div className="admin-page admin-bookings">
       <div className="admin-page__hero">
@@ -456,6 +506,16 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
             {localize(locale, { vi: "Thêm đặt phòng", en: "Add booking" })}
           </button>
         </div>
+      </div>
+
+      <div className="admin-bookings__stats">
+        {statsCards.map((card) => (
+          <div className={`admin-bookings__stat admin-bookings__stat--${card.tone}`} key={card.label}>
+            <p className="admin-bookings__stat-label">{card.label}</p>
+            <p className="admin-bookings__stat-value">{card.value}</p>
+            <p className="admin-bookings__stat-detail">{card.detail}</p>
+          </div>
+        ))}
       </div>
 
       <PortalCard className="admin-bookings__filters">

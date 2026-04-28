@@ -165,6 +165,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState(DEFAULT_MEMBER_PASSWORD);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isSignUp = mode === "sign-up";
@@ -287,14 +288,20 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
 
       await bootstrapMemberProfile(authUserId, trimmedFullName || normalizeFallbackName(trimmedEmail), trimmedEmail, trimmedPhone || null);
 
+      setIsRedirecting(true);
       router.replace(appendLocaleQuery(nextHref, locale));
       router.refresh();
     } catch (submittedError) {
       setError(resolveMemberFormError(locale, submittedError));
-    } finally {
       setIsSubmitting(false);
     }
   }
+
+  const redirectingLabel = isSignUp
+    ? localize(locale, { vi: "Đang vào portal thành viên", en: "Loading member portal" })
+    : localize(locale, { vi: "Đang vào portal thành viên", en: "Loading member portal" });
+  const isBusy = isSubmitting || isRedirecting;
+  const buttonLabel = isRedirecting ? redirectingLabel : isBusy ? submitPendingLabel : submitLabel;
 
   return (
     <form className="member-auth-form" onSubmit={handleSubmit}>
@@ -368,8 +375,14 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
       </div>
 
       <div className="member-auth-form__actions member-auth-form__actions--primary">
-        <button className="button button--solid member-auth-form__submit" disabled={isSubmitting} type="submit">
-          {isSubmitting ? submitPendingLabel : submitLabel}
+        <button
+          className="button button--solid member-auth-form__submit auth-submit-button"
+          data-busy={isBusy ? "true" : undefined}
+          disabled={isBusy}
+          type="submit"
+        >
+          {isBusy ? <span className="auth-submit-button__spinner" aria-hidden="true" /> : null}
+          <span className="auth-submit-button__label">{buttonLabel}</span>
         </button>
       </div>
 
@@ -382,6 +395,18 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
           {alternateLabel}
         </Link>
       </div>
+
+      {isRedirecting ? (
+        <div className="auth-loading-overlay" role="status" aria-live="polite">
+          <div className="auth-loading-overlay__card">
+            <span className="auth-loading-overlay__spinner" aria-hidden="true" />
+            <p className="auth-loading-overlay__title">{redirectingLabel}…</p>
+            <p className="auth-loading-overlay__copy">
+              {locale === "en" ? "Setting up your member dashboard." : "Đang chuẩn bị bảng điều khiển thành viên."}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }

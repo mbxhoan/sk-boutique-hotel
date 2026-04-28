@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 
 import {
   resendDepositRequestEmailAction,
@@ -14,18 +13,12 @@ type AdminBookingDetailToolbarProps = {
   canReject?: boolean;
   canResendEmail?: boolean;
   canVerify?: boolean;
-  copiedLabel: string;
-  copyLabel: string;
-  emailHref: string | null;
-  emailLabel: string;
   locale: "en" | "vi";
   paymentRequestId?: string;
   printLabel: string;
   requestId?: string;
   reservationId?: string;
   returnTo?: string;
-  workflowHref: string | null;
-  workflowLabel: string;
 };
 
 export function AdminBookingDetailToolbar({
@@ -34,31 +27,14 @@ export function AdminBookingDetailToolbar({
   canReject,
   canResendEmail,
   canVerify,
-  copiedLabel,
-  copyLabel,
-  emailHref,
-  emailLabel,
   locale,
   paymentRequestId,
   printLabel,
   requestId,
   reservationId,
-  returnTo,
-  workflowHref,
-  workflowLabel
+  returnTo
 }: AdminBookingDetailToolbarProps) {
-  const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
-
-  async function handleCopyLink() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  }
 
   function handleComplete() {
     if (!reservationId || !returnTo) return;
@@ -133,29 +109,15 @@ export function AdminBookingDetailToolbar({
 
   return (
     <div className="admin-booking-detail__toolbar">
-      {workflowHref ? (
-        <Link className="button button--text-light admin-booking-detail__toolbar-link" href={workflowHref}>
-          {workflowLabel}
-        </Link>
-      ) : null}
       <button className="button button--solid admin-booking-detail__toolbar-link" onClick={() => window.print()} type="button">
         {printLabel}
-      </button>
-      {emailHref ? (
-        <a className="button button--text-light admin-booking-detail__toolbar-link" href={emailHref}>
-          {emailLabel}
-        </a>
-      ) : null}
-      <button className="button button--text-light admin-booking-detail__toolbar-link" onClick={handleCopyLink} type="button">
-        {copied ? copiedLabel : copyLabel}
       </button>
 
       {canVerify && (
         <button
-          className="button button--solid admin-booking-detail__toolbar-link"
+          className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--success"
           disabled={isPending}
           onClick={handleVerifyDeposit}
-          style={{ backgroundColor: "#3f8c54", borderColor: "#3f8c54", color: "#fff" }}
           type="button"
         >
           {locale === "en" ? "Verify Deposit" : "Duyệt cọc"}
@@ -170,10 +132,9 @@ export function AdminBookingDetailToolbar({
 
       {canComplete && (
         <button
-          className="button button--solid admin-booking-detail__toolbar-link"
+          className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--success"
           disabled={isPending}
           onClick={handleComplete}
-          style={{ backgroundColor: "#3f8c54", borderColor: "#3f8c54", color: "#fff" }}
           type="button"
         >
           {locale === "en" ? "Complete" : "Hoàn tất"}
@@ -181,10 +142,9 @@ export function AdminBookingDetailToolbar({
       )}
       {canCancel && (
         <button
-          className="button button--solid admin-booking-detail__toolbar-link"
+          className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--danger"
           disabled={isPending}
           onClick={handleCancel}
-          style={{ backgroundColor: "#ffecec", borderColor: "#d85454", color: "#b14e4e" }}
           type="button"
         >
           {locale === "en" ? "Cancel Booking" : "Hủy Booking"}
@@ -192,10 +152,9 @@ export function AdminBookingDetailToolbar({
       )}
       {canReject && (
         <button
-          className="button button--solid admin-booking-detail__toolbar-link"
+          className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--danger"
           disabled={isPending}
           onClick={handleReject}
-          style={{ backgroundColor: "#ffecec", borderColor: "#d85454", color: "#b14e4e" }}
           type="button"
         >
           {locale === "en" ? "Reject" : "Từ chối"}

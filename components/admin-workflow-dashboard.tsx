@@ -50,10 +50,21 @@ function formatDateTime(locale: Locale, value: string) {
 
 function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
-    dateStyle: "medium"
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh"
   });
 
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
+}
+
+function toAsiaSaigonDateInputValue(value: string) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(new Date(value));
 }
 
 function formatMoney(locale: Locale, value: number, currency = "VND") {
@@ -801,11 +812,11 @@ function RequestDetailPanel({
           <div className="portal-grid portal-grid--two">
             <label className="portal-field">
               <span className="portal-field__label">{locale === "en" ? "Check-in" : "Check-in"}</span>
-              <input className="portal-field__control" defaultValue={request.stay_start_at.slice(0, 10)} name="stayStartAt" type="date" />
+              <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_start_at)} name="stayStartAt" type="date" />
             </label>
             <label className="portal-field">
               <span className="portal-field__label">{locale === "en" ? "Check-out" : "Check-out"}</span>
-              <input className="portal-field__control" defaultValue={request.stay_end_at.slice(0, 10)} name="stayEndAt" type="date" />
+              <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_end_at)} name="stayEndAt" type="date" />
             </label>
           </div>
           <div className="portal-grid portal-grid--two">
