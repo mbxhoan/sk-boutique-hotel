@@ -4,11 +4,63 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
+import { localize } from "@/lib/mock/i18n";
+import { readLocaleFromFormData } from "@/lib/locale";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
-import { getErrorMessage } from "@/lib/supabase/errors";
 import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
 import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { createPaymentRequest, uploadPaymentProof, verifyPaymentRequest } from "@/lib/supabase/payments";
+
+const copy = {
+  createPaymentRequestFailed: {
+    vi: "Không thể tạo yêu cầu thanh toán.",
+    en: "Unable to create payment request."
+  },
+  depositConfirmed: {
+    vi: "Khoản cọc đã được xác nhận.",
+    en: "Deposit confirmed successfully."
+  },
+  depositConfirmationFailed: {
+    vi: "Không thể xác nhận khoản cọc.",
+    en: "Unable to confirm deposit."
+  },
+  invalidProofFile: {
+    vi: "Vui lòng chọn tệp proof hợp lệ.",
+    en: "Please select a valid payment proof file."
+  },
+  memberProfileRequired: {
+    vi: "Cần có hồ sơ member để tải proof thanh toán.",
+    en: "Member profile is required to upload payment proof."
+  },
+  missingPaymentContext: {
+    vi: "Thiếu mã thanh toán hoặc mã yêu cầu thanh toán.",
+    en: "Missing payment token or payment request id."
+  },
+  paymentProofRejected: {
+    vi: "Proof thanh toán đã bị từ chối.",
+    en: "Payment proof rejected."
+  },
+  paymentProofRejectedFailed: {
+    vi: "Không thể từ chối proof thanh toán.",
+    en: "Unable to reject payment proof."
+  },
+  paymentProofUploaded: {
+    vi: "Proof thanh toán đã được tải lên.",
+    en: "Payment proof uploaded."
+  },
+  paymentRequestCreated: {
+    vi: "Yêu cầu thanh toán đã được tạo.",
+    en: "Payment request created."
+  },
+  requestOwnershipMismatch: {
+    vi: "Yêu cầu thanh toán không thuộc về member hiện tại.",
+    en: "Payment request does not belong to the current member."
+  },
+  uploadPaymentProofFailed: {
+    vi: "Không thể tải proof thanh toán.",
+    en: "Unable to upload payment proof."
+  }
+} as const;
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -74,6 +126,7 @@ export async function createPaymentRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
   const returnTo = readReturnTo(formData);
+  const locale = readLocaleFromFormData(formData);
 
   try {
     await createPaymentRequest({
@@ -86,13 +139,14 @@ export async function createPaymentRequestAction(formData: FormData) {
       source: readOptionalString(formData, "source") ?? "admin_console"
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to create payment request."));
+    console.warn("[payments] Failed to create payment request", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.createPaymentRequestFailed));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(returnTo, "success", "Payment request created.");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.paymentRequestCreated));
 }
 
 function readRequiredNumber(formData: FormData, key: string) {
@@ -107,6 +161,13 @@ function readRequiredNumber(formData: FormData, key: string) {
 
 export async function submitPaymentProofAction(formData: FormData) {
   const returnTo = readReturnTo(formData);
+  const locale = readLocaleFromFormData(formData);
+  const safeValidationMessages = new Set([
+    localize(locale, copy.invalidProofFile),
+    localize(locale, copy.missingPaymentContext),
+    localize(locale, copy.memberProfileRequired),
+    localize(locale, copy.requestOwnershipMismatch)
+  ]);
 
   try {
     const token = readOptionalString(formData, "paymentToken");
@@ -116,12 +177,12 @@ export async function submitPaymentProofAction(formData: FormData) {
 
     const proofFileRaw = formData.get("proofFile");
     if (!(proofFileRaw instanceof File) || proofFileRaw.size <= 0) {
-      throw new Error("Please select a valid payment proof file.");
+      throw new Error(localize(locale, copy.invalidProofFile));
     }
     const proofFile = proofFileRaw;
 
     if (!token && !paymentRequestId) {
-      throw new Error("Missing payment token or payment request id.");
+      throw new Error(localize(locale, copy.missingPaymentContext));
     }
 
     if (paymentRequestId) {
@@ -129,13 +190,13 @@ export async function submitPaymentProofAction(formData: FormData) {
       const customer = user ? await getCustomerByAuthUserId(user.id) : null;
 
       if (!customer) {
-        throw new Error("Member profile is required to upload payment proof.");
+        throw new Error(localize(locale, copy.memberProfileRequired));
       }
 
       const paymentRequest = await getPaymentRequestById(paymentRequestId);
 
       if (!paymentRequest || paymentRequest.customer_id !== customer.id) {
-        throw new Error("Payment request does not belong to the current member.");
+        throw new Error(localize(locale, copy.requestOwnershipMismatch));
       }
     }
 
@@ -147,7 +208,10 @@ export async function submitPaymentProofAction(formData: FormData) {
       uploadedVia
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to upload payment proof."));
+    console.warn("[payments] Failed to upload payment proof", error);
+    const candidateMessage = error instanceof Error ? error.message : "";
+    const message = safeValidationMessages.has(candidateMessage) ? candidateMessage : localize(locale, copy.uploadPaymentProofFailed);
+    redirectWithActionResult(returnTo, "error", message);
     throw error;
   }
 
@@ -155,12 +219,13 @@ export async function submitPaymentProofAction(formData: FormData) {
   revalidatePath("/member");
 
   if (returnTo) {
-    redirect(buildActionResultHref(returnTo, { kind: "success", message: "Payment proof uploaded." }));
+    redirect(buildActionResultHref(returnTo, { kind: "success", message: localize(locale, copy.paymentProofUploaded) }));
   }
 }
 
 export async function verifyPaymentRequestAction(formData: FormData) {
   const returnTo = readReturnTo(formData);
+  const locale = readLocaleFromFormData(formData);
   let status: "verified" | "rejected" | null = null;
 
   try {
@@ -176,10 +241,11 @@ export async function verifyPaymentRequestAction(formData: FormData) {
       status
     });
   } catch (error) {
+    console.warn("[payments] Failed to verify payment request", { error, status });
     redirectWithActionResult(
       returnTo,
       "error",
-      getErrorMessage(error, status === "verified" ? "Unable to confirm deposit." : "Unable to reject payment proof.")
+      status === "verified" ? localize(locale, copy.depositConfirmationFailed) : localize(locale, copy.paymentProofRejectedFailed)
     );
     throw error;
   }
@@ -189,6 +255,6 @@ export async function verifyPaymentRequestAction(formData: FormData) {
   redirectWithActionResult(
     returnTo,
     "success",
-    status === "verified" ? "Deposit confirmed successfully." : "Payment proof rejected."
+    status === "verified" ? localize(locale, copy.depositConfirmed) : localize(locale, copy.paymentProofRejected)
   );
 }

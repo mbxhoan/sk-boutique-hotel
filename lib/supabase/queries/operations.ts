@@ -336,7 +336,7 @@ export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = 
     listReservationRoomItems(),
     listAvailabilityRequests({ branchId: branchFilterId, limit: 8 }),
     listRoomHolds({ branchId: branchFilterId, limit: 8, status: ["active", "converted", "expired"] }),
-    listReservations({ branchId: branchFilterId, limit: 20, since: dashboardWindowSince }),
+    listReservations({ branchId: branchFilterId, limit: 200, since: dashboardWindowSince }),
     listAuditLogs({ branchId: branchFilterId, limit: 10, since: dashboardWindowSince }),
     listBranchBankAccounts({ branchId: branchFilterId, limit: 20 }),
     listPaymentRequests({ branchId: branchFilterId, limit: 12 }),

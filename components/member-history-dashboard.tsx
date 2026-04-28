@@ -2,6 +2,7 @@ import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { MemberLiveUpdates } from "@/components/member-live-updates";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import type { WorkflowAuditLog, WorkflowMemberHistoryData, WorkflowPaymentRequest } from "@/lib/supabase/workflow.types";
 
@@ -130,6 +131,7 @@ function PaymentRequestCard({
       {canUpload ? (
         <form className="portal-form" action={submitPaymentProofAction}>
           <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+          <input name="locale" type="hidden" value={locale} />
           <input name="returnTo" type="hidden" value="/member" />
           <input name="uploadedVia" type="hidden" value="member_portal" />
           <label className="portal-field">
@@ -140,9 +142,9 @@ function PaymentRequestCard({
             <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
             <textarea className="portal-field__control" name="note" rows={3} />
           </label>
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}>
             {locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
-          </button>
+          </PortalSubmitButton>
         </form>
       ) : null}
     </PortalCard>

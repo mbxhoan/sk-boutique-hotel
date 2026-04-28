@@ -3935,7 +3935,10 @@ textarea {
   border-radius: 1rem;
   overflow: hidden;
   min-height: 12rem;
-  background: rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(135deg, rgba(245, 240, 228, 0.95) 0%, rgba(255, 255, 255, 0.92) 100%),
+    repeating-linear-gradient(45deg, rgba(0, 12, 30, 0.05) 0 12px, transparent 12px 24px);
+  border: 1px solid rgba(197, 160, 89, 0.12);
 }
 
 .admin-media__asset-image {
@@ -3972,6 +3975,221 @@ textarea {
   padding: 0.35rem 0.55rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-media__asset-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-media__dialog,
+.admin-accounts__dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: rgba(8, 12, 22, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: auth-loading-fade 0.18s ease-out;
+}
+
+.admin-media__dialog-card,
+.admin-accounts__dialog-card {
+  width: min(100%, 72rem);
+  max-height: min(92vh, 76rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 1.4rem;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7f0 100%);
+  color: var(--ink);
+  box-shadow: 0 32px 70px rgba(0, 12, 30, 0.28);
+}
+
+.admin-media__dialog-head,
+.admin-accounts__dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.07);
+}
+
+.admin-media__dialog-eyebrow,
+.admin-accounts__dialog-eyebrow {
+  margin: 0;
+  color: var(--gold-strong, #b48a3b);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.admin-media__dialog-title,
+.admin-accounts__dialog-title {
+  margin: 0.25rem 0 0;
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.admin-media__dialog-close,
+.admin-accounts__dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgba(0, 12, 30, 0.08);
+  border-radius: 999px;
+  background: rgba(0, 12, 30, 0.04);
+  color: rgba(16, 35, 62, 0.72);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-media__dialog-body,
+.admin-accounts__dialog-body {
+  display: grid;
+  gap: 1rem;
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1.15rem 1.15rem;
+}
+
+.admin-media__dialog-preview {
+  display: grid;
+  place-items: center;
+  min-height: 24rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgba(245, 240, 228, 0.9) 0%, rgba(255, 255, 255, 0.88) 100%),
+    repeating-linear-gradient(45deg, rgba(0, 12, 30, 0.05) 0 12px, transparent 12px 24px);
+}
+
+.admin-media__dialog-image {
+  width: 100%;
+  max-height: 34rem;
+  object-fit: contain;
+  border-radius: 0.9rem;
+  box-shadow: 0 18px 42px rgba(0, 12, 30, 0.15);
+  background: #ffffff;
+}
+
+.admin-media__dialog-empty {
+  display: grid;
+  place-items: center;
+  min-height: 16rem;
+  color: #5d6472;
+  font-weight: 600;
+}
+
+.admin-media__dialog-meta {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-media__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.admin-accounts__dialog-card {
+  width: min(100%, 80rem);
+}
+
+.admin-accounts__dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.admin-accounts__dialog-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-accounts__dialog-sections {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-accounts__dialog-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-accounts__dialog-list,
+.admin-accounts__dialog-timeline {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-accounts__dialog-list-item,
+.admin-accounts__dialog-timeline-item {
+  padding: 0.72rem 0;
+  border-bottom: 1px solid rgba(0, 12, 30, 0.08);
+}
+
+.admin-accounts__dialog-list-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-accounts__dialog-timeline-item:last-child,
+.admin-accounts__dialog-list-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-accounts__dialog-item-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.admin-accounts__dialog-item-copy {
+  margin: 0.2rem 0 0;
+  color: #5d6472;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.admin-accounts-page__customer-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-accounts-page__customer-link:hover,
+.admin-accounts-page__customer-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.16em;
 }
 
 .admin-media__tabs {
@@ -5188,6 +5406,48 @@ textarea {
   color: rgba(16, 35, 62, 0.7);
   font-size: 0.86rem;
   line-height: 1.55;
+}
+
+.portal-submit-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.portal-submit-button[data-busy="true"] {
+  cursor: progress;
+  opacity: 0.92 !important;
+  pointer-events: none;
+  transform: none;
+}
+
+.portal-submit-button__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.portal-submit-button[data-busy="true"] .portal-submit-button__label::after {
+  content: "";
+  display: inline-block;
+  width: 0.95em;
+  text-align: left;
+  animation: auth-loading-dots 1.2s steps(4, end) infinite;
+}
+
+.portal-submit-button__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 999px;
+  opacity: 0.72;
+  animation: auth-loading-spin 0.7s linear infinite;
 }
 
 @keyframes auth-loading-spin {

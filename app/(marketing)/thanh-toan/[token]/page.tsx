@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { PageViewTracker } from "@/components/page-view-tracker";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import { resolveLocale } from "@/lib/locale";
 import { buildVietQrImageUrl, getPaymentRequestByPublicToken } from "@/lib/supabase/payments";
@@ -131,6 +132,7 @@ export default async function PaymentUploadPage({ params, searchParams }: PagePr
 
             <form className="portal-form" action={submitPaymentProofAction}>
               <input name="paymentToken" type="hidden" value={resolvedParams.token} />
+              <input name="locale" type="hidden" value={locale} />
               <input name="returnTo" type="hidden" value={`/thanh-toan/${resolvedParams.token}`} />
               <input name="uploadedVia" type="hidden" value="public_link" />
               <label className="portal-field">
@@ -141,9 +143,9 @@ export default async function PaymentUploadPage({ params, searchParams }: PagePr
                 <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
                 <textarea className="portal-field__control" name="note" rows={4} />
               </label>
-              <button className="button button--solid" type="submit">
+              <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Uploading..." : "Đang tải..."}>
                 {locale === "en" ? "Upload proof" : "Tải proof"}
-              </button>
+              </PortalSubmitButton>
             </form>
           </PortalCard>
         </div>

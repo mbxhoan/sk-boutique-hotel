@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { resolveMediaSource } from "@/lib/media/library";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -144,24 +145,24 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
         </PortalCard>
 
         <div className="admin-room-types__editor-stack">
-          <PortalCard className="admin-room-types__hero" tone="default">
-            <div className="admin-room-types__hero-copy">
-              <p className="portal-panel__eyebrow">{selectedRoomType.code}</p>
-              <h2 className="admin-room-types__hero-title">{roomTypeTitle}</h2>
-              <p className="admin-room-types__hero-description">{roomTypeDescription}</p>
-            </div>
-
-            <div className="admin-room-types__hero-actions">
-              <PortalBadge tone={selectedRoomType.is_active ? "accent" : "neutral"}>
-                {selectedRoomType.is_active ? localize(locale, { vi: "Đang hoạt động", en: "Active" }) : localize(locale, { vi: "Tạm ẩn", en: "Hidden" })}
-              </PortalBadge>
-              <button className="button button--solid" form="room-type-form" type="submit">
-                {localize(locale, { vi: "Lưu thay đổi", en: "Save changes" })}
-              </button>
-            </div>
-          </PortalCard>
-
           <form className="admin-room-types__form" action={saveRoomTypeAction} id="room-type-form">
+            <PortalCard className="admin-room-types__hero" tone="default">
+              <div className="admin-room-types__hero-copy">
+                <p className="portal-panel__eyebrow">{selectedRoomType.code}</p>
+                <h2 className="admin-room-types__hero-title">{roomTypeTitle}</h2>
+                <p className="admin-room-types__hero-description">{roomTypeDescription}</p>
+              </div>
+
+              <div className="admin-room-types__hero-actions">
+                <PortalBadge tone={selectedRoomType.is_active ? "accent" : "neutral"}>
+                  {selectedRoomType.is_active ? localize(locale, { vi: "Đang hoạt động", en: "Active" }) : localize(locale, { vi: "Tạm ẩn", en: "Hidden" })}
+                </PortalBadge>
+                <PortalSubmitButton className="button button--solid" pendingLabel={localize(locale, { vi: "Đang lưu...", en: "Saving..." })}>
+                  {localize(locale, { vi: "Lưu thay đổi", en: "Save changes" })}
+                </PortalSubmitButton>
+              </div>
+            </PortalCard>
+
             <input name="id" type="hidden" value={selectedRoomType.id} />
 
             <div className="admin-room-types__form-grid">

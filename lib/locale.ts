@@ -111,6 +111,12 @@ export function resolveLocale(input?: string | null): Locale {
   return input?.toLowerCase() === "en" ? "en" : defaultLocale;
 }
 
+export function readLocaleFromFormData(formData: FormData): Locale {
+  const value = formData.get("locale");
+
+  return resolveLocale(typeof value === "string" ? value : null);
+}
+
 export function translate(locale: Locale, value: string): string {
   if (locale === "vi") {
     return value;

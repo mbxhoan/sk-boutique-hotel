@@ -41,6 +41,7 @@ export function AdminBookingDetailToolbar({
     const reason = window.prompt(locale === "en" ? "Optional completion note:" : "Ghi chú khi hoàn tất booking (không bắt buộc):") ?? "";
     const formData = new FormData();
     formData.append("reservationId", reservationId);
+    formData.append("locale", locale);
     formData.append("status", "completed");
     formData.append("returnTo", returnTo);
     formData.append("reason", reason);
@@ -55,6 +56,7 @@ export function AdminBookingDetailToolbar({
     if (!reason) return;
     const formData = new FormData();
     formData.append("reservationId", reservationId);
+    formData.append("locale", locale);
     formData.append("status", "cancelled");
     formData.append("returnTo", returnTo);
     formData.append("reason", reason);
@@ -69,6 +71,7 @@ export function AdminBookingDetailToolbar({
     if (!note) return;
     const formData = new FormData();
     formData.append("availabilityRequestId", requestId);
+    formData.append("locale", locale);
     formData.append("status", "rejected");
     formData.append("returnTo", returnTo);
     formData.append("note", note);
@@ -88,6 +91,7 @@ export function AdminBookingDetailToolbar({
 
     const formData = new FormData();
     formData.append("paymentRequestId", paymentRequestId);
+    formData.append("locale", locale);
     formData.append("status", "verified");
     formData.append("returnTo", returnTo);
     formData.append("note", "Manual verification from toolbar");
@@ -101,6 +105,7 @@ export function AdminBookingDetailToolbar({
     if (!paymentRequestId || !returnTo) return;
     const formData = new FormData();
     formData.append("paymentRequestId", paymentRequestId);
+    formData.append("locale", locale);
     formData.append("returnTo", returnTo);
     startTransition(() => {
       resendDepositRequestEmailAction(formData);
@@ -115,48 +120,63 @@ export function AdminBookingDetailToolbar({
 
       {canVerify && (
         <button
+          aria-busy={isPending}
           className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--success"
           disabled={isPending}
           onClick={handleVerifyDeposit}
           type="button"
         >
+          {isPending ? <span aria-hidden="true" className="portal-submit-button__spinner" /> : null}
           {locale === "en" ? "Verify Deposit" : "Duyệt cọc"}
         </button>
       )}
 
       {canResendEmail && (
-        <button className="button button--text-light admin-booking-detail__toolbar-link" disabled={isPending} onClick={handleResendEmail} type="button">
+        <button
+          aria-busy={isPending}
+          className="button button--text-light admin-booking-detail__toolbar-link"
+          disabled={isPending}
+          onClick={handleResendEmail}
+          type="button"
+        >
+          {isPending ? <span aria-hidden="true" className="portal-submit-button__spinner" /> : null}
           {locale === "en" ? "Resend QR" : "Gửi lại QR"}
         </button>
       )}
 
       {canComplete && (
         <button
+          aria-busy={isPending}
           className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--success"
           disabled={isPending}
           onClick={handleComplete}
           type="button"
         >
+          {isPending ? <span aria-hidden="true" className="portal-submit-button__spinner" /> : null}
           {locale === "en" ? "Complete" : "Hoàn tất"}
         </button>
       )}
       {canCancel && (
         <button
+          aria-busy={isPending}
           className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--danger"
           disabled={isPending}
           onClick={handleCancel}
           type="button"
         >
+          {isPending ? <span aria-hidden="true" className="portal-submit-button__spinner" /> : null}
           {locale === "en" ? "Cancel Booking" : "Hủy Booking"}
         </button>
       )}
       {canReject && (
         <button
+          aria-busy={isPending}
           className="button admin-booking-detail__toolbar-link admin-booking-detail__toolbar-link--danger"
           disabled={isPending}
           onClick={handleReject}
           type="button"
         >
+          {isPending ? <span aria-hidden="true" className="portal-submit-button__spinner" /> : null}
           {locale === "en" ? "Reject" : "Từ chối"}
         </button>
       )}

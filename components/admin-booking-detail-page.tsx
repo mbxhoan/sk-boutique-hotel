@@ -14,6 +14,7 @@ import {
 import { verifyPaymentRequestAction } from "@/app/actions/payments";
 import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import { AdminBookingDetailToolbar } from "@/components/admin-booking-detail-toolbar";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
@@ -578,6 +579,7 @@ function ConfirmAvailabilityCard({
       <form action={confirmAvailabilityRequestAction} className="portal-form">
         <input name="availabilityRequestId" type="hidden" value={request.id} />
         <input name="actorRole" type="hidden" value="staff" />
+        <input name="locale" type="hidden" value={locale} />
         <input name="returnTo" type="hidden" value={returnTo} />
 
         <label className="portal-field">
@@ -660,9 +662,9 @@ function ConfirmAvailabilityCard({
           <textarea className="portal-field__control" defaultValue={request.note} name="notes" rows={3} />
         </label>
 
-        <button className="button admin-booking-detail__primary-action" disabled={!selectedRoomId} type="submit">
+        <PortalSubmitButton className="button admin-booking-detail__primary-action" disabled={!selectedRoomId} pendingLabel={locale === "en" ? "Confirming..." : "Đang xác nhận..."}>
           {locale === "en" ? "Confirm availability" : "Xác nhận còn phòng"}
-        </button>
+        </PortalSubmitButton>
       </form>
     </PortalCard>
   );
@@ -706,6 +708,7 @@ function DepositCard({
       <form action={reissueDepositPaymentRequestAction} className="portal-form">
         <input name="reservationId" type="hidden" value={reservation.id} />
         <input name="actorRole" type="hidden" value="staff" />
+        <input name="locale" type="hidden" value={locale} />
         <input name="returnTo" type="hidden" value={returnTo} />
 
         <div className="portal-grid portal-grid--two">
@@ -762,9 +765,12 @@ function DepositCard({
           {activePaymentRequest ? <PaymentRequestActions locale={locale} paymentRequest={activePaymentRequest} returnTo={returnTo} /> : null}
         </div>
 
-        <button className={`button button--text-light ${shouldHighlightRegenerate ? "admin-booking-detail__button--attention" : ""}`} type="submit">
+        <PortalSubmitButton
+          className={`button button--text-light ${shouldHighlightRegenerate ? "admin-booking-detail__button--attention" : ""}`}
+          pendingLabel={locale === "en" ? "Generating..." : "Đang tạo..."}
+        >
           {activePaymentRequest ? (locale === "en" ? "Regenerate QR" : "Tạo lại mã QR") : locale === "en" ? "Issue QR" : "Tạo mã QR"}
-        </button>
+        </PortalSubmitButton>
       </form>
     </PortalCard>
   );
@@ -830,6 +836,7 @@ function VerifyDepositCard({
 
       <form action={verifyPaymentRequestAction} className="portal-form">
         <input name="actorRole" type="hidden" value="staff" />
+        <input name="locale" type="hidden" value={locale} />
         <input name="paymentRequestId" type="hidden" value={activePaymentRequest?.id ?? ""} />
         <input name="returnTo" type="hidden" value={returnTo} />
 
@@ -843,14 +850,25 @@ function VerifyDepositCard({
           />
         </label>
 
-        <button className="button admin-booking-detail__muted-action" disabled={!canVerify} name="status" type="submit" value="verified">
+        <PortalSubmitButton
+          className="button admin-booking-detail__muted-action"
+          disabled={!canVerify}
+          name="status"
+          pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}
+          value="verified"
+        >
           {locale === "en" ? "Confirm deposit received" : "Xác nhận đã nhận cọc"}
-        </button>
+        </PortalSubmitButton>
 
         {canVerify ? (
-          <button className="button admin-booking-detail__ghost-danger" name="status" type="submit" value="rejected">
+          <PortalSubmitButton
+            className="button admin-booking-detail__ghost-danger"
+            name="status"
+            pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}
+            value="rejected"
+          >
             {locale === "en" ? "Reject proof" : "Từ chối proof"}
-          </button>
+          </PortalSubmitButton>
         ) : null}
       </form>
     </PortalCard>
@@ -923,17 +941,19 @@ function PaymentRequestActions({
       </button>
       <form action={resendDepositRequestEmailAction}>
         <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+        <input name="locale" type="hidden" value={locale} />
         <input name="returnTo" type="hidden" value={returnTo} />
-        <button className="button button--text-light" type="submit">
+        <PortalSubmitButton className="button button--text-light" pendingLabel={locale === "en" ? "Sending..." : "Đang gửi..."}>
           {locale === "en" ? "Send email" : "Gửi email"}
-        </button>
+        </PortalSubmitButton>
       </form>
       <form action={notifyPaymentRequestMemberAction}>
         <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+        <input name="locale" type="hidden" value={locale} />
         <input name="returnTo" type="hidden" value={returnTo} />
-        <button className="button button--text-light" type="submit">
-          {locale === "en" ? "Notify app" : "Notify app"}
-        </button>
+        <PortalSubmitButton className="button button--text-light" pendingLabel={locale === "en" ? "Sending..." : "Đang gửi..."}>
+          {locale === "en" ? "Notify app" : "Thông báo app"}
+        </PortalSubmitButton>
       </form>
     </div>
   );

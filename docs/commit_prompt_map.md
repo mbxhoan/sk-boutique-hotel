@@ -219,6 +219,30 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `prompt_summary`: Sửa Supabase browser client để đọc env public bằng access trực tiếp, tránh Next.js bỏ qua biến khi bundle client.
 - `commit_message`: `fix(supabase): inline public envs for browser client`
 
+## 2026-04-28
+
+### Entry 000
+- `time`: 2026-04-28T23:47:42+07:00
+- `prompt_summary`: Thêm popup tạo danh mục trong thư viện ảnh, popup chi tiết khách hàng, sửa dashboard revenue/chart và hold card, song ngữ hóa message, và thêm loading/disabled cho các thao tác submit trong admin portal.
+- `commit_message`: `fix(admin-portal): add dialogs, dashboard fixes, and loading states`
+- `main_files`:
+  - `components/admin-media-manager.tsx`
+  - `components/admin-accounts-page.tsx`
+  - `app/(admin)/admin/accounts/page.tsx`
+  - `components/admin-dashboard.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-booking-detail-toolbar.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `app/(marketing)/thanh-toan/[token]/page.tsx`
+  - `app/actions/payments.ts`
+  - `app/(admin)/admin/actions.ts`
+  - `components/portal-submit-button.tsx`
+  - `lib/locale.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `app/globals.css`
+
 ### Entry 015
 - `time`: 2026-04-12T01:30:00+07:00
 - `prompt_summary`: Chốt lại seeded admin password cho auth demo, đồng bộ hint UI để hết mơ hồ khi đăng nhập admin portal.

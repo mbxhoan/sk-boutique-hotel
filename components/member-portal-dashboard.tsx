@@ -2,6 +2,7 @@
 
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { useEffect, useState } from "react";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
@@ -439,6 +440,7 @@ function PaymentRequestPanel({
 
           <form className="portal-form member-payment-panel__form" action={submitPaymentProofAction} encType="multipart/form-data">
             <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+            <input name="locale" type="hidden" value={locale} />
             <input name="returnTo" type="hidden" value={returnTo} />
             <input name="uploadedVia" type="hidden" value="member_portal" />
 
@@ -453,9 +455,12 @@ function PaymentRequestPanel({
             </label>
 
             <div className="member-payment-panel__actions">
-              <button className="button button--solid member-payment-panel__submit" type="submit">
+              <PortalSubmitButton
+                className="button button--solid member-payment-panel__submit"
+                pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}
+              >
                 {locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
-              </button>
+              </PortalSubmitButton>
             </div>
           </form>
         </>
