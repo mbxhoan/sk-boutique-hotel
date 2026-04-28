@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalHelp, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
 import {
   confirmAvailabilityRequestAction,
@@ -50,10 +51,21 @@ function formatDateTime(locale: Locale, value: string) {
 
 function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
-    dateStyle: "medium"
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh"
   });
 
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
+}
+
+function toAsiaSaigonDateInputValue(value: string) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(new Date(value));
 }
 
 function formatMoney(locale: Locale, value: number, currency = "VND") {
@@ -737,6 +749,7 @@ function RequestDetailPanel({
           <form className="portal-form portal-workflow-card__status-form" action={updateAvailabilityRequestStatusAction}>
             <input name="availabilityRequestId" type="hidden" value={request.id} />
             <input name="actorRole" type="hidden" value="staff" />
+            <input name="locale" type="hidden" value={locale} />
             {alternativeStatuses.length ? (
               <label className="portal-field">
                 <span className="portal-field__label">{locale === "en" ? "Change to" : "Đổi sang"}</span>
@@ -749,9 +762,9 @@ function RequestDetailPanel({
                 </select>
               </label>
             ) : null}
-            <button className="button button--solid" type="submit" disabled={!alternativeStatuses.length}>
+            <PortalSubmitButton className="button button--solid" disabled={!alternativeStatuses.length} pendingLabel={locale === "en" ? "Updating..." : "Đang cập nhật..."}>
               {locale === "en" ? "Update status" : "Cập nhật trạng thái"}
-            </button>
+            </PortalSubmitButton>
           </form>
         ) : null}
       </div>
@@ -787,6 +800,7 @@ function RequestDetailPanel({
       {canOperate ? (
         <form className="portal-form portal-workflow-card__confirm-form" action={confirmAvailabilityRequestAction}>
           <input name="actorRole" type="hidden" value="staff" />
+          <input name="locale" type="hidden" value={locale} />
           <input name="availabilityRequestId" type="hidden" value={request.id} />
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Room type" : "Hạng phòng"}</span>
@@ -801,11 +815,11 @@ function RequestDetailPanel({
           <div className="portal-grid portal-grid--two">
             <label className="portal-field">
               <span className="portal-field__label">{locale === "en" ? "Check-in" : "Check-in"}</span>
-              <input className="portal-field__control" defaultValue={request.stay_start_at.slice(0, 10)} name="stayStartAt" type="date" />
+              <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_start_at)} name="stayStartAt" type="date" />
             </label>
             <label className="portal-field">
               <span className="portal-field__label">{locale === "en" ? "Check-out" : "Check-out"}</span>
-              <input className="portal-field__control" defaultValue={request.stay_end_at.slice(0, 10)} name="stayEndAt" type="date" />
+              <input className="portal-field__control" defaultValue={toAsiaSaigonDateInputValue(request.stay_end_at)} name="stayEndAt" type="date" />
             </label>
           </div>
           <div className="portal-grid portal-grid--two">
@@ -838,9 +852,9 @@ function RequestDetailPanel({
             <span className="portal-field__label">{locale === "en" ? "Notes" : "Ghi chú"}</span>
             <textarea className="portal-field__control" name="notes" rows={3} defaultValue={request.note} />
           </label>
-          <button className="button button--solid" type="submit" disabled={!roomSuggestions.length}>
+          <PortalSubmitButton className="button button--solid" disabled={!roomSuggestions.length} pendingLabel={locale === "en" ? "Confirming..." : "Đang chốt..."}>
             {locale === "en" ? "Confirm & send deposit" : "Chốt & gửi cọc"}
-          </button>
+          </PortalSubmitButton>
         </form>
       ) : null}
 
@@ -891,6 +905,7 @@ function RequestDetailPanel({
                 {canOperate ? (
                   <form className="portal-form" action={createRoomHoldAction}>
                     <input name="actorRole" type="hidden" value="staff" />
+                    <input name="locale" type="hidden" value={locale} />
                     <input name="availabilityRequestId" type="hidden" value={request.id} />
                     <input name="branchId" type="hidden" value={request.branch_id} />
                     <input name="roomTypeId" type="hidden" value={request.room_type_id} />
@@ -903,9 +918,9 @@ function RequestDetailPanel({
                       <span className="portal-field__label">{locale === "en" ? "Hold minutes" : "Số phút hold"}</span>
                       <input className="portal-field__control" defaultValue={30} min={5} name="holdMinutes" step={5} type="number" />
                     </label>
-                    <button className="button button--solid" type="submit">
+                    <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Holding..." : "Đang giữ..."}>
                       {locale === "en" ? "Hold this room" : "Giữ phòng này"}
-                    </button>
+                    </PortalSubmitButton>
                   </form>
                 ) : null}
               </PortalCard>
@@ -980,6 +995,7 @@ function HoldCard({
       {canOperate && hold.customer_id ? (
         <form className="portal-form" action={createReservationAction}>
           <input name="actorRole" type="hidden" value="staff" />
+          <input name="locale" type="hidden" value={locale} />
           <input name="availabilityRequestId" type="hidden" value={hold.availability_request_id ?? ""} />
           <input name="basePrice" type="hidden" value={String(pricing.basePrice)} />
           <input name="branchId" type="hidden" value={hold.branch_id} />
@@ -997,9 +1013,9 @@ function HoldCard({
           <input name="stayStartAt" type="hidden" value={hold.stay_start_at} />
           <input name="totalAmount" type="hidden" value={String(totalAmount)} />
           <input name="weekendSurcharge" type="hidden" value={String(pricing.weekendSurcharge)} />
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Creating..." : "Đang tạo..."}>
             {locale === "en" ? "Create reservation" : "Tạo reservation"}
-          </button>
+          </PortalSubmitButton>
         </form>
       ) : canOperate ? (
         <p className="portal-item-card__note">
@@ -1067,6 +1083,7 @@ function ReservationCard({
         <form className="portal-form" action={createPaymentRequestAction}>
           <input name="amount" type="hidden" value={String(reservation.deposit_amount || reservation.total_amount)} />
           <input name="createdBy" type="hidden" value="staff" />
+          <input name="locale" type="hidden" value={locale} />
           <input name="reservationId" type="hidden" value={reservation.id} />
           <input name="source" type="hidden" value="admin_console" />
           <label className="portal-field">
@@ -1084,9 +1101,9 @@ function ReservationCard({
             <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
             <textarea className="portal-field__control" name="note" rows={3} defaultValue={reservation.notes} />
           </label>
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Creating..." : "Đang tạo..."}>
             {locale === "en" ? "Create payment request" : "Tạo payment request"}
-          </button>
+          </PortalSubmitButton>
         </form>
       ) : null}
     </PortalCard>
@@ -1155,6 +1172,7 @@ function PaymentRequestCard({
       {canOperate && canVerify ? (
         <form className="portal-form" action={verifyPaymentRequestAction}>
           <input name="actorRole" type="hidden" value="staff" />
+          <input name="locale" type="hidden" value={locale} />
           <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
           <label className="portal-field">
             <span className="portal-field__label">{locale === "en" ? "Status" : "Trạng thái"}</span>
@@ -1167,9 +1185,9 @@ function PaymentRequestCard({
             <span className="portal-field__label">{locale === "en" ? "Review note" : "Ghi chú duyệt"}</span>
             <textarea className="portal-field__control" name="reviewNote" rows={3} />
           </label>
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}>
             {locale === "en" ? "Save verification" : "Lưu verify"}
-          </button>
+          </PortalSubmitButton>
         </form>
       ) : null}
 
@@ -1225,6 +1243,7 @@ function EmailTestCard({
       </p>
 
       <form className="portal-form" action={sendEmailTestAction}>
+        <input name="locale" type="hidden" value={locale} />
         <label className="portal-field">
           <span className="portal-field__label">{locale === "en" ? "Template" : "Template"}</span>
           <select className="portal-field__control" name="templateKey" defaultValue="booking_request_customer">
@@ -1247,9 +1266,9 @@ function EmailTestCard({
           />
         </label>
 
-        <button className="button button--solid" type="submit">
+        <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Sending..." : "Đang gửi..."}>
           {locale === "en" ? "Send test email" : "Gửi test email"}
-        </button>
+        </PortalSubmitButton>
       </form>
     </PortalCard>
   );
@@ -1331,16 +1350,17 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
 
       <section className="portal-section" id="holds">
         <PortalSectionHeading
-          actions={
-            canOperate ? (
-              <form action={releaseExpiredHoldsAction}>
-                <input name="asOf" type="hidden" value="" />
-                <button className="button button--text-light" type="submit">
-                  {locale === "en" ? "Release expired holds & bookings" : "Dọn holds & booking hết hạn"}
-                </button>
-              </form>
-            ) : null
-          }
+        actions={
+          canOperate ? (
+            <form action={releaseExpiredHoldsAction}>
+              <input name="asOf" type="hidden" value="" />
+              <input name="locale" type="hidden" value={locale} />
+              <PortalSubmitButton className="button button--text-light" pendingLabel={locale === "en" ? "Releasing..." : "Đang dọn..."}>
+                {locale === "en" ? "Release expired holds & bookings" : "Dọn holds & booking hết hạn"}
+              </PortalSubmitButton>
+            </form>
+          ) : null
+        }
           description={{
             en: "Active holds live here until they convert or expire.",
             vi: "Hold đang mở sẽ nằm ở đây cho tới khi chuyển đổi hoặc hết hạn."

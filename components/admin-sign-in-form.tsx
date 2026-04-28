@@ -48,16 +48,24 @@ const copy = {
     } satisfies LocalizedText
   },
   signingIn: {
-    vi: "Đang đăng nhập...",
-    en: "Signing in..."
+    vi: "Đang đăng nhập",
+    en: "Signing in"
+  } satisfies LocalizedText,
+  redirecting: {
+    vi: "Đang chuyển vào admin portal",
+    en: "Loading admin portal"
   } satisfies LocalizedText,
   submit: {
     vi: "Đăng nhập",
     en: "Sign in"
   } satisfies LocalizedText,
-  title: {
+  prompt: {
     vi: "Đăng nhập admin",
     en: "Admin sign in"
+  } satisfies LocalizedText,
+  title: {
+    vi: "Truy cập admin portal",
+    en: "Access the admin portal"
   } satisfies LocalizedText
 } as const;
 
@@ -87,6 +95,7 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -105,54 +114,89 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
         throw authError;
       }
 
+      setIsRedirecting(true);
       router.replace(appendLocaleQuery(nextHref, locale));
       router.refresh();
     } catch (submittedError) {
       setError(resolveSignInError(locale, submittedError));
-    } finally {
       setIsSubmitting(false);
     }
   }
 
+  const isBusy = isSubmitting || isRedirecting;
+  const submitLabel = isRedirecting
+    ? localize(locale, copy.redirecting)
+    : isSubmitting
+      ? localize(locale, copy.signingIn)
+      : localize(locale, copy.submit);
+
   return (
-    <form className="admin-auth-form" onSubmit={handleSubmit}>
-      <p className="admin-auth-form__title">{localize(locale, copy.title)}</p>
-      <div className="admin-auth-form__fields">
-        <label className="admin-auth-form__field">
-          <span>{localize(locale, copy.email)}</span>
-          <input
-            autoComplete="email"
-            className="admin-auth-form__input"
-            inputMode="email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@skboutiquehotel.example"
-            type="email"
-            value={email}
-          />
-        </label>
-        <label className="admin-auth-form__field">
-          <span>{localize(locale, copy.password)}</span>
-          <input
-            autoComplete="current-password"
-            className="admin-auth-form__input"
-            name="password"
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="••••••••••"
-            type="password"
-            value={password}
-          />
-        </label>
-      </div>
+    <>
+      <form className="member-auth-form" onSubmit={handleSubmit}>
+        <p className="member-auth-form__title">{localize(locale, copy.title)}</p>
+        <p className="member-auth-form__description">{localize(locale, copy.description)}</p>
 
-      <div className="admin-auth-form__actions">
-        <button className="button button--solid" disabled={isSubmitting} type="submit">
-          {isSubmitting ? localize(locale, copy.signingIn) : localize(locale, copy.submit)}
-        </button>
-      </div>
+        <div className="member-auth-form__fields">
+          <label className="member-auth-form__field">
+            <span>{localize(locale, copy.email)}</span>
+            <input
+              autoComplete="email"
+              className="member-auth-form__input"
+              inputMode="email"
+              name="email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="admin@skboutiquehotel.example"
+              required
+              type="email"
+              value={email}
+            />
+          </label>
+          <label className="member-auth-form__field">
+            <span>{localize(locale, copy.password)}</span>
+            <input
+              autoComplete="current-password"
+              className="member-auth-form__input"
+              name="password"
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="••••••••••"
+              required
+              type="password"
+              value={password}
+            />
+          </label>
+        </div>
 
-      {error ? <p className="admin-auth-form__error">{error}</p> : null}
-      <p className="admin-auth-form__hint">{localize(locale, copy.helper)}</p>
-    </form>
+        <div className="member-auth-form__actions member-auth-form__actions--primary">
+          <button
+            className="button button--solid member-auth-form__submit auth-submit-button"
+            data-busy={isBusy ? "true" : undefined}
+            disabled={isBusy}
+            type="submit"
+          >
+            {isBusy ? <span className="auth-submit-button__spinner" aria-hidden="true" /> : null}
+            <span className="auth-submit-button__label">{submitLabel}</span>
+          </button>
+        </div>
+
+        {error ? <p className="member-auth-form__error">{error}</p> : null}
+        <p className="member-auth-form__hint">{localize(locale, copy.helper)}</p>
+      </form>
+
+      {isRedirecting ? <AuthLoadingOverlay locale={locale} message={localize(locale, copy.redirecting)} /> : null}
+    </>
+  );
+}
+
+function AuthLoadingOverlay({ locale, message }: { locale: "vi" | "en"; message: string }) {
+  return (
+    <div className="auth-loading-overlay" role="status" aria-live="polite">
+      <div className="auth-loading-overlay__card">
+        <span className="auth-loading-overlay__spinner" aria-hidden="true" />
+        <p className="auth-loading-overlay__title">{message}…</p>
+        <p className="auth-loading-overlay__copy">
+          {locale === "en" ? "Setting up your secure session." : "Đang chuẩn bị phiên đăng nhập của bạn."}
+        </p>
+      </div>
+    </div>
   );
 }

@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { MediaAssetRowWithUrl, MediaCollectionRow } from "@/lib/supabase/queries/media";
 import {
@@ -18,6 +22,68 @@ type AdminMediaManagerProps = {
   activeCollectionSlug?: string | null;
   locale: Locale;
 };
+
+function useEscapeToClose(isOpen: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+}
+
+function MediaDialog({
+  children,
+  onClose,
+  title,
+  locale
+}: {
+  children: ReactNode;
+  onClose: () => void;
+  title: string;
+  locale: Locale;
+}) {
+  useEscapeToClose(true, onClose);
+
+  return (
+    <div className="admin-media__dialog" role="presentation" onClick={onClose}>
+      <div
+        aria-labelledby="admin-media-dialog-title"
+        aria-modal="true"
+        className="admin-media__dialog-card"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+      >
+        <header className="admin-media__dialog-head">
+          <div>
+            <p className="admin-media__dialog-eyebrow">{locale === "en" ? "Media library" : "Thư viện ảnh"}</p>
+            <h3 className="admin-media__dialog-title" id="admin-media-dialog-title">
+              {title}
+            </h3>
+          </div>
+          <button
+            aria-label={locale === "en" ? "Close dialog" : "Đóng cửa sổ"}
+            className="admin-media__dialog-close"
+            onClick={onClose}
+            type="button"
+          >
+            ×
+          </button>
+        </header>
+        <div className="admin-media__dialog-body">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 function groupAssetsByCollectionSlug(assets: MediaAssetRowWithUrl[]) {
   return assets.reduce<Record<string, MediaAssetRowWithUrl[]>>((groups, asset) => {
@@ -111,9 +177,9 @@ function NewCollectionForm({ locale }: { locale: Locale }) {
         </label>
 
         <div className="admin-media__actions">
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Creating..." : "Đang tạo..."}>
             {locale === "en" ? "Create collection" : "Tạo danh mục"}
-          </button>
+          </PortalSubmitButton>
         </div>
       </form>
     </PortalCard>
@@ -141,9 +207,9 @@ function CollectionEditor({
 
         <form action={deleteMediaCollectionAction}>
           <input name="slug" type="hidden" value={collection.slug} />
-          <button className="button button--text-light admin-media__danger" type="submit">
+          <PortalSubmitButton className="button button--text-light admin-media__danger" pendingLabel={locale === "en" ? "Deleting..." : "Đang xoá..."}>
             {locale === "en" ? "Delete" : "Xoá"}
-          </button>
+          </PortalSubmitButton>
         </form>
       </div>
 
@@ -182,9 +248,9 @@ function CollectionEditor({
             <input className="portal-field__checkbox" name="isActive" type="checkbox" defaultChecked={collection.is_active} />
           </label>
           <div className="admin-media__actions">
-            <button className="button button--solid" type="submit">
+            <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}>
               {locale === "en" ? "Save" : "Lưu"}
-            </button>
+            </PortalSubmitButton>
           </div>
         </div>
       </form>
@@ -194,13 +260,15 @@ function CollectionEditor({
 
 function AssetEditor({
   asset,
-  locale
+  locale,
+  onOpenPreview
 }: {
   asset: MediaAssetRowWithUrl;
   locale: Locale;
+  onOpenPreview: () => void;
 }) {
   return (
-    <PortalCard className="admin-media__asset-card" tone={asset.is_active ? "default" : "soft"}>
+    <PortalCard className="admin-media__asset-card" id={`media-asset-${asset.id}`} tone={asset.is_active ? "default" : "soft"}>
       <div className="admin-media__asset-preview">
         {asset.public_url ? (
           <img alt={asset.alt_vi || asset.title_vi || asset.slug} className="admin-media__asset-image" loading="lazy" src={asset.public_url} />
@@ -215,14 +283,19 @@ function AssetEditor({
           <h4 className="admin-media__asset-title">{asset.title_vi || asset.title_en || asset.slug}</h4>
         </div>
 
-        <form action={deleteMediaAssetAction}>
-          <input name="id" type="hidden" value={asset.id} />
-          <input name="fileBucket" type="hidden" value={asset.file_bucket} />
-          <input name="filePath" type="hidden" value={asset.file_path ?? ""} />
-          <button className="button button--text-light admin-media__danger" type="submit">
-            {locale === "en" ? "Delete" : "Xoá"}
+        <div className="admin-media__asset-head-actions">
+          <button className="button button--text-light" onClick={onOpenPreview} type="button">
+            {locale === "en" ? "View" : "Xem"}
           </button>
-        </form>
+          <form action={deleteMediaAssetAction}>
+            <input name="id" type="hidden" value={asset.id} />
+            <input name="fileBucket" type="hidden" value={asset.file_bucket} />
+            <input name="filePath" type="hidden" value={asset.file_path ?? ""} />
+            <PortalSubmitButton className="button button--text-light admin-media__danger" pendingLabel={locale === "en" ? "Deleting..." : "Đang xoá..."}>
+              {locale === "en" ? "Delete" : "Xoá"}
+            </PortalSubmitButton>
+          </form>
+        </div>
       </div>
 
       <form className="admin-media__form" action={saveMediaAssetAction} encType="multipart/form-data">
@@ -293,9 +366,9 @@ function AssetEditor({
         </div>
 
         <div className="admin-media__actions">
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}>
             {locale === "en" ? "Save asset" : "Lưu ảnh"}
-          </button>
+          </PortalSubmitButton>
         </div>
       </form>
 
@@ -386,12 +459,81 @@ function NewAssetForm({
         </div>
 
         <div className="admin-media__actions">
-          <button className="button button--solid" type="submit">
+          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Uploading..." : "Đang tải lên..."}>
             {locale === "en" ? "Create asset" : "Tạo ảnh"}
-          </button>
+          </PortalSubmitButton>
         </div>
       </form>
     </PortalCard>
+  );
+}
+
+function CollectionCreateDialog({
+  locale,
+  onClose
+}: {
+  locale: Locale;
+  onClose: () => void;
+}) {
+  return (
+    <MediaDialog locale={locale} onClose={onClose} title={locale === "en" ? "Create collection" : "Tạo danh mục"}>
+      <NewCollectionForm locale={locale} />
+    </MediaDialog>
+  );
+}
+
+function AssetPreviewDialog({
+  asset,
+  locale,
+  onClose
+}: {
+  asset: MediaAssetRowWithUrl;
+  locale: Locale;
+  onClose: () => void;
+}) {
+  const previewUrl = asset.public_url || asset.fallback_url || "";
+  const editHref = `#media-asset-${asset.id}`;
+
+  return (
+    <MediaDialog
+      locale={locale}
+      onClose={onClose}
+      title={localize(locale, {
+        vi: asset.title_vi || asset.slug,
+        en: asset.title_en || asset.slug
+      })}
+    >
+      <div className="admin-media__dialog-preview">
+        {previewUrl ? (
+          <img alt={asset.alt_vi || asset.title_vi || asset.slug} className="admin-media__dialog-image" loading="lazy" src={previewUrl} />
+        ) : (
+          <div className="admin-media__dialog-empty">{locale === "en" ? "No image available" : "Không có ảnh"}</div>
+        )}
+      </div>
+
+      <div className="admin-media__dialog-meta">
+        <p className="portal-panel__eyebrow">
+          {asset.collection_slug}/{asset.slug}
+        </p>
+        <p className="portal-description">{asset.file_name || asset.file_path || asset.fallback_url || "-"}</p>
+        <p className="portal-panel__note-copy">
+          {locale === "en"
+            ? "Use the form on the card below to edit metadata or replace the file."
+            : "Dùng form bên dưới card để sửa metadata hoặc thay file ảnh."}
+        </p>
+      </div>
+
+      <div className="admin-media__dialog-actions">
+        <a className="button button--text-light" href={editHref}>
+          {locale === "en" ? "Jump to edit form" : "Tới form chỉnh sửa"}
+        </a>
+        {previewUrl ? (
+          <a className="button button--solid" href={previewUrl} rel="noreferrer" target="_blank">
+            {locale === "en" ? "Open image" : "Mở ảnh"}
+          </a>
+        ) : null}
+      </div>
+    </MediaDialog>
   );
 }
 
@@ -411,6 +553,9 @@ export function AdminMediaManager({
     accumulator[collection.slug] = groupedAssets[collection.slug]?.length ?? 0;
     return accumulator;
   }, {});
+  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
+  const [previewAssetId, setPreviewAssetId] = useState<string | null>(null);
+  const previewAsset = useMemo(() => assets.find((asset) => asset.id === previewAssetId) ?? null, [assets, previewAssetId]);
 
   return (
     <div className="portal-content admin-media">
@@ -420,6 +565,11 @@ export function AdminMediaManager({
           vi: "Quản lý toàn bộ media dùng chung tại đây. Các trang public có thể chọn ảnh từ nhóm này thay vì hard-code trong source."
         }}
         eyebrow={{ en: "Media library", vi: "Thư viện media" }}
+        actions={
+          <button className="button button--solid" onClick={() => setIsCreateCollectionOpen(true)} type="button">
+            {locale === "en" ? "Add collection" : "Thêm danh mục"}
+          </button>
+        }
         locale={locale}
         title={{ en: "Collections & assets", vi: "Danh mục và ảnh" }}
       />
@@ -467,8 +617,6 @@ export function AdminMediaManager({
         </div>
       </PortalCard>
 
-      <NewCollectionForm locale={locale} />
-
       <div className="admin-media__collection-list">
         {visibleCollections.map((collection) => {
           const collectionAssets = groupedAssets[collection.slug] ?? [];
@@ -493,7 +641,9 @@ export function AdminMediaManager({
 
               <div className="admin-media__grid-list">
                 {collectionAssets.length ? (
-                  collectionAssets.map((asset) => <AssetEditor asset={asset} key={asset.id} locale={locale} />)
+                  collectionAssets.map((asset) => (
+                    <AssetEditor asset={asset} key={asset.id} locale={locale} onOpenPreview={() => setPreviewAssetId(asset.id)} />
+                  ))
                 ) : (
                   <PortalCard tone="soft">
                     <p className="portal-panel__note-copy">
@@ -506,6 +656,9 @@ export function AdminMediaManager({
           );
         })}
       </div>
+
+      {isCreateCollectionOpen ? <CollectionCreateDialog locale={locale} onClose={() => setIsCreateCollectionOpen(false)} /> : null}
+      {previewAsset ? <AssetPreviewDialog asset={previewAsset} locale={locale} onClose={() => setPreviewAssetId(null)} /> : null}
     </div>
   );
 }

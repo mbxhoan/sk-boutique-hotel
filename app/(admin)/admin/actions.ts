@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
+import { localize } from "@/lib/mock/i18n";
+import { readLocaleFromFormData } from "@/lib/locale";
 import { sendEmail } from "@/lib/supabase/email";
 import { sendDepositRequestCustomerEmail } from "@/lib/supabase/email";
 import { updateReservationLifecycle } from "@/lib/supabase/booking-lifecycle";
 import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
-import { getErrorMessage } from "@/lib/supabase/errors";
 import {
   confirmAvailabilityRequest,
   createReservation,
@@ -33,6 +34,93 @@ import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/l
 import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 import { buildMemberPortalUrl, buildVietQrImageUrl, createPaymentRequest } from "@/lib/supabase/payments";
+
+const copy = {
+  bookingCancelledSuccessfully: {
+    vi: "Booking đã được hủy.",
+    en: "Booking cancelled successfully."
+  },
+  bookingMarkedAsCompleted: {
+    vi: "Booking đã được đánh dấu hoàn tất.",
+    en: "Booking marked as completed."
+  },
+  bookingRequestRejected: {
+    vi: "Yêu cầu booking đã bị từ chối.",
+    en: "Booking request was rejected."
+  },
+  bookingRequestUpdated: {
+    vi: "Yêu cầu booking đã được cập nhật.",
+    en: "Booking request was updated."
+  },
+  bookingConfirmedAndDepositQrIssued: {
+    vi: "Booking đã được xác nhận và QR cọc đã được phát hành.",
+    en: "Booking confirmed and deposit QR issued."
+  },
+  bookingNotFound: {
+    vi: "Không tìm thấy booking.",
+    en: "Booking was not found."
+  },
+  depositEmailSentAgain: {
+    vi: "Email deposit đã được gửi lại.",
+    en: "Deposit email sent again."
+  },
+  depositQrIssuedAgain: {
+    vi: "QR cọc mới đã được phát hành.",
+    en: "A new deposit QR has been issued."
+  },
+  memberNotificationSent: {
+    vi: "Thông báo cho member đã được gửi.",
+    en: "Member notification sent."
+  },
+  paymentRequestNotFound: {
+    vi: "Không tìm thấy yêu cầu thanh toán.",
+    en: "Payment request was not found."
+  },
+  reservationNotFoundForPaymentRequest: {
+    vi: "Không tìm thấy booking của yêu cầu thanh toán.",
+    en: "Reservation not found for payment request."
+  },
+  customerProfileNotFoundForPaymentRequest: {
+    vi: "Không tìm thấy hồ sơ khách cho yêu cầu thanh toán.",
+    en: "Customer profile not found for payment request."
+  },
+  depositAmountMustBeGreaterThanZero: {
+    vi: "Số tiền cọc phải lớn hơn 0.",
+    en: "Deposit amount must be greater than zero."
+  },
+  unableToCancelBooking: {
+    vi: "Không thể hủy booking.",
+    en: "Unable to cancel booking."
+  },
+  unableToCompleteBooking: {
+    vi: "Không thể hoàn tất booking.",
+    en: "Unable to complete booking."
+  },
+  unableToConfirmBooking: {
+    vi: "Không thể xác nhận booking.",
+    en: "Unable to confirm booking."
+  },
+  unableToCreatePaymentRequest: {
+    vi: "Không thể tạo yêu cầu thanh toán.",
+    en: "Unable to create payment request."
+  },
+  unableToRegenerateDepositQr: {
+    vi: "Không thể tạo lại QR cọc.",
+    en: "Unable to regenerate deposit QR."
+  },
+  unableToResendDepositEmail: {
+    vi: "Không thể gửi lại email cọc.",
+    en: "Unable to resend deposit email."
+  },
+  unableToSendMemberNotification: {
+    vi: "Không thể gửi thông báo cho member.",
+    en: "Unable to send member notification."
+  },
+  unableToUpdateBookingRequest: {
+    vi: "Không thể cập nhật yêu cầu booking.",
+    en: "Unable to update booking request."
+  }
+} as const;
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -170,6 +258,7 @@ export async function submitAvailabilityRequestAction(formData: FormData) {
 export async function updateAvailabilityRequestStatusAction(formData: FormData) {
   const status = readRequiredString(formData, "status");
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
 
   if (!availabilityRequestStatusOptions.includes(status as AvailabilityRequestStatusOption)) {
     throw new Error(`Unsupported availability request status: ${status}`);
@@ -187,17 +276,14 @@ export async function updateAvailabilityRequestStatusAction(formData: FormData) 
       status: status as AvailabilityRequestStatusOption
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to update booking request."));
+    console.warn("[admin] Failed to update booking request", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToUpdateBookingRequest));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(
-    returnTo,
-    "success",
-    status === "rejected" ? "Booking request was rejected." : "Booking request was updated."
-  );
+  redirectWithActionResult(returnTo, "success", status === "rejected" ? localize(locale, copy.bookingRequestRejected) : localize(locale, copy.bookingRequestUpdated));
 }
 
 export async function createPaymentRequestAction(formData: FormData) {
@@ -263,6 +349,7 @@ export async function confirmAvailabilityRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
 
   try {
     await confirmAvailabilityRequest({
@@ -280,24 +367,31 @@ export async function confirmAvailabilityRequestAction(formData: FormData) {
       stayStartAt: readRequiredString(formData, "stayStartAt")
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to confirm booking."));
+    console.warn("[admin] Failed to confirm booking", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToConfirmBooking));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(returnTo, "success", "Booking confirmed and deposit QR issued.");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.bookingConfirmedAndDepositQrIssued));
 }
 
 export async function reissueDepositPaymentRequestAction(formData: FormData) {
   const user = await getSupabaseUser().catch(() => null);
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
   const reservationId = readRequiredString(formData, "reservationId");
   const reservation = await getReservationById(reservationId);
 
   if (!reservation) {
-    throw new Error("Booking was not found.");
+    if (returnTo) {
+      redirectWithActionResult(returnTo, "error", localize(locale, copy.bookingNotFound));
+      return;
+    }
+
+    throw new Error(localize(locale, copy.bookingNotFound));
   }
 
   const depositAmount = calculateDepositAmount({
@@ -307,7 +401,12 @@ export async function reissueDepositPaymentRequestAction(formData: FormData) {
   });
 
   if (depositAmount <= 0) {
-    throw new Error("Deposit amount must be greater than zero.");
+    if (returnTo) {
+      redirectWithActionResult(returnTo, "error", localize(locale, copy.depositAmountMustBeGreaterThanZero));
+      return;
+    }
+
+    throw new Error(localize(locale, copy.depositAmountMustBeGreaterThanZero));
   }
 
   try {
@@ -330,7 +429,10 @@ export async function reissueDepositPaymentRequestAction(formData: FormData) {
       entityId: paymentRequest.id,
       entityType: "payment_request",
       reservationId: reservation.id,
-      summary: `Deposit QR reissued for booking ${reservation.booking_code}.`,
+      summary: localize(locale, {
+        vi: `QR cọc đã được tạo lại cho booking ${reservation.booking_code}.`,
+        en: `Deposit QR reissued for booking ${reservation.booking_code}.`
+      }),
       metadata: {
         amount: paymentRequest.amount,
         branch_bank_account_id: paymentRequest.branch_bank_account_id,
@@ -338,13 +440,14 @@ export async function reissueDepositPaymentRequestAction(formData: FormData) {
       }
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to regenerate deposit QR."));
+    console.warn("[admin] Failed to regenerate deposit QR", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToRegenerateDepositQr));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(returnTo, "success", "A new deposit QR has been issued.");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.depositQrIssuedAgain));
 }
 
 export async function updateReservationLifecycleAction(formData: FormData) {
@@ -352,6 +455,7 @@ export async function updateReservationLifecycleAction(formData: FormData) {
   const actorRole = user ? getSupabaseUserPortalRole(user) : null;
   const status = readRequiredString(formData, "status");
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
 
   if (status !== "cancelled" && status !== "completed") {
     throw new Error(`Unsupported booking lifecycle status: ${status}`);
@@ -366,21 +470,18 @@ export async function updateReservationLifecycleAction(formData: FormData) {
       status
     });
   } catch (error) {
+    console.warn("[admin] Failed to update reservation lifecycle", { error, status });
     redirectWithActionResult(
       returnTo,
       "error",
-      getErrorMessage(error, status === "cancelled" ? "Unable to cancel booking." : "Unable to complete booking.")
+      status === "cancelled" ? localize(locale, copy.unableToCancelBooking) : localize(locale, copy.unableToCompleteBooking)
     );
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(
-    returnTo,
-    "success",
-    status === "cancelled" ? "Booking cancelled successfully." : "Booking marked as completed."
-  );
+  redirectWithActionResult(returnTo, "success", status === "cancelled" ? localize(locale, copy.bookingCancelledSuccessfully) : localize(locale, copy.bookingMarkedAsCompleted));
 }
 
 export async function releaseExpiredHoldsAction(formData: FormData) {
@@ -425,6 +526,7 @@ export async function sendEmailTestAction(formData: FormData) {
 export async function resendDepositRequestEmailAction(formData: FormData) {
   const paymentRequestId = readRequiredString(formData, "paymentRequestId");
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
 
   try {
     const { branch, customer, paymentRequest, reservation, roomType } = await loadPaymentRequestDetail(paymentRequestId);
@@ -463,21 +565,26 @@ export async function resendDepositRequestEmailAction(formData: FormData) {
       entityId: paymentRequest.id,
       entityType: "payment_request",
       reservationId: reservation.id,
-      summary: `Deposit request email resent to ${customer.email}.`
+      summary: localize(locale, {
+        vi: `Email cọc đã được gửi lại cho ${customer.email}.`,
+        en: `Deposit request email resent to ${customer.email}.`
+      })
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to resend deposit email."));
+    console.warn("[admin] Failed to resend deposit email", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToResendDepositEmail));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(returnTo, "success", "Deposit email sent again.");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.depositEmailSentAgain));
 }
 
 export async function notifyPaymentRequestMemberAction(formData: FormData) {
   const paymentRequestId = readRequiredString(formData, "paymentRequestId");
   const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const locale = readLocaleFromFormData(formData);
 
   try {
     const { customer, paymentRequest, reservation } = await loadPaymentRequestDetail(paymentRequestId);
@@ -490,14 +597,18 @@ export async function notifyPaymentRequestMemberAction(formData: FormData) {
       entityId: paymentRequest.id,
       entityType: "payment_request",
       reservationId: reservation.id,
-      summary: `Member notification sent for payment request ${paymentRequest.payment_code}.`
+      summary: localize(locale, {
+        vi: `Đã gửi thông báo member cho yêu cầu thanh toán ${paymentRequest.payment_code}.`,
+        en: `Member notification sent for payment request ${paymentRequest.payment_code}.`
+      })
     });
   } catch (error) {
-    redirectWithActionResult(returnTo, "error", getErrorMessage(error, "Unable to send member notification."));
+    console.warn("[admin] Failed to send member notification", error);
+    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToSendMemberNotification));
     throw error;
   }
 
   revalidatePath("/admin");
   revalidatePath("/member");
-  redirectWithActionResult(returnTo, "success", "Member notification sent.");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.memberNotificationSent));
 }

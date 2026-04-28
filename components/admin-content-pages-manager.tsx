@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PortalBadge, PortalCard } from "@/components/portal-ui";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { saveContentPageAction } from "@/app/(admin)/admin/content-pages/actions";
@@ -136,9 +137,9 @@ function PageEditor({
             <input className="portal-field__checkbox" name="isPublished" type="checkbox" defaultChecked={page.is_published} />
           </label>
           <div className="admin-content__editor-actions">
-            <button className="button button--solid" type="submit">
+            <PortalSubmitButton className="button button--solid" pendingLabel={localize(locale, { vi: "Đang lưu...", en: "Saving..." })}>
               {localize(locale, { vi: "Lưu thay đổi", en: "Save changes" })}
-            </button>
+            </PortalSubmitButton>
           </div>
         </div>
       </form>

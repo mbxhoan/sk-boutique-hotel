@@ -5,9 +5,11 @@ import { AdminAccountsPage } from "@/components/admin-accounts-page";
 import { appendLocaleQuery, resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { listCustomers } from "@/lib/supabase/queries/customers";
+import { loadMemberHistoryDashboardByUser } from "@/lib/supabase/queries/member-history";
 
 type PageProps = {
   searchParams?: Promise<{
+    customer?: string;
     lang?: string;
   }>;
 };
@@ -29,6 +31,12 @@ export default async function AdminAccountsPageRoute({ searchParams }: PageProps
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
   const customers = await listCustomers({ limit: 200 });
+  const selectedCustomer = resolvedSearchParams.customer
+    ? customers.find((customer) => customer.id === resolvedSearchParams.customer) ?? null
+    : null;
+  const selectedCustomerHistory = selectedCustomer
+    ? await loadMemberHistoryDashboardByUser(selectedCustomer.auth_user_id ?? selectedCustomer.id, selectedCustomer.email)
+    : null;
 
   return (
     <AdminAccountsPage
@@ -37,8 +45,11 @@ export default async function AdminAccountsPageRoute({ searchParams }: PageProps
           {locale === "en" ? "Open roles" : "Mở phân quyền"}
         </Link>
       }
+      closeHref={appendLocaleQuery("/admin/accounts", locale)}
       locale={locale}
       customers={customers}
+      selectedCustomer={selectedCustomer}
+      selectedCustomerHistory={selectedCustomerHistory}
     />
   );
 }

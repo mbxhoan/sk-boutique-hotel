@@ -6,7 +6,9 @@ import { localize } from "@/lib/mock/i18n";
 import { listAvailabilityRequests } from "@/lib/supabase/queries/availability-requests";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { listReservationRoomItems } from "@/lib/supabase/queries/reservation-room-items";
 import { listReservations } from "@/lib/supabase/queries/reservations";
+import { listRoomsByBranchId } from "@/lib/supabase/queries/rooms";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import type { AvailabilityRequestRow, BranchRow, ReservationRow, RoomTypeRow } from "@/lib/supabase/database.types";
 import type { WorkflowBookingRow } from "@/lib/supabase/workflow.types";
@@ -53,7 +55,8 @@ function mapReservation(
   reservation: ReservationRow,
   branchMap: Record<string, BranchRow>,
   roomTypeMap: Record<string, RoomTypeRow>,
-  customerMap: Record<string, { email: string; full_name: string }>
+  customerMap: Record<string, { email: string; full_name: string }>,
+  roomCode: string | null
 ): WorkflowBookingRow {
   const branch = branchMap[reservation.branch_id];
   const roomType = roomTypeMap[reservation.primary_room_type_id];
@@ -70,6 +73,7 @@ function mapReservation(
     guest_count: reservation.guest_count,
     id: reservation.id,
     notes: reservation.notes,
+    room_code: roomCode,
     room_type_id: reservation.primary_room_type_id,
     room_type_name_en: roomType?.name_en ?? reservation.primary_room_type_id,
     room_type_name_vi: roomType?.name_vi ?? reservation.primary_room_type_id,
@@ -101,6 +105,7 @@ function mapAvailabilityRequest(
     guest_count: request.guest_count,
     id: request.id,
     notes: request.note,
+    room_code: null,
     room_type_id: request.room_type_id,
     room_type_name_en: roomType?.name_en ?? request.room_type_id,
     room_type_name_vi: roomType?.name_vi ?? request.room_type_id,
@@ -137,6 +142,16 @@ export default async function AdminBookingsRoute({ searchParams }: PageProps) {
     listAvailabilityRequests({ branchId, limit: 1000 }),
     listReservations({ branchId, limit: 1000 })
   ]);
+  const roomGroups = await Promise.all(branches.map((branch) => listRoomsByBranchId(branch.id)));
+  const roomMap = Object.fromEntries(roomGroups.flat().map((room) => [room.id, room])) as Record<string, Awaited<ReturnType<typeof listRoomsByBranchId>>[number]>;
+  const reservationRoomItems = await listReservationRoomItems();
+  const reservationRoomMap = reservationRoomItems.reduce<Record<string, string>>((map, item) => {
+    if (!map[item.reservation_id] && item.room_id) {
+      map[item.reservation_id] = item.room_id;
+    }
+
+    return map;
+  }, {});
 
   const branchMap = buildMap(branches);
   const roomTypeMap = buildMap(roomTypes);
@@ -149,7 +164,12 @@ export default async function AdminBookingsRoute({ searchParams }: PageProps) {
   >;
 
   const bookingRows: WorkflowBookingRow[] = [
-    ...reservations.map((reservation) => mapReservation(reservation, branchMap, roomTypeMap, customerMap)),
+    ...reservations.map((reservation) => {
+      const roomId = reservationRoomMap[reservation.id] ?? null;
+      const roomCode = roomId ? roomMap[roomId]?.code ?? null : null;
+
+      return mapReservation(reservation, branchMap, roomTypeMap, customerMap, roomCode);
+    }),
     ...requests
       .filter((request) => !reservationMap.has(request.id))
       .map((request) => mapAvailabilityRequest(request, branchMap, roomTypeMap))

@@ -126,22 +126,50 @@ function buildHtmlEmail(
     .map(
       ([label, value]) => `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #ece7de;color:#7a6f60;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">${escapeHtml(label)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #ece7de;color:#10233e;font-size:14px;line-height:1.6;">${escapeHtml(value)}</td>
+          <td class="email-row-label" style="padding:10px 12px;border-bottom:1px solid #ece7de;color:#7a6f60;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;background:#ffffff;">${escapeHtml(label)}</td>
+          <td class="email-row-value" style="padding:10px 12px;border-bottom:1px solid #ece7de;color:#10233e;font-size:14px;line-height:1.6;background:#ffffff;">${escapeHtml(value)}</td>
         </tr>`
     )
     .join("");
 
   return `<!doctype html>
 <html lang="${escapeHtml(lang)}">
-  <body style="margin:0;background:#fbf9f5;color:#1a1a1a;font-family:Arial,Helvetica,sans-serif;">
-    <div style="max-width:680px;margin:0 auto;padding:32px 20px;">
-      <div style="padding:28px;border:1px solid rgba(0,12,30,0.08);border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,244,236,0.96));box-shadow:0 20px 40px rgba(0,12,30,0.06);">
-        <p style="margin:0 0 10px;color:#c5a059;font-size:12px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;">${escapeHtml(subject)}</p>
-        <h1 style="margin:0 0 12px;color:#000c1e;font-size:28px;line-height:1.1;letter-spacing:-0.03em;">${escapeHtml(subject)}</h1>
-        <p style="margin:0 0 20px;color:#61656f;font-size:15px;line-height:1.7;">${escapeHtml(intro)}</p>
-        <table role="presentation" style="width:100%;border-collapse:collapse;border-spacing:0;">${rows}</table>
-        <p style="margin:20px 0 0;color:#61656f;font-size:14px;line-height:1.7;">${escapeHtml(closing)}</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>${escapeHtml(subject)}</title>
+    <style>
+      :root { color-scheme: light only; supported-color-schemes: light; }
+      @media (prefers-color-scheme: dark) {
+        body { background:#fbf9f5 !important; color:#1a1a1a !important; }
+        .email-card { background:#ffffff !important; }
+        .email-title { color:#000c1e !important; }
+        .email-intro, .email-closing { color:#61656f !important; }
+        .email-eyebrow { color:#c5a059 !important; }
+        .email-row-label { color:#7a6f60 !important; background:#ffffff !important; }
+        .email-row-value { color:#10233e !important; background:#ffffff !important; }
+      }
+      [data-ogsc] body { background:#fbf9f5 !important; color:#1a1a1a !important; }
+      [data-ogsc] .email-card { background:#ffffff !important; }
+      [data-ogsc] .email-title { color:#000c1e !important; }
+      [data-ogsc] .email-intro, [data-ogsc] .email-closing { color:#61656f !important; }
+      [data-ogsc] .email-eyebrow { color:#c5a059 !important; }
+      [data-ogsc] .email-row-label { color:#7a6f60 !important; background:#ffffff !important; }
+      [data-ogsc] .email-row-value { color:#10233e !important; background:#ffffff !important; }
+      [data-ogsb] body { background:#fbf9f5 !important; }
+      [data-ogsb] .email-card { background:#ffffff !important; }
+    </style>
+  </head>
+  <body bgcolor="#fbf9f5" style="margin:0;background:#fbf9f5;color:#1a1a1a;font-family:Arial,Helvetica,sans-serif;">
+    <div style="max-width:680px;margin:0 auto;padding:32px 20px;background:#fbf9f5;">
+      <div class="email-card" style="padding:28px;border:1px solid rgba(0,12,30,0.08);border-radius:20px;background:#ffffff;box-shadow:0 20px 40px rgba(0,12,30,0.06);">
+        <p class="email-eyebrow" style="margin:0 0 10px;color:#c5a059;font-size:12px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;">${escapeHtml(subject)}</p>
+        <h1 class="email-title" style="margin:0 0 12px;color:#000c1e;font-size:28px;line-height:1.1;letter-spacing:-0.03em;">${escapeHtml(subject)}</h1>
+        <p class="email-intro" style="margin:0 0 20px;color:#61656f;font-size:15px;line-height:1.7;">${escapeHtml(intro)}</p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;border-spacing:0;background:#ffffff;">${rows}</table>
+        <p class="email-closing" style="margin:20px 0 0;color:#61656f;font-size:14px;line-height:1.7;">${escapeHtml(closing)}</p>
       </div>
     </div>
   </body>

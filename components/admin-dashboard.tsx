@@ -45,15 +45,14 @@ type DashboardMetricBlueprint = {
   value: string;
 };
 
-const trendBars = [
-  { day: { en: "Mon", vi: "T2" }, value: 60, tone: "default" },
-  { day: { en: "Tue", vi: "T3" }, value: 86, tone: "gold" },
-  { day: { en: "Wed", vi: "T4" }, value: 42, tone: "default" },
-  { day: { en: "Thu", vi: "T5" }, value: 73, tone: "default" },
-  { day: { en: "Fri", vi: "T6" }, value: 90, tone: "accent" },
-  { day: { en: "Sat", vi: "T7" }, value: 57, tone: "default" },
-  { day: { en: "Sun", vi: "CN" }, value: 68, tone: "default" }
-] as const;
+type TrendBar = {
+  day: {
+    en: string;
+    vi: string;
+  };
+  tone: "default" | "gold" | "accent";
+  value: number;
+};
 
 const rangeLabels: Record<
   DashboardRange,
@@ -98,34 +97,86 @@ function formatMoneyVnd(locale: Locale, value: number) {
   return `${formatted} VND`;
 }
 
-function buildMap<T extends { id: string }>(items: T[]) {
-  return Object.fromEntries(items.map((item) => [item.id, item])) as Record<string, T>;
+function getVietnamStartOfDay(date = new Date()) {
+  const offsetMs = 7 * 60 * 60 * 1000;
+  const localDate = new Date(date.getTime() + offsetMs);
+  const startUtc = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate()) - offsetMs;
+
+  return new Date(startUtc).getTime();
 }
 
-function calculateNights(startAt: string, endAt: string) {
-  const diffMs = new Date(endAt).getTime() - new Date(startAt).getTime();
+function formatTrendLabel(locale: Locale, range: DashboardRange, startAt: number) {
+  const date = new Date(startAt);
 
-  if (!Number.isFinite(diffMs) || diffMs <= 0) {
-    return 1;
+  if (range === "today") {
+    return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
+      hour: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Ho_Chi_Minh"
+    }).format(date);
   }
 
-  return Math.max(1, Math.round(diffMs / 86_400_000));
+  if (range === "7d") {
+    return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
+      weekday: "short",
+      timeZone: "Asia/Ho_Chi_Minh"
+    }).format(date);
+  }
+
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "vi-VN", {
+    day: "numeric",
+    month: "numeric",
+    timeZone: "Asia/Ho_Chi_Minh"
+  }).format(date);
 }
 
-function estimateRequestTotal(
-  request: WorkflowDashboardData["availability_requests"][number],
-  roomTypeMap: Record<string, WorkflowDashboardData["room_type_options"][number]>
-) {
-  const roomType = roomTypeMap[request.room_type_id];
+function buildTrendBars(reservations: WorkflowDashboardData["recent_reservations"], range: DashboardRange, locale: Locale): TrendBar[] {
+  const now = Date.now();
+  const rangeStart =
+    range === "today"
+      ? getVietnamStartOfDay()
+      : range === "7d"
+        ? getVietnamStartOfDay() - 6 * 86_400_000
+        : getVietnamStartOfDay() - 29 * 86_400_000;
+  const rangeDuration = Math.max(1, now - rangeStart);
+  const bucketCount = 7;
+  const bucketDuration = rangeDuration / bucketCount;
+  const counts = Array.from({ length: bucketCount }, () => 0);
 
-  if (!roomType) {
-    return 0;
+  for (const reservation of reservations) {
+    const createdAt = new Date(reservation.created_at).getTime();
+
+    if (!Number.isFinite(createdAt) || createdAt < rangeStart || createdAt > now) {
+      continue;
+    }
+
+    const bucketIndex = Math.min(bucketCount - 1, Math.floor((createdAt - rangeStart) / bucketDuration));
+    counts[bucketIndex] += 1;
   }
 
-  const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
-  const nights = calculateNights(request.stay_start_at, request.stay_end_at);
+  const ranking = [...counts.entries()].sort((left, right) => {
+    if (right[1] === left[1]) {
+      return left[0] - right[0];
+    }
 
-  return nightlyRate * nights + (roomType.weekend_surcharge ?? 0);
+    return right[1] - left[1];
+  });
+  const highestIndex = ranking[0]?.[0] ?? -1;
+  const secondIndex = ranking[1]?.[0] ?? -1;
+  const maxCount = Math.max(...counts, 0);
+
+  return counts.map((count, index) => {
+    const bucketStart = rangeStart + index * bucketDuration;
+
+    return {
+      day: {
+        en: formatTrendLabel("en", range, bucketStart),
+        vi: formatTrendLabel("vi", range, bucketStart)
+      },
+      tone: count > 0 && index === highestIndex ? "gold" : count > 0 && index === secondIndex ? "accent" : "default",
+      value: maxCount > 0 && count > 0 ? Math.max(10, Math.round((count / maxCount) * 100)) : 0
+    };
+  });
 }
 
 function getStatValue(data: WorkflowDashboardData, labelEn: string) {
@@ -133,25 +184,17 @@ function getStatValue(data: WorkflowDashboardData, labelEn: string) {
 }
 
 function buildMetricCards(data: WorkflowDashboardData, locale: Locale): DashboardMetricBlueprint[] {
-  const roomTypeMap = buildMap(data.room_type_options);
-  const convertedRequestIds = new Set(
-    data.recent_reservations
-      .map((reservation) => reservation.availability_request_id)
-      .filter((requestId): requestId is string => Boolean(requestId))
-  );
-  const openRequests = data.availability_requests.filter((request) => !convertedRequestIds.has(request.id));
-  const totalBookings = data.recent_reservations.length + openRequests.length;
-  const revenue =
-    data.recent_reservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0) +
-    openRequests.reduce((sum, request) => sum + estimateRequestTotal(request, roomTypeMap), 0);
+  const confirmedReservations = data.recent_reservations.filter((reservation) => ["confirmed", "completed"].includes(reservation.status));
+  const totalBookings = data.recent_reservations.length;
+  const revenue = confirmedReservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0);
   const activeHolds = getStatValue(data, "Active holds");
   const pendingRequests = getStatValue(data, "Open requests");
 
   return [
     {
       detail: {
-        vi: "Từ Supabase",
-        en: "from Supabase"
+        vi: "Từ dữ liệu thật",
+        en: "from live data"
       },
       icon: "bookings",
       label: {
@@ -169,8 +212,8 @@ function buildMetricCards(data: WorkflowDashboardData, locale: Locale): Dashboar
     },
     {
       detail: {
-        vi: "từ booking gần đây",
-        en: "from recent bookings"
+        vi: "từ booking đã xác nhận",
+        en: "from confirmed bookings"
       },
       icon: "payments",
       label: {
@@ -317,7 +360,7 @@ function MetricCard({
   value: string;
 }) {
   return (
-    <PortalCard className={`admin-dashboard__metric admin-dashboard__metric--${tone}`} tone={tone === "gold" ? "accent" : "default"}>
+    <PortalCard className={`admin-dashboard__metric admin-dashboard__metric--${tone}`} tone="default">
       <div className="admin-dashboard__metric-art" aria-hidden="true">
         <MetricGlyph icon={icon} />
       </div>
@@ -416,6 +459,7 @@ function getGlanceItems(data: WorkflowDashboardData, locale: Locale): AdminGlanc
 export function AdminDashboard({ data, locale, range, searchParams }: AdminDashboardProps) {
   const glanceItems = getGlanceItems(data, locale);
   const metricCards = buildMetricCards(data, locale);
+  const trendBars = buildTrendBars(data.recent_reservations, range, locale);
   const currentRangeLabel = rangeLabels[range][locale];
   const activeRequestId = searchParams.request ?? null;
 

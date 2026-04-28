@@ -39,13 +39,13 @@ function escapeHtml(input: string | undefined | null): string {
 
 function renderSummaryCard(card: SummaryCard): string {
   return `
-    <div class="card">
+    <div class="card" style="background:#faf8f4;border:1px solid #ece6da;color:#1f1f1f;">
       ${card.fields
         .map(
           (field) => `
-            <div class="row">
-              <span class="label">${escapeHtml(field.label)}</span>
-              <span class="value">${escapeHtml(field.value)}</span>
+            <div class="row" style="color:#4a4a4a;">
+              <span class="label" style="color:#7a7a7a;">${escapeHtml(field.label)}</span>
+              <span class="value" style="color:#1f1f1f;">${escapeHtml(field.value)}</span>
             </div>
           `
         )
@@ -87,16 +87,19 @@ function renderBaseEmail(params: {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
   <title>${escapeHtml(title)}</title>
   <style>
-    body { margin:0; padding:0; background:#f5f3ee; font-family:Arial, Helvetica, sans-serif; color:#1f1f1f; }
+    :root { color-scheme: light only; supported-color-schemes: light; }
+    body { margin:0; padding:0; background:#f5f3ee; font-family:Arial, Helvetica, sans-serif; color:#1f1f1f; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
     table { border-collapse:collapse; }
     .wrapper { width:100%; background:#f5f3ee; padding:32px 16px; }
     .container { max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; overflow:hidden; }
-    .header { padding:28px 32px 12px; }
-    .brand { font-size:22px; font-weight:700; letter-spacing:0.3px; }
-    .subbrand { font-size:12px; color:#777; margin-top:4px; }
-    .content { padding:8px 32px 8px; }
+    .header { padding:28px 32px 12px; background:#ffffff; }
+    .brand { font-size:22px; font-weight:700; letter-spacing:0.3px; color:#1f1f1f; }
+    .subbrand { font-size:12px; color:#777777; margin-top:4px; }
+    .content { padding:8px 32px 8px; background:#ffffff; }
     .eyebrow { font-size:12px; letter-spacing:1.6px; color:#b08a35; font-weight:700; text-transform:uppercase; }
     h1 { margin:12px 0 12px; font-size:28px; line-height:1.2; color:#1f1f1f; }
     p { margin:0 0 14px; font-size:15px; line-height:1.7; color:#4a4a4a; }
@@ -106,42 +109,75 @@ function renderBaseEmail(params: {
     .label { color:#7a7a7a; display:block; margin-bottom:2px; }
     .value { color:#1f1f1f; font-weight:600; }
     .button-wrap { padding:8px 0 4px; }
-    .button { display:inline-block; background:#b08a35; color:#ffffff !important; text-decoration:none; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:700; }
+    .button { display:inline-block; background:#b08a35; color:#ffffff !important; text-decoration:none; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:700; mso-padding-alt:0; mso-text-raise:0; }
     .qr-wrap { text-align:center; margin:20px 0; }
-    .qr-img { max-width:220px; width:100%; height:auto; border:1px solid #ece6da; border-radius:12px; background:#fff; padding:10px; }
+    .qr-img { max-width:220px; width:100%; height:auto; border:1px solid #ece6da; border-radius:12px; background:#ffffff; padding:10px; }
     .note { font-size:13px; color:#7a7a7a; margin-top:10px; }
-    .footer { padding:20px 32px 32px; font-size:12px; color:#8a8a8a; line-height:1.7; }
+    .footer { padding:20px 32px 32px; font-size:12px; color:#8a8a8a; line-height:1.7; background:#ffffff; }
     .divider { height:1px; background:#eee7db; margin:8px 0 0; }
     @media only screen and (max-width: 640px) {
       .header, .content, .footer { padding-left:20px !important; padding-right:20px !important; }
       h1 { font-size:24px !important; }
     }
+    /* Force light scheme for clients that honour prefers-color-scheme. We intentionally
+       restate the same light-mode palette so no color flips when device is in dark mode. */
+    @media (prefers-color-scheme: dark) {
+      body, .wrapper { background:#f5f3ee !important; color:#1f1f1f !important; }
+      .container, .header, .content, .footer { background:#ffffff !important; }
+      h1, .brand, .value { color:#1f1f1f !important; }
+      p, .row, .footer { color:#4a4a4a !important; }
+      .label, .subbrand, .note { color:#7a7a7a !important; }
+      .card { background:#faf8f4 !important; border-color:#ece6da !important; }
+      .button { background:#b08a35 !important; color:#ffffff !important; }
+      .eyebrow { color:#b08a35 !important; }
+      .qr-img { background:#ffffff !important; border-color:#ece6da !important; }
+      .divider { background:#eee7db !important; }
+    }
+    /* Gmail iOS / Apple Mail dark-mode pass: ensure the same light palette. */
+    [data-ogsc] body, [data-ogsc] .wrapper { background:#f5f3ee !important; color:#1f1f1f !important; }
+    [data-ogsc] .container, [data-ogsc] .header, [data-ogsc] .content, [data-ogsc] .footer { background:#ffffff !important; }
+    [data-ogsc] h1, [data-ogsc] .brand, [data-ogsc] .value { color:#1f1f1f !important; }
+    [data-ogsc] p, [data-ogsc] .row { color:#4a4a4a !important; }
+    [data-ogsc] .label, [data-ogsc] .subbrand, [data-ogsc] .note { color:#7a7a7a !important; }
+    [data-ogsc] .card { background:#faf8f4 !important; border-color:#ece6da !important; }
+    [data-ogsc] .button { background:#b08a35 !important; color:#ffffff !important; }
+    [data-ogsc] .eyebrow { color:#b08a35 !important; }
+    [data-ogsc] .qr-img { background:#ffffff !important; border-color:#ece6da !important; }
+    [data-ogsc] .divider { background:#eee7db !important; }
+    /* Outlook.com dark mode (uses [data-ogsb]) */
+    [data-ogsb] body, [data-ogsb] .wrapper { background:#f5f3ee !important; color:#1f1f1f !important; }
+    [data-ogsb] .container, [data-ogsb] .header, [data-ogsb] .content, [data-ogsb] .footer { background:#ffffff !important; }
   </style>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, a, p, h1 { font-family: Arial, Helvetica, sans-serif !important; }
+  </style>
+  <![endif]-->
 </head>
-<body>
-  <div class="wrapper">
-    <table role="presentation" width="100%">
+<body bgcolor="#f5f3ee" style="background:#f5f3ee;color:#1f1f1f;">
+  <div class="wrapper" style="background:#f5f3ee;">
+    <table role="presentation" width="100%" bgcolor="#f5f3ee" style="background:#f5f3ee;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" class="container">
+          <table role="presentation" width="100%" class="container" bgcolor="#ffffff" style="background:#ffffff;">
             <tr>
-              <td class="header">
-                <div class="brand">${escapeHtml(brand.hotelName)}</div>
-                <div class="subbrand">${escapeHtml(brand.brandLine || "Boutique Hotel")}</div>
+              <td class="header" bgcolor="#ffffff" style="background:#ffffff;">
+                <div class="brand" style="color:#1f1f1f;">${escapeHtml(brand.hotelName)}</div>
+                <div class="subbrand" style="color:#777777;">${escapeHtml(brand.brandLine || "Boutique Hotel")}</div>
               </td>
             </tr>
-            <tr><td><div class="divider"></div></td></tr>
+            <tr><td bgcolor="#ffffff"><div class="divider" style="background:#eee7db;"></div></td></tr>
             <tr>
-              <td class="content">
-                <div class="eyebrow">${escapeHtml(eyebrow)}</div>
-                <h1>${escapeHtml(title)}</h1>
-                ${intro ? `<p>${escapeHtml(intro)}</p>` : ""}
+              <td class="content" bgcolor="#ffffff" style="background:#ffffff;">
+                <div class="eyebrow" style="color:#b08a35;">${escapeHtml(eyebrow)}</div>
+                <h1 style="color:#1f1f1f;">${escapeHtml(title)}</h1>
+                ${intro ? `<p style="color:#4a4a4a;">${escapeHtml(intro)}</p>` : ""}
                 ${cards.map(renderSummaryCard).join("")}
-                ${sections.map((section) => `<p>${escapeHtml(section)}</p>`).join("")}
+                ${sections.map((section) => `<p style="color:#4a4a4a;">${escapeHtml(section)}</p>`).join("")}
                 ${renderQrBlock(qrBlock)}
                 ${
                   ctaLabel && ctaUrl
-                    ? `<div class="button-wrap"><a href="${escapeHtml(ctaUrl)}" class="button">${escapeHtml(
+                    ? `<div class="button-wrap"><a href="${escapeHtml(ctaUrl)}" class="button" style="background:#b08a35;color:#ffffff;">${escapeHtml(
                         ctaLabel
                       )}</a></div>`
                     : ""
@@ -149,7 +185,7 @@ function renderBaseEmail(params: {
               </td>
             </tr>
             <tr>
-              <td class="footer">
+              <td class="footer" bgcolor="#ffffff" style="background:#ffffff;color:#8a8a8a;">
                 ${footerNote ? `${escapeHtml(footerNote)}<br>` : ""}
                 ${
                   brand.contactPhone || brand.contactEmail

@@ -48,7 +48,6 @@ export async function getPrimaryReservationRoomItemByReservationId(reservationId
         .from("reservation_room_items")
         .select(reservationRoomItemSelect)
         .eq("reservation_id", reservationId)
-        .eq("status", "active")
         .order("sort_order", { ascending: true })
         .limit(1)
         .maybeSingle();
