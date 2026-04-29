@@ -7816,6 +7816,25 @@ textarea {
   min-width: 100%;
 }
 
+@media (max-width: 860px) {
+  .availability-check__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .availability-check__field {
+    min-height: auto;
+  }
+
+  .availability-check__field-copy {
+    min-width: 0;
+  }
+
+  .availability-check__submit {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .booking-search-modal {
   position: fixed;
   inset: 0;
@@ -11754,7 +11773,7 @@ textarea {
 .admin-dashboard__metric--gold .admin-dashboard__metric-label,
 .admin-dashboard__metric--gold .admin-dashboard__metric-value,
 .admin-dashboard__metric--gold .admin-dashboard__metric-trend {
-  color: #ffffff;
+  /* color: #ffffff; */
 }
 
 .admin-dashboard__metric--warning {
