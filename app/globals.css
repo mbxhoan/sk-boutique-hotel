@@ -4277,7 +4277,7 @@ textarea {
 }
 
 .admin-room-types__sidebar {
-  display: grid;
+  /* display: grid; */
   gap: 0.9rem;
   align-self: start;
   position: sticky;
@@ -10240,7 +10240,7 @@ textarea {
 }
 
 .admin-shell__sidebar-controls {
-  display: grid;
+  display: none;
   gap: 0.75rem;
   margin: 0.95rem 0 0.75rem;
 }
@@ -14694,6 +14694,10 @@ textarea {
     display: inline-flex;
   }
 
+  .admin-shell__sidebar-controls {
+    display: grid;
+  }
+
   .admin-shell__workspace {
     min-height: 0;
   }
@@ -14726,6 +14730,12 @@ textarea {
   }
 
   .admin-shell__search {
+    display: none;
+  }
+
+  .admin-shell__actions .admin-shell__branch-menu,
+  .admin-shell__actions .admin-shell__locale-switch,
+  .admin-shell__actions .admin-shell__divider {
     display: none;
   }
 

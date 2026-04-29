@@ -576,7 +576,45 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
             ) : null}
 
             <div className="admin-shell__actions">
+              <details className="admin-shell__branch-menu">
+                <summary className="admin-shell__branch-selector">
+                  <span className="admin-shell__branch-selector-icon" aria-hidden="true">
+                    <ShellIcon icon="storefront" size={16} />
+                  </span>
+                  <span>{currentBranch ? (locale === "en" ? currentBranch.name_en : currentBranch.name_vi) : locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
+                  <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
+                    <ShellIcon icon="chevron" size={15} />
+                  </span>
+                </summary>
+                <div className="admin-shell__branch-menu-panel" role="menu">
+                  <Link className="admin-shell__branch-menu-link" href={buildBranchHref(pathname, searchParams, locale)}>
+                    {locale === "en" ? "All branches" : "Tất cả chi nhánh"}
+                  </Link>
+                  {branches.map((branch) => {
+                    const href = buildBranchHref(pathname, searchParams, locale, branch.id);
+                    const active = branch.id === currentBranch?.id;
+
+                    return (
+                      <Link
+                        aria-current={active ? "page" : undefined}
+                        className={`admin-shell__branch-menu-link${active ? " admin-shell__branch-menu-link--active" : ""}`}
+                        href={href}
+                        key={branch.id}
+                      >
+                        <span>{locale === "en" ? branch.name_en : branch.name_vi}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
+
+              <span className="admin-shell__divider" aria-hidden="true" />
+
               <AdminNotificationsMenu locale={locale} viewAllHref="/admin/notifications" />
+
+              <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
+                {localeLabel(localeToggle)}
+              </Link>
 
               <button className="admin-shell__avatar" aria-label={locale === "en" ? "Profile" : "Hồ sơ cá nhân"} type="button">
                 AD

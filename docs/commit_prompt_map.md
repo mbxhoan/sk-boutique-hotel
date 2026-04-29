@@ -1492,3 +1492,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/admin-room-types-manager.tsx`
   - `app/globals.css`
+
+### Entry 130
+- `time`: 2026-04-29T15:42:40+07:00
+- `prompt_summary`: giữ nguyên header desktop như trước, chỉ đưa branch và language vào sidebar khi responsive tablet/mobile
+- `commit_message`: `fix(admin-shell): restore desktop header actions`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `app/globals.css`
