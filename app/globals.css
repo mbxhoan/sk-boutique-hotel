@@ -1580,7 +1580,7 @@ textarea {
 }
 
 .site-footer {
-  padding-bottom: 1.4rem;
+  /* padding-bottom: 1.4rem; */
 }
 
 .site-footer__panel {
@@ -5408,6 +5408,56 @@ textarea {
   line-height: 1.55;
 }
 
+.page-loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: rgba(4, 9, 16, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: auth-loading-fade 0.18s ease-out;
+}
+
+.page-loading-screen__card {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  width: min(100%, 22rem);
+  padding: 1.3rem 1.25rem;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
+  box-shadow: 0 24px 64px rgba(0, 12, 30, 0.22);
+  text-align: center;
+}
+
+.page-loading-screen__spinner {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  border: 3px solid rgba(197, 160, 89, 0.18);
+  border-top-color: var(--gold-strong, #b48a3b);
+  animation: auth-loading-spin 0.85s linear infinite;
+}
+
+.page-loading-screen__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.page-loading-screen__copy {
+  margin: 0;
+  color: rgba(16, 35, 62, 0.74);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
 .portal-submit-button {
   position: relative;
   display: inline-flex;
@@ -7803,6 +7853,10 @@ textarea {
   width: 100%;
 }
 
+.booking-search-modal .availability-check__fields {
+  align-items: flex-start;
+}
+
 .booking-search-modal .availability-check__submit {
   position: sticky;
   bottom: 0;
@@ -7815,15 +7869,20 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.location-band {
-  padding-block: clamp(0.8rem, 2.2vw, 1.4rem);
-}
+@media (max-width: 720px) {
+  .booking-search-modal__dialog {
+    width: min(100%, calc(100vw - 1.5rem));
+    padding: 1rem;
+  }
 
-.location-band__shell {
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 1rem;
-  align-items: stretch;
+  .booking-search-modal .availability-check__popover {
+    margin-top: 0.95rem;
+  }
+
+  .booking-search-modal .availability-calendar {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
 }
 
 .location-band__copy,

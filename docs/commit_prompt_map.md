@@ -1432,3 +1432,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `feat(admin): set default dashboard range to 7 days`
 - `main_files`:
   - `app/(admin)/admin/page.tsx`
+
+### Entry 124
+- `time`: 2026-04-29T10:30:00+07:00
+- `prompt_summary`: fix mobile availability modal overflow and add global page loading screen for route transitions
+- `commit_message`: `fix(ui): improve mobile booking filter layout and add route loading screen`
+- `main_files`:
+  - `app/loading.tsx`
+  - `app/globals.css`
