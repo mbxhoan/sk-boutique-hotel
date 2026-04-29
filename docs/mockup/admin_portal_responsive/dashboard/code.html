@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#e8c086",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-tint": "#775928",
+                        "tertiary-fixed": "#e1e3e4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary": "#775928",
+                        "outline-variant": "#d1c5b6",
+                        "on-surface-variant": "#4e453a",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#021c36",
+                        "on-primary-fixed": "#281800",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface": "#f8f9ff",
+                        "on-secondary-container": "#4b617d",
+                        "tertiary": "#5c5f60",
+                        "secondary": "#4a607c",
+                        "on-tertiary-container": "#292c2d",
+                        "on-primary-fixed-variant": "#5d4213",
+                        "secondary-container": "#c5dcfd",
+                        "on-primary-container": "#3d2700",
+                        "outline": "#807569",
+                        "on-surface": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#ffdeae",
+                        "on-secondary-fixed-variant": "#324863",
+                        "inverse-primary": "#e8c086",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-background": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "secondary-fixed": "#d2e4ff",
+                        "primary-container": "#b08d57",
+                        "tertiary-container": "#919394",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#b1c8e9",
+                        "inverse-on-surface": "#eaf1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "md": "16px",
+                        "gutter": "20px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "h1": ["Inter"],
+                        "table-data": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h3": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h1": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "table-data": ["13px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h2": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h3": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar Shared Component -->
+<header class="bg-white dark:bg-zinc-950 border-b border-zinc-100 dark:border-zinc-900 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex justify-between items-center px-4 h-16 w-full z-40 fixed top-0">
+<!-- Leading Icon -->
+<button class="text-amber-600 dark:text-amber-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors active:opacity-80 transition-all duration-200 p-2 -ml-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Headline / Brand Logo -->
+<h1 class="text-sm font-bold tracking-[0.2em] text-zinc-900 dark:text-zinc-100 uppercase font-['Inter']">SK Boutique Hotel</h1>
+<!-- Trailing Avatar -->
+<button class="hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors active:opacity-80 transition-all duration-200 w-8 h-8 rounded-full overflow-hidden border border-zinc-200 shadow-sm flex-shrink-0">
+<img alt="Manager Profile" class="w-full h-full object-cover" data-alt="Professional headshot of a female hotel manager in a tailored navy blazer, soft neutral lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGFFau__s1XMkHWAKWGh0vfeMQ0YOQ3to9zGs8H1LLrhpMDmC_xauPZy-yCWrEllAARJi7-gvL664ml2V7CX9dZ7675kGIiGVeiPqhzqr51mIB-Nl41CxhTZqtWumroEc7ZmR8DGGm413KpPECTwrVlYOTowshrtnTLIG909wruT9vUdbAQqFTx29Q4VmEc2D_j0sKkp47jcZ2rISj4wmHi4nLHZe0RKylii6KHdMvSnI3AinNOB6v-TkroaHlLQpjLIJR-7CmHyTf"/>
+</button>
+</header>
+<!-- Main Content -->
+<main class="pt-[88px] pb-lg px-md flex flex-col gap-lg max-w-md mx-auto">
+<!-- Page Header -->
+<section class="flex flex-col gap-xs">
+<h2 class="font-h2 text-h2 text-on-surface">Overview</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today's operational metrics.</p>
+</section>
+<!-- Stats Stack -->
+<section class="flex flex-col gap-md">
+<!-- Revenue Stat Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow">
+<!-- Decorative Icon Background -->
+<div class="absolute -right-4 -top-4 opacity-[0.03] transform group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">account_balance_wallet</span>
+</div>
+<div class="flex items-center justify-between relative z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Daily Revenue</span>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs relative z-10">
+<span class="font-h1 text-h1 text-on-surface">$12,450.00</span>
+<div class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="text-primary font-semibold">+8.4%</span>
+<span class="text-secondary">vs yesterday</span>
+</div>
+</div>
+</div>
+<!-- Bookings Stat Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow">
+<!-- Decorative Icon Background -->
+<div class="absolute -right-4 -top-4 opacity-[0.03] transform group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">book_online</span>
+</div>
+<div class="flex items-center justify-between relative z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">New Bookings</span>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs relative z-10">
+<span class="font-h1 text-h1 text-on-surface">34</span>
+<div class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="text-on-surface-variant font-semibold">Steady</span>
+<span class="text-secondary">pace</span>
+</div>
+</div>
+</div>
+<!-- Occupancy Stat Card (Added for visual balance) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="absolute -right-4 -top-4 opacity-[0.03] transform group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">hotel</span>
+</div>
+<div class="flex items-center justify-between relative z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Occupancy Rate</span>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">horizontal_rule</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs relative z-10">
+<span class="font-h1 text-h1 text-on-surface">86%</span>
+<div class="w-full bg-surface-container rounded-full h-1.5 mt-2 overflow-hidden">
+<div class="bg-primary h-1.5 rounded-full" style="width: 86%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions (Bento Style) -->
+<section class="grid grid-cols-2 gap-sm mt-sm">
+<button class="bg-primary hover:bg-primary/90 text-on-primary rounded-xl p-md flex flex-col items-center justify-center gap-sm shadow-[0px_2px_4px_rgba(0,0,0,0.05)] transition-all active:scale-95">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">add</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Create</span>
+</button>
+<button class="bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface rounded-xl p-md flex flex-col items-center justify-center gap-sm shadow-[0px_2px_4px_rgba(0,0,0,0.05)] transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary text-[28px]">search</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Search</span>
+</button>
+</section>
+</main>
+</body></html>

@@ -118,6 +118,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 ### Entry 006
 - `time`: 2026-04-11T21:42:37+07:00
 - `prompt_summary`: Sửa lỗi `supabase db reset --linked --debug` do seed `room_types` dư 1 expression so với schema, khiến INSERT fail ở bước import seed.
+
+### Entry 007
+- `time`: 2026-04-29T14:02:05+07:00
+- `prompt_summary`: Move admin portal settings menu item to footer above support so `Cài đặt` appears below main navigation and above `Hỗ trợ`.
+- `commit_message`: `fix(admin-shell): move settings below nav and above support`
+- `main_files`:
+  - `components/admin-shell.tsx`
+
 - `commit_message`: `fix(seed): align room_types seed rows with schema`
 - `main_files`:
   - `supabase/seed.sql`
@@ -1447,4 +1455,25 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(ui): add global error page for app exceptions`
 - `main_files`:
   - `app/error.tsx`
+  - `app/globals.css`
+
+### Entry 126
+- `time`: 2026-04-29T13:55:20+07:00
+- `prompt_summary`: bổ sung responsive UI cho tablet/mobile cho admin portal theo mockup tham khảo, thêm drawer menu, thêm PWA manifest/service worker riêng cho /admin, giữ nguyên component và tính năng hiện có
+- `commit_message`: `feat(admin-portal): add responsive drawer and PWA support`
+- `main_files`:
+  - `app/(admin)/layout.tsx`
+  - `app/(admin)/admin/manifest.ts`
+  - `public/admin/sw.js`
+  - `components/admin-shell.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `app/globals.css`
+
+### Entry 127
+- `time`: 2026-04-29T14:10:10+07:00
+- `prompt_summary`: tinh chỉnh header admin theo mockup responsive: logo nhỏ ở giữa, notifications mở overlay toàn màn hình, profile ở bên phải, và đưa đổi chi nhánh/ngôn ngữ vào sidebar dưới logo
+- `commit_message`: `feat(admin-portal): compact header and notifications drawer`
+- `main_files`:
+  - `components/admin-shell.tsx`
+  - `components/admin-notifications-center.tsx`
   - `app/globals.css`

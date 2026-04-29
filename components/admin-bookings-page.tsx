@@ -334,6 +334,110 @@ function ColumnsIcon() {
   return <span className="admin-bookings__columns-icon">|||</span>;
 }
 
+function BookingMobileCard({
+  booking,
+  locale,
+  visibleColumns
+}: {
+  booking: WorkflowBookingRow;
+  locale: Locale;
+  visibleColumns: Record<BookingColumnKey, boolean>;
+}) {
+  const tone = statusTone(booking.status);
+  const bookingHref = buildBookingDetailHref(locale, booking.booking_code);
+
+  return (
+    <article className={`admin-bookings__mobile-card admin-bookings__mobile-card--${tone}`}>
+      <div className="admin-bookings__mobile-card-head">
+        <div className="admin-bookings__mobile-card-copy">
+          {visibleColumns.booking_code ? <p className="admin-bookings__mobile-card-eyebrow">{localize(locale, { vi: "Mã booking", en: "Booking ID" })}</p> : null}
+          {visibleColumns.booking_code ? (
+            <Link className="admin-bookings__mobile-card-code" href={bookingHref}>
+              {booking.booking_code}
+            </Link>
+          ) : null}
+          <p className={`admin-bookings__source-pill admin-bookings__source-pill--${booking.source === "reservation" ? "reservation" : "request"}`}>
+            {sourceLabel(locale, booking.source)}
+          </p>
+        </div>
+
+        {visibleColumns.status ? (
+          <PortalBadge tone={tone}>{statusLabel(locale, booking.status)}</PortalBadge>
+        ) : null}
+      </div>
+
+      <div className="admin-bookings__mobile-divider" />
+
+      {visibleColumns.customer ? (
+        <div className="admin-bookings__mobile-block">
+          <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Khách hàng", en: "Guest" })}</p>
+          <p className={`admin-bookings__mobile-value${tone === "neutral" ? " admin-bookings__muted" : ""}`}>{booking.customer_name}</p>
+          <p className="admin-bookings__mobile-meta">{booking.customer_email}</p>
+        </div>
+      ) : null}
+
+      <div className="admin-bookings__mobile-grid">
+        {visibleColumns.room_type ? (
+          <div className="admin-bookings__mobile-block">
+            <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Loại phòng", en: "Room type" })}</p>
+            <p className="admin-bookings__mobile-value">{locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi}</p>
+          </div>
+        ) : null}
+
+        {visibleColumns.room_code ? (
+          <div className="admin-bookings__mobile-block">
+            <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Phòng", en: "Room" })}</p>
+            <p className="admin-bookings__mobile-value">{booking.room_code ?? "—"}</p>
+          </div>
+        ) : null}
+
+        {visibleColumns.stay_dates ? (
+          <div className="admin-bookings__mobile-block">
+            <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Ngày ở", en: "Dates" })}</p>
+            <p className={`admin-bookings__mobile-value${tone === "neutral" ? " admin-bookings__muted" : ""}`}>
+              {formatDateRange(locale, booking.stay_start_at, booking.stay_end_at)}
+            </p>
+          </div>
+        ) : null}
+
+        {visibleColumns.total ? (
+          <div className="admin-bookings__mobile-block">
+            <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Tổng tiền", en: "Total" })}</p>
+            <p className="admin-bookings__mobile-value admin-bookings__mobile-value--total">{formatMoney(locale, booking.total_amount)}</p>
+          </div>
+        ) : null}
+      </div>
+
+      {visibleColumns.actions ? (
+        <div className="admin-bookings__mobile-actions">
+          <Link className="admin-bookings__action-button" href={bookingHref} title={localize(locale, { vi: "Mở chi tiết", en: "Open details" })}>
+            →
+          </Link>
+          {booking.customer_email.includes("@") ? (
+            <a
+              className="admin-bookings__action-button"
+              href={`mailto:${booking.customer_email}`}
+              rel="noreferrer"
+              title={localize(locale, { vi: "Gửi email cho khách", en: "Email guest" })}
+            >
+              <MailIcon />
+            </a>
+          ) : (
+            <button
+              className="admin-bookings__action-button"
+              disabled
+              type="button"
+              title={localize(locale, { vi: "Không có email hợp lệ", en: "No valid email" })}
+            >
+              <MailIcon />
+            </button>
+          )}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 function statusLabel(locale: Locale, status: WorkflowBookingRow["status"]) {
   return statusLabels[locale][status] ?? status;
 }
@@ -759,8 +863,26 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
             </tbody>
           </table>
         </div>
+      </PortalCard>
 
-        <div className="admin-bookings__footer">
+      <div className="admin-bookings__mobile-list" aria-label={localize(locale, { vi: "Danh sách booking", en: "Booking cards" })}>
+        {pageRows.length ? (
+          pageRows.map((booking) => (
+            <BookingMobileCard booking={booking} key={booking.id} locale={locale} visibleColumns={visibleColumns} />
+          ))
+        ) : (
+          <PortalCard className="admin-bookings__mobile-empty" tone="soft">
+            <p className="admin-bookings__empty-row">
+              {localize(locale, {
+                vi: "Không có booking nào khớp bộ lọc hiện tại.",
+                en: "No bookings match the current filters."
+              })}
+            </p>
+          </PortalCard>
+        )}
+      </div>
+
+      <div className="admin-bookings__footer">
           <span className="admin-bookings__summary">
             {localize(locale, {
               vi: `Hiển thị ${pageRows.length ? (safeCurrentPage - 1) * PAGE_SIZE + 1 : 0} đến ${Math.min(safeCurrentPage * PAGE_SIZE, filteredRows.length)} trên tổng ${totalCount} booking`,
@@ -797,7 +919,6 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
             </button>
           </div>
         </div>
-      </PortalCard>
     </div>
   );
 }

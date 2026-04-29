@@ -566,28 +566,36 @@ function ToastStack() {
 
 export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificationsMenuProps) {
   const router = useRouter();
-  const rootRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const { items, isRead, markAllAsRead, openNotification } = useAdminNotificationCenter();
   const unreadCount = items.filter((item) => !isRead(item.id)).length;
 
   useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (!rootRef.current) {
-        return;
-      }
+    setOpen(false);
+  }, [pathname]);
 
-      if (event.target instanceof Node && !rootRef.current.contains(event.target)) {
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
         setOpen(false);
       }
     }
 
-    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("mousedown", handlePointerDown);
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -631,7 +639,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
   }, [router]);
 
   return (
-    <div className="admin-notifications" ref={rootRef}>
+    <div className="admin-notifications">
       <button
         aria-expanded={open}
         aria-haspopup="dialog"
@@ -657,18 +665,44 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
       </button>
 
       {open ? (
-        <div className="admin-notifications__panel" role="dialog">
-          <div className="admin-notifications__panel-head">
-            <div>
-              <p className="admin-notifications__eyebrow">{locale === "en" ? "Ops inbox" : "Ops inbox"}</p>
-              <h3 className="admin-notifications__panel-title">{locale === "en" ? "Notifications" : "Thông báo"}</h3>
-            </div>
-            <button className="admin-notifications__mark-all" onClick={markAllAsRead} type="button">
-              {locale === "en" ? "Mark all as read" : "Đánh dấu đã đọc"}
-            </button>
-          </div>
+        <div className="admin-notifications__overlay">
+          <button
+            aria-label={locale === "en" ? "Close notifications" : "Đóng thông báo"}
+            className="admin-notifications__overlay-backdrop"
+            onClick={() => setOpen(false)}
+            type="button"
+          />
 
-          <div className="admin-notifications__panel-list">
+          <section
+            aria-labelledby="admin-notifications-menu-title"
+            aria-modal="true"
+            className="admin-notifications__panel"
+            role="dialog"
+          >
+            <div className="admin-notifications__panel-head">
+              <div>
+                <p className="admin-notifications__eyebrow">{locale === "en" ? "Ops inbox" : "Ops inbox"}</p>
+                <h3 className="admin-notifications__panel-title" id="admin-notifications-menu-title">
+                  {locale === "en" ? "Notifications" : "Thông báo"}
+                </h3>
+              </div>
+
+              <div className="admin-notifications__panel-head-actions">
+                <button className="admin-notifications__mark-all" onClick={markAllAsRead} type="button">
+                  {locale === "en" ? "Mark all as read" : "Đánh dấu đã đọc"}
+                </button>
+                <button
+                  aria-label={locale === "en" ? "Close notifications" : "Đóng thông báo"}
+                  className="admin-notifications__panel-close"
+                  onClick={() => setOpen(false)}
+                  type="button"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="admin-notifications__panel-list">
               {items.length ? (
                 items.map((item) => (
                   <NotificationItemButton
@@ -683,17 +717,18 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
                   />
                 ))
               ) : (
-              <div className="admin-notifications__empty">
-                <p>{locale === "en" ? "No recent notifications." : "Chưa có thông báo mới."}</p>
-              </div>
-            )}
-          </div>
+                <div className="admin-notifications__empty">
+                  <p>{locale === "en" ? "No recent notifications." : "Chưa có thông báo mới."}</p>
+                </div>
+              )}
+            </div>
 
-          <div className="admin-notifications__panel-footer">
-            <Link className="admin-notifications__view-all" href={appendLocaleQuery(viewAllHref, locale)} onClick={() => setOpen(false)}>
-              {locale === "en" ? "View all notifications" : "Xem tất cả thông báo"}
-            </Link>
-          </div>
+            <div className="admin-notifications__panel-footer">
+              <Link className="admin-notifications__view-all" href={appendLocaleQuery(viewAllHref, locale)} onClick={() => setOpen(false)}>
+                {locale === "en" ? "View all notifications" : "Xem tất cả thông báo"}
+              </Link>
+            </div>
+          </section>
         </div>
       ) : null}
     </div>
