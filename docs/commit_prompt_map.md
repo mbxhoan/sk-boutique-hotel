@@ -1477,3 +1477,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-shell.tsx`
   - `components/admin-notifications-center.tsx`
   - `app/globals.css`
+
+### Entry 128
+- `time`: 2026-04-29T14:21:27+07:00
+- `prompt_summary`: fix layout biểu đồ cột dashboard để trục X không bị lệch xuống dưới và nội dung phía dưới không bị chồng trên mobile
+- `commit_message`: `fix(admin-dashboard): align booking chart axes on mobile`
+- `main_files`:
+  - `app/globals.css`
