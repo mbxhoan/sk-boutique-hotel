@@ -1425,3 +1425,10 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-notifications-center.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 123
+- `time`: 2026-04-29T10:00:00+07:00
+- `prompt_summary`: dashboard admin portal mặc định chỉnh về bộ lọc 7 ngày đầu tiên
+- `commit_message`: `feat(admin): set default dashboard range to 7 days`
+- `main_files`:
+  - `app/(admin)/admin/page.tsx`
