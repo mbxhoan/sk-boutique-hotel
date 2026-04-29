@@ -4686,6 +4686,53 @@ textarea {
   }
 }
 
+@media (max-width: 1280px) {
+  .admin-room-types__layout {
+    grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .admin-room-types__form-grid,
+  .admin-room-types__grid--two,
+  .admin-room-types__grid--three,
+  .admin-room-types__image-grid,
+  .admin-room-types__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-room-types__hero-actions {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .admin-room-types__room-card {
+    gap: 0.35rem;
+    padding: 0.82rem 0.85rem;
+  }
+
+  .admin-room-types__room-code,
+  .admin-room-types__room-meta,
+  .admin-room-types__room-footer {
+    display: none;
+  }
+
+  .admin-room-types__room-title {
+    font-size: 0.95rem;
+  }
+
+  .admin-room-types__sidebar-head {
+    align-items: center;
+  }
+
+  .admin-room-types .portal-field__control {
+    padding: 0.75rem 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  .admin-room-types .portal-field__label {
+    font-size: 0.68rem;
+  }
+}
+
 @media (max-width: 720px) {
   .admin-media__tabs,
   .admin-room-types__tabs {
@@ -4696,6 +4743,15 @@ textarea {
   .admin-room-types__stats,
   .admin-room-types__form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-room-types__room-card {
+    border-radius: 0.85rem;
+  }
+
+  .admin-room-types .portal-field__control {
+    padding: 0.72rem 0.78rem;
+    font-size: 0.92rem;
   }
 
   .admin-room-types__image-preview {

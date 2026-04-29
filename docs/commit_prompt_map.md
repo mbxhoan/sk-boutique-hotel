@@ -1484,3 +1484,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `commit_message`: `fix(admin-dashboard): align booking chart axes on mobile`
 - `main_files`:
   - `app/globals.css`
+
+### Entry 129
+- `time`: 2026-04-29T14:42:28+07:00
+- `prompt_summary`: sửa responsive cho trang quản lý hạng phòng: sidebar bên trái chỉ còn danh sách tên hạng phòng gọn hơn, và vùng form bên phải không bị bó hẹp trên màn nhỏ
+- `commit_message`: `fix(admin-room-types): improve responsive room type editor`
+- `main_files`:
+  - `components/admin-room-types-manager.tsx`
+  - `app/globals.css`
