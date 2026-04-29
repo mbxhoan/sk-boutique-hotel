@@ -1440,3 +1440,11 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `app/loading.tsx`
   - `app/globals.css`
+
+### Entry 125
+- `time`: 2026-04-29T10:40:00+07:00
+- `prompt_summary`: add friendly app error page so users see a polished fallback instead of raw client-side exception text
+- `commit_message`: `fix(ui): add global error page for app exceptions`
+- `main_files`:
+  - `app/error.tsx`
+  - `app/globals.css`
