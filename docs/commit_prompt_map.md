@@ -1500,3 +1500,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `components/admin-shell.tsx`
   - `app/globals.css`
+
+### Entry 131
+- `time`: 2026-04-30T12:30:30+07:00
+- `prompt_summary`: Sửa logic availability/booking trên trang /rooms: giữ nguyên ngày từ URL thay vì clamp về hôm nay, và tính completed reservation vào overlap để số phòng còn lại phản ánh đúng booking lịch sử.
+- `commit_message`: `fix(rooms-availability): preserve URL dates and count completed stays`
+- `main_files`:
+  - `app/(marketing)/rooms/page.tsx`
+  - `components/availability-check-bar.tsx`
+  - `supabase/migrations/20260430123000_phase_j_historical_availability_overlap.sql`

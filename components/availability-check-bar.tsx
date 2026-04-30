@@ -72,7 +72,7 @@ function normalizeInitialRange(initialCheckin?: string, initialCheckout?: string
   const today = toStartOfDay(new Date());
   const parsedCheckin = parseDateInput(initialCheckin);
   const parsedCheckout = parseDateInput(initialCheckout);
-  const checkin = parsedCheckin && !isBeforeDay(parsedCheckin, today) ? parsedCheckin : today;
+  const checkin = parsedCheckin ?? today;
   const minimumCheckout = addDays(checkin, 1);
   const checkout = parsedCheckout && parsedCheckout.getTime() > checkin.getTime() ? parsedCheckout : minimumCheckout;
 
