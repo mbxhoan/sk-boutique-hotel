@@ -8695,6 +8695,13 @@ textarea {
   margin: 0;
   color: var(--muted);
   font-size: 0.94rem;
+  line-height: 1.5;
+  min-height: calc(0.94rem * 1.5 * 3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 .rooms-card__fit {
@@ -8799,6 +8806,9 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-height: 3.4rem;
+  justify-content: flex-end;
+  margin-top: auto;
 }
 
 .rooms-card__original-price {
