@@ -4,6 +4,16 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { isBookingRequestStayWindowValid } from "@/lib/booking-dates";
+import {
+  getContactDetailFieldError,
+  getFirstContactDetailsError,
+  normalizeContactDetails,
+  resolveContactDetailsError,
+  validateContactDetails,
+  type ContactDetailsDraft,
+  type ContactDetailsErrors
+} from "@/lib/contact-details";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { DEFAULT_MEMBER_PASSWORD, resolveMemberAuthError } from "@/lib/member-auth";
@@ -37,9 +47,10 @@ function localize(locale: Locale, vi: string, en: string) {
 function appendErrorDetail(locale: Locale, prefixVi: string, prefixEn: string, message: string) {
   const detail = message
     .replace(/^unable to create booking request[:\s-]*/i, "")
-    .replace(/^unable to submit the booking request[:\s-]*/i, "")
+    .replace(/^unable to submit(?: the)? booking request[:\s-]*/i, "")
     .replace(/^unable to bootstrap member profile[:\s-]*/i, "")
     .replace(/^unable to create the member profile[:\s-]*/i, "")
+    .replace(/^unable to update member profile[:\s-]*/i, "")
     .trim();
 
   if (!detail) {
@@ -60,12 +71,42 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
     return localize(locale, "Vui lòng nhập email.", "Please enter your email.");
   }
 
+  if (
+    message.includes("email chưa đúng định dạng") ||
+    message.includes("invalid email") ||
+    message.includes("please enter a valid email address") ||
+    message.includes("email is already in use") ||
+    message.includes("email already exists") ||
+    message.includes("already used by another member") ||
+    message.includes("duplicate key value") ||
+    message.includes("already registered") ||
+    message.includes("already exists")
+  ) {
+    return resolveContactDetailsError(locale, error).message;
+  }
+
   if (message.includes("please enter your phone number") || message.includes("vui lòng nhập số điện thoại")) {
     return localize(locale, "Vui lòng nhập số điện thoại.", "Please enter your phone number.");
   }
 
+  if (
+    message.includes("số điện thoại chưa đúng định dạng") ||
+    message.includes("invalid phone") ||
+    message.includes("please enter a valid phone number")
+  ) {
+    return resolveContactDetailsError(locale, error).message;
+  }
+
   if (message.includes("missing required booking request fields")) {
     return localize(locale, "Vui lòng nhập đủ họ tên, email, số điện thoại và ngày lưu trú.", "Please enter your full name, email, phone number, and stay dates.");
+  }
+
+  if (
+    message.includes("check-in date is invalid") ||
+    message.includes("ngày nhận phòng không hợp lệ") ||
+    message.includes("stay date is invalid")
+  ) {
+    return localize(locale, "Ngày nhận phòng không hợp lệ. Vui lòng chọn hôm nay hoặc ngày sau.", "Check-in date is invalid. Please choose today or later.");
   }
 
   if (message.includes("missing required member bootstrap fields")) {
@@ -76,7 +117,11 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
     return localize(locale, "Hết phòng trong khoảng thời gian bạn chọn.", "No rooms are available for the selected stay window.");
   }
 
-  if (message.includes("unable to submit the booking request") || message.includes("unable to create booking request")) {
+  if (
+    message.includes("unable to submit booking request") ||
+    message.includes("unable to submit the booking request") ||
+    message.includes("unable to create booking request")
+  ) {
     return appendErrorDetail(locale, "Không thể gửi yêu cầu booking", "Unable to submit the booking request", error instanceof Error ? error.message : "");
   }
 
@@ -104,15 +149,140 @@ export function RoomBookingRequestForm({
   stayStartAt
 }: RoomBookingRequestFormProps) {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
+  const [profileDraft, setProfileDraft] = useState<ContactDetailsDraft>({
+    email: "",
+    fullName: "",
+    phone: ""
+  });
+  const [profileFieldErrors, setProfileFieldErrors] = useState<ContactDetailsErrors>({});
+  const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingMemberProfile, setIsLoadingMemberProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  function normalizeProfileDraft(draft: ContactDetailsDraft) {
+    return normalizeContactDetails(draft);
+  }
+
+  function hasProfileChanges(profile: MemberProfile, draft: ContactDetailsDraft) {
+    const normalizedDraft = normalizeProfileDraft(draft);
+
+    return (
+      normalizedDraft.fullName !== profile.fullName.trim() ||
+      normalizedDraft.email !== profile.email.trim() ||
+      normalizedDraft.phone !== (profile.phone ?? "").trim()
+    );
+  }
+
+  function setProfileDraftField(field: keyof ContactDetailsDraft, value: string) {
+    setProfileDraft((current) => ({
+      ...current,
+      [field]: value
+    }));
+
+    setError(null);
+
+    setProfileFieldErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function validateProfileField(field: keyof ContactDetailsDraft, value: string) {
+    const fieldError = getContactDetailFieldError(locale, field, value, { phoneRequired: true });
+
+    setProfileFieldErrors((current) => {
+      if (!fieldError) {
+        if (!current[field]) {
+          return current;
+        }
+
+        const next = { ...current };
+        delete next[field];
+        return next;
+      }
+
+      return {
+        ...current,
+        [field]: fieldError
+      };
+    });
+  }
+
+  function beginProfileEdit() {
+    if (!memberProfile) {
+      return;
+    }
+
+    setProfileDraft({
+      email: memberProfile.email,
+      fullName: memberProfile.fullName,
+      phone: memberProfile.phone ?? ""
+    });
+    setProfileFieldErrors({});
+    setError(null);
+    setIsProfileEditing(true);
+  }
+
+  function cancelProfileEdit() {
+    if (memberProfile) {
+      setProfileDraft({
+        email: memberProfile.email,
+        fullName: memberProfile.fullName,
+        phone: memberProfile.phone ?? ""
+      });
+    }
+
+    setProfileFieldErrors({});
+    setError(null);
+    setIsProfileEditing(false);
+  }
+
+  async function saveMemberProfile(contactDetails: ContactDetailsDraft) {
+    const response = await fetch("/api/member/profile", {
+      body: JSON.stringify({
+        email: contactDetails.email,
+        fullName: contactDetails.fullName,
+        phone: contactDetails.phone,
+        preferredLocale: locale
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "PATCH"
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      throw new Error(payload?.error ?? localize(locale, "Không thể cập nhật hồ sơ thành viên.", "Unable to update the member profile."));
+    }
+
+    const payload = (await response.json().catch(() => null)) as { profile?: MemberProfile | null } | null;
+    const profile = payload?.profile ?? null;
+
+    if (!profile) {
+      throw new Error(localize(locale, "Không thể cập nhật hồ sơ thành viên.", "Unable to update the member profile."));
+    }
+
+    setMemberProfile(profile);
+    setProfileDraft({
+      email: profile.email,
+      fullName: profile.fullName,
+      phone: profile.phone ?? ""
+    });
+    setProfileFieldErrors({});
+    setIsProfileEditing(false);
+
+    return profile;
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -149,9 +319,13 @@ export function RoomBookingRequestForm({
 
         if (!cancelled && profile) {
           setMemberProfile(profile);
-          setFullName(profile.fullName);
-          setEmail(profile.email);
-          setPhone(profile.phone ?? "");
+          setProfileDraft({
+            email: profile.email,
+            fullName: profile.fullName,
+            phone: profile.phone ?? ""
+          });
+          setProfileFieldErrors({});
+          setIsProfileEditing(false);
         }
       } catch {
         // Keep the guest flow if the profile lookup fails.
@@ -226,41 +400,75 @@ export function RoomBookingRequestForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setProfileFieldErrors({});
+
+    if (!isBookingRequestStayWindowValid(stayStartAt, stayEndAt)) {
+      setError(localize(locale, "Ngày nhận phòng không hợp lệ. Vui lòng chọn hôm nay hoặc ngày sau.", "Check-in date is invalid. Please choose today or later."));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const trimmedFullName = (memberProfile?.fullName ?? fullName).trim();
-      const trimmedEmail = (memberProfile?.email ?? email).trim();
-      const trimmedPhone = (memberProfile?.phone ?? phone).trim();
-      const isMemberProfileReady = Boolean(memberProfile);
+      const validation = validateContactDetails(locale, profileDraft, { phoneRequired: true });
+      setProfileFieldErrors(validation.errors);
 
-      if (!isMemberProfileReady && (!trimmedFullName || !trimmedEmail || !trimmedPhone)) {
-        throw new Error(localize(locale, "Vui lòng nhập họ tên, email và số điện thoại.", "Please enter your full name, email, and phone number."));
+      if (getFirstContactDetailsError(validation.errors)) {
+        if (memberProfile && !isProfileEditing) {
+          setIsProfileEditing(true);
+        }
+
+        return;
       }
 
-      const supabase = createSupabaseBrowserClient();
-
+      const contactDetails = validation.values;
       let authUserId: string | null = memberProfile?.authUserId ?? null;
 
-      if (!authUserId) {
+      if (memberProfile) {
+        if (isProfileEditing) {
+          if (!hasProfileChanges(memberProfile, contactDetails)) {
+            setIsProfileEditing(false);
+          } else {
+            try {
+              await saveMemberProfile(contactDetails);
+            } catch (profileError) {
+              const resolvedProfileError = resolveContactDetailsError(locale, profileError);
+
+              if (resolvedProfileError.field) {
+                setProfileFieldErrors((current) => ({
+                  ...current,
+                  [resolvedProfileError.field]: resolvedProfileError.message
+                }));
+              } else {
+                setError(resolvedProfileError.message);
+              }
+
+              return;
+            }
+          }
+        }
+      } else {
+        const supabase = createSupabaseBrowserClient();
+
         const { data: currentUserData } = await supabase.auth.getUser();
-        if (currentUserData.user?.email?.toLowerCase() === trimmedEmail.toLowerCase()) {
+
+        if (currentUserData.user?.email?.toLowerCase() === contactDetails.email.toLowerCase()) {
           authUserId = currentUserData.user.id;
         } else {
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: trimmedEmail,
+            email: contactDetails.email,
             password: DEFAULT_MEMBER_PASSWORD
           });
 
           if (signInError) {
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-              email: trimmedEmail,
+              email: contactDetails.email,
               password: DEFAULT_MEMBER_PASSWORD,
               options: {
                 data: {
-                  full_name: trimmedFullName,
+                  full_name: contactDetails.fullName,
                   locale,
-                  phone: trimmedPhone
+                  phone: contactDetails.phone
                 }
               }
             });
@@ -270,7 +478,7 @@ export function RoomBookingRequestForm({
 
               if (message.includes("already registered") || message.includes("already exists")) {
                 const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword({
-                  email: trimmedEmail,
+                  email: contactDetails.email,
                   password: DEFAULT_MEMBER_PASSWORD
                 });
 
@@ -289,21 +497,24 @@ export function RoomBookingRequestForm({
             authUserId = signInData.user?.id ?? null;
           }
         }
-      }
 
-      if (!authUserId) {
-        const { data } = await supabase.auth.getUser();
-        authUserId = data.user?.id ?? null;
+        if (!authUserId) {
+          const { data } = await supabase.auth.getUser();
+          authUserId = data.user?.id ?? null;
+        }
+
+        if (!authUserId) {
+          throw new Error(localize(locale, "Không thể xác thực tài khoản.", "Unable to authenticate the account."));
+        }
+
+        await bootstrapMemberProfile(authUserId, contactDetails.fullName, contactDetails.email, contactDetails.phone);
       }
 
       if (!authUserId) {
         throw new Error(localize(locale, "Không thể xác thực tài khoản.", "Unable to authenticate the account."));
       }
 
-      if (!isMemberProfileReady) {
-        await bootstrapMemberProfile(authUserId, trimmedFullName, trimmedEmail, trimmedPhone);
-      }
-      await submitBookingRequest(authUserId, trimmedFullName, trimmedEmail, trimmedPhone);
+      await submitBookingRequest(authUserId, contactDetails.fullName, contactDetails.email, contactDetails.phone);
 
       router.push(appendLocaleQuery("/member", locale));
       router.refresh();
@@ -318,81 +529,174 @@ export function RoomBookingRequestForm({
     <form className="room-booking-panel__form" onSubmit={handleSubmit}>
       {memberProfile ? (
         <div className="room-booking-panel__member-card">
-          <div>
-            <p className="room-booking-panel__eyebrow">{localize(locale, "Hồ sơ đã đăng nhập", "Signed-in profile")}</p>
-            <p className="room-booking-panel__member-name">{memberProfile.fullName}</p>
-            <p className="room-booking-panel__member-note">
-              {localize(
-                locale,
-                "Hệ thống sẽ dùng hồ sơ này để gửi yêu cầu booking.",
-                "The system will use this profile to send the booking request."
-              )}
-            </p>
-          </div>
-          <dl className="room-booking-panel__member-meta">
+          <div className="room-booking-panel__member-toolbar">
             <div>
-              <dt>{localize(locale, "Email", "Email")}</dt>
-              <dd>{memberProfile.email}</dd>
+              <p className="room-booking-panel__eyebrow">{localize(locale, "Hồ sơ đã đăng nhập", "Signed-in profile")}</p>
+              <p className="room-booking-panel__member-name">{memberProfile.fullName}</p>
+              <p className="room-booking-panel__member-note">
+                {isProfileEditing
+                  ? localize(
+                      locale,
+                      "Bạn có thể đổi họ tên, email và số điện thoại trước khi gửi yêu cầu.",
+                      "You can update the full name, email, and phone number before sending the request."
+                    )
+                  : localize(
+                      locale,
+                      "Hệ thống sẽ dùng hồ sơ này để gửi yêu cầu booking.",
+                      "The system will use this profile to send the booking request."
+                    )}
+              </p>
             </div>
-            <div>
-              <dt>{localize(locale, "Số điện thoại", "Phone")}</dt>
-              <dd>{memberProfile.phone ?? "—"}</dd>
-            </div>
-          </dl>
-        </div>
-      ) : null}
 
-      {!memberProfile && !isLoadingMemberProfile ? (
+            <div className="room-booking-panel__member-actions">
+              {isProfileEditing ? (
+                <button className="button button--text-light room-booking-panel__member-action" onClick={cancelProfileEdit} type="button">
+                  {localize(locale, "Hủy", "Cancel")}
+                </button>
+              ) : (
+                <button className="button button--text-light room-booking-panel__member-action" onClick={beginProfileEdit} type="button">
+                  {localize(locale, "Đổi hồ sơ", "Edit profile")}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {isProfileEditing ? (
+            <>
+              <div className="room-booking-panel__grid room-booking-panel__grid--member">
+                <label className="room-booking-panel__field">
+                  <span>{localize(locale, "Họ và tên", "Full name")}</span>
+                  <input
+                    autoComplete="name"
+                    className={`room-booking-panel__input${profileFieldErrors.fullName ? " room-booking-panel__input--error" : ""}`}
+                    name="fullName"
+                    onBlur={(event) => validateProfileField("fullName", event.target.value)}
+                    onChange={(event) => setProfileDraftField("fullName", event.target.value)}
+                    placeholder={localize(locale, "Nhập họ và tên", "Enter full name")}
+                    required
+                    type="text"
+                    value={profileDraft.fullName}
+                    aria-invalid={Boolean(profileFieldErrors.fullName)}
+                  />
+                  {profileFieldErrors.fullName ? <p className="room-booking-panel__field-error">{profileFieldErrors.fullName}</p> : null}
+                </label>
+
+                <label className="room-booking-panel__field">
+                  <span>{localize(locale, "Email", "Email")}</span>
+                  <input
+                    autoComplete="email"
+                    className={`room-booking-panel__input${profileFieldErrors.email ? " room-booking-panel__input--error" : ""}`}
+                    inputMode="email"
+                    name="email"
+                    onBlur={(event) => validateProfileField("email", event.target.value)}
+                    onChange={(event) => setProfileDraftField("email", event.target.value)}
+                    placeholder="example@gmail.com"
+                    required
+                    type="email"
+                    value={profileDraft.email}
+                    aria-invalid={Boolean(profileFieldErrors.email)}
+                  />
+                  {profileFieldErrors.email ? <p className="room-booking-panel__field-error">{profileFieldErrors.email}</p> : null}
+                </label>
+
+                <label className="room-booking-panel__field">
+                  <span>{localize(locale, "Số điện thoại", "Phone")}</span>
+                  <input
+                    autoComplete="tel"
+                    className={`room-booking-panel__input${profileFieldErrors.phone ? " room-booking-panel__input--error" : ""}`}
+                    inputMode="tel"
+                    name="phone"
+                    onBlur={(event) => validateProfileField("phone", event.target.value)}
+                    onChange={(event) => setProfileDraftField("phone", event.target.value)}
+                    placeholder={localize(locale, "090...", "+84 ...")}
+                    required
+                    type="tel"
+                    value={profileDraft.phone}
+                    aria-invalid={Boolean(profileFieldErrors.phone)}
+                  />
+                  {profileFieldErrors.phone ? <p className="room-booking-panel__field-error">{profileFieldErrors.phone}</p> : null}
+                </label>
+              </div>
+
+              <p className="room-booking-panel__hint">
+                {localize(
+                  locale,
+                  "Thay đổi hồ sơ sẽ được lưu trước khi gửi booking.",
+                  "Profile changes will be saved before the booking request is sent."
+                )}
+              </p>
+            </>
+          ) : (
+            <dl className="room-booking-panel__member-meta">
+              <div>
+                <dt>{localize(locale, "Email", "Email")}</dt>
+                <dd>{memberProfile.email}</dd>
+              </div>
+              <div>
+                <dt>{localize(locale, "Số điện thoại", "Phone")}</dt>
+                <dd>{memberProfile.phone ?? "—"}</dd>
+              </div>
+            </dl>
+          )}
+        </div>
+      ) : !isLoadingMemberProfile ? (
         <div className="room-booking-panel__grid">
           <label className="room-booking-panel__field">
             <span>{localize(locale, "Họ và tên", "Full name")}</span>
             <input
               autoComplete="name"
-              className="room-booking-panel__input"
+              className={`room-booking-panel__input${profileFieldErrors.fullName ? " room-booking-panel__input--error" : ""}`}
               name="fullName"
-              onChange={(event) => setFullName(event.target.value)}
+              onBlur={(event) => validateProfileField("fullName", event.target.value)}
+              onChange={(event) => setProfileDraftField("fullName", event.target.value)}
               placeholder={localize(locale, "Nhập họ và tên", "Enter full name")}
               required
               type="text"
-              value={fullName}
+              value={profileDraft.fullName}
+              aria-invalid={Boolean(profileFieldErrors.fullName)}
             />
+            {profileFieldErrors.fullName ? <p className="room-booking-panel__field-error">{profileFieldErrors.fullName}</p> : null}
           </label>
 
           <label className="room-booking-panel__field">
             <span>{localize(locale, "Email", "Email")}</span>
             <input
               autoComplete="email"
-              className="room-booking-panel__input"
+              className={`room-booking-panel__input${profileFieldErrors.email ? " room-booking-panel__input--error" : ""}`}
               inputMode="email"
               name="email"
-              onChange={(event) => setEmail(event.target.value)}
+              onBlur={(event) => validateProfileField("email", event.target.value)}
+              onChange={(event) => setProfileDraftField("email", event.target.value)}
               placeholder="example@gmail.com"
               required
               type="email"
-              value={email}
+              value={profileDraft.email}
+              aria-invalid={Boolean(profileFieldErrors.email)}
             />
+            {profileFieldErrors.email ? <p className="room-booking-panel__field-error">{profileFieldErrors.email}</p> : null}
           </label>
 
           <label className="room-booking-panel__field">
             <span>{localize(locale, "Số điện thoại", "Phone")}</span>
             <input
               autoComplete="tel"
-              className="room-booking-panel__input"
+              className={`room-booking-panel__input${profileFieldErrors.phone ? " room-booking-panel__input--error" : ""}`}
               inputMode="tel"
               name="phone"
-              onChange={(event) => setPhone(event.target.value)}
+              onBlur={(event) => validateProfileField("phone", event.target.value)}
+              onChange={(event) => setProfileDraftField("phone", event.target.value)}
               placeholder={localize(locale, "090...", "+84 ...")}
               required
               type="tel"
-              value={phone}
+              value={profileDraft.phone}
+              aria-invalid={Boolean(profileFieldErrors.phone)}
             />
+            {profileFieldErrors.phone ? <p className="room-booking-panel__field-error">{profileFieldErrors.phone}</p> : null}
           </label>
         </div>
-      ) : null}
-
-      {!memberProfile && isLoadingMemberProfile ? (
+      ) : (
         <p className="room-booking-panel__hint">{localize(locale, "Đang nhận diện hồ sơ đã đăng nhập...", "Detecting your signed-in profile...")}</p>
-      ) : null}
+      )}
 
       <label className="room-booking-panel__field room-booking-panel__field--full">
         <span>{localize(locale, "Ghi chú", "Note")}</span>
@@ -430,20 +734,16 @@ export function RoomBookingRequestForm({
       ) : null}
 
       <div className="room-booking-panel__actions">
-        <button
-          className="button button--solid"
-          disabled={isSubmitting || isLoadingMemberProfile || availableRooms <= 0}
-          type="submit"
-        >
+        <button className="button button--solid" disabled={isSubmitting || isLoadingMemberProfile || availableRooms <= 0} type="submit">
           {isSubmitting
             ? localize(locale, "Đang gửi...", "Sending...")
             : isLoadingMemberProfile
               ? localize(locale, "Đang nhận diện...", "Detecting profile...")
-            : availableRooms <= 0
-              ? localize(locale, "Hết phòng", "Sold out")
-              : memberProfile
-                ? localize(locale, "Gửi yêu cầu", "Send request")
-                : localize(locale, "Gửi yêu cầu", "Send request")}
+              : availableRooms <= 0
+                ? localize(locale, "Hết phòng", "Sold out")
+                : memberProfile && isProfileEditing
+                  ? localize(locale, "Lưu hồ sơ và gửi yêu cầu", "Save profile and send request")
+                  : localize(locale, "Gửi yêu cầu", "Send request")}
         </button>
       </div>
 

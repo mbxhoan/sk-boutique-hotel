@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import type { Locale } from "@/lib/locale";
+import { getFirstContactDetailsError, normalizeContactDetails, validateContactDetails } from "@/lib/contact-details";
 import { getSupabaseSession } from "@/lib/supabase/auth";
 import { upsertCustomerProfile } from "@/lib/supabase/queries/customers";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
@@ -16,21 +17,29 @@ type BootstrapBody = {
 
 function readBody(body: BootstrapBody) {
   const authUserId = typeof body.authUserId === "string" ? body.authUserId.trim() : "";
-  const email = typeof body.email === "string" ? body.email.trim() : "";
-  const fullName = typeof body.fullName === "string" ? body.fullName.trim() : "";
-  const phone = typeof body.phone === "string" && body.phone.trim().length > 0 ? body.phone.trim() : null;
   const preferredLocale = body.preferredLocale === "en" ? "en" : "vi";
   const source = typeof body.source === "string" && body.source.trim().length > 0 ? body.source.trim() : "member_portal";
+  const contactDetails = normalizeContactDetails({
+    email: typeof body.email === "string" ? body.email : "",
+    fullName: typeof body.fullName === "string" ? body.fullName : "",
+    phone: typeof body.phone === "string" ? body.phone : ""
+  });
+  const validation = validateContactDetails(preferredLocale, contactDetails, { phoneRequired: false });
+  const validationError = getFirstContactDetailsError(validation.errors);
 
-  if (!authUserId || !email || !fullName) {
+  if (!authUserId || validationError) {
+    if (validationError) {
+      throw new Error(validationError);
+    }
+
     throw new Error("Missing required member bootstrap fields.");
   }
 
   return {
     authUserId,
-    email,
-    fullName,
-    phone,
+    email: validation.values.email,
+    fullName: validation.values.fullName,
+    phone: validation.values.phone.length ? validation.values.phone : null,
     preferredLocale,
     source
   } satisfies {

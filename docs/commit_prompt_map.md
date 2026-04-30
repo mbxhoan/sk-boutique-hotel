@@ -1518,3 +1518,49 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/rooms/catalog.ts`
   - `components/rooms-catalog-page.tsx`
   - `app/globals.css`
+
+### Entry 133
+- `time`: 2026-04-30T16:08:03+07:00
+- `prompt_summary`: Cho phép member đổi hồ sơ ngay trong popup đặt phòng, validate tự động email và số điện thoại ở cả client lẫn server, và chặn email trùng khi cập nhật hồ sơ.
+- `commit_message`: `feat(member-booking): edit signed-in profile and validate contact details`
+- `main_files`:
+  - `components/room-booking-request-form.tsx`
+  - `lib/contact-details.ts`
+  - `app/api/member/profile/route.ts`
+  - `app/api/member/bootstrap/route.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `app/globals.css`
+
+### Entry 134
+- `time`: 2026-04-30T16:19:28+07:00
+- `prompt_summary`: Khi thời gian xử lý của booking/request đã hết thì tự động chuyển sang trạng thái hết hạn, đồng bộ lại copy/trạng thái ở booking detail và dọn expired workflow ở server.
+- `commit_message`: `feat(workflow-expiry): auto-expire overdue booking requests`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `app/(admin)/admin/actions.ts`
+  - `lib/supabase/workflows.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/database.types.ts`
+  - `supabase/migrations/20260430134500_phase_k_availability_request_expiry.sql`
+
+### Entry 135
+- `time`: 2026-04-30T16:30:49+07:00
+- `prompt_summary`: Cho phép khách hàng tự hủy booking/yêu cầu trước khi booking được xác nhận, có kiểm tra ownership và trạng thái, và thêm nút hủy trong member portal.
+- `commit_message`: `feat(member-booking): allow customers to cancel unconfirmed bookings`
+- `main_files`:
+  - `app/(member)/member/actions.ts`
+  - `components/member-portal-dashboard.tsx`
+  - `lib/supabase/member-booking.ts`
+  - `lib/supabase/member-booking-policy.ts`
+  - `app/globals.css`
+
+### Entry 136
+- `time`: 2026-04-30T17:39:23+07:00
+- `prompt_summary`: Chặn khách hàng tạo booking/request cho ngày trong quá khứ và hiển thị lý do ngày không hợp lệ thay vì cho submit xuống server.
+- `commit_message`: `fix(booking-request): reject stay dates in the past`
+- `main_files`:
+  - `app/api/public/booking-request/route.ts`
+  - `components/room-booking-request-form.tsx`
+  - `lib/booking-dates.ts`

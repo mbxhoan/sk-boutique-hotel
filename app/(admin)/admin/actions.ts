@@ -11,6 +11,7 @@ import { sendDepositRequestCustomerEmail } from "@/lib/supabase/email";
 import { updateReservationLifecycle } from "@/lib/supabase/booking-lifecycle";
 import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import {
+  releaseExpiredAvailabilityRequests,
   confirmAvailabilityRequest,
   createReservation,
   holdRoom,
@@ -487,9 +488,22 @@ export async function updateReservationLifecycleAction(formData: FormData) {
 export async function releaseExpiredHoldsAction(formData: FormData) {
   const asOf = readOptionalString(formData, "asOf") ?? undefined;
 
-  await Promise.allSettled([releaseExpiredHolds({ asOf }), releaseExpiredReservations({ asOf })]);
+  const releaseResults = await Promise.allSettled([
+    releaseExpiredAvailabilityRequests({ asOf }),
+    releaseExpiredHolds({ asOf }),
+    releaseExpiredReservations({ asOf })
+  ]);
+
+  if (releaseResults.some((result) => result.status === "rejected")) {
+    console.warn("[admin] Failed to release expired workflow items", {
+      requests: releaseResults[0].status === "fulfilled",
+      holds: releaseResults[1].status === "fulfilled",
+      reservations: releaseResults[2].status === "fulfilled"
+    });
+  }
 
   revalidatePath("/admin");
+  revalidatePath("/member");
 }
 
 export async function submitPaymentProofAction(formData: FormData) {

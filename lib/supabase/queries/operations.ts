@@ -22,7 +22,7 @@ import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { countRoomHolds, countExpiringRoomHolds, listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { countReservations, listReservations } from "@/lib/supabase/queries/reservations";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
-import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { releaseExpiredAvailabilityRequests, releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowAuditLog,
@@ -325,12 +325,17 @@ function getDashboardWindowSince(range: WorkflowSelection["range"]) {
 }
 
 export async function loadAdminWorkflowDashboard(selection: WorkflowSelection = {}): Promise<WorkflowDashboardData> {
-  const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+  const releaseResults = await Promise.allSettled([
+    releaseExpiredAvailabilityRequests(),
+    releaseExpiredHolds(),
+    releaseExpiredReservations()
+  ]);
 
   if (releaseResults.some((result) => result.status === "rejected")) {
-    console.warn("[workflow] Failed to release expired holds/reservations before loading admin dashboard", {
-      holds: releaseResults[0].status === "fulfilled",
-      reservations: releaseResults[1].status === "fulfilled"
+    console.warn("[workflow] Failed to release expired workflow items before loading admin dashboard", {
+      requests: releaseResults[0].status === "fulfilled",
+      holds: releaseResults[1].status === "fulfilled",
+      reservations: releaseResults[2].status === "fulfilled"
     });
   }
 

@@ -580,9 +580,6 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
@@ -592,7 +589,6 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [open]);
@@ -665,7 +661,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
       </button>
 
       {open ? (
-        <div className="admin-notifications__overlay">
+        <>
           <button
             aria-label={locale === "en" ? "Close notifications" : "Đóng thông báo"}
             className="admin-notifications__overlay-backdrop"
@@ -675,7 +671,6 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
 
           <section
             aria-labelledby="admin-notifications-menu-title"
-            aria-modal="true"
             className="admin-notifications__panel"
             role="dialog"
           >
@@ -729,7 +724,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
               </Link>
             </div>
           </section>
-        </div>
+        </>
       ) : null}
     </div>
   );

@@ -14,7 +14,7 @@ import { listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { calculateDepositAmount, calculateRemainingBalance, calculateVerifiedDepositAmount, DEFAULT_BOOKING_DEPOSIT_PERCENT } from "@/lib/supabase/booking-finance";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
-import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { releaseExpiredAvailabilityRequests, releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   BranchRow,
@@ -270,7 +270,19 @@ export type BookingDetailData = {
 };
 
 export async function loadBookingDetailByCode(bookingCode: string): Promise<BookingDetailData | null> {
-  await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+  const cleanupResults = await Promise.allSettled([
+    releaseExpiredAvailabilityRequests(),
+    releaseExpiredHolds(),
+    releaseExpiredReservations()
+  ]);
+
+  if (cleanupResults.some((result) => result.status === "rejected")) {
+    console.warn("[workflow] Failed to release expired workflow items before loading booking detail", {
+      requests: cleanupResults[0].status === "fulfilled",
+      holds: cleanupResults[1].status === "fulfilled",
+      reservations: cleanupResults[2].status === "fulfilled"
+    });
+  }
 
   const [branches, roomTypes, reservationByCode, requestByCode] = await Promise.all([
     listBranches(),

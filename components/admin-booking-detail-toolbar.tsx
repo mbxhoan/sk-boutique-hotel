@@ -10,6 +10,7 @@ import { verifyPaymentRequestAction } from "@/app/actions/payments";
 type AdminBookingDetailToolbarProps = {
   canCancel?: boolean;
   canComplete?: boolean;
+  canPrint?: boolean;
   canReject?: boolean;
   canResendEmail?: boolean;
   canVerify?: boolean;
@@ -24,6 +25,7 @@ type AdminBookingDetailToolbarProps = {
 export function AdminBookingDetailToolbar({
   canCancel,
   canComplete,
+  canPrint,
   canReject,
   canResendEmail,
   canVerify,
@@ -114,9 +116,11 @@ export function AdminBookingDetailToolbar({
 
   return (
     <div className="admin-booking-detail__toolbar">
-      <button className="button button--solid admin-booking-detail__toolbar-link" onClick={() => window.print()} type="button">
-        {printLabel}
-      </button>
+      {canPrint && (
+        <button className="button button--solid admin-booking-detail__toolbar-link" onClick={() => window.print()} type="button">
+          {printLabel}
+        </button>
+      )}
 
       {canVerify && (
         <button

@@ -3534,6 +3534,22 @@ textarea {
   line-height: 1.6;
 }
 
+.member-booking-card__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.member-booking-card__danger-button {
+  background: linear-gradient(135deg, #a93825 0%, #7f2516 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(169, 56, 37, 0.16);
+}
+
+.member-booking-card__danger-button:hover {
+  background: linear-gradient(135deg, #b5422e 0%, #712113 100%);
+  color: #ffffff;
+}
+
 .member-payment-panel {
   display: flex;
   flex-direction: column;
@@ -7169,6 +7185,10 @@ textarea {
     max-width: none;
   }
 
+  .member-booking-card__actions {
+    justify-content: flex-start;
+  }
+
   .admin-content-pages__actions {
     justify-content: flex-start;
   }
@@ -9689,6 +9709,25 @@ textarea {
   box-shadow: var(--shadow-soft);
 }
 
+.room-booking-panel__member-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.room-booking-panel__member-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.room-booking-panel__member-action {
+  min-height: 2.25rem;
+  padding-inline: 0.15rem;
+}
+
 .room-booking-panel__member-name {
   margin: 0;
   color: var(--ink);
@@ -9749,6 +9788,10 @@ textarea {
   gap: 0.8rem;
 }
 
+.room-booking-panel__grid--member {
+  margin-top: 0.1rem;
+}
+
 .room-booking-panel__field {
   display: grid;
   gap: 0.45rem;
@@ -9784,9 +9827,21 @@ textarea {
   box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
 }
 
+.room-booking-panel__input--error {
+  border-color: rgba(216, 84, 84, 0.42);
+  box-shadow: 0 0 0 3px rgba(216, 84, 84, 0.1);
+}
+
 .room-booking-panel__input--textarea {
   min-height: 7rem;
   resize: vertical;
+}
+
+.room-booking-panel__field-error {
+  margin: -0.1rem 0 0;
+  color: #b14d3b;
+  font-size: 0.76rem;
+  line-height: 1.45;
 }
 
 .room-booking-panel__consent {
@@ -10338,6 +10393,14 @@ textarea {
   .room-booking-panel__head,
   .room-booking-panel__summary {
     gap: 0.75rem;
+  }
+
+  .room-booking-panel__member-toolbar {
+    flex-direction: column;
+  }
+
+  .room-booking-panel__member-actions {
+    justify-content: flex-start;
   }
 
   .room-booking-panel__summary {
@@ -10898,40 +10961,30 @@ textarea {
 }
 
 .admin-notifications__panel {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  z-index: 76;
   display: flex;
   flex-direction: column;
-  width: min(38rem, calc(100vw - 1rem));
-  height: 100dvh;
-  max-height: 100dvh;
+  width: min(24rem, calc(100vw - 1rem));
+  max-height: min(34rem, calc(100vh - 6rem));
   border: 1px solid rgba(197, 160, 89, 0.22);
-  border-right: 0;
-  border-radius: 0 1.25rem 1.25rem 0;
+  border-radius: 1rem;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 246, 239, 0.99) 100%);
   box-shadow: 0 28px 60px rgba(0, 12, 30, 0.2);
   overflow: hidden;
 }
 
-.admin-notifications__overlay {
+.admin-notifications__overlay-backdrop {
   position: fixed;
   inset: 0;
   z-index: 75;
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-.admin-notifications__overlay-backdrop {
-  position: absolute;
-  inset: 0;
   width: 100%;
   padding: 0;
   border: 0;
-  background: rgba(8, 12, 22, 0.42);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: transparent;
 }
 
 .admin-notifications__panel-head {
@@ -11001,7 +11054,8 @@ textarea {
 }
 
 .admin-notifications__panel-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -11874,10 +11928,6 @@ textarea {
 }
 
 @media (max-width: 960px) {
-  .admin-notifications__panel {
-    width: min(34rem, calc(100vw - 1rem));
-  }
-
   .admin-booking-detail__hero-top,
   .admin-notifications-page__hero {
     flex-direction: column;
@@ -11905,7 +11955,7 @@ textarea {
 
 @media (max-width: 720px) {
   .admin-notifications__panel {
-    width: calc(100vw - 0.6rem);
+    width: min(22rem, calc(100vw - 1rem));
   }
 
   .admin-notifications__toast-stack {
@@ -15117,15 +15167,6 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .admin-notifications__overlay {
-    justify-content: flex-end;
-  }
-
-  .admin-notifications__panel {
-    width: calc(100vw - 0.6rem);
-    border-radius: 1.05rem 0 0 1.05rem;
-  }
-
   .admin-dashboard__chart {
     grid-template-columns: 1.4rem minmax(0, 1fr);
   }
@@ -15237,5 +15278,204 @@ textarea {
   to {
     transform: translateX(0);
     opacity: 1;
+  }
+}
+
+.booking-receipt-print {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .booking-receipt-print,
+  .booking-receipt-print * {
+    visibility: visible;
+  }
+
+  .booking-receipt-print {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #14223d;
+    font-family: var(--font-body, "Inter", system-ui, sans-serif);
+    z-index: 999999;
+  }
+
+  .booking-receipt-print__page {
+    width: 100%;
+    max-width: 190mm;
+    margin: 0 auto;
+    padding: 0;
+    color: #14223d;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+
+  .booking-receipt-print__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.45rem;
+  }
+
+  .booking-receipt-print__logo {
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .booking-receipt-print__hotel {
+    margin: 0;
+    color: #1d4783;
+    font-family: var(--font-display, "Playfair Display", serif);
+    font-size: 26pt;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .booking-receipt-print__contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1.1rem;
+    color: #14223d;
+    font-size: 9.5pt;
+  }
+
+  .booking-receipt-print__divider {
+    height: 1px;
+    margin: 0.85rem 0 1.1rem;
+    background: #c8d4e8;
+  }
+
+  .booking-receipt-print__top,
+  .booking-receipt-print__middle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .booking-receipt-print__middle {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .booking-receipt-print__heading {
+    align-self: start;
+    color: #1d4783;
+    font-family: var(--font-display, "Playfair Display", serif);
+    font-size: 22pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .booking-receipt-print__section-title {
+    margin: 0 0 0.35rem;
+    color: #1d4783;
+    font-size: 11pt;
+    font-weight: 700;
+  }
+
+  .booking-receipt-print__rows {
+    display: grid;
+    gap: 0.18rem;
+    margin: 0;
+  }
+
+  .booking-receipt-print__rows > div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.6rem;
+  }
+
+  .booking-receipt-print__rows dt,
+  .booking-receipt-print__rows dd {
+    margin: 0;
+  }
+
+  .booking-receipt-print__rows dt {
+    color: #14223d;
+    font-weight: 600;
+  }
+
+  .booking-receipt-print__rows dd {
+    color: #14223d;
+  }
+
+  .booking-receipt-print__customer-name {
+    margin: 0 0 0.15rem;
+    font-weight: 700;
+  }
+
+  .booking-receipt-print__middle p {
+    margin: 0 0 0.1rem;
+  }
+
+  .booking-receipt-print__table {
+    width: 100%;
+    margin-top: 0.85rem;
+    border-collapse: collapse;
+    border: 1px solid #c8d4e8;
+    font-size: 10.5pt;
+  }
+
+  .booking-receipt-print__table thead th {
+    padding: 0.55rem 0.7rem;
+    background: #1d4783;
+    color: #ffffff;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .booking-receipt-print__table tbody td {
+    padding: 0.55rem 0.7rem;
+    border-top: 1px solid #e1e8f3;
+    vertical-align: top;
+  }
+
+  .booking-receipt-print__col-qty {
+    width: 5.5rem;
+    text-align: left;
+  }
+
+  .booking-receipt-print__col-money {
+    width: 9rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .booking-receipt-print__summary-row td {
+    border-top: 1px solid #c8d4e8;
+    background: #ffffff;
+    font-weight: 600;
+  }
+
+  .booking-receipt-print__total-row td {
+    background: #eaf0fa;
+    color: #1d4783;
+    font-size: 12pt;
+    font-weight: 700;
+  }
+
+  .booking-receipt-print__note {
+    margin: 0.4rem 0 1rem;
+    color: #5c6a87;
+    font-size: 8.5pt;
+    text-align: right;
+  }
+
+  .booking-receipt-print__additional p {
+    margin: 0 0 0.18rem;
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { cancelMemberBookingAction } from "@/app/(member)/member/actions";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { useEffect, useState } from "react";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
@@ -12,19 +13,23 @@ import type {
   WorkflowPaymentRequest,
   WorkflowReservation
 } from "@/lib/supabase/workflow.types";
+import { canMemberCancelBooking, type MemberBookingKind, type MemberBookingStatus } from "@/lib/supabase/member-booking-policy";
 
 type BookingStage = "urgent" | "waiting" | "active" | "done";
-type BookingKind = "request" | "reservation";
+type BookingKind = MemberBookingKind;
 
 type BookingEntry = {
   anchorId: string;
   bodyNote: LocalizedText;
+  bookingId: string;
+  bookingStatus: MemberBookingStatus;
   code: string;
   createdAt: string;
   detail: LocalizedText;
   guestCount: number;
   kind: BookingKind;
   kindLabel: LocalizedText;
+  canCancel: boolean;
   paymentRequest: WorkflowPaymentRequest | null;
   roomTypeName: LocalizedText;
   stage: BookingStage;
@@ -172,17 +177,31 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
       "Yêu cầu này đã chuyển sang booking.",
       "This request has been converted into a booking."
     );
+  } else if (request.status === "closed") {
+    stage = "done";
+    bodyNote = text(
+      "Yêu cầu này đã được hủy.",
+      "This request has been cancelled."
+    );
+  } else if (request.status === "rejected") {
+    stage = "done";
+    bodyNote = text(
+      "Yêu cầu này đã bị từ chối.",
+      "This request was rejected."
+    );
   } else {
     stage = "done";
     bodyNote = text(
-      "Yêu cầu này đã đóng.",
-      "This request is no longer open."
+      "Yêu cầu này đã hết hạn.",
+      "This request has expired."
     );
   }
 
   return {
     anchorId: `booking-request-${request.id}`,
     bodyNote,
+    bookingId: request.id,
+    bookingStatus: request.status,
     code: request.request_code,
     createdAt: request.created_at,
     detail: text(
@@ -192,6 +211,7 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
     guestCount: request.guest_count,
     kind: "request",
     kindLabel: text("Yêu cầu", "Request"),
+    canCancel: canMemberCancelBooking("request", request.status),
     paymentRequest: null,
     totalAmount: request.quoted_total_amount ?? null,
     roomTypeName: text(request.room_type_name_vi, request.room_type_name_en),
@@ -207,7 +227,7 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
             : request.status === "converted"
               ? "Đã chuyển đổi"
               : request.status === "closed"
-                ? "Đã đóng"
+                ? "Đã hủy"
                 : request.status === "rejected"
                   ? "Từ chối"
                   : "Hết hạn",
@@ -215,12 +235,12 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
         ? "New"
         : request.status === "in_review"
           ? "In review"
-          : request.status === "quoted"
+        : request.status === "quoted"
             ? "Quoted"
             : request.status === "converted"
               ? "Converted"
               : request.status === "closed"
-                ? "Closed"
+                ? "Cancelled"
                 : request.status === "rejected"
                   ? "Rejected"
                   : "Expired"
@@ -265,11 +285,23 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
       "Booking đã được xác nhận.",
       "The booking has been confirmed."
     );
-  } else {
+  } else if (reservation.status === "cancelled") {
+    stage = "done";
+    bodyNote = text(
+      "Booking này đã bị hủy.",
+      "This booking has been cancelled."
+    );
+  } else if (reservation.status === "completed") {
     stage = "done";
     bodyNote = text(
       "Booking này đã hoàn tất.",
       "This booking is complete."
+    );
+  } else {
+    stage = "done";
+    bodyNote = text(
+      "Booking này đã hết hạn.",
+      "This booking has expired."
     );
   }
 
@@ -289,6 +321,8 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
   return {
     anchorId: `booking-reservation-${reservation.id}`,
     bodyNote,
+    bookingId: reservation.id,
+    bookingStatus: reservation.status,
     code: reservation.booking_code,
     createdAt: reservation.created_at,
     detail: text(
@@ -298,6 +332,7 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
     guestCount: reservation.guest_count,
     kind: "reservation",
     kindLabel: text("Booking", "Booking"),
+    canCancel: canMemberCancelBooking("reservation", reservation.status),
     paymentRequest,
     totalAmount: reservation.total_amount,
     roomTypeName: text(reservation.primary_room_type_name_vi, reservation.primary_room_type_name_en),
@@ -509,6 +544,15 @@ function BookingCard({ entry, locale }: BookingCardProps) {
   const paymentRequest = entry.paymentRequest;
   const showPaymentPanel = paymentRequest?.status === "sent" && entry.kind === "reservation" && entry.stage !== "active" && entry.stage !== "done";
   const returnTo = `/member#${entry.anchorId}`;
+  const cancelLabel =
+    locale === "en" ? (entry.kind === "request" ? "Cancel request" : "Cancel booking") : entry.kind === "request" ? "Hủy yêu cầu" : "Hủy booking";
+  const cancelConfirmMessage = localize(locale, {
+    vi: entry.kind === "request" ? "Bạn có chắc muốn hủy yêu cầu này không? Thao tác này không thể hoàn tác." : "Bạn có chắc muốn hủy booking này không? Thao tác này không thể hoàn tác.",
+    en:
+      entry.kind === "request"
+        ? "Are you sure you want to cancel this request? This cannot be undone."
+        : "Are you sure you want to cancel this booking? This cannot be undone."
+  });
 
   return (
     <details className={`member-booking-card member-booking-card--${entry.stage}`} id={entry.anchorId}>
@@ -605,6 +649,30 @@ function BookingCard({ entry, locale }: BookingCardProps) {
             </p>
           </div>
         )}
+
+        {entry.canCancel ? (
+          <form
+            action={cancelMemberBookingAction}
+            className="member-booking-card__actions"
+            onSubmit={(event) => {
+              if (!window.confirm(cancelConfirmMessage)) {
+                event.preventDefault();
+              }
+            }}
+          >
+            <input name="bookingId" type="hidden" value={entry.bookingId} />
+            <input name="bookingKind" type="hidden" value={entry.kind} />
+            <input name="locale" type="hidden" value={locale} />
+            <input name="returnTo" type="hidden" value={returnTo} />
+
+            <PortalSubmitButton
+              className="button member-booking-card__danger-button"
+              pendingLabel={locale === "en" ? "Cancelling..." : "Đang hủy..."}
+            >
+              {cancelLabel}
+            </PortalSubmitButton>
+          </form>
+        ) : null}
       </div>
     </details>
   );

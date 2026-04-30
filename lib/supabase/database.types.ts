@@ -1218,6 +1218,20 @@ export interface Database {
           status: Database["public"]["Enums"]["room_hold_status"];
         }[];
       };
+      release_expired_availability_requests: {
+        Args: {
+          p_as_of?: string | null;
+        };
+        Returns: {
+          branch_id: string;
+          customer_id: string | null;
+          expired_at: string;
+          request_code: string;
+          request_id: string;
+          response_due_at: string;
+          status: Database["public"]["Enums"]["availability_request_status"];
+        }[];
+      };
       release_expired_reservations: {
         Args: {
           p_as_of?: string | null;

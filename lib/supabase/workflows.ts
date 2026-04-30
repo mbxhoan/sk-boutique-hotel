@@ -78,8 +78,22 @@ export type ReleaseExpiredHoldsInput = {
   asOf?: string;
 };
 
+export type ReleaseExpiredAvailabilityRequestsInput = {
+  asOf?: string;
+};
+
 export type ReleaseExpiredReservationsInput = {
   asOf?: string;
+};
+
+export type ReleasedAvailabilityRequestRow = {
+  branch_id: string;
+  customer_id: string | null;
+  expired_at: string;
+  request_code: string;
+  request_id: string;
+  response_due_at: string;
+  status: AvailabilityRequestStatus;
 };
 
 export type ConfirmAvailabilityRequestInput = {
@@ -530,6 +544,23 @@ export async function releaseExpiredHolds(input: ReleaseExpiredHoldsInput = {}) 
   }
 
   return (data ?? []) as ReleasedHoldRow[];
+}
+
+export async function releaseExpiredAvailabilityRequests(input: ReleaseExpiredAvailabilityRequestsInput = {}) {
+  if (!hasSupabaseServiceConfig()) {
+    return [];
+  }
+
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase.rpc("release_expired_availability_requests", {
+    p_as_of: input.asOf ? normalizeTimestamptzInput(input.asOf) : new Date().toISOString()
+  });
+
+  if (error) {
+    throw toError(error, "Unable to release expired booking requests.");
+  }
+
+  return (data ?? []) as ReleasedAvailabilityRequestRow[];
 }
 
 export async function releaseExpiredReservations(input: ReleaseExpiredReservationsInput = {}) {
