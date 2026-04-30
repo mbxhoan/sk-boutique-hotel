@@ -365,6 +365,7 @@ function HeroMetrics({
   locale: Locale;
 }) {
   const nights = calculateNights(detail.booking.stay_start_at, detail.booking.stay_end_at);
+  const requestedDepositPercentage = detail.financial_summary.requested_deposit_percentage;
   const metrics = [
     {
       label: locale === "en" ? "Booking value" : "Giá trị booking",
@@ -375,9 +376,13 @@ function HeroMetrics({
     {
       label: locale === "en" ? "Deposit target" : "Mục tiêu cọc",
       note:
-        locale === "en"
-          ? `${detail.financial_summary.default_deposit_percentage}% default`
-          : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
+        detail.financial_summary.active_payment_request_id
+          ? locale === "en"
+            ? `${requestedDepositPercentage}% current`
+            : `${requestedDepositPercentage}% hiện tại`
+          : locale === "en"
+            ? `${detail.financial_summary.default_deposit_percentage}% default`
+            : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
       tone: "soft",
       value: formatMoney(locale, detail.financial_summary.requested_deposit_amount)
     },
@@ -717,7 +722,10 @@ function DepositCard({
   returnTo: string;
 }) {
   const reservation = detail.reservation;
-  const [depositPercent, setDepositPercent] = useState(detail.financial_summary.default_deposit_percentage);
+  const [depositPercent, setDepositPercent] = useState(detail.financial_summary.requested_deposit_percentage);
+  useEffect(() => {
+    setDepositPercent(detail.financial_summary.requested_deposit_percentage);
+  }, [detail.financial_summary.requested_deposit_percentage]);
   const depositAmount = useMemo(
     () => calculateDepositAmount({
       depositPercent,
@@ -725,7 +733,7 @@ function DepositCard({
     }),
     [depositPercent, detail.financial_summary.total_amount]
   );
-  const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.default_deposit_percentage;
+  const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.requested_deposit_percentage;
 
   if (!reservation || reservation.status === "confirmed" || reservation.status === "completed") {
     return null;

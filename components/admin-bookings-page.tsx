@@ -113,7 +113,7 @@ const statusLabels: Record<Locale, Record<WorkflowBookingRow["status"], string>>
     pending_deposit: "CHỜ CỌC",
     confirmed: "ĐÃ XÁC NHẬN",
     rejected: "TỪ CHỐI",
-    quoted: "ĐÃ BÁO GIÁ"
+    quoted: "ĐÃ TIẾP NHẬN"
   }
 };
 

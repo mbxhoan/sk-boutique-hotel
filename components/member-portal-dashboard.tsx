@@ -817,8 +817,8 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
       <section className="member-portal-section" id="info">
         <PortalSectionHeading
           description={{
-            vi: "Thông tin cá nhân, liên hệ, và marketing consent được cập nhật tại đây; mọi thay đổi sẽ được ghi lại cho admin và vận hành.",
-            en: "Personal details, contact data, and marketing consent are updated here; every change is logged for admin and operations."
+            vi: "Thông tin cá nhân, liên hệ được cập nhật tại đây.",
+            en: "Personal details, contact data are updated here."
           }}
           eyebrow={{
             vi: "Thông tin",

@@ -2654,15 +2654,15 @@ textarea {
 .portal-field__control {
   width: 100%;
   padding: 0.85rem 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(0, 12, 30, 0.12);
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--portal-text);
+  background: #ffffff;
+  color: #000000;
   outline: none;
 }
 
 .portal-field__control::placeholder {
-  color: rgba(249, 245, 239, 0.46);
+  color: rgba(0, 12, 30, 0.42);
 }
 
 .portal-field__control:focus {
@@ -3037,6 +3037,10 @@ textarea {
   border-color: rgba(0, 12, 30, 0.1);
   background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
+}
+
+.portal-shell--member .portal-field__control::placeholder {
+  color: rgba(0, 12, 30, 0.42);
 }
 
 .portal-shell--member .portal-workflow-card__pricing {
@@ -4935,7 +4939,7 @@ textarea {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.portal-shell .portal-field__control {
+.portal-shell--admin .portal-field__control {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.08);
 }

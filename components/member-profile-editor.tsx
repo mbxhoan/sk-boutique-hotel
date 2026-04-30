@@ -19,17 +19,17 @@ export function MemberProfileEditor({ customer, locale }: MemberProfileEditorPro
     <PortalCard className="member-profile-card" tone="accent">
       <div className="portal-item-card__top">
         <div>
-          <p className="portal-panel__eyebrow">{localize(locale, { vi: "Thông tin", en: "Info" })}</p>
-          <h3 className="portal-item-card__title">{localize(locale, { vi: "Thông tin cá nhân", en: "Personal information" })}</h3>
-          <p className="portal-panel__note-copy">
+          {/* <p className="portal-panel__eyebrow">{localize(locale, { vi: "Thông tin", en: "Info" })}</p> */}
+          {/* <h3 className="portal-item-card__title">{localize(locale, { vi: "Cập nhật thông tin", en: "Update Information" })}</h3> */}
+          {/* <p className="portal-panel__note-copy">
             {localize(locale, {
-              vi: "Cập nhật hồ sơ member tại đây. Mọi thay đổi sẽ được ghi nhận cho admin và vận hành.",
-              en: "Update your member profile here. Every change is recorded for admin and operations."
+              vi: "Cập nhật hồ sơ member tại đây",
+              en: "Update your member profile here"
             })}
-          </p>
+          </p> */}
         </div>
 
-        <PortalBadge tone="soft">{localize(locale, { vi: "Đã ghi log", en: "Audit tracked" })}</PortalBadge>
+        {/* <PortalBadge tone="soft">{localize(locale, { vi: "Đã ghi log", en: "Audit tracked" })}</PortalBadge> */}
       </div>
 
       <form className="portal-form" action={updateMemberProfileAction}>
@@ -96,13 +96,13 @@ export function MemberProfileEditor({ customer, locale }: MemberProfileEditorPro
         </label>
 
         <div className="member-profile-card__note">
-          <PortalBadge tone="soft">{localize(locale, { vi: "Lịch sử được lưu", en: "History kept" })}</PortalBadge>
-          <p className="member-profile-card__copy">
+          {/* <PortalBadge tone="soft">{localize(locale, { vi: "Lịch sử được lưu", en: "History kept" })}</PortalBadge> */}
+          {/* <p className="member-profile-card__copy">
             {localize(locale, {
               vi: "Mọi thay đổi hồ sơ được lưu trong audit log để admin và vận hành theo dõi.",
               en: "Every profile change is stored in the audit log for admin and operations."
             })}
-          </p>
+          </p> */}
         </div>
 
         <div className="member-profile-card__actions">

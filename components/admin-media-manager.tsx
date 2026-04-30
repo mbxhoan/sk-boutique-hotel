@@ -7,6 +7,7 @@ import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
+import { MediaPreviewImage } from "@/components/media-preview-image";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { MediaAssetRowWithUrl, MediaCollectionRow } from "@/lib/supabase/queries/media";
 import {
@@ -270,8 +271,14 @@ function AssetEditor({
   return (
     <PortalCard className="admin-media__asset-card" id={`media-asset-${asset.id}`} tone={asset.is_active ? "default" : "soft"}>
       <div className="admin-media__asset-preview">
-        {asset.public_url ? (
-          <img alt={asset.alt_vi || asset.title_vi || asset.slug} className="admin-media__asset-image" loading="lazy" src={asset.public_url} />
+        {asset.public_url || asset.fallback_url ? (
+          <MediaPreviewImage
+            alt={asset.alt_vi || asset.title_vi || asset.slug}
+            className="admin-media__asset-image"
+            fallbackSrc={asset.fallback_url || "/home/block.jpg"}
+            loading="lazy"
+            src={asset.public_url || asset.fallback_url}
+          />
         ) : (
           <div className="admin-media__asset-empty">{locale === "en" ? "No image" : "Chưa có ảnh"}</div>
         )}
@@ -505,7 +512,13 @@ function AssetPreviewDialog({
     >
       <div className="admin-media__dialog-preview">
         {previewUrl ? (
-          <img alt={asset.alt_vi || asset.title_vi || asset.slug} className="admin-media__dialog-image" loading="lazy" src={previewUrl} />
+          <MediaPreviewImage
+            alt={asset.alt_vi || asset.title_vi || asset.slug}
+            className="admin-media__dialog-image"
+            fallbackSrc={asset.fallback_url || "/home/block.jpg"}
+            loading="eager"
+            src={previewUrl}
+          />
         ) : (
           <div className="admin-media__dialog-empty">{locale === "en" ? "No image available" : "Không có ảnh"}</div>
         )}

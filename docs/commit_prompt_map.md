@@ -1598,3 +1598,15 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/operations.ts`
   - `lib/supabase/queries/booking-details.ts`
   - `app/globals.css`
+
+### Entry 139
+- `time`: 2026-04-30T21:43:37+07:00
+- `prompt_summary`: Giữ % cọc đã chỉnh sửa sau khi tạo lại QR, đồng thời khôi phục preview ảnh trong thư viện media/content overview khi nguồn ảnh gốc lỗi hoặc không tải được.
+- `commit_message`: `fix(admin-ui): preserve deposit percent and restore media previews`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `components/media-preview-image.tsx`
+  - `lib/supabase/booking-finance.ts`
+  - `lib/supabase/queries/booking-details.ts`
