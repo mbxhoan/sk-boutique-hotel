@@ -35,7 +35,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function AdminPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
-  const range = resolvedSearchParams.range === "7d" || resolvedSearchParams.range === "30d" ? resolvedSearchParams.range : "today";
+  const range = resolvedSearchParams.range === "today" || resolvedSearchParams.range === "30d" ? resolvedSearchParams.range : "7d";
   const parsedLimit = resolvedSearchParams.limit ? Number(resolvedSearchParams.limit) : null;
   const dashboard = await loadAdminWorkflowDashboard({
     branchId: resolvedSearchParams.branch,

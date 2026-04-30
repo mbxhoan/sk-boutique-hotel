@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
@@ -5,6 +6,11 @@ import { AdminShell } from "@/components/admin-shell";
 import { canAccessAdminPortal, getSupabaseUser } from "@/lib/supabase/auth";
 import { loadAdminNotifications } from "@/lib/supabase/queries/admin-notifications";
 import { listBranches } from "@/lib/supabase/queries/branches";
+
+export const metadata: Metadata = {
+  manifest: "/admin/manifest.webmanifest",
+  themeColor: "#f4f6fb"
+};
 
 export default async function AdminLayout({
   children

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SK Boutique Hotel - Media Library</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#e8c086",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-tint": "#775928",
+                    "tertiary-fixed": "#e1e3e4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary": "#775928",
+                    "outline-variant": "#d1c5b6",
+                    "on-surface-variant": "#4e453a",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#021c36",
+                    "on-primary-fixed": "#281800",
+                    "inverse-surface": "#213145",
+                    "surface-container-high": "#dce9ff",
+                    "surface-bright": "#f8f9ff",
+                    "surface": "#f8f9ff",
+                    "on-secondary-container": "#4b617d",
+                    "tertiary": "#5c5f60",
+                    "secondary": "#4a607c",
+                    "on-tertiary-container": "#292c2d",
+                    "on-primary-fixed-variant": "#5d4213",
+                    "secondary-container": "#c5dcfd",
+                    "on-primary-container": "#3d2700",
+                    "outline": "#807569",
+                    "on-surface": "#0b1c30",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#ffdeae",
+                    "on-secondary-fixed-variant": "#324863",
+                    "inverse-primary": "#e8c086",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary-fixed": "#191c1d",
+                    "on-background": "#0b1c30",
+                    "surface-variant": "#d3e4fe",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "secondary-fixed": "#d2e4ff",
+                    "primary-container": "#b08d57",
+                    "tertiary-container": "#919394",
+                    "surface-container": "#e5eeff",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#b1c8e9",
+                    "inverse-on-surface": "#eaf1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sidebar-width": "260px",
+                    "md": "16px",
+                    "gutter": "20px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "h1": ["Inter"],
+                    "table-data": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "h2": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h3": ["Inter"]
+            },
+            "fontSize": {
+                    "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "table-data": ["13px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h3": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background antialiased min-h-screen flex flex-col font-['Inter']">
+<!-- TopAppBar (From JSON) -->
+<header class="bg-white dark:bg-zinc-950 font-['Inter'] tracking-tight fixed top-0 w-full border-b border-zinc-200 dark:border-zinc-800 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex justify-between items-center px-4 h-16 w-full z-40 border-b border-zinc-100 dark:border-zinc-900">
+<button class="text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors active:opacity-80 transition-all duration-200 flex items-center justify-center p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="text-sm font-bold tracking-[0.2em] text-zinc-900 dark:text-zinc-100 uppercase">
+            SK Boutique Hotel
+        </div>
+<div class="hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors active:opacity-80 transition-all duration-200 cursor-pointer rounded-full overflow-hidden w-8 h-8 border border-outline-variant">
+<img alt="Manager Profile" class="w-full h-full object-cover" data-alt="professional portrait of hotel manager looking approachable" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCg6tGfBB6KISbIXrSq4wJ3vFSuX7BT7X0MjuFs5WjSFjLB9vWRxbOndIP4i8C_SzKNd-7K0mwWkuiNdzsaNtBE3h3iM7QsrsOwFTWMJv0EvR7naWB2oyfIM89L909g2Z-NAUprZT0aX98Ib-OwkIR9kvK8MfOGIAMLrXG2r9XpwEh89iNfQgHvBPg10Pc1v9GC0Gh722JnDg3aVAqFJ3bdrBcG0r9K8z6G47Gsr8yCMZdxXQ4tUZY5kwYxqNeF6s4h9Sqwx3DEbVwl"/>
+</div>
+</header>
+<!-- Main Content Canvas (Mobile Layout Emphasis) -->
+<main class="flex-1 pt-[80px] pb-xl px-md max-w-[600px] mx-auto w-full">
+<!-- Header & Primary Action -->
+<div class="flex justify-between items-center mb-md">
+<div>
+<h1 class="font-h2 text-h2 text-on-surface">Media Library</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Manage hotel assets</p>
+</div>
+<button class="bg-primary text-on-primary h-10 w-10 rounded-full flex items-center justify-center shadow-[0px_2px_4px_rgba(0,0,0,0.05)] active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">upload</span>
+</button>
+</div>
+<!-- Scrollable Filter Tabs -->
+<div class="flex overflow-x-auto space-x-sm pb-sm mb-sm hide-scrollbar border-b border-outline-variant/30">
+<button class="shrink-0 px-lg py-sm rounded-full border border-outline text-on-surface-variant font-label-caps text-label-caps uppercase active:bg-surface-dim transition-colors">
+                All
+            </button>
+<button class="shrink-0 px-lg py-sm rounded-full bg-primary-container text-on-primary-container border border-primary-container font-label-caps text-label-caps uppercase shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+                Rooms
+            </button>
+<button class="shrink-0 px-lg py-sm rounded-full border border-outline text-on-surface-variant font-label-caps text-label-caps uppercase active:bg-surface-dim transition-colors">
+                Dining
+            </button>
+<button class="shrink-0 px-lg py-sm rounded-full border border-outline text-on-surface-variant font-label-caps text-label-caps uppercase active:bg-surface-dim transition-colors">
+                Amenities
+            </button>
+<button class="shrink-0 px-lg py-sm rounded-full border border-outline text-on-surface-variant font-label-caps text-label-caps uppercase active:bg-surface-dim transition-colors">
+                Exterior
+            </button>
+</div>
+<!-- Info/Count Bar -->
+<div class="flex justify-between items-center mb-md px-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">24 Items</span>
+<button class="flex items-center text-secondary font-label-caps text-label-caps uppercase">
+<span class="material-symbols-outlined text-[16px] mr-xs">sort</span>
+                Newest
+            </button>
+</div>
+<!-- 2-Column Media Grid -->
+<div class="grid grid-cols-2 gap-sm">
+<!-- Grid Item 1 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim">
+<img alt="Deluxe King Room" class="w-full h-full object-cover" data-alt="luxurious hotel bedroom with king bed, crisp white linens, modern minimalist decor, soft morning sunlight, neutral tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgOykUto-wQ4Tkt7qjtq-XZHHtn-hdcn7WDQlfo_AJ8Abf-gAoYO9fTwgM3tbpdJbVjG8U9ou5A9MmmlBPAdtAXlqYQ5b0zeQgYrq7Gk-clFsUBaEb8zAxuYnSJD4u3IIOY3PNEk7-_veJCrb13pmVcUPhFTSkNya7benkzrCa710mp6TqZGhZoKZ9PZA1RrIdZ44_rbZUevSiuXSdQ3cEXBNlZrBYnrnV0tblNAwnBtRkD96yXxPOtY85btt5jMHxw97wv0WmO8gF"/>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">deluxe-king-01.jpg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">2.4 MB • 2400x1600</span>
+</div>
+</div>
+<!-- Grid Item 2 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim">
+<img alt="Executive Suite Living Area" class="w-full h-full object-cover" data-alt="executive suite living area with plush sofa, modern coffee table, large windows with city view, refined gold accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRVX6g-PpZ_hNPK4cE5oRk6-kswwC7A4kJpQYiBJQofGbx7tbf_O_fLa65WuWBZAGP4nnJBsLzrUPKUmFWoNVMV0vu32QQ_lIoq8C4bXtnKWP70iIykr65ROsyRRcQnQH3GYkG5WbiRNE3YxBkZNVrTBDyUNtXopNjaCmXVzp64nf9LASp8eWQPIBZGMKAPNWfec_kUbmfyPgHcudV30IuQuevuCmzDvgwj56jWvtQi9FA1w7CElLjiYHEmdodapb3q8tKQ_kkIbKX"/>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">exec-suite-living.jpg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">3.1 MB • 2400x1600</span>
+</div>
+</div>
+<!-- Grid Item 3 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim">
+<img alt="Standard Double Room" class="w-full h-full object-cover" data-alt="standard hotel room with two double beds, warm reading lamps, cozy atmosphere, clean modern aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Sy2LEsIHmf5kU8rx7Ib4riqIRJssJOeg-GKsx4VvjLMguVLbnodIBerncOFmLpDVFCqSdcyxQV3GlKJrCmyiCkRpVK1F6L0pgedY5rSH4hyjuwyEXEF6NXbMmzt540y6SUPZ6WD7pRcuMzQ4fZkLTMdzU36Ao2TuFSVpNj57vCUmW6gCPDqftBUotl2taIW1pgxC0rgFHwX1AQZtBsj-RKBjlZeXLJeVo_NLai05ZHYsld2CV4VWv9OSbCIROuQtXZiajdZ2XuWg"/>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">standard-dbl-02.jpg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">1.8 MB • 1920x1080</span>
+</div>
+</div>
+<!-- Grid Item 4 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim">
+<img alt="Luxury Bathroom" class="w-full h-full object-cover" data-alt="modern hotel bathroom with freestanding tub, marble walls, brass fixtures, fluffy white towels, warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvmXlFCC5yV3hrXSTN8H1wipV74QV749eUvUHMMYgX5ZBnNroXScwBnstODCFAlkZbLN6bdQntOcQe8KyHXe_Yw9yN4na0wtjw4RKrlp-h3lteva_oRi6vqhtMoVGCLcvHDeM50BQOMkWiL1heDMoYdt_cq3K0x7wh4IA1XaETvXOiZ3WdYPDZ5Ih8JJ1NlJh0MAMOdmlr7IksQa11Wh_AM-zLsuwGyoIFTYuBv8kZUHVC1Zl7TQufnhWawz71qxqwJT2Z2MBQ4p23"/>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">bathroom-deluxe.jpg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">2.9 MB • 2400x1600</span>
+</div>
+</div>
+<!-- Grid Item 5 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim flex items-center justify-center bg-surface-container-high">
+<span class="material-symbols-outlined text-outline text-[48px]" style="font-variation-settings: 'FILL' 0;">videocam</span>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+<div class="absolute bottom-xs left-xs bg-surface-container-lowest/80 backdrop-blur-sm px-2 py-1 rounded border border-outline-variant flex items-center">
+<span class="font-label-caps text-[10px] font-bold text-on-surface">0:45</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">room-tour-1080p.mp4</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">45 MB • MP4</span>
+</div>
+</div>
+<!-- Grid Item 6 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden flex flex-col shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative aspect-square bg-surface-dim">
+<img alt="Penthouse View" class="w-full h-full object-cover" data-alt="view from penthouse hotel balcony looking over city skyline at sunset, warm glowing light, elegant patio furniture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9VKGwhvXIf5AoGAm9DDEzMdNP3GyyM-veTXBGKFQM7V0iq-JT3ylvCcwH1jVFvRkSLKXcQD1y5PhSfYh9Et0XyoNM47edY3ToIbsI_drDsuxLxDQ68nfLZaPk2AOfMWgxV0tfp_DZWbiecDdEBTJSvQ31digIJQspcjJbTl7ZFP644kn_nCKZyl9ZXilVGMac0T74rrhjoEKsBZOw9xP2gb-XY8eXWJMCt00Ryd4PyWv2PHLQJ3M1bnKh9An801vqkgW8KtTgma-S"/>
+<div class="absolute top-xs right-xs w-6 h-6 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-base">
+<span class="font-body-sm text-body-sm text-on-surface truncate">penthouse-balcony.jpg</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">3.5 MB • 3000x2000</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

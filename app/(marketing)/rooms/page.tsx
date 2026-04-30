@@ -38,7 +38,7 @@ function normalizeRoomDateRange(checkin?: string | null, checkout?: string | nul
   const minCheckin = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const parsedCheckin = parseDateKey(checkin);
   const parsedCheckout = parseDateKey(checkout);
-  const normalizedCheckin = parsedCheckin && parsedCheckin.getTime() >= minCheckin.getTime() ? parsedCheckin : minCheckin;
+  const normalizedCheckin = parsedCheckin ?? minCheckin;
   const minimumCheckout = addDays(normalizedCheckin, 1);
   const normalizedCheckout = parsedCheckout && parsedCheckout.getTime() > normalizedCheckin.getTime() ? parsedCheckout : minimumCheckout;
 

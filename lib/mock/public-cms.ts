@@ -289,7 +289,7 @@ const roomItems: CmsCollectionItem[] = [
       "Không gian rộng rãi, lý tưởng cho gia đình, kết hợp sự tiện nghi và riêng tư với tầm nhìn sân vườn & hồ bơi.",
       "Spacious and refined, perfect for families seeking comfort, privacy, and serene garden & pool views."
     ),
-    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("From 1,700,000", "From 1,700,000")],
+    [text("6 khách", "6 guests"), text("60 m²", "60 sqm"), text("Từ 1,700,000", "From 1,700,000")],
     "paper",
     "/home/bed1.jpg",
     text("Family Room", "Family Room")
@@ -315,7 +315,7 @@ const roomItems: CmsCollectionItem[] = [
       "Lựa chọn linh hoạt cho nhóm bạn hoặc gia đình nhỏ, cân bằng giữa không gian, tiện nghi và chi phí.",
       "Flexible and comfortable, designed for small groups with a balance of space, functionality, and value."
     ),
-    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("From 1,300,000", "From 1,300,000")],
+    [text("5 khách", "5 guests"), text("35 m²", "35 sqm"), text("Từ 1,300,000", "From 1,300,000")],
     "ink",
     "/home/bed1.jpg",
     text("Quadruple Room", "Quadruple Room")
@@ -573,8 +573,8 @@ const homePageSections: CmsSection[] = [
         ),
         actions: {
           primary: {
-            href: "/chi-nhanh",
-            label: text("Khám phá chi nhánh", "Explore branches"),
+            href: "/phong",
+            label: text("Khám phá phòng", "Explore rooms"),
             tone: "solid"
           },
           secondary: {

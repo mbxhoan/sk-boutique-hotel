@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SK Boutique Navigation Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#e8c086",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-tint": "#775928",
+                        "tertiary-fixed": "#e1e3e4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary": "#775928",
+                        "outline-variant": "#d1c5b6",
+                        "on-surface-variant": "#4e453a",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#021c36",
+                        "on-primary-fixed": "#281800",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface": "#f8f9ff",
+                        "on-secondary-container": "#4b617d",
+                        "tertiary": "#5c5f60",
+                        "secondary": "#4a607c",
+                        "on-tertiary-container": "#292c2d",
+                        "on-primary-fixed-variant": "#5d4213",
+                        "secondary-container": "#c5dcfd",
+                        "on-primary-container": "#3d2700",
+                        "outline": "#807569",
+                        "on-surface": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#ffdeae",
+                        "on-secondary-fixed-variant": "#324863",
+                        "inverse-primary": "#e8c086",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-background": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "secondary-fixed": "#d2e4ff",
+                        "primary-container": "#b08d57",
+                        "tertiary-container": "#919394",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#b1c8e9",
+                        "inverse-on-surface": "#eaf1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "md": "16px",
+                        "gutter": "20px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "h1": ["Inter"],
+                        "table-data": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h3": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h1": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "table-data": ["13px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h2": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "h3": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background h-screen w-full overflow-hidden antialiased relative">
+<div class="fixed inset-0 bg-inverse-surface/60 z-40 backdrop-blur-sm transition-opacity"></div>
+<nav class="bg-white dark:bg-zinc-950 fixed left-0 top-0 h-full w-[260px] border-r border-zinc-200 dark:border-zinc-800 flex flex-col py-6 space-y-2 z-50 transition-all duration-300 ease-in-out shadow-none overflow-y-auto">
+<div class="flex items-center justify-between px-6 mb-8 mt-2">
+<span class="text-xl font-extrabold tracking-tighter text-amber-600 font-h2 text-h2">SK Boutique</span>
+<button class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-1 -mr-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</div>
+<div class="flex flex-col w-full px-4 gap-y-1">
+<a class="flex items-center px-4 py-3 bg-zinc-100 dark:bg-zinc-900 text-amber-600 dark:text-amber-500 border-r-4 border-amber-600 dark:border-amber-500 rounded-lg rounded-r-none font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="font-medium">Bookings</span>
+</a>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">bed</span>
+<span class="font-medium">Room Management</span>
+</a>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">photo_library</span>
+<span class="font-medium">Media Library</span>
+</a>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-medium">Customers</span>
+</a>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">article</span>
+<span class="font-medium">Content</span>
+</a>
+</div>
+<div class="mt-auto px-4 pb-4">
+<div class="w-full h-[1px] bg-outline-variant/30 my-4"></div>
+<a class="flex items-center px-4 py-3 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 rounded-lg font-['Inter'] text-sm antialiased transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-4 text-[20px]" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<div class="hidden">
+<img class="w-full h-full object-cover" data-alt="blurred background of a modern luxury hotel lobby with warm ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDufOuDvZ2AT8SMUGgnMtjV_-9olOnhMwvbhraQZwNfa3TSrShA0vnQV6QWT8O7LvnuA9SyOdeRpcrzwPrqEI0b9bgR8HRNxjH9FZdbD3qXc1LquMQkk32NEubZtzwrfjPACXAT_9WkKm1siLx9xKRjHSQS-n_inc2G0UzOT_AmQ32pfMeY-85d_7Ejtm8FfsoyaefJUBWo2A8-c_WsmGbIf0hISm9JCkw0DWDEy3ZKq5bCl9Tg4XpEKuK-P2wS1q_fjZkKebJyviKC"/>
+</div>
+</body></html>

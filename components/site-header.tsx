@@ -176,23 +176,24 @@ export function SiteHeader() {
               const isDropdownOpen = openDropdown === dropdownId;
 
               return (
-                <details
-                  className={`site-header__dropdown${active ? " site-header__dropdown--active" : ""}`}
+                <div
+                  className={`site-header__dropdown${isDropdownOpen ? " site-header__dropdown--open" : ""}${active ? " site-header__dropdown--active" : ""}`}
                   key={dropdownId}
-                  open={isDropdownOpen}
                 >
-                  <summary
+                  <button
+                    aria-expanded={isDropdownOpen}
+                    aria-haspopup="menu"
                     className={`site-header__nav-link site-header__nav-link--summary${active ? " site-header__nav-link--active" : ""}`}
                     aria-label={label}
-                    onClick={(event) => {
-                      event.preventDefault();
+                    onClick={() => {
                       setOpenDropdown((current) => (current === dropdownId ? null : dropdownId));
                     }}
+                    type="button"
                   >
                     <span>{label}</span>
                     <ChevronIcon />
-                  </summary>
-                  <div className="site-header__dropdown-panel">
+                  </button>
+                  <div className="site-header__dropdown-panel" role="menu">
                     {item.children.map((child) => {
                       const childActive = isRouteMatch(pathname, child.href);
 
@@ -202,13 +203,15 @@ export function SiteHeader() {
                           className={`site-header__dropdown-link${childActive ? " site-header__dropdown-link--active" : ""}`}
                           href={resolveHeaderHref(child.href, locale, currentHref)}
                           key={child.href}
+                          onClick={() => setOpenDropdown(null)}
+                          role="menuitem"
                         >
                           {localize(locale, child.label)}
                         </Link>
                       );
                     })}
                   </div>
-                </details>
+                </div>
               );
             }
 
@@ -270,33 +273,31 @@ export function SiteHeader() {
               >
                 <div className="site-header__drawer-head">
                   <LogoMark className="site-header__drawer-logo" href={appendLocaleQuery("/", locale)} priority />
-                  <button
-                    aria-label={locale === "en" ? "Close menu" : "Đóng menu"}
-                    className="site-header__drawer-close"
+
+                  <Link
+                    className="button button--solid site-header__cta site-header__cta--drawer"
+                    href={appendLocaleQuery(headerMenu.cta.href, locale)}
                     onClick={() => setDrawerOpen(false)}
-                    type="button"
                   >
-                    <CloseIcon />
-                  </button>
-                </div>
+                    {localize(locale, headerMenu.cta.label)}
+                  </Link>
 
-                <div className="site-header__drawer-actions">
-                  <LocaleToggleLink
-                    ariaLabel={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
-                    className="site-header__locale site-header__locale--drawer"
-                    href={appendLocaleQuery(pathname, localeToggle)}
-                    locale={localeToggle}
-                    onClick={() => setDrawerOpen(false)}
-                  />
-
-                  <div className="site-header__cta-wrap">
-                    <Link
-                      className="button button--solid site-header__cta site-header__cta--drawer"
-                      href={appendLocaleQuery(headerMenu.cta.href, locale)}
+                  <div className="site-header__drawer-head-actions">
+                    <LocaleToggleLink
+                      ariaLabel={locale === "en" ? "Switch to Vietnamese" : "Switch to English"}
+                      className="site-header__locale site-header__locale--drawer"
+                      href={appendLocaleQuery(pathname, localeToggle)}
+                      locale={localeToggle}
                       onClick={() => setDrawerOpen(false)}
+                    />
+                    <button
+                      aria-label={locale === "en" ? "Close menu" : "Đóng menu"}
+                      className="site-header__drawer-close"
+                      onClick={() => setDrawerOpen(false)}
+                      type="button"
                     >
-                      {localize(locale, headerMenu.cta.label)}
-                    </Link>
+                      <CloseIcon />
+                    </button>
                   </div>
                 </div>
 

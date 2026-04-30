@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import {
   AdminNotificationDialogHost,
@@ -107,8 +108,10 @@ function ShellIcon({
     | "content"
     | "customers"
     | "dashboard"
+    | "close"
     | "logout"
     | "media"
+    | "menu"
     | "notifications"
     | "rooms"
     | "roomTypes"
@@ -124,6 +127,25 @@ function ShellIcon({
       <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
         <circle cx="7.6" cy="7.6" r="4.9" stroke="currentColor" strokeWidth="1.4" />
         <path d="M11.3 11.3L15 15" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+      </svg>
+    );
+  }
+
+  if (icon === "menu") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M3 4.8h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+        <path d="M3 9h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+        <path d="M3 13.2h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+      </svg>
+    );
+  }
+
+  if (icon === "close") {
+    return (
+      <svg aria-hidden="true" fill="none" height={size} viewBox="0 0 18 18" width={size}>
+        <path d="M4.8 4.8 13.2 13.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+        <path d="M13.2 4.8 4.8 13.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
       </svg>
     );
   }
@@ -331,6 +353,7 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
   const currentSearch = searchParams.toString();
@@ -345,83 +368,89 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
     pathname.startsWith("/admin/room-types") ||
     pathname.startsWith("/admin/media");
 
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [currentSearch, pathname]);
+
+  useEffect(() => {
+    if (!isMobileNavOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsMobileNavOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileNavOpen]);
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin/" }).catch(() => {
+      // Ignore failures. The portal still works without a service worker.
+    });
+  }, []);
+
   async function handleSignOut() {
+    setIsMobileNavOpen(false);
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
     router.push("/admin/sign-in");
     router.refresh();
   }
 
+  const mainNavItems = adminNavItems.slice(0, -1);
+  const settingsNavItem = adminNavItems[adminNavItems.length - 1];
+
   return (
     <AdminNotificationProvider locale={locale} serverItems={notifications}>
       <div className="portal-shell portal-shell--admin admin-shell">
-        <aside className="admin-shell__sidebar">
-        <div className="admin-shell__brand">
-          <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
-          {/* <div className="admin-shell__brand-copy">
-            <p className="admin-shell__brand-title">SK Boutique</p>
-            <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
-          </div> */}
-        </div>
+        {isMobileNavOpen ? (
+          <button
+            aria-label={locale === "en" ? "Close admin menu" : "Đóng menu admin"}
+            className="admin-shell__drawer-overlay"
+            onClick={() => setIsMobileNavOpen(false)}
+            type="button"
+          />
+        ) : null}
 
-        <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="admin-shell__nav">
-          {adminNavItems.map((item) => {
-            const active = isActiveNavItem(pathname, item.href);
-
-            return (
-              <Link
-                aria-current={active ? "page" : undefined}
-                className={`admin-shell__nav-link${active ? " admin-shell__nav-link--active" : ""}`}
-                href={appendLocaleQuery(item.href, locale)}
-                key={item.href}
-              >
-                <span className="admin-shell__nav-icon" aria-hidden="true">
-                  <ShellIcon icon={item.icon} />
-                </span>
-                <span className="admin-shell__nav-label">{item.label[locale]}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="admin-shell__footer">
-          <a className="admin-shell__footer-link" href="mailto:ops@skboutiquehotel.vn">
-            <span className="admin-shell__nav-icon" aria-hidden="true">
-              <ShellIcon icon="support" />
-            </span>
-            <span>{locale === "en" ? "Support" : "Hỗ trợ"}</span>
-          </a>
-          <button className="admin-shell__footer-link admin-shell__footer-link--button" onClick={handleSignOut} type="button">
-            <span className="admin-shell__nav-icon" aria-hidden="true">
-              <ShellIcon icon="logout" />
-            </span>
-            <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
-          </button>
-        </div>
-        </aside>
-
-        <div className="admin-shell__workspace">
-          <header className="admin-shell__topbar">
-          {showSearchTopbar ? (
-            <label className="admin-shell__search">
-              <span className="admin-shell__search-icon" aria-hidden="true">
-                <ShellIcon icon="search" size={17} />
-              </span>
-              <input
-                aria-label={locale === "en" ? "Search admin portal" : "Tìm kiếm admin portal"}
-                className="admin-shell__search-input"
-                defaultValue=""
-                placeholder={getSearchPlaceholder(pathname, locale)}
-                type="search"
-              />
-            </label>
-          ) : (
-            <div className="admin-shell__topbar-brand">
-              <p className="admin-shell__topbar-brand-text">SK Boutique Hotel</p>
+        <aside
+          className={`admin-shell__sidebar${isMobileNavOpen ? " admin-shell__sidebar--open" : ""}`}
+          id="admin-shell-sidebar"
+        >
+          <div className="admin-shell__sidebar-head">
+            <div className="admin-shell__brand">
+              <LogoMark className="admin-shell__logo" href={appendLocaleQuery("/admin", locale)} priority variant="light" />
+              <div className="admin-shell__brand-copy">
+                <p className="admin-shell__brand-title">SK Boutique</p>
+                <p className="admin-shell__brand-subtitle">{locale === "en" ? "Admin Portal" : "Cổng quản trị"}</p>
+              </div>
             </div>
-          )}
 
-            <div className="admin-shell__actions">
+            <button
+              aria-label={locale === "en" ? "Close admin menu" : "Đóng menu admin"}
+              className="admin-shell__sidebar-close"
+              onClick={() => setIsMobileNavOpen(false)}
+              type="button"
+            >
+              <ShellIcon icon="close" size={18} />
+            </button>
+          </div>
+
+          <div className="admin-shell__sidebar-controls">
             <details className="admin-shell__branch-menu">
               <summary className="admin-shell__branch-selector">
                 <span className="admin-shell__branch-selector-icon" aria-hidden="true">
@@ -446,6 +475,7 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
                       className={`admin-shell__branch-menu-link${active ? " admin-shell__branch-menu-link--active" : ""}`}
                       href={href}
                       key={branch.id}
+                      onClick={() => setIsMobileNavOpen(false)}
                     >
                       <span>{locale === "en" ? branch.name_en : branch.name_vi}</span>
                     </Link>
@@ -454,21 +484,141 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
               </div>
             </details>
 
+            <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
+              {localeLabel(localeToggle)}
+            </Link>
+          </div>
+
+          <nav aria-label={locale === "en" ? "Admin navigation" : "Điều hướng admin"} className="admin-shell__nav">
+            {mainNavItems.map((item) => {
+              const active = isActiveNavItem(pathname, item.href);
+
+              return (
+                <Link
+                  aria-current={active ? "page" : undefined}
+                  className={`admin-shell__nav-link${active ? " admin-shell__nav-link--active" : ""}`}
+                  href={appendLocaleQuery(item.href, locale)}
+                  key={item.href}
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
+                  <span className="admin-shell__nav-icon" aria-hidden="true">
+                    <ShellIcon icon={item.icon} />
+                  </span>
+                  <span className="admin-shell__nav-label">{item.label[locale]}</span>
+                </Link>
+              );
+            })}
+
+            <div className="admin-shell__nav-divider" aria-hidden="true" />
+          </nav>
+
+          <div className="admin-shell__footer">
+            {settingsNavItem ? (
+              <Link
+                aria-current={isActiveNavItem(pathname, settingsNavItem.href) ? "page" : undefined}
+                className={`admin-shell__footer-link${isActiveNavItem(pathname, settingsNavItem.href) ? " admin-shell__nav-link--active" : ""}`}
+                href={appendLocaleQuery(settingsNavItem.href, locale)}
+                key={settingsNavItem.href}
+                onClick={() => setIsMobileNavOpen(false)}
+              >
+                <span className="admin-shell__nav-icon" aria-hidden="true">
+                  <ShellIcon icon={settingsNavItem.icon} />
+                </span>
+                <span>{settingsNavItem.label[locale]}</span>
+              </Link>
+            ) : null}
+            <a className="admin-shell__footer-link" href="mailto:ops@skboutiquehotel.vn" onClick={() => setIsMobileNavOpen(false)}>
+              <span className="admin-shell__nav-icon" aria-hidden="true">
+                <ShellIcon icon="support" />
+              </span>
+              <span>{locale === "en" ? "Support" : "Hỗ trợ"}</span>
+            </a>
+            <button className="admin-shell__footer-link admin-shell__footer-link--button" onClick={handleSignOut} type="button">
+              <span className="admin-shell__nav-icon" aria-hidden="true">
+                <ShellIcon icon="logout" />
+              </span>
+              <span>{locale === "en" ? "Log out" : "Đăng xuất"}</span>
+            </button>
+          </div>
+        </aside>
+
+        <div className="admin-shell__workspace">
+          <header className="admin-shell__topbar">
+            <button
+              aria-controls="admin-shell-sidebar"
+              aria-expanded={isMobileNavOpen}
+              aria-label={locale === "en" ? "Open admin menu" : "Mở menu admin"}
+              className="admin-shell__menu-button"
+              onClick={() => setIsMobileNavOpen(true)}
+              type="button"
+            >
+              <ShellIcon icon="menu" size={20} />
+            </button>
+
+            <div className={`admin-shell__topbar-brand${showSearchTopbar ? " admin-shell__topbar-brand--with-search" : ""}`}>
+              <LogoMark className="admin-shell__topbar-logo" href={appendLocaleQuery("/admin", locale)} priority={pathname === "/admin"} variant="noBg" />
+              <p className="admin-shell__topbar-brand-text">SK Boutique Hotel</p>
+            </div>
+
+            {showSearchTopbar ? (
+              <label className="admin-shell__search">
+                <span className="admin-shell__search-icon" aria-hidden="true">
+                  <ShellIcon icon="search" size={17} />
+                </span>
+                <input
+                  aria-label={locale === "en" ? "Search admin portal" : "Tìm kiếm admin portal"}
+                  className="admin-shell__search-input"
+                  defaultValue=""
+                  placeholder={getSearchPlaceholder(pathname, locale)}
+                  type="search"
+                />
+              </label>
+            ) : null}
+
+            <div className="admin-shell__actions">
+              <details className="admin-shell__branch-menu">
+                <summary className="admin-shell__branch-selector">
+                  <span className="admin-shell__branch-selector-icon" aria-hidden="true">
+                    <ShellIcon icon="storefront" size={16} />
+                  </span>
+                  <span>{currentBranch ? (locale === "en" ? currentBranch.name_en : currentBranch.name_vi) : locale === "en" ? "Branch selector" : "Chọn chi nhánh"}</span>
+                  <span className="admin-shell__branch-selector-chevron" aria-hidden="true">
+                    <ShellIcon icon="chevron" size={15} />
+                  </span>
+                </summary>
+                <div className="admin-shell__branch-menu-panel" role="menu">
+                  <Link className="admin-shell__branch-menu-link" href={buildBranchHref(pathname, searchParams, locale)}>
+                    {locale === "en" ? "All branches" : "Tất cả chi nhánh"}
+                  </Link>
+                  {branches.map((branch) => {
+                    const href = buildBranchHref(pathname, searchParams, locale, branch.id);
+                    const active = branch.id === currentBranch?.id;
+
+                    return (
+                      <Link
+                        aria-current={active ? "page" : undefined}
+                        className={`admin-shell__branch-menu-link${active ? " admin-shell__branch-menu-link--active" : ""}`}
+                        href={href}
+                        key={branch.id}
+                      >
+                        <span>{locale === "en" ? branch.name_en : branch.name_vi}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
+
               <span className="admin-shell__divider" aria-hidden="true" />
 
               <AdminNotificationsMenu locale={locale} viewAllHref="/admin/notifications" />
 
-              <a className="admin-shell__icon-button" href="mailto:ops@skboutiquehotel.vn">
-                <ShellIcon icon="support" />
-              </a>
+              <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
+                {localeLabel(localeToggle)}
+              </Link>
 
-            <Link className="admin-shell__locale-switch" href={appendLocaleQuery(currentHref, localeToggle)}>
-              {localeLabel(localeToggle)}
-            </Link>
-
-            <button className="admin-shell__avatar" type="button">
-              AD
-            </button>
+              <button className="admin-shell__avatar" aria-label={locale === "en" ? "Profile" : "Hồ sơ cá nhân"} type="button">
+                AD
+              </button>
             </div>
           </header>
 

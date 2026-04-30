@@ -19,7 +19,7 @@ export const aboutUsSeo = {
 const aboutCopy = {
   hero: {
     eyebrow: text("VỀ SK", "ABOUT SK"),
-    title: text("Ở lại theo cách tinh tế hơn.", "Stay in a more refined way."),
+    title: text("Nghỉ dưỡng theo cách tinh tế hơn.", "Stay in a more refined way."),
     description: text(
       "Không gian boutique ấm áp, riêng tư và dễ chịu cho những kỳ nghỉ đáng nhớ.",
       "A warm, private boutique stay designed for memorable moments."
