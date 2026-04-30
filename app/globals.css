@@ -8057,94 +8057,133 @@ textarea {
   }
 }
 
-.location-band__copy,
+.location-band__layout {
+  position: relative;
+  width: min(100%, 1280px);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 2.8vw, 1.6rem);
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  min-height: clamp(24rem, 48vw, 34rem);
+}
+
 .location-band__map {
-  border: 1px solid var(--border-subtle);
+  grid-area: 1 / 1;
+  align-self: stretch;
+  justify-self: end;
+  width: 66.66%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
   border-radius: 0.5rem;
+  background: var(--surface-container-lowest);
   box-shadow: var(--shadow-soft);
 }
 
-.location-band__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: clamp(1.1rem, 2.2vw, 1.6rem);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 244, 236, 0.96)),
-    var(--surface-container-lowest);
+.location-band__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #e7e0d1;
 }
 
-.location-band__eyebrow {
-  margin: 0;
-  color: var(--gold-strong);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  text-transform: uppercase;
+.location-band__shell {
+  grid-area: 1 / 1;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.location-band__card {
+  width: min(100%, 28rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: clamp(1.6rem, 2.8vw, 2.15rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.6rem;
+  background: rgba(251, 249, 245, 0.98);
+  box-shadow: 0 24px 56px rgba(0, 12, 30, 0.18);
+  pointer-events: auto;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.location-band__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .location-band__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.04;
+  line-height: 1.08;
   text-wrap: balance;
 }
 
-.location-band__description {
-  max-width: 42rem;
+.location-band__eyebrow {
   margin: 0;
   color: var(--muted);
-}
-
-.location-band__address {
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
-  background: rgba(0, 12, 30, 0.03);
-}
-
-.location-band__address-label {
-  margin: 0;
-  color: var(--gold-strong);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.22em;
   line-height: 1;
   text-transform: uppercase;
 }
 
-.location-band__address-value {
+.location-band__list {
+  list-style: none;
   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.location-band__list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--border-subtle);
   color: var(--ink);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
+}
+
+.location-band__list-item:last-child {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.location-band__list-name {
+  flex: 1 1 auto;
+}
+
+.location-band__list-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-strong);
+}
+
+.location-band__address {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
   line-height: 1.55;
 }
 
 .location-band__cta {
-  align-self: flex-start;
-  width: fit-content;
-}
-
-.location-band__map {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--surface-container-lowest);
-}
-
-.location-band__frame {
+  align-self: stretch;
   width: 100%;
-  min-height: 22rem;
-  border: 0;
-  background: #e7e0d1;
-  aspect-ratio: 16 / 10;
+  justify-content: center;
 }
 
 .facilities-band {
@@ -10018,12 +10057,29 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .location-band__shell {
+  .location-band__layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: 0;
+    gap: 1rem;
   }
 
-  .location-band__frame {
-    min-height: 18rem;
+  .location-band__map {
+    grid-area: 1 / 1;
+    justify-self: stretch;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    height: auto;
+  }
+
+  .location-band__shell {
+    grid-area: 2 / 1;
+    margin-top: 0;
+    padding-block: 0;
+  }
+
+  .location-band__card {
+    width: 100%;
   }
 
   .facilities-band__shell {
