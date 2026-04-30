@@ -131,7 +131,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "New",
       pending_deposit: "Pending deposit",
       pending_verification: "Pending verification",
-      quoted: "Quoted",
+      quoted: "Received",
       rejected: "Rejected",
       sent: "Deposit sent",
       verified: "Verified"
@@ -149,7 +149,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "Mới",
       pending_deposit: "Chờ cọc",
       pending_verification: "Chờ kiểm tra cọc",
-      quoted: "Đã báo giá",
+      quoted: "Đã tiếp nhận",
       rejected: "Từ chối",
       sent: "Đã gửi QR cọc",
       verified: "Đã duyệt cọc"

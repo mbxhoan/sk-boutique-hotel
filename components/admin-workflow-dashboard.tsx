@@ -235,7 +235,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "New",
       pending_deposit: "Pending deposit",
       pending_verification: "Pending verification",
-      quoted: "Quoted",
+      quoted: "Received",
       rejected: "Rejected",
       released: "Released",
       sent: "Sent",
@@ -255,7 +255,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "Mới",
       pending_deposit: "Chờ deposit",
       pending_verification: "Chờ verify",
-      quoted: "Đã báo giá",
+      quoted: "Đã tiếp nhận",
       rejected: "Từ chối",
       released: "Đã release",
       sent: "Đã gửi",
@@ -284,13 +284,13 @@ const availabilityRequestStatusTransitions = [
       vi: "Đang xử lý"
     }
   },
-  {
-    value: "quoted",
-    label: {
-      en: "Mark quoted",
-      vi: "Đã báo giá"
-    }
-  },
+    {
+      value: "quoted",
+      label: {
+        en: "Mark received",
+        vi: "Đã tiếp nhận"
+      }
+    },
   {
     value: "closed",
     label: {

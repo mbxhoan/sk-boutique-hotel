@@ -9,9 +9,9 @@ import {
   validateContactDetails
 } from "@/lib/contact-details";
 import { getSupabaseSession, getSupabaseUser } from "@/lib/supabase/auth";
-import { getCustomerByAuthUserId, getCustomerByEmail, upsertCustomerProfile } from "@/lib/supabase/queries/customers";
+import { memberProfileUpdateError, syncMemberProfile } from "@/lib/supabase/member-profile";
+import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function readProfileFallback(user: Awaited<ReturnType<typeof getSupabaseUser>>) {
   const metadata = (user?.user_metadata as Record<string, unknown> | null | undefined) ?? {};
@@ -26,6 +26,8 @@ function readProfileFallback(user: Awaited<ReturnType<typeof getSupabaseUser>>) 
     authUserId: user?.id ?? "",
     email: user?.email ?? "",
     fullName,
+    marketingConsent: false,
+    marketingConsentSource: null,
     phone: typeof metadata.phone === "string" && metadata.phone.trim().length ? metadata.phone.trim() : null,
     preferredLocale: metadata.locale === "en" ? ("en" as Locale) : ("vi" as Locale)
   };
@@ -34,6 +36,7 @@ function readProfileFallback(user: Awaited<ReturnType<typeof getSupabaseUser>>) 
 type ProfilePatchBody = {
   email?: string;
   fullName?: string;
+  marketingConsent?: boolean | null;
   phone?: string | null;
   preferredLocale?: Locale;
 };
@@ -48,12 +51,21 @@ function readProfilePatchBody(body: ProfilePatchBody) {
 
 function toProfilePayload(
   authUserId: string,
-  customer: { email: string; full_name: string; phone: string | null; preferred_locale: Locale }
+  customer: {
+    email: string;
+    full_name: string;
+    marketing_consent: boolean;
+    marketing_consent_source: string | null;
+    phone: string | null;
+    preferred_locale: Locale;
+  }
 ) {
   return {
     authUserId,
     email: customer.email,
     fullName: customer.full_name,
+    marketingConsent: customer.marketing_consent,
+    marketingConsentSource: customer.marketing_consent_source,
     phone: customer.phone,
     preferredLocale: customer.preferred_locale
   };
@@ -83,6 +95,8 @@ export async function GET() {
               authUserId: user.id,
               email: customer.email,
               fullName: customer.full_name,
+              marketingConsent: customer.marketing_consent,
+              marketingConsentSource: customer.marketing_consent_source,
               phone: customer.phone,
               preferredLocale: customer.preferred_locale
             }
@@ -138,9 +152,21 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    const duplicateCustomer = await getCustomerByEmail(validation.values.email);
+    const result = await syncMemberProfile({
+      actorRole: "member",
+      actorUserId: session.user.id,
+      authUserId: session.user.id,
+      email: validation.values.email,
+      fullName: validation.values.fullName,
+      marketingConsent: typeof body.marketingConsent === "boolean" ? body.marketingConsent : null,
+      phone: validation.values.phone,
+      preferredLocale,
+      source: "member_portal"
+    });
 
-    if (duplicateCustomer && duplicateCustomer.auth_user_id !== session.user.id) {
+    return NextResponse.json({ profile: toProfilePayload(session.user.id, result.customer) }, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error && error.message === memberProfileUpdateError.EMAIL_ALREADY_USED) {
       return NextResponse.json(
         {
           error: localize(preferredLocale, {
@@ -152,29 +178,6 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const customer = await upsertCustomerProfile({
-      authUserId: session.user.id,
-      email: validation.values.email,
-      fullName: validation.values.fullName,
-      phone: validation.values.phone,
-      preferredLocale,
-      source: "member_portal"
-    });
-
-    const supabase = await createSupabaseServerClient();
-
-    await supabase.auth
-      .updateUser({
-        data: {
-          full_name: customer.full_name,
-          locale: customer.preferred_locale,
-          phone: customer.phone
-        }
-      })
-      .catch(() => null);
-
-    return NextResponse.json({ profile: toProfilePayload(session.user.id, customer) }, { status: 200 });
-  } catch (error) {
     const resolved = resolveContactDetailsError(preferredLocale, error);
 
     if (resolved.field) {

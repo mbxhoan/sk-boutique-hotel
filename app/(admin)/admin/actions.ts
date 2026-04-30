@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
-import { localize } from "@/lib/mock/i18n";
+import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import { readLocaleFromFormData } from "@/lib/locale";
 import { sendEmail } from "@/lib/supabase/email";
 import { sendDepositRequestCustomerEmail } from "@/lib/supabase/email";
@@ -32,6 +32,7 @@ import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { getReservationById } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/lib/supabase/env";
+import { getErrorMessage } from "@/lib/supabase/errors";
 import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 import { buildMemberPortalUrl, buildVietQrImageUrl, createPaymentRequest } from "@/lib/supabase/payments";
@@ -101,6 +102,10 @@ const copy = {
     vi: "Không thể xác nhận booking.",
     en: "Unable to confirm booking."
   },
+  unableToConfirmBookingDetails: {
+    vi: "Hệ thống đang thiếu hàm ghi nhật ký thao tác log_audit_event nên chưa thể xác nhận booking.",
+    en: "The audit log function log_audit_event is missing, so the booking could not be confirmed."
+  },
   unableToCreatePaymentRequest: {
     vi: "Không thể tạo yêu cầu thanh toán.",
     en: "Unable to create payment request."
@@ -145,12 +150,29 @@ function readOptionalString(formData: FormData, key: string) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function redirectWithActionResult(returnTo: string | null, kind: "error" | "success", message: string) {
+function redirectWithActionResult(returnTo: string | null, kind: "error" | "success", message: string | LocalizedText) {
   if (!returnTo) {
     return;
   }
 
   redirect(buildActionResultHref(returnTo, { kind, message }));
+}
+
+function resolveConfirmAvailabilityRequestErrorMessage(error: unknown): LocalizedText {
+  const detail = getErrorMessage(error, "").trim();
+
+  if (!detail) {
+    return copy.unableToConfirmBooking;
+  }
+
+  if (detail.includes("log_audit_event")) {
+    return copy.unableToConfirmBookingDetails;
+  }
+
+  return {
+    en: `${copy.unableToConfirmBooking.en} Details: ${detail}`,
+    vi: `${copy.unableToConfirmBooking.vi} Chi tiết: ${detail}`
+  };
 }
 
 function readOptionalNumber(formData: FormData, key: string) {
@@ -369,7 +391,7 @@ export async function confirmAvailabilityRequestAction(formData: FormData) {
     });
   } catch (error) {
     console.warn("[admin] Failed to confirm booking", error);
-    redirectWithActionResult(returnTo, "error", localize(locale, copy.unableToConfirmBooking));
+    redirectWithActionResult(returnTo, "error", resolveConfirmAvailabilityRequestErrorMessage(error));
     throw error;
   }
 

@@ -61,6 +61,11 @@ function labelForEntity(entityType: string) {
         vi: "Yêu cầu availability",
         en: "Availability request"
       };
+    case "customer":
+      return {
+        vi: "Hồ sơ member",
+        en: "Member profile"
+      };
     case "room_hold":
       return {
         vi: "Hold phòng",

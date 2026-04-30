@@ -49,7 +49,7 @@ function statusLabel(locale: Locale, status: string) {
       completed: "Completed",
       new: "New",
       in_review: "In review",
-      quoted: "Quoted",
+      quoted: "Received",
       converted: "Converted",
       closed: "Closed",
       expired: "Expired"
@@ -67,7 +67,7 @@ function statusLabel(locale: Locale, status: string) {
       completed: "Hoàn tất",
       new: "Mới",
       in_review: "Đang duyệt",
-      quoted: "Đã báo giá",
+      quoted: "Đã tiếp nhận",
       converted: "Đã chuyển",
       closed: "Đã đóng",
       expired: "Hết hạn"

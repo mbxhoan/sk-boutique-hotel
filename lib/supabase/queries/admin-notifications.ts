@@ -177,14 +177,14 @@ function buildNotificationCopy(
     default:
       if (log.action.startsWith("availability_request.status.")) {
         const status = log.action.replace("availability_request.status.", "");
-        const statusLabelEn = status.replaceAll("_", " ");
+        const statusLabelEn = status === "quoted" ? "received" : status.replaceAll("_", " ");
         const statusLabelVi =
           status === "rejected"
             ? "đã từ chối"
             : status === "closed"
               ? "đã đóng"
               : status === "quoted"
-                ? "đã báo giá"
+                ? "đã tiếp nhận"
                 : status === "in_review"
                   ? "đang xử lý"
                   : "đã cập nhật";

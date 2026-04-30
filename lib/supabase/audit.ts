@@ -20,21 +20,25 @@ export type LogAuditEventInput = {
 
 export async function logAuditEvent(input: LogAuditEventInput) {
   const supabase = createSupabaseServiceClient();
-  const { data, error } = await supabase.rpc("log_audit_event", {
-    p_action: input.action,
-    p_actor_role: input.actorRole ?? null,
-    p_actor_user_id: input.actorUserId ?? null,
-    p_availability_request_id: input.availabilityRequestId ?? null,
-    p_branch_id: input.branchId ?? null,
-    p_customer_id: input.customerId ?? null,
-    p_entity_id: input.entityId ?? null,
-    p_entity_type: input.entityType,
-    p_hold_id: input.holdId ?? null,
-    p_metadata: input.metadata ?? {},
-    p_reservation_id: input.reservationId ?? null,
-    p_room_id: input.roomId ?? null,
-    p_summary: input.summary
-  });
+  const { data, error } = await supabase
+    .from("audit_logs")
+    .insert({
+      action: input.action,
+      actor_role: input.actorRole ?? null,
+      actor_user_id: input.actorUserId ?? null,
+      availability_request_id: input.availabilityRequestId ?? null,
+      branch_id: input.branchId ?? null,
+      customer_id: input.customerId ?? null,
+      entity_id: input.entityId ?? null,
+      entity_type: input.entityType,
+      hold_id: input.holdId ?? null,
+      metadata: input.metadata ?? {},
+      reservation_id: input.reservationId ?? null,
+      room_id: input.roomId ?? null,
+      summary: input.summary
+    })
+    .select("*")
+    .single();
 
   if (error) {
     throw toError(error, "Unable to write audit log.");

@@ -5,6 +5,7 @@ import { submitPaymentProofAction } from "@/app/actions/payments";
 import { useEffect, useState } from "react";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { MemberProfileEditor } from "@/components/member-profile-editor";
 import type { Locale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import type {
@@ -223,7 +224,7 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
         : request.status === "in_review"
           ? "Đang xem xét"
           : request.status === "quoted"
-            ? "Đã báo giá"
+            ? "Đã tiếp nhận"
             : request.status === "converted"
               ? "Đã chuyển đổi"
               : request.status === "closed"
@@ -236,7 +237,7 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
         : request.status === "in_review"
           ? "In review"
         : request.status === "quoted"
-            ? "Quoted"
+            ? "Received"
             : request.status === "converted"
               ? "Converted"
               : request.status === "closed"
@@ -816,8 +817,8 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
       <section className="member-portal-section" id="info">
         <PortalSectionHeading
           description={{
-            vi: "Thông tin cá nhân, liên hệ, và marketing consent được tách riêng để dễ quản lý.",
-            en: "Personal details, contact data, and marketing consent are kept separate for easier management."
+            vi: "Thông tin cá nhân, liên hệ, và marketing consent được cập nhật tại đây; mọi thay đổi sẽ được ghi lại cho admin và vận hành.",
+            en: "Personal details, contact data, and marketing consent are updated here; every change is logged for admin and operations."
           }}
           eyebrow={{
             vi: "Thông tin",
@@ -830,43 +831,7 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
           }}
         />
 
-        <PortalCard className="member-profile-card" tone="accent">
-          <dl className="portal-profile-list">
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Full name" : "Ho ten"}</dt>
-              <dd className="portal-profile-list__value">{customerDisplayName}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Email" : "Email"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.email}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Phone" : "Số điện thoại"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.phone ?? "—"}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Preferred locale" : "Ngôn ngữ"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.preferred_locale.toUpperCase()}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Marketing consent" : "Marketing consent"}</dt>
-              <dd className="portal-profile-list__value">
-                {data.customer.marketing_consent ? (locale === "en" ? "Enabled" : "Đã đồng ý") : locale === "en" ? "Disabled" : "Chưa đồng ý"}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="member-profile-card__note">
-            <PortalBadge tone="soft">
-              {data.customer.marketing_consent ? (locale === "en" ? "Consent logged" : "Đã ghi nhận") : locale === "en" ? "Consent off" : "Chưa đồng ý"}
-            </PortalBadge>
-            <p className="member-profile-card__copy">
-              {locale === "en"
-                ? "Consent is stored separately from booking history and deposit workflows."
-                : "Consent được lưu riêng với lịch sử booking và luồng thanh toán."}
-            </p>
-          </div>
-        </PortalCard>
+        <MemberProfileEditor customer={data.customer} locale={locale} />
       </section>
     </div>
   );

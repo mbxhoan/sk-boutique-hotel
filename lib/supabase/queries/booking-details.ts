@@ -202,6 +202,7 @@ function mapAuditLog(
   const branch = log.branch_id ? branchMap[log.branch_id] : null;
   const entityLabels = {
     availability_request: { en: "Availability request", vi: "Yêu cầu đặt phòng" },
+    customer: { en: "Member profile", vi: "Hồ sơ member" },
     payment_request: { en: "Payment request", vi: "Yêu cầu cọc" },
     reservation: { en: "Reservation", vi: "Reservation" },
     room_hold: { en: "Room hold", vi: "Hold phòng" }

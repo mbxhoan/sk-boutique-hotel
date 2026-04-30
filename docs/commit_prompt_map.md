@@ -1564,3 +1564,37 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/api/public/booking-request/route.ts`
   - `components/room-booking-request-form.tsx`
   - `lib/booking-dates.ts`
+
+### Entry 137
+- `time`: 2026-04-30T20:53:46+07:00
+- `prompt_summary`: Đổi trạng thái hiển thị từ "Đã báo giá" sang "Đã tiếp nhận" song ngữ, và khi confirm booking lỗi thì trả về thông báo chi tiết song ngữ thay vì message chung chung; đồng thời xử lý fallback để confirm/create hold không bị sập vì thiếu `log_audit_event`.
+- `commit_message`: `fix(admin-booking): surface detailed confirm errors and rename received status`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `components/admin-notifications-center.tsx`
+  - `components/member-notifications-provider.tsx`
+  - `lib/action-result.ts`
+  - `lib/supabase/audit.ts`
+  - `lib/supabase/workflows.ts`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/admin-accounts-page.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `lib/supabase/queries/admin-notifications.ts`
+
+### Entry 138
+- `time`: 2026-04-30T21:13:40+07:00
+- `prompt_summary`: Chuyển luồng sửa hồ sơ từ booking form sang member portal > Thông tin, giữ booking form chỉ đọc đối với member đã đăng nhập, và lưu lịch sử thay đổi hồ sơ member để admin/vận hành theo dõi.
+- `commit_message`: `feat(member-profile): move profile editing to portal and log changes`
+- `main_files`:
+  - `app/(member)/member/actions.ts`
+  - `app/api/member/profile/route.ts`
+  - `components/member-profile-editor.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `lib/supabase/member-profile.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `app/globals.css`
