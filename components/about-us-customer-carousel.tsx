@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 import type { Locale } from "@/lib/locale";
 
@@ -10,84 +10,51 @@ type AboutCustomerCarouselProps = {
   locale: Locale;
 };
 
-function slideLabel(locale: Locale, index: number, total: number) {
-  return locale === "en" ? `Slide ${index + 1} of ${total}` : `Ảnh ${index + 1} trên ${total}`;
+function pickRandomImages(images: string[], limit: number) {
+  if (images.length <= limit) {
+    return images;
+  }
+
+  const result = [...images];
+
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result.slice(0, limit);
 }
 
 export function AboutCustomerCarousel({ images, locale }: AboutCustomerCarouselProps) {
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const total = images.length;
+  const galleryImages = useMemo(() => pickRandomImages(images, 3), [images]);
 
-  useEffect(() => {
-    if (paused || total <= 1) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setCurrent((previous) => (previous + 1) % total);
-    }, 3000);
-
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [paused, total]);
-
-  if (!total) {
+  if (!galleryImages.length) {
     return null;
   }
 
   return (
     <div
-      aria-label={locale === "en" ? "Customer moments carousel" : "Carousel ảnh khách hàng"}
-      aria-roledescription="carousel"
+      aria-label={locale === "en" ? "Customer moments gallery" : "Bộ sưu tập ảnh khách hàng"}
       className="about-us-carousel"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
-      <div className="about-us-carousel__viewport">
-        <div className="about-us-carousel__track" style={{ transform: `translate3d(-${current * 100}%, 0, 0)` }}>
-          {images.map((src, index) => {
-            const alt = locale === "en" ? `Customer photo ${index + 1}` : `Ảnh khách hàng ${index + 1}`;
+      <div className="about-us-carousel__gallery">
+        {galleryImages.map((src, index) => {
+          const alt = locale === "en" ? `Customer photo ${index + 1}` : `Ảnh khách hàng ${index + 1}`;
 
-            return (
-              <figure
-                aria-hidden={index !== current}
-                aria-label={slideLabel(locale, index, total)}
-                className="about-us-carousel__slide"
-                key={src}
-                role="group"
-                aria-roledescription="slide"
-              >
-                <Image
-                  alt={alt}
-                  className="about-us-carousel__image"
-                  fill
-                  priority={index === 0}
-                  sizes="(min-width: 1200px) 1180px, (min-width: 780px) calc(100vw - 3rem), calc(100vw - 2rem)"
-                  src={src}
-                />
-              </figure>
-            );
-          })}
-        </div>
+          return (
+            <figure className="about-us-carousel__item" key={src}>
+              <Image
+                alt={alt}
+                className="about-us-carousel__image"
+                fill
+                priority={index === 0}
+                sizes="(min-width: 1200px) 360px, (min-width: 780px) 30vw, 100vw"
+                src={src}
+              />
+            </figure>
+          );
+        })}
       </div>
-
-      {total > 1 ? (
-        <div aria-label={locale === "en" ? "Select customer slide" : "Chọn ảnh khách hàng"} className="about-us-carousel__dots" role="tablist">
-          {images.map((_, index) => (
-            <button
-              aria-label={locale === "en" ? `Go to slide ${index + 1}` : `Đi tới ảnh ${index + 1}`}
-              aria-selected={index === current}
-              className={`about-us-carousel__dot${index === current ? " about-us-carousel__dot--active" : ""}`}
-              key={`about-us-carousel-dot-${index}`}
-              onClick={() => setCurrent(index)}
-              role="tab"
-              type="button"
-            />
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }

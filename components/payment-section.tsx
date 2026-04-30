@@ -31,12 +31,12 @@ function CreditCardIcon() {
 const paymentBrands: PaymentBrand[] = [
   { src: "/logos/Mastercard.svg", label: { vi: "Mastercard", en: "Mastercard" } },
   { src: "/logos/visa.svg", label: { vi: "Visa", en: "Visa" } },
-  { src: "/logos/cash.svg", label: { vi: "Tiền mặt", en: "Cash" } }
+  { src: "/logos/vnd.png", label: { vi: "Tiền mặt", en: "Cash" } }
 ];
 
 export function PaymentSection({ className, locale }: PaymentSectionProps) {
   const title = locale === "en" ? "Cards accepted at this property" : "Thẻ được chấp nhận tại cơ sở này";
-  const summary = locale === "en" ? "Mastercard, Visa, and cash" : "Mastercard, Visa, và tiền mặt";
+  const summary = locale === "en" ? "Mastercard, Visa, and Cash" : "Mastercard, Visa, và Tiền mặt";
   const note =
     locale === "en"
       ? "This hotel accepts card and cash payments."

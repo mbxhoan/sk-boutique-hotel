@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { buildRoomsHref } from "@/lib/room-routes";
@@ -111,23 +111,26 @@ function formatMonthLabel(locale: Locale, date: Date) {
 function buildMonthMatrix(monthStart: Date) {
   const firstDay = new Date(monthStart.getFullYear(), monthStart.getMonth(), 1);
   const lastDay = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
-  const gridStart = new Date(firstDay);
-  gridStart.setDate(firstDay.getDate() - firstDay.getDay());
-  const gridEnd = new Date(lastDay);
-  gridEnd.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
+  const leadingBlanks = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+  const totalCells = Math.ceil((leadingBlanks + totalDays) / 7) * 7;
 
-  const weeks: Date[][] = [];
-  let cursor = gridStart;
+  const weeks: (Date | null)[][] = [];
+  let week: (Date | null)[] = [];
 
-  while (cursor <= gridEnd) {
-    const week: Date[] = [];
+  for (let cellIndex = 0; cellIndex < totalCells; cellIndex += 1) {
+    const dayNumber = cellIndex - leadingBlanks + 1;
 
-    for (let index = 0; index < 7; index += 1) {
-      week.push(new Date(cursor));
-      cursor = addDays(cursor, 1);
+    if (dayNumber < 1 || dayNumber > totalDays) {
+      week.push(null);
+    } else {
+      week.push(new Date(monthStart.getFullYear(), monthStart.getMonth(), dayNumber));
     }
 
-    weeks.push(week);
+    if (week.length === 7) {
+      weeks.push(week);
+      week = [];
+    }
   }
 
   return weeks;
@@ -266,6 +269,8 @@ export function AvailabilityCheckBar({
   locale,
   variant = "page"
 }: AvailabilityCheckBarProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [activePanel, setActivePanel] = useState<"dates" | "guests" | null>(null);
   const [dateSelectionMode, setDateSelectionMode] = useState<"start" | "end">("start");
@@ -393,8 +398,9 @@ export function AvailabilityCheckBar({
         </div>
 
         <div className="availability-calendar__grid">
-          {days.map((week) =>
-            week.map((day) => (
+          {days.map((week, weekIndex) =>
+            week.map((day, dayIndex) =>
+              day ? (
                 <CalendarDay
                   currentMonth={month.getMonth()}
                   day={day}
@@ -405,7 +411,14 @@ export function AvailabilityCheckBar({
                   selectedEnd={checkout}
                   selectedStart={checkin}
                 />
-              ))
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="availability-calendar__day availability-calendar__day--blank"
+                  key={`blank-${weekIndex}-${dayIndex}`}
+                />
+              )
+            )
           )}
         </div>
       </div>
@@ -553,10 +566,10 @@ export function AvailabilityCheckBar({
                 </div>
               </div>
 
-              <div className="availability-check__fixed-room">
+              {/* <div className="availability-check__fixed-room">
                 <span>{locale === "en" ? "Room" : "Phòng"}</span>
                 <strong>{locale === "en" ? "1 room fixed" : "1 phòng cố định"}</strong>
-              </div>
+              </div> */}
 
               <div className="availability-check__popover-actions">
                 <button className="button button--solid availability-check__save" onClick={() => setActivePanel(null)} type="button">
@@ -567,9 +580,25 @@ export function AvailabilityCheckBar({
           ) : null}
         </div>
 
-        <Link className="button button--solid availability-check__submit" href={buildHref()}>
-          {locale === "en" ? "Check availability" : "Kiểm tra phòng"}
-        </Link>
+        <button
+          className="button button--solid availability-check__submit"
+          disabled={isPending}
+          onClick={() => {
+            startTransition(() => {
+              router.push(buildHref());
+            });
+          }}
+          type="button"
+        >
+          {isPending ? (
+            <span className="availability-check__submit-loading" aria-live="polite">
+              <span className="availability-check__spinner" aria-hidden="true" />
+              <span>{locale === "en" ? "Loading…" : "Đang tải…"}</span>
+            </span>
+          ) : (
+            <span>{locale === "en" ? "Check availability" : "Kiểm tra phòng"}</span>
+          )}
+        </button>
       </div>
     </div>
   );
