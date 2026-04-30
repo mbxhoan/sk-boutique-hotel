@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { createManualReservationAction } from "@/app/(admin)/admin/actions";
 import { PortalCard } from "@/components/portal-ui";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
@@ -149,6 +151,103 @@ function bookingStatusLabel(locale: Locale, status: string) {
   return labels[locale][status] ?? status;
 }
 
+function ManualReservationForm({
+  branchId,
+  locale,
+  returnToHref,
+  room,
+  selectedEndDate,
+  selectedStartDate
+}: {
+  branchId: string;
+  locale: Locale;
+  returnToHref: string;
+  room: RoomView;
+  selectedEndDate: string;
+  selectedStartDate: string;
+}) {
+  return (
+    <div className="admin-rooms__manual-booking">
+      <div className="admin-rooms__section-head">
+        <p className="admin-rooms__section-title">{localize(locale, { vi: "Đánh dấu đặt phòng thủ công", en: "Manual room booking" })}</p>
+        <span className="admin-rooms__booking-count">{localize(locale, { vi: "STAFF", en: "STAFF" })}</span>
+      </div>
+      <p className="admin-rooms__booking-empty">
+        {localize(locale, {
+          vi: "Tạo booking thủ công sẽ chặn phòng trong khoảng ngày đang lọc và cập nhật số phòng còn lại trên web.",
+          en: "Creating a manual booking blocks the room for the selected range and updates remaining-room counts on the public site."
+        })}
+      </p>
+
+      <form className="portal-form" action={createManualReservationAction}>
+        <input name="actorRole" type="hidden" value="staff" />
+        <input name="branchId" type="hidden" value={branchId} />
+        <input name="createdBy" type="hidden" value="" />
+        <input name="roomId" type="hidden" value={room.id} />
+        <input name="roomTypeId" type="hidden" value={room.room_type_id} />
+        <input name="returnTo" type="hidden" value={returnToHref} />
+        <input name="stayEndAt" type="hidden" value={selectedEndDate} />
+        <input name="stayStartAt" type="hidden" value={selectedStartDate} />
+
+        <div className="admin-rooms__manual-grid">
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Họ và tên khách", en: "Guest full name" })}</span>
+            <input
+              className="portal-field__control"
+              name="customerName"
+              placeholder={localize(locale, { vi: "Ví dụ: Nguyễn Văn A", en: "e.g. Alex Smith" })}
+              required
+              type="text"
+            />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Email khách", en: "Guest email" })}</span>
+            <input
+              autoComplete="email"
+              className="portal-field__control"
+              name="customerEmail"
+              placeholder="guest@example.com"
+              required
+              type="email"
+            />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Số điện thoại", en: "Phone number" })}</span>
+            <input
+              autoComplete="tel"
+              className="portal-field__control"
+              name="customerPhone"
+              placeholder={localize(locale, { vi: "Tùy chọn", en: "Optional" })}
+              type="tel"
+            />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Số khách", en: "Guests" })}</span>
+            <input className="portal-field__control" defaultValue={1} min={1} name="guestCount" type="number" />
+          </label>
+        </div>
+
+        <label className="portal-field">
+          <span className="portal-field__label">{localize(locale, { vi: "Ghi chú", en: "Notes" })}</span>
+          <textarea
+            className="portal-field__control"
+            name="notes"
+            placeholder={localize(locale, {
+              vi: "Đặt thủ công từ admin rooms page.",
+              en: "Manual booking created from the admin rooms page."
+            })}
+            rows={3}
+          />
+        </label>
+
+        <PortalSubmitButton className="button button--solid" pendingLabel={localize(locale, { vi: "Đang lưu...", en: "Saving..." })}>
+          {localize(locale, { vi: "Đánh dấu đã đặt", en: "Mark as booked" })}
+        </PortalSubmitButton>
+      </form>
+    </div>
+  );
+}
+
 export function AdminRoomsPage({
   branchName,
   branchId,
@@ -212,6 +311,7 @@ export function AdminRoomsPage({
   const visibleRooms = selectedFloor ? filteredRooms.filter((room) => room.floor_id === selectedFloor.id) : filteredRooms;
   const gridRooms = selectedFloor ? visibleRooms : filteredRooms;
   const selectedRoom = gridRooms.find((room) => room.id === selectedRoomId) ?? gridRooms[0] ?? null;
+  const manualBookingHref = buildCurrentHref({});
   const selectedFloorLabel = selectedFloor
     ? locale === "en"
       ? selectedFloor.name_en ?? selectedFloor.code
@@ -533,6 +633,17 @@ export function AdminRoomsPage({
               placeholder={localize(locale, { vi: "Thêm ghi chú tại đây...", en: "Add notes here..." })}
             />
           </div>
+
+          {selectedRoom && branchId ? (
+            <ManualReservationForm
+              branchId={branchId}
+              locale={locale}
+              returnToHref={manualBookingHref}
+              room={selectedRoom}
+              selectedEndDate={selectedEndDate}
+              selectedStartDate={selectedStartDate}
+            />
+          ) : null}
 
           <button className="button button--solid admin-rooms__save" type="button">
             {localize(locale, { vi: "LƯU THAY ĐỔI", en: "SAVE CHANGES" })}

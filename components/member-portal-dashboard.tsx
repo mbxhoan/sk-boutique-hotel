@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import { MemberProfileEditor } from "@/components/member-profile-editor";
+import { MemberPasswordEditor } from "@/components/member-password-editor";
 import type { Locale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import type {
@@ -832,6 +833,7 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
         />
 
         <MemberProfileEditor customer={data.customer} locale={locale} />
+        <MemberPasswordEditor locale={locale} />
       </section>
     </div>
   );

@@ -1,10 +1,12 @@
 import Image from "next/image";
 
 import { AboutCustomerCarousel } from "@/components/about-us-customer-carousel";
-import { ButtonLink } from "@/components/sections";
+import { ButtonLink, MetricStrip } from "@/components/sections";
 import type { Locale } from "@/lib/locale";
+import { translate } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import type { LocalizedText } from "@/lib/mock/i18n";
+import type { PageContent } from "@/lib/site-content";
 
 const text = (vi: string, en: string): LocalizedText => ({ vi, en });
 
@@ -158,46 +160,48 @@ function AboutUsStoryCard({
 }
 
 export function AboutUsPage({
+  content,
   customerImages,
   locale
 }: {
+  content: PageContent;
   customerImages: string[];
   locale: Locale;
 }) {
   const galleryCards = buildGalleryCards(customerImages);
+  const heroTitle = content.hero.title;
+  const heroDescription = content.hero.description;
+  const heroEyebrow = content.hero.eyebrow;
+  const heroPrimaryCta = content.hero.primaryCta;
+  const heroSecondaryCta = content.hero.secondaryCta;
+  const heroCaptionEyebrow = content.hero.visual.label;
+  const heroCaptionTitle = content.hero.visual.title;
 
   return (
     <>
       <section className="hero hero--split about-us-hero">
         <div className="section-shell hero__inner about-us-hero__inner">
           <div className="hero__copy about-us-hero__copy">
-            <p className="hero__eyebrow">{localize(locale, aboutCopy.hero.eyebrow)}</p>
-            <h1 className="hero__title">{localize(locale, aboutCopy.hero.title)}</h1>
-            <p className="hero__description">{localize(locale, aboutCopy.hero.description)}</p>
+            <p className="hero__eyebrow">{translate(locale, heroEyebrow)}</p>
+            <h1 className="hero__title">{translate(locale, heroTitle)}</h1>
+            <p className="hero__description">{translate(locale, heroDescription)}</p>
 
             <div className="hero__actions">
-              <ButtonLink href="/rooms" locale={locale}>
-                {localize(locale, aboutCopy.hero.primaryCta)}
+              <ButtonLink href={heroPrimaryCta.href} locale={locale}>
+                {translate(locale, heroPrimaryCta.label)}
               </ButtonLink>
-              <ButtonLink href="/about-us#site-footer" locale={locale} variant="ghost">
-                {localize(locale, aboutCopy.hero.secondaryCta)}
-              </ButtonLink>
+              {heroSecondaryCta ? (
+                <ButtonLink href={heroSecondaryCta.href} locale={locale} variant="ghost">
+                  {translate(locale, heroSecondaryCta.label)}
+                </ButtonLink>
+              ) : null}
             </div>
-
-            <ul className="about-us-hero__notes">
-              {aboutCopy.hero.bullets.map((bullet) => (
-                <li className="about-us-hero__note" key={bullet.vi}>
-                  <span className="about-us-hero__note-marker" aria-hidden="true" />
-                  <span>{localize(locale, bullet)}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="hero__visual about-us-hero__visual">
             <div className="about-us-hero__media">
               <Image
-                alt={localize(locale, aboutCopy.hero.imageAlt)}
+                alt={translate(locale, heroCaptionTitle)}
                 className="about-us-hero__media-image"
                 fill
                 priority
@@ -205,17 +209,16 @@ export function AboutUsPage({
                 src={customerImages[0] ?? customerImages[customerImages.length - 1] ?? "/customers/customers1.jpg"}
               />
               <div className="about-us-hero__caption">
-                <p className="about-us-hero__caption-eyebrow">
-                  {localize(locale, aboutCopy.hero.captionEyebrow)}
-                </p>
-                <p className="about-us-hero__caption-title">
-                  {localize(locale, aboutCopy.hero.captionTitle)}
-                </p>
+                <p className="about-us-hero__caption-eyebrow">{translate(locale, heroCaptionEyebrow)}</p>
+                <p className="about-us-hero__caption-title">{translate(locale, heroCaptionTitle)}</p>
+                <p className="about-us-hero__caption-description">{translate(locale, content.hero.visual.description)}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {content.metrics?.length ? <MetricStrip locale={locale} metrics={content.metrics} /> : null}
 
       <section className="section about-us-carousel-section">
         <div className="section-shell">

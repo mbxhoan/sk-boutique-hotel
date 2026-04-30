@@ -44,3 +44,11 @@ export function formatCurrencyText(value: number | null | undefined) {
 
   return text(`Từ ${formatNumber(value, "vi")}`, `From ${formatNumber(value, "en")}`);
 }
+
+export function formatTeaserCurrencyText(value: number | null | undefined) {
+  if (value == null) {
+    return null;
+  }
+
+  return text(`Chỉ từ ${formatNumber(value, "vi")}`, `From ${formatNumber(value, "en")}`);
+}

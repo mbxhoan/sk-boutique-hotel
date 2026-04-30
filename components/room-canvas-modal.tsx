@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
 import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
+import { formatTeaserCurrencyText } from "@/lib/supabase/content";
 import { RoomBookingRequestForm } from "@/components/room-booking-request-form";
 
 type RoomCanvasModalProps = {
@@ -179,6 +180,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
   const isSoldOut = room.availableRooms <= 0;
+  const teaserPrice = room.priceVisible ? null : formatTeaserCurrencyText(room.currentPrice);
   const canNavigateGallery = room.gallery.length > 1;
 
   return (
@@ -373,7 +375,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
                 </>
               ) : (
                 <div className="room-canvas__price-row">
-                  <strong className="room-canvas__price">{locale === "en" ? "Price hidden" : "Ẩn giá công khai"}</strong>
+                  <strong className="room-canvas__price">{teaserPrice ? teaserPrice[locale] : room.bookingCtaLabel[locale]}</strong>
                 </div>
               )}
             </div>
@@ -395,7 +397,7 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
             </div>
           </div>
 
-          {bookingOpen ? (
+          {bookingOpen && !isSoldOut ? (
             <div className="room-booking-panel" ref={bookingPanelRef}>
               <div className="room-booking-panel__head">
                 <div>

@@ -400,10 +400,10 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                     {localize(locale, {
                       vi: selectedRoomType.show_public_price
                         ? `Giá public hiện tại: ${formatMoney(publicPrice)}`
-                        : "Giá public đang bị ẩn, chỉ hiển thị CTA.",
+                        : `Giá public đang ẩn, public site sẽ hiển thị Chỉ từ ${formatMoney(publicPrice)}.`,
                       en: selectedRoomType.show_public_price
                         ? `Current public price: ${formatMoney(publicPrice)}`
-                        : "Public pricing is hidden and the CTA-only mode is active."
+                        : `Public pricing is hidden, and the public site will show From ${formatMoney(publicPrice)}.`
                     })}
                   </div>
                 </PortalCard>

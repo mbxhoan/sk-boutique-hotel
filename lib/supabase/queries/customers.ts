@@ -1,8 +1,9 @@
 import type { Locale } from "@/lib/locale";
 import { defaultLocale } from "@/lib/locale";
 import type { CustomerInsert, CustomerRow } from "@/lib/supabase/database.types";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { queryWithFallback, queryWithServiceFallback } from "@/lib/supabase/queries/shared";
+import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 export type CustomerProfileInput = {
   authUserId: string;
@@ -16,16 +17,22 @@ export type CustomerProfileInput = {
   source?: string | null;
 };
 
+export type GuestCustomerProfileInput = {
+  email: string;
+  fullName: string;
+  notes?: string | null;
+  phone?: string | null;
+  preferredLocale?: Locale | null;
+  source?: string | null;
+};
+
+const customerSelect =
+  "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at";
+
 export async function getCustomerByAuthUserId(authUserId: string) {
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("customers")
-        .select(
-          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-        )
-        .eq("auth_user_id", authUserId)
-        .maybeSingle();
+      const { data, error } = await client.from("customers").select(customerSelect).eq("auth_user_id", authUserId).maybeSingle();
 
       if (error) {
         throw error;
@@ -46,13 +53,7 @@ export async function getCustomerByEmail(email: string) {
 
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("customers")
-        .select(
-          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-        )
-        .ilike("email", normalizedEmail)
-        .maybeSingle();
+      const { data, error } = await client.from("customers").select(customerSelect).ilike("email", normalizedEmail).maybeSingle();
 
       if (error) {
         throw error;
@@ -73,12 +74,7 @@ export async function listCustomersByEmail(email: string) {
 
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("customers")
-        .select(
-          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-        )
-        .ilike("email", normalizedEmail);
+      const { data, error } = await client.from("customers").select(customerSelect).ilike("email", normalizedEmail);
 
       if (error) {
         throw error;
@@ -99,13 +95,7 @@ export async function listCustomersByIds(customerIds: string[]) {
 
   return queryWithServiceFallback(
     async (client) => {
-      const { data, error } = await client
-        .from("customers")
-        .select(
-          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-        )
-        .in("id", uniqueIds)
-        .order("created_at", { ascending: false });
+      const { data, error } = await client.from("customers").select(customerSelect).in("id", uniqueIds).order("created_at", { ascending: false });
 
       if (error) {
         throw error;
@@ -125,11 +115,7 @@ export type CustomerQueryOptions = {
 export async function listCustomers(options: CustomerQueryOptions = {}) {
   return queryWithServiceFallback(
     async (client) => {
-      let query = client
-        .from("customers")
-        .select(
-          "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-        );
+      let query = client.from("customers").select(customerSelect);
 
       if (options.since) {
         query = query.gte("created_at", options.since);
@@ -148,37 +134,100 @@ export async function listCustomers(options: CustomerQueryOptions = {}) {
 }
 
 export async function upsertCustomerProfile(input: CustomerProfileInput) {
-  const supabase = await createSupabaseServerClient();
-  let payload: CustomerInsert = {
+  const supabase = createSupabaseServiceClient();
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const payload: CustomerInsert = {
     auth_user_id: input.authUserId,
-    email: input.email,
+    email: normalizedEmail,
     full_name: input.fullName,
     phone: input.phone ?? null,
-    preferred_locale: input.preferredLocale ?? defaultLocale
+    preferred_locale: input.preferredLocale ?? defaultLocale,
+    marketing_consent: typeof input.marketingConsent === "boolean" ? input.marketingConsent : false,
+    marketing_consent_at:
+      typeof input.marketingConsent === "boolean" ? (input.marketingConsent ? new Date().toISOString() : null) : null,
+    marketing_consent_source:
+      typeof input.marketingConsent === "boolean"
+        ? input.marketingConsent
+          ? input.marketingConsentSource ?? "member_portal"
+          : null
+        : null,
+    notes: typeof input.notes === "string" ? input.notes : "",
+    source: typeof input.source === "string" && input.source.length > 0 ? input.source : "member_portal"
   };
 
-  if (typeof input.marketingConsent === "boolean") {
-    payload.marketing_consent = input.marketingConsent;
-    payload.marketing_consent_at = input.marketingConsent ? new Date().toISOString() : null;
-    payload.marketing_consent_source = input.marketingConsentSource ?? (input.marketingConsent ? "public_form" : null);
+  const { data: existingByAuthUserId, error: authLookupError } = await supabase
+    .from("customers")
+    .select(customerSelect)
+    .eq("auth_user_id", input.authUserId)
+    .maybeSingle();
+
+  if (authLookupError) {
+    throw authLookupError;
   }
 
-  if (typeof input.source === "string" && input.source.length > 0) {
-    payload.source = input.source;
+  if (existingByAuthUserId) {
+    const { data, error } = await supabase.from("customers").update(payload).eq("id", existingByAuthUserId.id).select(customerSelect).single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as CustomerRow;
   }
 
-  if (typeof input.notes === "string") {
-    payload.notes = input.notes;
+  const { data: existingByEmail, error: emailLookupError } = await supabase.from("customers").select(customerSelect).ilike("email", normalizedEmail).maybeSingle();
+
+  if (emailLookupError) {
+    throw emailLookupError;
   }
 
+  if (existingByEmail) {
+    const { data, error } = await supabase.from("customers").update(payload).eq("id", existingByEmail.id).select(customerSelect).single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as CustomerRow;
+  }
+
+  const { data, error } = await supabase.from("customers").insert(payload).select(customerSelect).single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as CustomerRow;
+}
+
+export async function ensureCustomerByEmail(input: GuestCustomerProfileInput) {
+  const normalizedEmail = input.email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error("Customer email is required.");
+  }
+
+  const existing = await getCustomerByEmail(normalizedEmail);
+
+  if (existing) {
+    return existing;
+  }
+
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("customers")
-    .upsert(payload, {
-      onConflict: "auth_user_id"
+    .insert({
+      email: normalizedEmail,
+      full_name: input.fullName.trim(),
+      marketing_consent: false,
+      marketing_consent_at: null,
+      marketing_consent_source: null,
+      notes: input.notes ?? "",
+      phone: input.phone ?? null,
+      preferred_locale: input.preferredLocale ?? defaultLocale,
+      source: input.source ?? "admin_manual_booking"
     })
-    .select(
-      "id, auth_user_id, full_name, email, phone, preferred_locale, marketing_consent, marketing_consent_at, marketing_consent_source, source, notes, last_seen_at, created_at, updated_at"
-    )
+    .select(customerSelect)
     .single();
 
   if (error) {

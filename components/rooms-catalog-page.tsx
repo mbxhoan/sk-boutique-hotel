@@ -12,12 +12,16 @@ import type { Locale } from "@/lib/locale";
 import { buildRoomDetailHref, buildRoomsHref, type RoomsSearchState } from "@/lib/room-routes";
 import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
 import { type RoomTypeRow } from "@/lib/supabase/database.types";
+import { formatTeaserCurrencyText } from "@/lib/supabase/content";
+import type { PageContent } from "@/lib/site-content";
+import { translate } from "@/lib/locale";
 
 type RoomsCatalogPageProps = {
   defaultBranchId: string | null;
   initialFilters: RoomsSearchState;
   initialRoomSlug?: string | null;
   locale: Locale;
+  pageContent: PageContent;
   roomCarouselImages: string[];
   roomGalleriesBySlug: Record<string, string[]>;
   roomAvailabilityByTypeId: Record<string, number>;
@@ -57,6 +61,7 @@ function RoomCard({
   const isAvailable = room.availableRooms > 0;
   const fitState = isAvailable && isCapacityMatch ? "recommended" : isAvailable ? "soft" : "sold-out";
   const currentPrice = room.priceVisible ? formatCompactPrice(locale, room.currentPrice) : null;
+  const teaserPrice = room.priceVisible ? null : formatTeaserCurrencyText(room.currentPrice);
   const originalPrice = room.priceVisible && room.originalPrice != null ? formatCompactPrice(locale, room.originalPrice) : null;
   const capacityLabel =
     locale === "en"
@@ -148,11 +153,13 @@ function RoomCard({
             </div>
           ) : (
             <div className="rooms-card__price-block">
-              <strong className="rooms-card__price">{locale === "en" ? "CTA only" : "Chỉ hiện CTA"}</strong>
+              <strong className="rooms-card__price">{teaserPrice ? teaserPrice[locale] : room.bookingCtaLabel[locale]}</strong>
             </div>
           )}
 
-          <span className="button button--solid rooms-card__cta">{room.bookingCtaLabel[locale]}</span>
+          <span className={`button button--solid rooms-card__cta${isAvailable ? "" : " rooms-card__cta--sold-out"}`}>
+            {isAvailable ? room.bookingCtaLabel[locale] : locale === "en" ? "Sold out" : "Hết phòng"}
+          </span>
         </div>
       </article>
     </Link>
@@ -164,6 +171,7 @@ export function RoomsCatalogPage({
   initialFilters,
   initialRoomSlug,
   locale,
+  pageContent,
   roomCarouselImages,
   roomGalleriesBySlug,
   roomAvailabilityByTypeId,
@@ -205,8 +213,9 @@ export function RoomsCatalogPage({
           <div className="rooms-panel">
             <div className="rooms-panel__headline">
               <div>
-                <p className="rooms-panel__eyebrow">{locale === "en" ? "Room selection" : "Chọn phòng"}</p>
-                <h1 className="rooms-panel__title">{locale === "en" ? "Choose your room" : "Chọn phòng của bạn"}</h1>
+                <p className="rooms-panel__eyebrow">{translate(locale, pageContent.hero.eyebrow)}</p>
+                <h1 className="rooms-panel__title">{translate(locale, pageContent.hero.title)}</h1>
+                <p className="rooms-panel__description">{translate(locale, pageContent.hero.description)}</p>
               </div>
             </div>
 

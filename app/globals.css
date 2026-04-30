@@ -734,6 +734,13 @@ textarea {
   line-height: 1.6;
 }
 
+.about-us-hero__caption-description {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
 .about-us-hero__notes {
   display: grid;
   gap: 0.7rem;
@@ -3781,6 +3788,38 @@ textarea {
   justify-content: flex-end;
 }
 
+.member-password-card {
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.member-password-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.member-password-card__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.member-password-card__copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.member-password-card__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .member-empty-state__eyebrow {
   margin: 0;
   color: var(--gold);
@@ -4319,6 +4358,284 @@ textarea {
   display: grid;
   gap: 0.9rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-media__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.admin-media__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.admin-media__toolbar-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.admin-media__toolbar-count {
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.admin-media__toolbar-edit {
+  padding-inline: 0.4rem;
+  font-size: 0.86rem;
+}
+
+.admin-media__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.admin-media__sort-label {
+  color: var(--gold-strong);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.admin-media__sort-select {
+  width: auto;
+  min-width: 12rem;
+  padding-block: 0.55rem;
+}
+
+.admin-media__library-card-wrap {
+  padding: 1.1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-media__library-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+}
+
+.admin-media__library-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(0, 12, 30, 0.08);
+  border-radius: 0.95rem;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.admin-media__library-card:hover,
+.admin-media__library-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(197, 160, 89, 0.42);
+  box-shadow: 0 18px 36px rgba(0, 12, 30, 0.1);
+  outline: none;
+}
+
+.admin-media__library-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(245, 240, 228, 0.95) 0%, rgba(255, 255, 255, 0.92) 100%),
+    repeating-linear-gradient(45deg, rgba(0, 12, 30, 0.05) 0 12px, transparent 12px 24px);
+}
+
+.admin-media__library-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-media__library-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: rgba(76, 93, 121, 0.7);
+  font-size: 0.85rem;
+}
+
+.admin-media__library-status {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 12, 30, 0.78);
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-media__library-meta {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0 0.15rem 0.2rem;
+}
+
+.admin-media__library-name {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.admin-media__library-size {
+  margin: 0;
+  color: rgba(76, 93, 121, 0.78);
+  font-size: 0.78rem;
+}
+
+.admin-media__library-chip {
+  width: fit-content;
+  margin-top: 0.15rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(197, 160, 89, 0.14);
+  color: var(--gold-strong);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.admin-media__library-empty-state {
+  padding: 2rem 1rem;
+  color: rgba(76, 93, 121, 0.78);
+  text-align: center;
+}
+
+.admin-media__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(0, 12, 30, 0.06);
+}
+
+.admin-media__pagination-info {
+  color: rgba(76, 93, 121, 0.85);
+  font-size: 0.82rem;
+}
+
+.admin-media__pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.admin-media__page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.55rem;
+  border: 1px solid rgba(0, 12, 30, 0.1);
+  border-radius: 0.55rem;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-media__page-button:hover:not(:disabled) {
+  border-color: rgba(197, 160, 89, 0.45);
+}
+
+.admin-media__page-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-media__page-button--active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #b58b45 0%, #8d6827 100%);
+  color: #ffffff;
+}
+
+.admin-media__page-ellipsis {
+  padding: 0 0.35rem;
+  color: rgba(76, 93, 121, 0.7);
+}
+
+.admin-media__dialog-card--wide {
+  width: min(100%, 84rem);
+  max-height: min(94vh, 80rem);
+}
+
+.admin-media__dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.95fr) minmax(0, 1.05fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.admin-media__dialog-side {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-media__dialog-side-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.admin-media__dialog-meta-line {
+  margin: 0;
+  color: rgba(76, 93, 121, 0.85);
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.admin-media__dialog-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (max-width: 880px) {
+  .admin-media__dialog-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admin-room-types {
@@ -8517,6 +8834,14 @@ textarea {
   /* font-size: clamp(2.35rem, 5vw, 4.2rem); */
 }
 
+.rooms-panel__description {
+  margin: 0.75rem 0 0;
+  max-width: 45rem;
+  color: var(--text-muted);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  line-height: 1.7;
+}
+
 .rooms-panel__share--desktop {
   display: none;
 }
@@ -8845,6 +9170,12 @@ textarea {
 
 .rooms-card__cta {
   width: fit-content;
+}
+
+.rooms-card__cta--sold-out {
+  background: rgba(0, 12, 30, 0.08);
+  color: rgba(30, 39, 54, 0.72);
+  box-shadow: none;
 }
 
 .rooms-story {
@@ -14130,6 +14461,26 @@ textarea {
   resize: vertical;
 }
 
+.admin-rooms__manual-booking {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0 1.15rem 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: 0.55rem;
+  background: linear-gradient(180deg, rgba(252, 250, 246, 0.98), rgba(246, 243, 236, 0.92));
+}
+
+.admin-rooms__manual-booking .portal-form {
+  gap: 0.8rem;
+}
+
+.admin-rooms__manual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
 .admin-rooms__booking-history {
   display: grid;
   gap: 0.75rem;
@@ -14824,6 +15175,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .admin-rooms__manual-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-content__media-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -15103,6 +15458,10 @@ textarea {
   .admin-content__form-grid--two,
   .admin-content__form-grid--footer,
   .admin-rooms__status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rooms__manual-grid {
     grid-template-columns: 1fr;
   }
 

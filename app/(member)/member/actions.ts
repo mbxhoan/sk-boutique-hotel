@@ -7,6 +7,7 @@ import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
 import { getFirstContactDetailsError, normalizeContactDetails, resolveContactDetailsError, validateContactDetails } from "@/lib/contact-details";
 import { localize } from "@/lib/mock/i18n";
 import { readLocaleFromFormData } from "@/lib/locale";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 import { memberProfileUpdateError, syncMemberProfile } from "@/lib/supabase/member-profile";
 import { getCustomerByAuthUserId, getCustomerByEmail } from "@/lib/supabase/queries/customers";
@@ -243,4 +244,93 @@ export async function updateMemberProfileAction(formData: FormData) {
     redirectWithActionResult(returnTo, "error", candidateMessage);
     throw error;
   }
+}
+
+export async function changeMemberPasswordAction(formData: FormData) {
+  const returnTo = readReturnTo(formData);
+  const locale = readLocaleFromFormData(formData);
+  const user = await getSupabaseUser().catch(() => null);
+
+  if (!user || !user.email) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Cần đăng nhập để đổi mật khẩu.", en: "You must be signed in to change your password." })
+    );
+    return;
+  }
+
+  const currentPassword = readOptionalString(formData, "currentPassword") ?? "";
+  const newPassword = readOptionalString(formData, "newPassword") ?? "";
+  const confirmPassword = readOptionalString(formData, "confirmPassword") ?? "";
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Vui lòng nhập đầy đủ mật khẩu.", en: "Please fill in all password fields." })
+    );
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Mật khẩu mới phải có ít nhất 8 ký tự.", en: "The new password must be at least 8 characters." })
+    );
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Mật khẩu xác nhận không khớp.", en: "The confirmation password does not match." })
+    );
+    return;
+  }
+
+  if (newPassword === currentPassword) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Mật khẩu mới phải khác mật khẩu hiện tại.", en: "The new password must be different from the current one." })
+    );
+    return;
+  }
+
+  const supabase = await createSupabaseServerClient();
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword
+  });
+
+  if (signInError) {
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Mật khẩu hiện tại không đúng.", en: "The current password is incorrect." })
+    );
+    return;
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (updateError) {
+    console.warn("[member] Failed to update password", updateError);
+    redirectWithActionResult(
+      returnTo,
+      "error",
+      localize(locale, { vi: "Không thể đổi mật khẩu. Vui lòng thử lại.", en: "Unable to update the password. Please try again." })
+    );
+    return;
+  }
+
+  redirectWithActionResult(
+    returnTo,
+    "success",
+    localize(locale, { vi: "Đã đổi mật khẩu thành công.", en: "Password updated successfully." })
+  );
 }

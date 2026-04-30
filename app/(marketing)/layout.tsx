@@ -5,12 +5,15 @@ import { MarketingBottomSections } from "@/components/marketing-bottom-sections"
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { loadHomePageCopy } from "@/lib/supabase/queries/content-pages";
 
 export default async function MarketingLayout({
   children
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const homePageCopy = await loadHomePageCopy();
+
   if (process.env.NEXT_PHASE !== "phase-production-build") {
     const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
 
@@ -30,7 +33,7 @@ export default async function MarketingLayout({
       <main className="site-main">
         {children}
         <Suspense fallback={null}>
-          <MarketingBottomSections />
+          <MarketingBottomSections copy={homePageCopy.marketingShell} />
         </Suspense>
       </main>
       <Suspense fallback={null}>

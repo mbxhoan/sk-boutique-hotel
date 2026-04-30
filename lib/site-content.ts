@@ -791,7 +791,7 @@ export const pages: PageContent[] = [
     description: "Trang về chúng tôi với câu chuyện thương hiệu, mốc thời gian và giá trị cốt lõi.",
     hero: {
       layout: "split",
-      eyebrow: "ABOUT US",
+      eyebrow: "Về chúng tôi",
       title: "Một câu chuyện nhỏ về sự chăm chút lớn.",
       description:
         "Khối nội dung này kể lại tinh thần SK Boutique Hotel theo kiểu editorial: ngắn, rõ, giàu hình ảnh và đủ sâu để tạo niềm tin.",
@@ -918,6 +918,26 @@ export const pages: PageContent[] = [
         "Bạn có thể thay phần này bằng nội dung thật về lịch sử, đội ngũ và triết lý phục vụ của khách sạn.",
       cta: { label: "Xem liên hệ", href: "/lien-he" },
       secondaryCta: { label: "Xem tuyển dụng", href: "/tuyen-dung" }
+    }
+  },
+  {
+    slug: "/rooms",
+    title: "Phòng",
+    description: "Trang danh sách phòng với hero, call to action và khung nội dung để staff chỉnh sửa.",
+    hero: {
+      layout: "split",
+      eyebrow: "Phòng",
+      title: "Chọn phòng của bạn",
+      description: "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách.",
+      primaryCta: { label: "Kiểm tra phòng trống", href: "/lien-he" },
+      secondaryCta: { label: "Xem tiện nghi", href: "/about-us" },
+      visual: {
+        label: "ROOM COLLECTION",
+        title: "Nội dung đầu trang danh sách phòng",
+        description: "Placeholder cho hero image, badge và copy điều hướng.",
+        variant: "gold",
+        chips: ["Family", "Superior", "Quadruple"]
+      }
     }
   },
   {

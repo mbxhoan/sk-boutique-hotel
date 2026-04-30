@@ -404,6 +404,23 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
     });
   }, []);
 
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      const openMenus = document.querySelectorAll<HTMLDetailsElement>(".admin-shell__branch-menu[open]");
+      openMenus.forEach((menu) => {
+        if (!menu.contains(target)) {
+          menu.open = false;
+        }
+      });
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
   async function handleSignOut() {
     setIsMobileNavOpen(false);
     const supabase = createSupabaseBrowserClient();

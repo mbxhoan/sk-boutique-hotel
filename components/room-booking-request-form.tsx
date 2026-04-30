@@ -2,7 +2,6 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { isBookingRequestStayWindowValid } from "@/lib/booking-dates";
@@ -238,7 +237,6 @@ export function RoomBookingRequestForm({
 
         if (!cancelled && profile) {
           setMemberProfile(profile);
-          setProfileFieldErrors({});
         }
       } catch {
         // Keep the guest flow if the profile lookup fails.
@@ -256,6 +254,20 @@ export function RoomBookingRequestForm({
     };
   }, []);
 
+  useEffect(() => {
+    if (!memberProfile) {
+      return;
+    }
+
+    setProfileDraft({
+      email: memberProfile.email,
+      fullName: memberProfile.fullName,
+      phone: memberProfile.phone ?? ""
+    });
+    setMarketingConsent(memberProfile.marketingConsent);
+    setProfileFieldErrors({});
+  }, [memberProfile]);
+
   async function bootstrapMemberProfile(authUserId: string, contactName: string, contactEmail: string, contactPhone: string) {
     const response = await fetch("/api/member/bootstrap", {
       body: JSON.stringify({
@@ -264,7 +276,7 @@ export function RoomBookingRequestForm({
         fullName: contactName,
         phone: contactPhone,
         preferredLocale: locale,
-        source: "member_portal"
+        source: "public_site"
       }),
       headers: {
         "Content-Type": "application/json"
@@ -300,7 +312,7 @@ export function RoomBookingRequestForm({
         quotedNightlyRate,
         quotedTotalAmount,
         roomTypeId,
-        source: "member_portal",
+        source: "public_site",
         stayEndAt,
         stayStartAt
       }),
@@ -329,88 +341,61 @@ export function RoomBookingRequestForm({
     setIsSubmitting(true);
 
     try {
-      const contactDetailsSource = memberProfile
-        ? {
-            email: memberProfile.email,
-            fullName: memberProfile.fullName,
-            phone: memberProfile.phone ?? ""
-          }
-        : profileDraft;
-      const validation = validateContactDetails(locale, contactDetailsSource, { phoneRequired: true });
+      const validation = validateContactDetails(locale, profileDraft, { phoneRequired: true });
       const validationError = getFirstContactDetailsError(validation.errors);
 
-      if (memberProfile) {
-        if (validationError) {
-          setError(
-            localize(
-              locale,
-              "Hồ sơ member hiện không hợp lệ. Vui lòng cập nhật trong member portal.",
-              "Your member profile is invalid. Please update it in the member portal."
-            )
-          );
-          return;
-        }
-      } else {
-        setProfileFieldErrors(validation.errors);
+      setProfileFieldErrors(validation.errors);
 
-        if (validationError) {
-          return;
-        }
+      if (validationError) {
+        return;
       }
 
       const contactDetails = validation.values;
-      let authUserId: string | null = memberProfile?.authUserId ?? null;
-      const requestMarketingConsent = memberProfile ? memberProfile.marketingConsent : marketingConsent;
+      const supabase = createSupabaseBrowserClient();
+      const { data: currentUserData } = await supabase.auth.getUser();
+      let authUserId: string | null = currentUserData.user?.id ?? null;
 
-      if (!memberProfile) {
-        const supabase = createSupabaseBrowserClient();
+      if (!authUserId) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: contactDetails.email,
+          password: DEFAULT_MEMBER_PASSWORD
+        });
 
-        const { data: currentUserData } = await supabase.auth.getUser();
-
-        if (currentUserData.user?.email?.toLowerCase() === contactDetails.email.toLowerCase()) {
-          authUserId = currentUserData.user.id;
-        } else {
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        if (signInError) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: contactDetails.email,
-            password: DEFAULT_MEMBER_PASSWORD
+            password: DEFAULT_MEMBER_PASSWORD,
+            options: {
+              data: {
+                full_name: contactDetails.fullName,
+                locale,
+                phone: contactDetails.phone
+              }
+            }
           });
 
-          if (signInError) {
-            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-              email: contactDetails.email,
-              password: DEFAULT_MEMBER_PASSWORD,
-              options: {
-                data: {
-                  full_name: contactDetails.fullName,
-                  locale,
-                  phone: contactDetails.phone
-                }
+          if (signUpError) {
+            const message = signUpError.message.toLowerCase();
+
+            if (message.includes("already registered") || message.includes("already exists")) {
+              const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword({
+                email: contactDetails.email,
+                password: DEFAULT_MEMBER_PASSWORD
+              });
+
+              if (fallbackSignInError) {
+                throw fallbackSignInError;
               }
-            });
 
-            if (signUpError) {
-              const message = signUpError.message.toLowerCase();
-
-              if (message.includes("already registered") || message.includes("already exists")) {
-                const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword({
-                  email: contactDetails.email,
-                  password: DEFAULT_MEMBER_PASSWORD
-                });
-
-                if (fallbackSignInError) {
-                  throw fallbackSignInError;
-                }
-
-                authUserId = fallbackSignInData.user?.id ?? null;
-              } else {
-                throw signUpError;
-              }
+              authUserId = fallbackSignInData.user?.id ?? null;
             } else {
-              authUserId = signUpData.user?.id ?? null;
+              throw signUpError;
             }
           } else {
-            authUserId = signInData.user?.id ?? null;
+            authUserId = signUpData.user?.id ?? null;
           }
+        } else {
+          authUserId = signInData.user?.id ?? null;
         }
 
         if (!authUserId) {
@@ -434,7 +419,7 @@ export function RoomBookingRequestForm({
         contactDetails.fullName,
         contactDetails.email,
         contactDetails.phone,
-        requestMarketingConsent
+        marketingConsent
       );
 
       router.push(appendLocaleQuery("/member", locale));
@@ -448,48 +433,11 @@ export function RoomBookingRequestForm({
 
   return (
     <form className="room-booking-panel__form" onSubmit={handleSubmit}>
-      {memberProfile ? (
-        <div className="room-booking-panel__member-card">
-          <div className="room-booking-panel__member-toolbar">
-            <div>
-              <p className="room-booking-panel__eyebrow">{localize(locale, "Hồ sơ đã đăng nhập", "Signed-in profile")}</p>
-              <p className="room-booking-panel__member-name">{memberProfile.fullName}</p>
-              <p className="room-booking-panel__member-note">
-                {localize(
-                  locale,
-                  "Hồ sơ này sẽ được dùng cho booking. Muốn đổi thông tin, vào member portal > Thông tin.",
-                  "This profile will be used for the booking. To change it, go to the member portal > Info."
-                )}
-              </p>
-            </div>
+      {isLoadingMemberProfile ? (
+        <p className="room-booking-panel__hint">{localize(locale, "Đang chuẩn bị biểu mẫu...", "Preparing the form...")}</p>
+      ) : null}
 
-            <div className="room-booking-panel__member-actions">
-              <Link className="button button--text-light room-booking-panel__member-action" href={appendLocaleQuery("/member#info", locale)}>
-                {localize(locale, "Mở member portal", "Open member portal")}
-              </Link>
-            </div>
-          </div>
-
-          <dl className="room-booking-panel__member-meta">
-            <div>
-              <dt>{localize(locale, "Email", "Email")}</dt>
-              <dd>{memberProfile.email}</dd>
-            </div>
-            <div>
-              <dt>{localize(locale, "Số điện thoại", "Phone")}</dt>
-              <dd>{memberProfile.phone ?? "—"}</dd>
-            </div>
-          </dl>
-
-          <p className="room-booking-panel__hint">
-            {localize(
-              locale,
-              "Mọi thay đổi hồ sơ member sẽ được ghi lại trong lịch sử vận hành.",
-              "Every member profile change is recorded in the operational history."
-            )}
-          </p>
-        </div>
-      ) : !isLoadingMemberProfile ? (
+      {!isLoadingMemberProfile ? (
         <div className="room-booking-panel__grid">
           <label className="room-booking-panel__field">
             <span>{localize(locale, "Họ và tên", "Full name")}</span>
@@ -544,9 +492,17 @@ export function RoomBookingRequestForm({
             {profileFieldErrors.phone ? <p className="room-booking-panel__field-error">{profileFieldErrors.phone}</p> : null}
           </label>
         </div>
-      ) : (
-        <p className="room-booking-panel__hint">{localize(locale, "Đang nhận diện hồ sơ đã đăng nhập...", "Detecting your signed-in profile...")}</p>
-      )}
+      ) : null}
+
+      {!isLoadingMemberProfile && memberProfile ? (
+        <p className="room-booking-panel__hint">
+          {localize(
+            locale,
+            "Thông tin này đã được điền sẵn từ hồ sơ của bạn, bạn có thể chỉnh lại cho lần đặt này.",
+            "These details were prefilled from your profile and can be adjusted for this booking."
+          )}
+        </p>
+      ) : null}
 
       <label className="room-booking-panel__field room-booking-panel__field--full">
         <span>{localize(locale, "Ghi chú", "Note")}</span>
@@ -560,18 +516,16 @@ export function RoomBookingRequestForm({
         />
       </label>
 
-      {!memberProfile ? (
-        <label className="room-booking-panel__consent">
-          <input checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} type="checkbox" />
-          <span>
-            {localize(
-              locale,
-              "Tôi đồng ý nhận thông tin liên quan đến booking và ưu đãi từ khách sạn.",
-              "I agree to receive booking-related updates and hotel offers."
-            )}
-          </span>
-        </label>
-      ) : null}
+      <label className="room-booking-panel__consent">
+        <input checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} type="checkbox" />
+        <span>
+          {localize(
+            locale,
+            "Tôi đồng ý nhận thông tin liên quan đến booking và ưu đãi từ khách sạn.",
+            "I agree to receive booking-related updates and hotel offers."
+          )}
+        </span>
+      </label>
 
       {!memberProfile ? (
         <p className="room-booking-panel__hint">
