@@ -9725,7 +9725,7 @@ textarea {
 
 .room-booking-panel__member-action {
   min-height: 2.25rem;
-  padding-inline: 0.15rem;
+  /* padding-inline: 0.15rem; */
 }
 
 .room-booking-panel__member-name {
@@ -10975,16 +10975,6 @@ textarea {
     linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 246, 239, 0.99) 100%);
   box-shadow: 0 28px 60px rgba(0, 12, 30, 0.2);
   overflow: hidden;
-}
-
-.admin-notifications__overlay-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 75;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
 }
 
 .admin-notifications__panel-head {

@@ -555,7 +555,7 @@ export function RoomBookingRequestForm({
                 </button>
               ) : (
                 <button className="button button--text-light room-booking-panel__member-action" onClick={beginProfileEdit} type="button">
-                  {localize(locale, "Đổi hồ sơ", "Edit profile")}
+                  {localize(locale, "Thay đổi thông tin", "Edit information")}
                 </button>
               )}
             </div>
