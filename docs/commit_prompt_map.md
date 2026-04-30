@@ -1509,3 +1509,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(marketing)/rooms/page.tsx`
   - `components/availability-check-bar.tsx`
   - `supabase/migrations/20260430123000_phase_j_historical_availability_overlap.sql`
+
+### Entry 132
+- `time`: 2026-04-30T12:37:14+07:00
+- `prompt_summary`: Làm nổi bật hạng phòng phù hợp với số khách đang lọc trên trang /rooms, và làm mờ các hạng phòng không khớp sức chứa nhưng vẫn cho phép xem và đặt.
+- `commit_message`: `feat(rooms): highlight capacity-fit room types`
+- `main_files`:
+  - `lib/rooms/catalog.ts`
+  - `components/rooms-catalog-page.tsx`
+  - `app/globals.css`

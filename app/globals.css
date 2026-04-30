@@ -8474,11 +8474,64 @@ textarea {
   display: block;
   height: 100%;
   color: inherit;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
 }
 
 .rooms-card__link--active .rooms-card {
   border-color: rgba(197, 160, 89, 0.5);
   box-shadow: 0 28px 56px rgba(0, 12, 30, 0.11), 0 0 0 1px rgba(197, 160, 89, 0.12);
+}
+
+.rooms-card__link--recommended .rooms-card {
+  border-color: rgba(197, 160, 89, 0.58);
+  box-shadow: 0 30px 60px rgba(0, 12, 30, 0.14), 0 0 0 1px rgba(197, 160, 89, 0.1);
+}
+
+.rooms-card__link--recommended .rooms-card__media {
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.16), rgba(0, 12, 30, 0.06));
+}
+
+.rooms-card__link--soft .rooms-card {
+  border-color: rgba(0, 12, 30, 0.07);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 236, 0.9)),
+    var(--surface-container-lowest);
+}
+
+.rooms-card__link--soft .rooms-card__media {
+  filter: saturate(0.88) brightness(0.98);
+}
+
+.rooms-card__link--soft .rooms-card__tag {
+  background: rgba(197, 160, 89, 0.08);
+  color: rgba(138, 109, 53, 0.9);
+}
+
+.rooms-card__link--soft .rooms-card__availability,
+.rooms-card__link--soft .rooms-card__fit {
+  color: var(--muted);
+}
+
+.rooms-card__link--sold-out .rooms-card {
+  border-color: rgba(0, 12, 30, 0.06);
+  box-shadow: none;
+  filter: grayscale(0.04) saturate(0.9);
+}
+
+.rooms-card__link--sold-out .rooms-card__media {
+  filter: saturate(0.8) brightness(0.96);
+}
+
+.rooms-card__link--sold-out .rooms-card__tag {
+  background: rgba(0, 12, 30, 0.05);
+  color: var(--muted);
+}
+
+.rooms-card__link--sold-out .rooms-card__availability,
+.rooms-card__link--sold-out .rooms-card__fit {
+  color: var(--muted);
 }
 
 .rooms-card {
@@ -8560,6 +8613,38 @@ textarea {
   font-size: 0.94rem;
 }
 
+.rooms-card__fit {
+  align-self: flex-start;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.08rem 0 0;
+  padding: 0.4rem 0.68rem;
+  border-radius: 999px;
+  background: rgba(0, 12, 30, 0.035);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.rooms-card__fit--recommended {
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--gold-strong);
+}
+
+.rooms-card__fit--soft {
+  background: rgba(0, 12, 30, 0.035);
+  color: var(--muted);
+}
+
+.rooms-card__fit--sold-out {
+  background: rgba(0, 12, 30, 0.045);
+  color: var(--muted);
+}
+
 .rooms-card__facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -8615,6 +8700,15 @@ textarea {
   letter-spacing: 0.16em;
   line-height: 1.2;
   text-transform: uppercase;
+}
+
+.rooms-card__availability--soft,
+.rooms-card__availability--sold-out {
+  color: var(--muted);
+}
+
+.rooms-card__availability--recommended {
+  color: var(--gold-strong);
 }
 
 .rooms-card__price-block {

@@ -35,12 +35,14 @@ function formatCompactPrice(locale: Locale, price: number | null) {
 
 function RoomCard({
   filters,
+  guestCount,
   locale,
   activeSlug,
   room
 }: {
   activeSlug?: string | null;
   filters: RoomsSearchState;
+  guestCount: number;
   locale: Locale;
   room: RoomCatalogEntry;
 }) {
@@ -51,11 +53,41 @@ function RoomCard({
     checkout: filters.checkout,
     lang: locale
   });
+  const isCapacityMatch = room.guestCapacity >= guestCount;
+  const isAvailable = room.availableRooms > 0;
+  const fitState = isAvailable && isCapacityMatch ? "recommended" : isAvailable ? "soft" : "sold-out";
   const currentPrice = room.priceVisible ? formatCompactPrice(locale, room.currentPrice) : null;
   const originalPrice = room.priceVisible && room.originalPrice != null ? formatCompactPrice(locale, room.originalPrice) : null;
+  const capacityLabel =
+    locale === "en"
+      ? `${room.guestCapacity} guest max`
+      : `Tối đa ${room.guestCapacity} khách`;
+  const matchLabel =
+    fitState === "recommended"
+      ? locale === "en"
+        ? `Fits your ${guestCount}-guest search`
+        : `Phù hợp với nhóm ${guestCount} khách`
+      : fitState === "sold-out"
+        ? locale === "en"
+          ? `Sold out for now`
+          : `Tạm hết phòng`
+        : locale === "en"
+          ? `Works for smaller groups`
+          : `Hợp với nhóm nhỏ hơn`;
 
   return (
-    <Link className={`rooms-card__link${room.slug === activeSlug ? " rooms-card__link--active" : ""}`} href={href}>
+    <Link
+      className={[
+        "rooms-card__link",
+        room.slug === activeSlug ? "rooms-card__link--active" : "",
+        fitState === "recommended" ? "rooms-card__link--recommended" : "",
+        fitState === "soft" ? "rooms-card__link--soft" : "",
+        fitState === "sold-out" ? "rooms-card__link--sold-out" : ""
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      href={href}
+    >
       <article className="rooms-card">
         <div className="rooms-card__media">
           <Image
@@ -74,6 +106,11 @@ function RoomCard({
           <div className="rooms-card__top">
             <h2 className="rooms-card__title">{room.title[locale]}</h2>
             <p className="rooms-card__summary">{room.summary[locale]}</p>
+            <p className={`rooms-card__fit rooms-card__fit--${fitState}`}>
+              <span>{matchLabel}</span>
+              <span aria-hidden="true">•</span>
+              <span>{capacityLabel}</span>
+            </p>
           </div>
 
           <div className="rooms-card__facts">
@@ -99,7 +136,7 @@ function RoomCard({
             </div>
           ) : null}
 
-          <p className="rooms-card__availability">{room.availabilityLabel[locale]}</p>
+          <p className={`rooms-card__availability rooms-card__availability--${fitState}`}>{room.availabilityLabel[locale]}</p>
 
           {room.priceVisible && currentPrice != null ? (
             <div className="rooms-card__price-block">
@@ -189,7 +226,14 @@ export function RoomsCatalogPage({
         <div className="section-shell">
           <div className="rooms-grid">
             {roomEntries.map((room) => (
-              <RoomCard activeSlug={initialRoomSlug} filters={initialFilters} key={room.slug} locale={locale} room={room} />
+              <RoomCard
+                activeSlug={initialRoomSlug}
+                filters={initialFilters}
+                guestCount={guestCount}
+                key={room.slug}
+                locale={locale}
+                room={room}
+              />
             ))}
           </div>
         </div>

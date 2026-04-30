@@ -24,6 +24,7 @@ export type RoomCatalogEntry = {
   gallery: string[];
   galleryBadge: LocalizedText;
   highlights: LocalizedText[];
+  guestCapacity: number;
   metaFacts: {
     label: LocalizedText;
     value: LocalizedText;
@@ -182,6 +183,7 @@ export function buildRoomCatalogEntry(
 ): RoomCatalogEntry {
   const currentPrice = roomType.manual_override_price ?? roomType.base_price;
   const originalPrice = roomType.manual_override_price != null ? roomType.base_price : null;
+  const guestCapacity = roomType.occupancy_adults + roomType.occupancy_children;
   const discountPercent =
     originalPrice && currentPrice
       ? Math.max(0, Math.round((1 - currentPrice / originalPrice) * 100))
@@ -205,6 +207,7 @@ export function buildRoomCatalogEntry(
       `View ${gallery.length} photos`
     ),
     highlights: localizedArray(roomType.highlights_vi, roomType.highlights_en),
+    guestCapacity,
     metaFacts: buildMetaFacts(roomType),
     originalPrice,
     priceVisible: roomType.show_public_price,
