@@ -1518,3 +1518,95 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/rooms/catalog.ts`
   - `components/rooms-catalog-page.tsx`
   - `app/globals.css`
+
+### Entry 133
+- `time`: 2026-04-30T16:08:03+07:00
+- `prompt_summary`: Cho phép member đổi hồ sơ ngay trong popup đặt phòng, validate tự động email và số điện thoại ở cả client lẫn server, và chặn email trùng khi cập nhật hồ sơ.
+- `commit_message`: `feat(member-booking): edit signed-in profile and validate contact details`
+- `main_files`:
+  - `components/room-booking-request-form.tsx`
+  - `lib/contact-details.ts`
+  - `app/api/member/profile/route.ts`
+  - `app/api/member/bootstrap/route.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `app/globals.css`
+
+### Entry 134
+- `time`: 2026-04-30T16:19:28+07:00
+- `prompt_summary`: Khi thời gian xử lý của booking/request đã hết thì tự động chuyển sang trạng thái hết hạn, đồng bộ lại copy/trạng thái ở booking detail và dọn expired workflow ở server.
+- `commit_message`: `feat(workflow-expiry): auto-expire overdue booking requests`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `app/(admin)/admin/actions.ts`
+  - `lib/supabase/workflows.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/database.types.ts`
+  - `supabase/migrations/20260430134500_phase_k_availability_request_expiry.sql`
+
+### Entry 135
+- `time`: 2026-04-30T16:30:49+07:00
+- `prompt_summary`: Cho phép khách hàng tự hủy booking/yêu cầu trước khi booking được xác nhận, có kiểm tra ownership và trạng thái, và thêm nút hủy trong member portal.
+- `commit_message`: `feat(member-booking): allow customers to cancel unconfirmed bookings`
+- `main_files`:
+  - `app/(member)/member/actions.ts`
+  - `components/member-portal-dashboard.tsx`
+  - `lib/supabase/member-booking.ts`
+  - `lib/supabase/member-booking-policy.ts`
+  - `app/globals.css`
+
+### Entry 136
+- `time`: 2026-04-30T17:39:23+07:00
+- `prompt_summary`: Chặn khách hàng tạo booking/request cho ngày trong quá khứ và hiển thị lý do ngày không hợp lệ thay vì cho submit xuống server.
+- `commit_message`: `fix(booking-request): reject stay dates in the past`
+- `main_files`:
+  - `app/api/public/booking-request/route.ts`
+  - `components/room-booking-request-form.tsx`
+  - `lib/booking-dates.ts`
+
+### Entry 137
+- `time`: 2026-04-30T20:53:46+07:00
+- `prompt_summary`: Đổi trạng thái hiển thị từ "Đã báo giá" sang "Đã tiếp nhận" song ngữ, và khi confirm booking lỗi thì trả về thông báo chi tiết song ngữ thay vì message chung chung; đồng thời xử lý fallback để confirm/create hold không bị sập vì thiếu `log_audit_event`.
+- `commit_message`: `fix(admin-booking): surface detailed confirm errors and rename received status`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `components/admin-notifications-center.tsx`
+  - `components/member-notifications-provider.tsx`
+  - `lib/action-result.ts`
+  - `lib/supabase/audit.ts`
+  - `lib/supabase/workflows.ts`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-workflow-dashboard.tsx`
+  - `components/admin-accounts-page.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `lib/supabase/queries/admin-notifications.ts`
+
+### Entry 138
+- `time`: 2026-04-30T21:13:40+07:00
+- `prompt_summary`: Chuyển luồng sửa hồ sơ từ booking form sang member portal > Thông tin, giữ booking form chỉ đọc đối với member đã đăng nhập, và lưu lịch sử thay đổi hồ sơ member để admin/vận hành theo dõi.
+- `commit_message`: `feat(member-profile): move profile editing to portal and log changes`
+- `main_files`:
+  - `app/(member)/member/actions.ts`
+  - `app/api/member/profile/route.ts`
+  - `components/member-profile-editor.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `lib/supabase/member-profile.ts`
+  - `lib/supabase/queries/member-history.ts`
+  - `lib/supabase/queries/operations.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `app/globals.css`
+
+### Entry 139
+- `time`: 2026-04-30T21:43:37+07:00
+- `prompt_summary`: Giữ % cọc đã chỉnh sửa sau khi tạo lại QR, đồng thời khôi phục preview ảnh trong thư viện media/content overview khi nguồn ảnh gốc lỗi hoặc không tải được.
+- `commit_message`: `fix(admin-ui): preserve deposit percent and restore media previews`
+- `main_files`:
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-media-manager.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `components/media-preview-image.tsx`
+  - `lib/supabase/booking-finance.ts`
+  - `lib/supabase/queries/booking-details.ts`

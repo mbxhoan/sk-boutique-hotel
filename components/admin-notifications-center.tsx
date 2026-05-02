@@ -6,7 +6,7 @@ import { createContext, startTransition, Suspense, type ReactNode, useContext, u
 
 import { PortalCard } from "@/components/portal-ui";
 import { appendLocaleQuery, type Locale } from "@/lib/locale";
-import { localize } from "@/lib/mock/i18n";
+import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { AdminNotificationIcon, AdminNotificationItem, AdminNotificationTone } from "@/lib/supabase/queries/admin-notifications";
 
@@ -20,7 +20,7 @@ type AdminNotificationsPageSectionProps = {
 };
 
 type AdminNotificationCenterValue = {
-  addFlash: (status: "success" | "error", message: string) => void;
+  addFlash: (status: "success" | "error", message: string | LocalizedText) => void;
   closeNotification: () => void;
   dismissToast: (id: string) => void;
   isRead: (id: string) => boolean;
@@ -192,15 +192,16 @@ function createFlashNotification({
   status
 }: {
   href: string;
-  message: string;
+  message: string | LocalizedText;
   status: "error" | "success";
 }): AdminNotificationItem {
   const now = new Date().toISOString();
+  const body = typeof message === "string" ? { en: message, vi: message } : message;
 
   return {
     action: `flash.${status}`,
-    body_en: message,
-    body_vi: message,
+    body_en: body.en,
+    body_vi: body.vi,
     branch_name_en: null,
     branch_name_vi: null,
     happened_at: now,
@@ -217,6 +218,8 @@ function buildCleanHref(pathname: string, searchParams: URLSearchParams) {
   const nextParams = new URLSearchParams(searchParams.toString());
   nextParams.delete("actionStatus");
   nextParams.delete("actionMessage");
+  nextParams.delete("actionMessageVi");
+  nextParams.delete("actionMessageEn");
 
   const query = nextParams.toString();
 
@@ -254,7 +257,7 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
     persistLocalNotifications(localItems.slice(0, maxStoredNotifications));
   }, [localItems]);
 
-  function addFlash(status: "success" | "error", message: string) {
+  function addFlash(status: "success" | "error", message: string | LocalizedText) {
     const flashItem = createFlashNotification({
       href: pathname,
       message,
@@ -339,7 +342,11 @@ function useAdminNotificationCenterState(locale: Locale, serverItems: AdminNotif
   } satisfies AdminNotificationCenterValue;
 }
 
-function FlashHandler({ onFlash }: { onFlash: (status: "success" | "error", message: string) => void }) {
+function FlashHandler({
+  onFlash
+}: {
+  onFlash: (status: "success" | "error", message: string | LocalizedText) => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -348,21 +355,31 @@ function FlashHandler({ onFlash }: { onFlash: (status: "success" | "error", mess
   useEffect(() => {
     const actionStatus = searchParams.get("actionStatus");
     const actionMessage = searchParams.get("actionMessage");
+    const actionMessageVi = searchParams.get("actionMessageVi");
+    const actionMessageEn = searchParams.get("actionMessageEn");
 
-    if (!actionStatus || !actionMessage) {
+    if (!actionStatus || (!actionMessage && !actionMessageVi && !actionMessageEn)) {
       handledFlashRef.current = null;
       return;
     }
 
     const flashStatus = actionStatus === "success" ? "success" : "error";
-    const flashSignature = `${pathname}|${flashStatus}|${actionMessage}`;
+    const flashMessage =
+      actionMessageVi || actionMessageEn
+        ? {
+            en: actionMessageEn ?? actionMessage ?? "",
+            vi: actionMessageVi ?? actionMessage ?? ""
+          }
+        : actionMessage ?? "";
+    const flashSignature =
+      typeof flashMessage === "string" ? `${pathname}|${flashStatus}|${flashMessage}` : `${pathname}|${flashStatus}|${flashMessage.vi}|${flashMessage.en}`;
 
     if (handledFlashRef.current === flashSignature) {
       return;
     }
 
     handledFlashRef.current = flashSignature;
-    onFlash(flashStatus, actionMessage);
+    onFlash(flashStatus, flashMessage);
 
     const cleanHref = buildCleanHref(pathname, new URLSearchParams(searchParams.toString()));
     router.replace(cleanHref);
@@ -568,6 +585,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
   const { items, isRead, markAllAsRead, openNotification } = useAdminNotificationCenter();
   const unreadCount = items.filter((item) => !isRead(item.id)).length;
 
@@ -580,20 +598,25 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
       }
     }
 
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (containerRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+
     window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [open]);
 
@@ -639,7 +662,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
   }, [router]);
 
   return (
-    <div className="admin-notifications">
+    <div className="admin-notifications" ref={containerRef}>
       <button
         aria-expanded={open}
         aria-haspopup="dialog"
@@ -665,20 +688,11 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
       </button>
 
       {open ? (
-        <div className="admin-notifications__overlay">
-          <button
-            aria-label={locale === "en" ? "Close notifications" : "Đóng thông báo"}
-            className="admin-notifications__overlay-backdrop"
-            onClick={() => setOpen(false)}
-            type="button"
-          />
-
-          <section
-            aria-labelledby="admin-notifications-menu-title"
-            aria-modal="true"
-            className="admin-notifications__panel"
-            role="dialog"
-          >
+        <section
+          aria-labelledby="admin-notifications-menu-title"
+          className="admin-notifications__panel"
+          role="dialog"
+        >
             <div className="admin-notifications__panel-head">
               <div>
                 <p className="admin-notifications__eyebrow">{locale === "en" ? "Ops inbox" : "Ops inbox"}</p>
@@ -723,13 +737,12 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
               )}
             </div>
 
-            <div className="admin-notifications__panel-footer">
-              <Link className="admin-notifications__view-all" href={appendLocaleQuery(viewAllHref, locale)} onClick={() => setOpen(false)}>
-                {locale === "en" ? "View all notifications" : "Xem tất cả thông báo"}
-              </Link>
-            </div>
-          </section>
-        </div>
+          <div className="admin-notifications__panel-footer">
+            <Link className="admin-notifications__view-all" href={appendLocaleQuery(viewAllHref, locale)} onClick={() => setOpen(false)}>
+              {locale === "en" ? "View all notifications" : "Xem tất cả thông báo"}
+            </Link>
+          </div>
+        </section>
       ) : null}
     </div>
   );

@@ -1,19 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   confirmAvailabilityRequestAction,
   notifyPaymentRequestMemberAction,
   reissueDepositPaymentRequestAction,
   resendDepositRequestEmailAction,
+  releaseExpiredHoldsAction,
   updateAvailabilityRequestStatusAction,
   updateReservationLifecycleAction
 } from "@/app/(admin)/admin/actions";
 import { verifyPaymentRequestAction } from "@/app/actions/payments";
 import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import { AdminBookingDetailToolbar } from "@/components/admin-booking-detail-toolbar";
+import { AdminBookingReceiptPrint } from "@/components/admin-booking-receipt-print";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import type { Locale } from "@/lib/locale";
@@ -128,7 +131,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "New",
       pending_deposit: "Pending deposit",
       pending_verification: "Pending verification",
-      quoted: "Quoted",
+      quoted: "Received",
       rejected: "Rejected",
       sent: "Deposit sent",
       verified: "Verified"
@@ -146,7 +149,7 @@ function statusLabel(locale: Locale, status: string) {
       new: "Mới",
       pending_deposit: "Chờ cọc",
       pending_verification: "Chờ kiểm tra cọc",
-      quoted: "Đã báo giá",
+      quoted: "Đã tiếp nhận",
       rejected: "Từ chối",
       sent: "Đã gửi QR cọc",
       verified: "Đã duyệt cọc"
@@ -178,6 +181,22 @@ function formatConsent(locale: Locale, value: boolean | null | undefined) {
 function getWorkflowTitle(detail: BookingDetailData, locale: Locale) {
   const activePaymentRequest =
     detail.payment_requests.find((paymentRequest) => ["sent", "pending_verification"].includes(paymentRequest.status)) ?? null;
+
+  if (detail.booking.status === "expired") {
+    return localize(
+      locale,
+      detail.booking.source === "reservation"
+        ? { vi: "Booking này đã hết hạn.", en: "This booking has expired." }
+        : { vi: "Yêu cầu này đã hết hạn xử lý.", en: "This request has expired." }
+    );
+  }
+
+  if (detail.booking.status === "closed") {
+    return localize(locale, {
+      vi: "Yêu cầu này đã được đóng.",
+      en: "This request has been closed."
+    });
+  }
 
   if (detail.reservation?.status === "completed") {
     return localize(locale, { vi: "Booking đã hoàn tất", en: "Booking completed" });
@@ -346,6 +365,7 @@ function HeroMetrics({
   locale: Locale;
 }) {
   const nights = calculateNights(detail.booking.stay_start_at, detail.booking.stay_end_at);
+  const requestedDepositPercentage = detail.financial_summary.requested_deposit_percentage;
   const metrics = [
     {
       label: locale === "en" ? "Booking value" : "Giá trị booking",
@@ -356,9 +376,13 @@ function HeroMetrics({
     {
       label: locale === "en" ? "Deposit target" : "Mục tiêu cọc",
       note:
-        locale === "en"
-          ? `${detail.financial_summary.default_deposit_percentage}% default`
-          : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
+        detail.financial_summary.active_payment_request_id
+          ? locale === "en"
+            ? `${requestedDepositPercentage}% current`
+            : `${requestedDepositPercentage}% hiện tại`
+          : locale === "en"
+            ? `${detail.financial_summary.default_deposit_percentage}% default`
+            : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
       tone: "soft",
       value: formatMoney(locale, detail.financial_summary.requested_deposit_amount)
     },
@@ -412,6 +436,28 @@ function ProcessingTimeline({
     detail.payment_requests.find((paymentRequest) => ["sent", "pending_verification"].includes(paymentRequest.status)) ??
     detail.payment_requests.find((paymentRequest) => paymentRequest.status === "verified") ??
     null;
+  const requestTerminalWithoutReservation = !reservation && request ? ["closed", "rejected", "expired"].includes(request.status) : false;
+  const requestExpired = !reservation && request?.status === "expired";
+  const availabilityStepDescription = reservation
+    ? localize(locale, {
+        vi: "Admin đã chốt phòng và chuyển booking sang trạng thái chờ cọc.",
+        en: "The room was confirmed and the booking moved to pending deposit."
+      })
+    : requestExpired
+      ? localize(locale, {
+          vi: "Yêu cầu đã hết hạn xử lý trước khi được xác nhận.",
+          en: "The request expired before staff could confirm availability."
+        })
+      : requestTerminalWithoutReservation
+        ? localize(locale, {
+            vi: "Yêu cầu đã được đóng hoặc từ chối trước khi xác nhận còn phòng.",
+            en: "The request was closed or rejected before availability was confirmed."
+          })
+        : localize(locale, {
+            vi: "Đang chờ admin kiểm tra phòng trống và xác nhận booking.",
+            en: "Waiting for manual availability confirmation."
+          });
+  const availabilityStepState: TimelineStepState = reservation || requestTerminalWithoutReservation ? "done" : "active";
   const steps: Array<{
     description: string;
     time: string | null;
@@ -428,22 +474,16 @@ function ProcessingTimeline({
       state: "done"
     },
     {
-      description: reservation
-        ? localize(locale, {
-            vi: "Admin đã chốt phòng và chuyển booking sang trạng thái chờ cọc.",
-            en: "The room was confirmed and the booking moved to pending deposit."
-          })
-        : localize(locale, {
-            vi: "Đang chờ admin kiểm tra phòng trống và xác nhận booking.",
-            en: "Waiting for manual availability confirmation."
-          }),
+      description: availabilityStepDescription,
       time: reservation?.confirmed_at
         ? formatDateTime(locale, reservation.confirmed_at)
+        : requestTerminalWithoutReservation && request?.closed_at
+          ? formatDateTime(locale, request.closed_at)
         : request?.response_due_at
           ? formatDateTime(locale, request.response_due_at)
           : null,
       label: localize(locale, { vi: "Xác nhận còn phòng", en: "Confirm availability" }),
-      state: reservation ? "done" : "active"
+      state: availabilityStepState
     },
     {
       description:
@@ -556,7 +596,7 @@ function ConfirmAvailabilityCard({
     }
   }, [roomSuggestions, selectedRoomId]);
 
-  if (!request || detail.reservation) {
+  if (!request || detail.reservation || ["closed", "rejected", "expired"].includes(request.status)) {
     return null;
   }
 
@@ -682,7 +722,10 @@ function DepositCard({
   returnTo: string;
 }) {
   const reservation = detail.reservation;
-  const [depositPercent, setDepositPercent] = useState(detail.financial_summary.default_deposit_percentage);
+  const [depositPercent, setDepositPercent] = useState(detail.financial_summary.requested_deposit_percentage);
+  useEffect(() => {
+    setDepositPercent(detail.financial_summary.requested_deposit_percentage);
+  }, [detail.financial_summary.requested_deposit_percentage]);
   const depositAmount = useMemo(
     () => calculateDepositAmount({
       depositPercent,
@@ -690,7 +733,7 @@ function DepositCard({
     }),
     [depositPercent, detail.financial_summary.total_amount]
   );
-  const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.default_deposit_percentage;
+  const shouldHighlightRegenerate = depositPercent !== detail.financial_summary.requested_deposit_percentage;
 
   if (!reservation || reservation.status === "confirmed" || reservation.status === "completed") {
     return null;
@@ -1145,6 +1188,8 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
   const booking = detail.booking;
   const request = detail.request;
   const reservation = detail.reservation;
+  const router = useRouter();
+  const autoExpiryKeyRef = useRef<string | null>(null);
   const backHref = appendLocaleQuery("/admin/bookings", locale);
   const detailHref = appendLocaleQuery(`/admin/bookings/${booking.booking_code}`, locale);
   const activePaymentRequest =
@@ -1157,6 +1202,49 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
       : !reservation && request?.response_due_at
         ? request.response_due_at
         : null;
+  const shouldAutoExpire =
+    (!reservation && request ? ["new", "in_review", "quoted"].includes(request.status) : false) || reservation?.status === "pending_deposit";
+
+  useEffect(() => {
+    if (!countdownTarget || !shouldAutoExpire) {
+      autoExpiryKeyRef.current = null;
+      return;
+    }
+
+    const targetMs = new Date(countdownTarget).getTime();
+
+    if (!Number.isFinite(targetMs)) {
+      return;
+    }
+
+    const expiryKey = `${booking.booking_code}:${countdownTarget}`;
+
+    const triggerExpiryCleanup = () => {
+      if (autoExpiryKeyRef.current === expiryKey) {
+        return;
+      }
+
+      autoExpiryKeyRef.current = expiryKey;
+      void releaseExpiredHoldsAction(new FormData())
+        .catch((error) => {
+          console.warn("[workflow] Failed to auto-release expired booking detail", error);
+        })
+        .finally(() => {
+          router.refresh();
+        });
+    };
+
+    const remainingMs = targetMs - Date.now();
+
+    if (remainingMs <= 0) {
+      triggerExpiryCleanup();
+      return;
+    }
+
+    const timer = window.setTimeout(triggerExpiryCleanup, remainingMs);
+
+    return () => window.clearTimeout(timer);
+  }, [booking.booking_code, countdownTarget, router, shouldAutoExpire]);
 
   const canCancelReservation = reservation && !["cancelled", "completed", "expired"].includes(reservation.status);
   const canCompleteReservation = reservation?.status === "confirmed";
@@ -1182,6 +1270,7 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
             <AdminBookingDetailToolbar
               canCancel={!!reservation && ["confirmed", "pending_deposit"].includes(reservation.status)}
               canComplete={!!reservation && reservation.status === "confirmed"}
+              canPrint={reservation?.status === "completed"}
               canReject={booking.status === "new" || booking.status === "in_review"}
               canResendEmail={!!activePaymentRequest && activePaymentRequest.status !== "verified"}
               canVerify={!!activePaymentRequest && ["sent", "pending_verification"].includes(activePaymentRequest.status)}
@@ -1215,6 +1304,8 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
           <FinancialSummaryCard detail={detail} locale={locale} />
         </div>
       </div>
+
+      {reservation?.status === "completed" ? <AdminBookingReceiptPrint detail={detail} locale={locale} /> : null}
     </div>
   );
 }

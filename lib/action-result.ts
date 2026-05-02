@@ -1,4 +1,7 @@
+import type { LocalizedText } from "@/lib/mock/i18n";
+
 export type ActionResultKind = "error" | "success";
+export type ActionResultMessage = string | LocalizedText;
 
 export function readSafeReturnTo(value: string | null | undefined) {
   if (!value) {
@@ -15,7 +18,7 @@ export function buildActionResultHref(
     message
   }: {
     kind: ActionResultKind;
-    message: string;
+    message: ActionResultMessage;
   }
 ) {
   const [pathname, hash = ""] = returnTo.split("#");
@@ -23,7 +26,14 @@ export function buildActionResultHref(
   const params = new URLSearchParams(query);
 
   params.set("actionStatus", kind);
-  params.set("actionMessage", message);
+
+  if (typeof message === "string") {
+    params.set("actionMessage", message);
+  } else {
+    params.set("actionMessage", message.en);
+    params.set("actionMessageVi", message.vi);
+    params.set("actionMessageEn", message.en);
+  }
 
   const nextQuery = params.toString();
 

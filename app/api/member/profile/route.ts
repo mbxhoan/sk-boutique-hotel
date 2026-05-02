@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 
 import type { Locale } from "@/lib/locale";
-import { getSupabaseUser } from "@/lib/supabase/auth";
+import { localize } from "@/lib/mock/i18n";
+import {
+  getFirstContactDetailsError,
+  normalizeContactDetails,
+  resolveContactDetailsError,
+  validateContactDetails
+} from "@/lib/contact-details";
+import { getSupabaseSession, getSupabaseUser } from "@/lib/supabase/auth";
+import { memberProfileUpdateError, syncMemberProfile } from "@/lib/supabase/member-profile";
 import { getCustomerByAuthUserId } from "@/lib/supabase/queries/customers";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
 
@@ -18,8 +26,48 @@ function readProfileFallback(user: Awaited<ReturnType<typeof getSupabaseUser>>) 
     authUserId: user?.id ?? "",
     email: user?.email ?? "",
     fullName,
+    marketingConsent: false,
+    marketingConsentSource: null,
     phone: typeof metadata.phone === "string" && metadata.phone.trim().length ? metadata.phone.trim() : null,
     preferredLocale: metadata.locale === "en" ? ("en" as Locale) : ("vi" as Locale)
+  };
+}
+
+type ProfilePatchBody = {
+  email?: string;
+  fullName?: string;
+  marketingConsent?: boolean | null;
+  phone?: string | null;
+  preferredLocale?: Locale;
+};
+
+function readProfilePatchBody(body: ProfilePatchBody) {
+  return normalizeContactDetails({
+    email: typeof body.email === "string" ? body.email : "",
+    fullName: typeof body.fullName === "string" ? body.fullName : "",
+    phone: typeof body.phone === "string" ? body.phone : ""
+  });
+}
+
+function toProfilePayload(
+  authUserId: string,
+  customer: {
+    email: string;
+    full_name: string;
+    marketing_consent: boolean;
+    marketing_consent_source: string | null;
+    phone: string | null;
+    preferred_locale: Locale;
+  }
+) {
+  return {
+    authUserId,
+    email: customer.email,
+    fullName: customer.full_name,
+    marketingConsent: customer.marketing_consent,
+    marketingConsentSource: customer.marketing_consent_source,
+    phone: customer.phone,
+    preferredLocale: customer.preferred_locale
   };
 }
 
@@ -47,6 +95,8 @@ export async function GET() {
               authUserId: user.id,
               email: customer.email,
               fullName: customer.full_name,
+              marketingConsent: customer.marketing_consent,
+              marketingConsentSource: customer.marketing_consent_source,
               phone: customer.phone,
               preferredLocale: customer.preferred_locale
             }
@@ -59,6 +109,86 @@ export async function GET() {
       context: {},
       error,
       fallbackMessage: "Unable to load member profile",
+      scope: "api/member/profile",
+      status: 400
+    });
+  }
+}
+
+export async function PATCH(request: Request) {
+  let preferredLocale: Locale = "vi";
+
+  try {
+    const session = await getSupabaseSession().catch(() => null);
+
+    if (!session?.user) {
+      return jsonApiErrorResponse({
+        context: {},
+        error: new Error("Unauthorized profile update."),
+        fallbackMessage: "Unable to update member profile",
+        scope: "api/member/profile",
+        status: 401
+      });
+    }
+
+    const body = (await request.json().catch(() => null)) as ProfilePatchBody | null;
+
+    if (!body) {
+      return jsonApiErrorResponse({
+        context: { authUserId: session.user.id },
+        error: new Error("Missing required member profile fields."),
+        fallbackMessage: "Unable to update member profile",
+        scope: "api/member/profile",
+        status: 400
+      });
+    }
+
+    preferredLocale = body.preferredLocale === "en" ? "en" : "vi";
+    const profileInput = readProfilePatchBody(body);
+    const validation = validateContactDetails(preferredLocale, profileInput, { phoneRequired: true });
+    const validationError = getFirstContactDetailsError(validation.errors);
+
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
+    const result = await syncMemberProfile({
+      actorRole: "member",
+      actorUserId: session.user.id,
+      authUserId: session.user.id,
+      email: validation.values.email,
+      fullName: validation.values.fullName,
+      marketingConsent: typeof body.marketingConsent === "boolean" ? body.marketingConsent : null,
+      phone: validation.values.phone,
+      preferredLocale,
+      source: "member_portal"
+    });
+
+    return NextResponse.json({ profile: toProfilePayload(session.user.id, result.customer) }, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error && error.message === memberProfileUpdateError.EMAIL_ALREADY_USED) {
+      return NextResponse.json(
+        {
+          error: localize(preferredLocale, {
+            vi: "Email này đã được dùng bởi member khác.",
+            en: "This email is already used by another member."
+          })
+        },
+        { status: 409 }
+      );
+    }
+
+    const resolved = resolveContactDetailsError(preferredLocale, error);
+
+    if (resolved.field) {
+      const status = resolved.field === "email" && resolved.message.toLowerCase().includes("already") ? 409 : 400;
+      return NextResponse.json({ error: resolved.message }, { status });
+    }
+
+    return jsonApiErrorResponse({
+      context: {},
+      error,
+      fallbackMessage: "Unable to update member profile",
       scope: "api/member/profile",
       status: 400
     });

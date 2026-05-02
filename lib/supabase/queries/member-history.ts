@@ -9,7 +9,7 @@ import { listReservations } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
-import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { releaseExpiredAvailabilityRequests, releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import type {
   WorkflowAvailabilityRequest,
   WorkflowAuditLog,
@@ -118,6 +118,7 @@ function toAuditLogView(log: Awaited<ReturnType<typeof listAuditLogs>>[number], 
   const branch = log.branch_id ? branchMap[log.branch_id] : null;
   const entityLabels = {
     availability_request: { en: "Availability request", vi: "Yêu cầu đặt phòng" },
+    customer: { en: "Member profile", vi: "Hồ sơ member" },
     payment_request: { en: "Payment request", vi: "Yêu cầu cọc" },
     reservation: { en: "Reservation", vi: "Reservation" },
     room_hold: { en: "Room hold", vi: "Hold phòng" }
@@ -144,12 +145,17 @@ export async function loadMemberHistoryDashboard(authUserId: string, authUserEma
 export async function loadMemberHistoryDashboardByUser(authUserId: string, authUserEmail: string | null): Promise<WorkflowMemberHistoryData | null> {
   return queryWithServiceFallback(
     async () => {
-      const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+      const releaseResults = await Promise.allSettled([
+        releaseExpiredAvailabilityRequests(),
+        releaseExpiredHolds(),
+        releaseExpiredReservations()
+      ]);
 
       if (releaseResults.some((result) => result.status === "rejected")) {
-        console.warn("[workflow] Failed to release expired holds/reservations before loading member history", {
-          holds: releaseResults[0].status === "fulfilled",
-          reservations: releaseResults[1].status === "fulfilled"
+        console.warn("[workflow] Failed to release expired workflow items before loading member history", {
+          requests: releaseResults[0].status === "fulfilled",
+          holds: releaseResults[1].status === "fulfilled",
+          reservations: releaseResults[2].status === "fulfilled"
         });
       }
 

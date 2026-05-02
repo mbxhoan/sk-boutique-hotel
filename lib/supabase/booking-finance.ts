@@ -33,6 +33,23 @@ export function calculateDepositAmount({
   return Number(((normalizedTotal * normalizedPercent) / 100).toFixed(2));
 }
 
+export function calculateDepositPercentage({
+  depositAmount,
+  totalAmount
+}: {
+  depositAmount: number;
+  totalAmount: number;
+}) {
+  const normalizedTotal = normalizeAmount(totalAmount);
+  const normalizedDeposit = normalizeAmount(depositAmount);
+
+  if (normalizedTotal <= 0 || normalizedDeposit <= 0) {
+    return DEFAULT_BOOKING_DEPOSIT_PERCENT;
+  }
+
+  return Math.min(100, Math.max(0, Math.round((normalizedDeposit / normalizedTotal) * 100)));
+}
+
 export function calculateVerifiedDepositAmount(
   paymentRequests: Array<{
     amount: number;

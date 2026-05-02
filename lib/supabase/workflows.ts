@@ -9,7 +9,7 @@ import type {
 import { logAuditEvent } from "@/lib/supabase/audit";
 import { calculateDepositAmount } from "@/lib/supabase/booking-finance";
 import { hasSupabaseServiceConfig } from "@/lib/supabase/env";
-import { toError } from "@/lib/supabase/errors";
+import { getErrorMessage, toError } from "@/lib/supabase/errors";
 import { getCustomerByEmail } from "@/lib/supabase/queries/customers";
 import { listReservations } from "@/lib/supabase/queries/reservations";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
@@ -78,8 +78,22 @@ export type ReleaseExpiredHoldsInput = {
   asOf?: string;
 };
 
+export type ReleaseExpiredAvailabilityRequestsInput = {
+  asOf?: string;
+};
+
 export type ReleaseExpiredReservationsInput = {
   asOf?: string;
+};
+
+export type ReleasedAvailabilityRequestRow = {
+  branch_id: string;
+  customer_id: string | null;
+  expired_at: string;
+  request_code: string;
+  request_id: string;
+  response_due_at: string;
+  status: AvailabilityRequestStatus;
 };
 
 export type ConfirmAvailabilityRequestInput = {
@@ -156,6 +170,348 @@ function normalizeQuotedAmount(value: number | null | undefined) {
   }
 
   return Number(value.toFixed(2));
+}
+
+type RoomAvailabilityCheckInput = {
+  branchId: string;
+  roomId: string;
+  roomTypeId: string;
+  stayEndAt: string;
+  stayStartAt: string;
+};
+
+function shouldFallbackToDirectMutation(error: unknown, functionNames: string[]) {
+  const message = getErrorMessage(error, "");
+
+  return functionNames.some((functionName) => message.includes(functionName)) && message.includes("does not exist");
+}
+
+async function assertRoomIsAvailable(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+  input: RoomAvailabilityCheckInput,
+  unavailableMessage: string
+) {
+  const { data, error } = await supabase.rpc("find_available_rooms", {
+    p_branch_id: input.branchId,
+    p_limit: 1000,
+    p_room_type_id: input.roomTypeId,
+    p_stay_end_at: normalizeTimestamptzInput(input.stayEndAt),
+    p_stay_start_at: normalizeTimestamptzInput(input.stayStartAt)
+  });
+
+  if (error) {
+    throw new Error(error.message ?? "Unable to check room availability.");
+  }
+
+  if (!((data ?? []) as RoomRow[]).some((room) => room.id === input.roomId)) {
+    throw new Error(unavailableMessage);
+  }
+}
+
+async function writeAuditLogSafely(
+  input: Parameters<typeof logAuditEvent>[0],
+  context: string
+) {
+  try {
+    await logAuditEvent(input);
+  } catch (error) {
+    console.warn(context, {
+      action: input.action,
+      error,
+      entityId: input.entityId,
+      entityType: input.entityType
+    });
+  }
+}
+
+async function createRoomHoldDirect(input: HoldRoomInput) {
+  const supabase = createSupabaseServiceClient();
+  const holdMinutesValue = Number.isFinite(input.holdMinutes ?? 30) ? Number(input.holdMinutes ?? 30) : 30;
+
+  if (holdMinutesValue <= 0) {
+    throw new Error("Hold expiry must be greater than zero minutes.");
+  }
+
+  if (new Date(input.stayEndAt).getTime() <= new Date(input.stayStartAt).getTime()) {
+    throw new Error("Hold stay window is invalid.");
+  }
+
+  await assertRoomIsAvailable(
+    supabase,
+    {
+      branchId: input.branchId,
+      roomId: input.roomId,
+      roomTypeId: input.roomTypeId,
+      stayEndAt: input.stayEndAt,
+      stayStartAt: input.stayStartAt
+    },
+    "Room is not available for hold creation."
+  );
+
+  const holdMinutes = Math.max(1, Math.round(holdMinutesValue));
+  const expiresAt = new Date(Date.now() + holdMinutes * 60_000).toISOString();
+  const actorUserId = input.createdBy ?? input.heldBy ?? null;
+  const { data: hold, error: holdError } = await supabase
+    .from("room_holds")
+    .insert({
+      availability_request_id: input.availabilityRequestId ?? null,
+      branch_id: input.branchId,
+      created_by: input.createdBy ?? null,
+      customer_id: input.customerId ?? null,
+      expires_at: expiresAt,
+      held_by: input.heldBy ?? input.createdBy ?? null,
+      notes: input.notes ?? "",
+      room_id: input.roomId,
+      room_type_id: input.roomTypeId,
+      release_reason: "",
+      status: "active",
+      stay_end_at: normalizeTimestamptzInput(input.stayEndAt),
+      stay_start_at: normalizeTimestamptzInput(input.stayStartAt),
+      updated_by: input.createdBy ?? null
+    })
+    .select("*")
+    .single();
+
+  if (holdError) {
+    throw toError(holdError, "Unable to create room hold.");
+  }
+
+  if (input.availabilityRequestId) {
+    const { data: request, error: requestError } = await supabase
+      .from("availability_requests")
+      .select("id, handled_at, handled_by")
+      .eq("id", input.availabilityRequestId)
+      .maybeSingle();
+
+    if (requestError) {
+      throw new Error(requestError.message ?? "Unable to load availability request.");
+    }
+
+    if (request) {
+      const { error: requestUpdateError } = await supabase
+        .from("availability_requests")
+        .update({
+          handled_at: request.handled_at ?? new Date().toISOString(),
+          handled_by: request.handled_by ?? input.createdBy ?? null,
+          status: "converted",
+          updated_by: input.createdBy ?? null
+        })
+        .eq("id", request.id);
+
+      if (requestUpdateError) {
+        throw new Error(requestUpdateError.message ?? "Unable to update availability request before hold creation.");
+      }
+    }
+  }
+
+  await writeAuditLogSafely(
+    {
+      action: "hold.created",
+      actorRole: input.actorRole ?? null,
+      actorUserId,
+      availabilityRequestId: input.availabilityRequestId ?? null,
+      branchId: input.branchId,
+      customerId: input.customerId ?? null,
+      entityId: hold.id,
+      entityType: "room_hold",
+      holdId: hold.id,
+      metadata: {
+        expires_at: hold.expires_at,
+        hold_code: hold.hold_code
+      },
+      roomId: input.roomId,
+      summary: "Room hold created"
+    },
+    "[workflow] Failed to write fallback hold audit log"
+  );
+
+  return hold as RoomHoldRow;
+}
+
+async function createReservationDirect(input: CreateReservationInput) {
+  const supabase = createSupabaseServiceClient();
+  let branchId = input.branchId;
+  let roomTypeId = input.primaryRoomTypeId;
+  let roomId = input.roomId;
+  let stayStartAt = input.stayStartAt;
+  let stayEndAt = input.stayEndAt;
+  let customerId = input.customerId ?? null;
+  let availabilityRequestId = input.availabilityRequestId ?? null;
+
+  if (input.holdId) {
+    const { data: hold, error: holdError } = await supabase
+      .from("room_holds")
+      .select("id, availability_request_id, branch_id, customer_id, room_id, room_type_id, status, stay_end_at, stay_start_at")
+      .eq("id", input.holdId)
+      .maybeSingle();
+
+    if (holdError) {
+      throw new Error(holdError.message ?? "Unable to load hold.");
+    }
+
+    if (!hold) {
+      throw new Error("Hold not found.");
+    }
+
+    if (hold.status !== "active") {
+      throw new Error("Hold is not active.");
+    }
+
+    branchId = hold.branch_id;
+    roomTypeId = hold.room_type_id;
+    roomId = hold.room_id;
+    stayStartAt = hold.stay_start_at;
+    stayEndAt = hold.stay_end_at;
+    customerId = customerId ?? hold.customer_id ?? null;
+    availabilityRequestId = availabilityRequestId ?? hold.availability_request_id ?? null;
+  }
+
+  if (!customerId) {
+    throw new Error("Reservation requires a customer.");
+  }
+
+  if (!branchId || !roomTypeId || !roomId || !stayStartAt || !stayEndAt) {
+    throw new Error("Reservation requires room, branch, room type, and stay window data.");
+  }
+
+  if (new Date(stayEndAt).getTime() <= new Date(stayStartAt).getTime()) {
+    throw new Error("Reservation stay window is invalid.");
+  }
+
+  const normalizedStayStartAt = normalizeTimestamptzInput(stayStartAt);
+  const normalizedStayEndAt = normalizeTimestamptzInput(stayEndAt);
+
+  await assertRoomIsAvailable(
+    supabase,
+    {
+      branchId,
+      roomId,
+      roomTypeId,
+      stayEndAt: normalizedStayEndAt,
+      stayStartAt: normalizedStayStartAt
+    },
+    "Room is not available for reservation creation."
+  );
+
+  const guestCount = Math.max(1, Number.isFinite(input.guestCount ?? 1) ? Number(input.guestCount ?? 1) : 1);
+  const now = new Date().toISOString();
+  const { data: reservation, error: reservationError } = await supabase
+    .from("reservations")
+    .insert({
+      availability_request_id: availabilityRequestId,
+      base_price: input.basePrice ?? 0,
+      branch_id: branchId,
+      created_by: input.createdBy ?? null,
+      customer_id: customerId,
+      deposit_amount: input.depositAmount ?? 0,
+      expires_at: input.expiresAt ? normalizeTimestamptzInput(input.expiresAt) : null,
+      guest_count: guestCount,
+      hold_id: input.holdId ?? null,
+      manual_override_price: input.manualOverridePrice ?? null,
+      nightly_rate: input.nightlyRate ?? 0,
+      notes: input.notes ?? "",
+      primary_room_type_id: roomTypeId,
+      status: input.status ?? "pending_deposit",
+      stay_end_at: normalizedStayEndAt,
+      stay_start_at: normalizedStayStartAt,
+      total_amount: input.totalAmount ?? 0,
+      updated_by: input.createdBy ?? null,
+      weekend_surcharge: input.weekendSurcharge ?? 0
+    })
+    .select("*")
+    .single();
+
+  if (reservationError) {
+    throw toError(reservationError, "Unable to create booking.");
+  }
+
+  const { error: roomItemError } = await supabase
+    .from("reservation_room_items")
+    .insert({
+      nightly_rate: input.nightlyRate ?? 0,
+      notes: input.notes ?? "",
+      reservation_id: reservation.id,
+      room_id: roomId,
+      room_type_id: roomTypeId,
+      sort_order: 1,
+      status: "active",
+      stay_end_at: normalizedStayEndAt,
+      stay_start_at: normalizedStayStartAt,
+      total_amount: input.totalAmount ?? 0
+    });
+
+  if (roomItemError) {
+    throw new Error(roomItemError.message ?? "Unable to create reservation room item.");
+  }
+
+  if (input.holdId) {
+    const { error: holdUpdateError } = await supabase
+      .from("room_holds")
+      .update({
+        converted_at: now,
+        reservation_id: reservation.id,
+        status: "converted",
+        updated_by: input.createdBy ?? null
+      })
+      .eq("id", input.holdId);
+
+    if (holdUpdateError) {
+      throw new Error(holdUpdateError.message ?? "Unable to update hold before booking creation.");
+    }
+  }
+
+  if (availabilityRequestId) {
+    const { data: request, error: requestError } = await supabase
+      .from("availability_requests")
+      .select("id, closed_at, handled_at, handled_by")
+      .eq("id", availabilityRequestId)
+      .maybeSingle();
+
+    if (requestError) {
+      throw new Error(requestError.message ?? "Unable to load availability request.");
+    }
+
+    if (request) {
+      const { error: requestUpdateError } = await supabase
+        .from("availability_requests")
+        .update({
+          closed_at: request.closed_at ?? now,
+          handled_at: request.handled_at ?? now,
+          handled_by: request.handled_by ?? input.createdBy ?? null,
+          status: "converted",
+          updated_by: input.createdBy ?? null
+        })
+        .eq("id", request.id);
+
+      if (requestUpdateError) {
+        throw new Error(requestUpdateError.message ?? "Unable to update availability request before booking creation.");
+      }
+    }
+  }
+
+  await writeAuditLogSafely(
+    {
+      action: "reservation.created",
+      actorRole: input.actorRole ?? null,
+      actorUserId: input.createdBy ?? null,
+      availabilityRequestId,
+      branchId,
+      customerId,
+      entityId: reservation.id,
+      entityType: "reservation",
+      holdId: input.holdId ?? null,
+      metadata: {
+        booking_code: reservation.booking_code,
+        status: reservation.status
+      },
+      reservationId: reservation.id,
+      roomId,
+      summary: `Reservation ${reservation.booking_code} created.`
+    },
+    "[workflow] Failed to write fallback reservation audit log"
+  );
+
+  return reservation as ReservationRow;
 }
 
 async function assertRoomsAvailable(
@@ -476,6 +832,10 @@ export async function holdRoom(input: HoldRoomInput) {
   });
 
   if (error) {
+    if (shouldFallbackToDirectMutation(error, ["create_room_hold", "log_audit_event"])) {
+      return createRoomHoldDirect(input);
+    }
+
     throw toError(error, "Unable to create room hold.");
   }
 
@@ -509,6 +869,10 @@ export async function createReservation(input: CreateReservationInput) {
   });
 
   if (error) {
+    if (shouldFallbackToDirectMutation(error, ["create_reservation", "log_audit_event"])) {
+      return createReservationDirect(input);
+    }
+
     throw toError(error, "Unable to create booking.");
   }
 
@@ -530,6 +894,23 @@ export async function releaseExpiredHolds(input: ReleaseExpiredHoldsInput = {}) 
   }
 
   return (data ?? []) as ReleasedHoldRow[];
+}
+
+export async function releaseExpiredAvailabilityRequests(input: ReleaseExpiredAvailabilityRequestsInput = {}) {
+  if (!hasSupabaseServiceConfig()) {
+    return [];
+  }
+
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase.rpc("release_expired_availability_requests", {
+    p_as_of: input.asOf ? normalizeTimestamptzInput(input.asOf) : new Date().toISOString()
+  });
+
+  if (error) {
+    throw toError(error, "Unable to release expired booking requests.");
+  }
+
+  return (data ?? []) as ReleasedAvailabilityRequestRow[];
 }
 
 export async function releaseExpiredReservations(input: ReleaseExpiredReservationsInput = {}) {

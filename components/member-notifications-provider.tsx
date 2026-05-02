@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { createContext, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/lib/locale";
-import { localize } from "@/lib/mock/i18n";
+import { localize, type LocalizedText } from "@/lib/mock/i18n";
 
 type MemberNotificationItem = {
   body_en: string;
@@ -18,7 +18,7 @@ type MemberNotificationItem = {
 };
 
 type MemberNotificationContextValue = {
-  addToast: (status: string, message: string) => void;
+  addToast: (status: string, message: string | LocalizedText) => void;
   dismissToast: (id: string) => void;
   toasts: MemberNotificationItem[];
 };
@@ -33,11 +33,12 @@ export function useMemberNotifications() {
   return context;
 }
 
-function createFlashNotification(status: string, message: string): MemberNotificationItem {
+function createFlashNotification(status: string, message: string | LocalizedText): MemberNotificationItem {
   const now = new Date().toISOString();
+  const body = typeof message === "string" ? { en: message, vi: message } : message;
   return {
-    body_en: message,
-    body_vi: message,
+    body_en: body.en,
+    body_vi: body.vi,
     happened_at: now,
     id: `member-flash-${status}-${Date.now()}`,
     title_en: status === "success" ? "Action successful" : "Action failed",
@@ -46,7 +47,11 @@ function createFlashNotification(status: string, message: string): MemberNotific
   };
 }
 
-function FlashHandler({ onFlash }: { onFlash: (status: string, message: string) => void }) {
+function FlashHandler({
+  onFlash
+}: {
+  onFlash: (status: string, message: string | LocalizedText) => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -55,25 +60,37 @@ function FlashHandler({ onFlash }: { onFlash: (status: string, message: string) 
   useEffect(() => {
     const actionStatus = searchParams.get("actionStatus");
     const actionMessage = searchParams.get("actionMessage");
+    const actionMessageVi = searchParams.get("actionMessageVi");
+    const actionMessageEn = searchParams.get("actionMessageEn");
 
-    if (!actionStatus || !actionMessage) {
+    if (!actionStatus || (!actionMessage && !actionMessageVi && !actionMessageEn)) {
       handledFlashRef.current = null;
       return;
     }
 
-    const flashSignature = `${pathname}|${actionStatus}|${actionMessage}`;
+    const flashMessage =
+      actionMessageVi || actionMessageEn
+        ? {
+            en: actionMessageEn ?? actionMessage ?? "",
+            vi: actionMessageVi ?? actionMessage ?? ""
+          }
+        : actionMessage ?? "";
+    const flashSignature =
+      typeof flashMessage === "string" ? `${pathname}|${actionStatus}|${flashMessage}` : `${pathname}|${actionStatus}|${flashMessage.vi}|${flashMessage.en}`;
 
     if (handledFlashRef.current === flashSignature) {
       return;
     }
 
     handledFlashRef.current = flashSignature;
-    onFlash(actionStatus, actionMessage);
+    onFlash(actionStatus, flashMessage);
 
     // Clean URL
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("actionStatus");
     nextParams.delete("actionMessage");
+    nextParams.delete("actionMessageVi");
+    nextParams.delete("actionMessageEn");
     const query = nextParams.toString();
     const cleanHref = `${pathname}${query ? `?${query}` : ""}`;
     router.replace(cleanHref);
@@ -95,7 +112,7 @@ export function MemberNotificationProvider({ children, locale }: { children: Rea
     return () => timers.forEach(window.clearTimeout);
   }, [toasts]);
 
-  function addToast(status: string, message: string) {
+  function addToast(status: string, message: string | LocalizedText) {
     const flashItem = createFlashNotification(status, message);
     setToasts((current) => [flashItem, ...current].slice(0, 3));
   }

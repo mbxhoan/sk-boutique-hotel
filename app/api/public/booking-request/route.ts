@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { isBookingRequestStayWindowValid } from "@/lib/booking-dates";
 import type { Locale } from "@/lib/locale";
+import { localize } from "@/lib/mock/i18n";
+import { getFirstContactDetailsError, normalizeContactDetails, validateContactDetails } from "@/lib/contact-details";
 import { getSupabaseSession } from "@/lib/supabase/auth";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
 import { submitAvailabilityRequest } from "@/lib/supabase/workflows";
@@ -53,28 +56,37 @@ function readBody(body: BookingRequestBody) {
   const roomTypeId = readString(body.roomTypeId);
   const stayStartAt = readString(body.stayStartAt);
   const stayEndAt = readString(body.stayEndAt);
-  const contactName = readString(body.contactName);
-  const contactEmail = readString(body.contactEmail);
+  const preferredLocale: Locale = body.preferredLocale === "en" ? "en" : "vi";
   const createdBy = readOptionalString(body.createdBy);
   const source = readString(body.source) || "member_portal";
   const note = readOptionalString(body.note) ?? "";
-  const contactPhone = readOptionalString(body.contactPhone);
-  const preferredLocale: Locale = body.preferredLocale === "en" ? "en" : "vi";
   const guestCount = readNumber(body.guestCount) ?? 1;
   const marketingConsent = Boolean(body.marketingConsent);
   const quotedCurrency = readString(body.quotedCurrency) || "VND";
   const quotedNightlyRate = readNumber(body.quotedNightlyRate);
   const quotedTotalAmount = readNumber(body.quotedTotalAmount);
+  const contactDetails = normalizeContactDetails({
+    email: readString(body.contactEmail),
+    fullName: readString(body.contactName),
+    phone: readOptionalString(body.contactPhone) ?? ""
+  });
 
-  if (!branchId || !roomTypeId || !stayStartAt || !stayEndAt || !contactName || !contactEmail || !createdBy) {
+  const contactValidation = validateContactDetails(preferredLocale, contactDetails, { phoneRequired: true });
+  const contactError = getFirstContactDetailsError(contactValidation.errors);
+
+  if (contactError) {
+    throw new Error(contactError);
+  }
+
+  if (!branchId || !roomTypeId || !stayStartAt || !stayEndAt || !createdBy) {
     throw new Error("Missing required booking request fields.");
   }
 
   return {
     branchId,
-    contactEmail,
-    contactName,
-    contactPhone,
+    contactEmail: contactValidation.values.email,
+    contactName: contactValidation.values.fullName,
+    contactPhone: contactValidation.values.phone,
     createdBy,
     guestCount,
     marketingConsent,
@@ -89,6 +101,13 @@ function readBody(body: BookingRequestBody) {
     stayStartAt
   };
 }
+
+const stayDateCopy = {
+  invalid: {
+    vi: "Ngày nhận phòng không hợp lệ. Vui lòng chọn hôm nay hoặc ngày sau.",
+    en: "Check-in date is invalid. Please choose today or later."
+  }
+} as const;
 
 export async function POST(request: Request) {
   let body: BookingRequestBody | null = null;
@@ -113,6 +132,10 @@ export async function POST(request: Request) {
         scope: "api/public/booking-request",
         status: 401
       });
+    }
+
+    if (!isBookingRequestStayWindowValid(input.stayStartAt, input.stayEndAt)) {
+      throw new Error(localize(input.preferredLocale, stayDateCopy.invalid));
     }
 
     const bookingRequest = await submitAvailabilityRequest(input);

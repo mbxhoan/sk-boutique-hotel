@@ -12,9 +12,9 @@ import { getReservationByBookingCode, listReservations } from "@/lib/supabase/qu
 import { getRoomById } from "@/lib/supabase/queries/rooms";
 import { listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
-import { calculateDepositAmount, calculateRemainingBalance, calculateVerifiedDepositAmount, DEFAULT_BOOKING_DEPOSIT_PERCENT } from "@/lib/supabase/booking-finance";
+import { calculateDepositAmount, calculateDepositPercentage, calculateRemainingBalance, calculateVerifiedDepositAmount, DEFAULT_BOOKING_DEPOSIT_PERCENT } from "@/lib/supabase/booking-finance";
 import { buildPaymentUploadPath, buildVietQrImageUrl } from "@/lib/supabase/payments";
-import { releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
+import { releaseExpiredAvailabilityRequests, releaseExpiredHolds, releaseExpiredReservations } from "@/lib/supabase/workflows";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   BranchRow,
@@ -202,6 +202,7 @@ function mapAuditLog(
   const branch = log.branch_id ? branchMap[log.branch_id] : null;
   const entityLabels = {
     availability_request: { en: "Availability request", vi: "Yêu cầu đặt phòng" },
+    customer: { en: "Member profile", vi: "Hồ sơ member" },
     payment_request: { en: "Payment request", vi: "Yêu cầu cọc" },
     reservation: { en: "Reservation", vi: "Reservation" },
     room_hold: { en: "Room hold", vi: "Hold phòng" }
@@ -246,6 +247,7 @@ export type BookingDetailFinancialSummary = {
   default_deposit_percentage: number;
   pending_deposit_amount: number;
   remaining_balance_amount: number;
+  requested_deposit_percentage: number;
   requested_deposit_amount: number;
   total_amount: number;
   verified_deposit_amount: number;
@@ -270,7 +272,19 @@ export type BookingDetailData = {
 };
 
 export async function loadBookingDetailByCode(bookingCode: string): Promise<BookingDetailData | null> {
-  await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
+  const cleanupResults = await Promise.allSettled([
+    releaseExpiredAvailabilityRequests(),
+    releaseExpiredHolds(),
+    releaseExpiredReservations()
+  ]);
+
+  if (cleanupResults.some((result) => result.status === "rejected")) {
+    console.warn("[workflow] Failed to release expired workflow items before loading booking detail", {
+      requests: cleanupResults[0].status === "fulfilled",
+      holds: cleanupResults[1].status === "fulfilled",
+      reservations: cleanupResults[2].status === "fulfilled"
+    });
+  }
 
   const [branches, roomTypes, reservationByCode, requestByCode] = await Promise.all([
     listBranches(),
@@ -459,6 +473,10 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     reservation?.deposit_amount && reservation.deposit_amount > 0
       ? reservation.deposit_amount
       : activePaymentRequest?.amount ?? defaultDepositAmount;
+  const requestedDepositPercentage = calculateDepositPercentage({
+    depositAmount: requestedDepositAmount,
+    totalAmount
+  });
   const pendingDepositAmount = activePaymentRequest?.status === "verified" ? 0 : activePaymentRequest?.amount ?? 0;
 
   return {
@@ -481,6 +499,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
       pending_deposit_amount: pendingDepositAmount,
       remaining_balance_amount: calculateRemainingBalance(totalAmount, verifiedDepositAmount),
       requested_deposit_amount: requestedDepositAmount,
+      requested_deposit_percentage: requestedDepositPercentage,
       total_amount: totalAmount,
       verified_deposit_amount: verifiedDepositAmount
     },

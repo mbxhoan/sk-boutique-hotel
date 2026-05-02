@@ -1,9 +1,11 @@
 "use client";
 
+import { cancelMemberBookingAction } from "@/app/(member)/member/actions";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { useEffect, useState } from "react";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { MemberProfileEditor } from "@/components/member-profile-editor";
 import type { Locale } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import type {
@@ -12,19 +14,23 @@ import type {
   WorkflowPaymentRequest,
   WorkflowReservation
 } from "@/lib/supabase/workflow.types";
+import { canMemberCancelBooking, type MemberBookingKind, type MemberBookingStatus } from "@/lib/supabase/member-booking-policy";
 
 type BookingStage = "urgent" | "waiting" | "active" | "done";
-type BookingKind = "request" | "reservation";
+type BookingKind = MemberBookingKind;
 
 type BookingEntry = {
   anchorId: string;
   bodyNote: LocalizedText;
+  bookingId: string;
+  bookingStatus: MemberBookingStatus;
   code: string;
   createdAt: string;
   detail: LocalizedText;
   guestCount: number;
   kind: BookingKind;
   kindLabel: LocalizedText;
+  canCancel: boolean;
   paymentRequest: WorkflowPaymentRequest | null;
   roomTypeName: LocalizedText;
   stage: BookingStage;
@@ -172,17 +178,31 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
       "Yêu cầu này đã chuyển sang booking.",
       "This request has been converted into a booking."
     );
+  } else if (request.status === "closed") {
+    stage = "done";
+    bodyNote = text(
+      "Yêu cầu này đã được hủy.",
+      "This request has been cancelled."
+    );
+  } else if (request.status === "rejected") {
+    stage = "done";
+    bodyNote = text(
+      "Yêu cầu này đã bị từ chối.",
+      "This request was rejected."
+    );
   } else {
     stage = "done";
     bodyNote = text(
-      "Yêu cầu này đã đóng.",
-      "This request is no longer open."
+      "Yêu cầu này đã hết hạn.",
+      "This request has expired."
     );
   }
 
   return {
     anchorId: `booking-request-${request.id}`,
     bodyNote,
+    bookingId: request.id,
+    bookingStatus: request.status,
     code: request.request_code,
     createdAt: request.created_at,
     detail: text(
@@ -192,6 +212,7 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
     guestCount: request.guest_count,
     kind: "request",
     kindLabel: text("Yêu cầu", "Request"),
+    canCancel: canMemberCancelBooking("request", request.status),
     paymentRequest: null,
     totalAmount: request.quoted_total_amount ?? null,
     roomTypeName: text(request.room_type_name_vi, request.room_type_name_en),
@@ -203,11 +224,11 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
         : request.status === "in_review"
           ? "Đang xem xét"
           : request.status === "quoted"
-            ? "Đã báo giá"
+            ? "Đã tiếp nhận"
             : request.status === "converted"
               ? "Đã chuyển đổi"
               : request.status === "closed"
-                ? "Đã đóng"
+                ? "Đã hủy"
                 : request.status === "rejected"
                   ? "Từ chối"
                   : "Hết hạn",
@@ -215,12 +236,12 @@ function buildRequestEntry(request: WorkflowAvailabilityRequest): BookingEntry {
         ? "New"
         : request.status === "in_review"
           ? "In review"
-          : request.status === "quoted"
-            ? "Quoted"
+        : request.status === "quoted"
+            ? "Received"
             : request.status === "converted"
               ? "Converted"
               : request.status === "closed"
-                ? "Closed"
+                ? "Cancelled"
                 : request.status === "rejected"
                   ? "Rejected"
                   : "Expired"
@@ -265,11 +286,23 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
       "Booking đã được xác nhận.",
       "The booking has been confirmed."
     );
-  } else {
+  } else if (reservation.status === "cancelled") {
+    stage = "done";
+    bodyNote = text(
+      "Booking này đã bị hủy.",
+      "This booking has been cancelled."
+    );
+  } else if (reservation.status === "completed") {
     stage = "done";
     bodyNote = text(
       "Booking này đã hoàn tất.",
       "This booking is complete."
+    );
+  } else {
+    stage = "done";
+    bodyNote = text(
+      "Booking này đã hết hạn.",
+      "This booking has expired."
     );
   }
 
@@ -289,6 +322,8 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
   return {
     anchorId: `booking-reservation-${reservation.id}`,
     bodyNote,
+    bookingId: reservation.id,
+    bookingStatus: reservation.status,
     code: reservation.booking_code,
     createdAt: reservation.created_at,
     detail: text(
@@ -298,6 +333,7 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
     guestCount: reservation.guest_count,
     kind: "reservation",
     kindLabel: text("Booking", "Booking"),
+    canCancel: canMemberCancelBooking("reservation", reservation.status),
     paymentRequest,
     totalAmount: reservation.total_amount,
     roomTypeName: text(reservation.primary_room_type_name_vi, reservation.primary_room_type_name_en),
@@ -509,6 +545,15 @@ function BookingCard({ entry, locale }: BookingCardProps) {
   const paymentRequest = entry.paymentRequest;
   const showPaymentPanel = paymentRequest?.status === "sent" && entry.kind === "reservation" && entry.stage !== "active" && entry.stage !== "done";
   const returnTo = `/member#${entry.anchorId}`;
+  const cancelLabel =
+    locale === "en" ? (entry.kind === "request" ? "Cancel request" : "Cancel booking") : entry.kind === "request" ? "Hủy yêu cầu" : "Hủy booking";
+  const cancelConfirmMessage = localize(locale, {
+    vi: entry.kind === "request" ? "Bạn có chắc muốn hủy yêu cầu này không? Thao tác này không thể hoàn tác." : "Bạn có chắc muốn hủy booking này không? Thao tác này không thể hoàn tác.",
+    en:
+      entry.kind === "request"
+        ? "Are you sure you want to cancel this request? This cannot be undone."
+        : "Are you sure you want to cancel this booking? This cannot be undone."
+  });
 
   return (
     <details className={`member-booking-card member-booking-card--${entry.stage}`} id={entry.anchorId}>
@@ -605,6 +650,30 @@ function BookingCard({ entry, locale }: BookingCardProps) {
             </p>
           </div>
         )}
+
+        {entry.canCancel ? (
+          <form
+            action={cancelMemberBookingAction}
+            className="member-booking-card__actions"
+            onSubmit={(event) => {
+              if (!window.confirm(cancelConfirmMessage)) {
+                event.preventDefault();
+              }
+            }}
+          >
+            <input name="bookingId" type="hidden" value={entry.bookingId} />
+            <input name="bookingKind" type="hidden" value={entry.kind} />
+            <input name="locale" type="hidden" value={locale} />
+            <input name="returnTo" type="hidden" value={returnTo} />
+
+            <PortalSubmitButton
+              className="button member-booking-card__danger-button"
+              pendingLabel={locale === "en" ? "Cancelling..." : "Đang hủy..."}
+            >
+              {cancelLabel}
+            </PortalSubmitButton>
+          </form>
+        ) : null}
       </div>
     </details>
   );
@@ -748,8 +817,8 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
       <section className="member-portal-section" id="info">
         <PortalSectionHeading
           description={{
-            vi: "Thông tin cá nhân, liên hệ, và marketing consent được tách riêng để dễ quản lý.",
-            en: "Personal details, contact data, and marketing consent are kept separate for easier management."
+            vi: "Thông tin cá nhân, liên hệ được cập nhật tại đây.",
+            en: "Personal details, contact data are updated here."
           }}
           eyebrow={{
             vi: "Thông tin",
@@ -762,43 +831,7 @@ export function MemberHistoryDashboard({ data, locale, customerNameFallback }: M
           }}
         />
 
-        <PortalCard className="member-profile-card" tone="accent">
-          <dl className="portal-profile-list">
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Full name" : "Ho ten"}</dt>
-              <dd className="portal-profile-list__value">{customerDisplayName}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Email" : "Email"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.email}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Phone" : "Số điện thoại"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.phone ?? "—"}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Preferred locale" : "Ngôn ngữ"}</dt>
-              <dd className="portal-profile-list__value">{data.customer.preferred_locale.toUpperCase()}</dd>
-            </div>
-            <div className="portal-profile-list__item">
-              <dt className="portal-profile-list__label">{locale === "en" ? "Marketing consent" : "Marketing consent"}</dt>
-              <dd className="portal-profile-list__value">
-                {data.customer.marketing_consent ? (locale === "en" ? "Enabled" : "Đã đồng ý") : locale === "en" ? "Disabled" : "Chưa đồng ý"}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="member-profile-card__note">
-            <PortalBadge tone="soft">
-              {data.customer.marketing_consent ? (locale === "en" ? "Consent logged" : "Đã ghi nhận") : locale === "en" ? "Consent off" : "Chưa đồng ý"}
-            </PortalBadge>
-            <p className="member-profile-card__copy">
-              {locale === "en"
-                ? "Consent is stored separately from booking history and deposit workflows."
-                : "Consent được lưu riêng với lịch sử booking và luồng thanh toán."}
-            </p>
-          </div>
-        </PortalCard>
+        <MemberProfileEditor customer={data.customer} locale={locale} />
       </section>
     </div>
   );

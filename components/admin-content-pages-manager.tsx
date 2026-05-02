@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { MediaPreviewImage } from "@/components/media-preview-image";
 import { PortalBadge, PortalCard } from "@/components/portal-ui";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import type { Locale } from "@/lib/locale";
@@ -409,10 +410,11 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
         <div className="admin-content__media-grid">
           {mediaAssets.map((asset) => (
             <figure className="admin-content__media-thumb" key={asset.id}>
-              <img
+              <MediaPreviewImage
                 alt={locale === "en" ? asset.alt_en || asset.title_en || asset.slug : asset.alt_vi || asset.title_vi || asset.slug}
                 className="admin-content__media-image"
                 loading="lazy"
+                fallbackSrc={asset.fallback_url || "/home/block.jpg"}
                 src={asset.public_url || asset.fallback_url || "/home/block.jpg"}
               />
             </figure>
