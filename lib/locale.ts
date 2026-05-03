@@ -127,6 +127,18 @@ export function resolveLocale(input?: string | null): Locale {
   return input?.toLowerCase() === "en" ? "en" : defaultLocale;
 }
 
+export function resolveLocaleFromUrl(input?: string | null): Locale {
+  if (!input) {
+    return defaultLocale;
+  }
+
+  try {
+    return resolveLocale(new URL(input, "https://sk-boutique-hotel.local").searchParams.get(localeQueryKey));
+  } catch {
+    return defaultLocale;
+  }
+}
+
 export function readLocaleFromFormData(formData: FormData): Locale {
   const value = formData.get("locale");
 

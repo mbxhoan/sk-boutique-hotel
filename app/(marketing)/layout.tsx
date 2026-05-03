@@ -12,18 +12,20 @@ export default async function MarketingLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const homePageCopy = await loadHomePageCopy();
+  const homePageCopyPromise = loadHomePageCopy();
 
   if (process.env.NEXT_PHASE !== "phase-production-build") {
-    const releaseResults = await Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]);
-
-    if (releaseResults.some((result) => result.status === "rejected")) {
-      console.warn("[workflow] Failed to release expired holds/reservations before loading marketing layout", {
-        holds: releaseResults[0].status === "fulfilled",
-        reservations: releaseResults[1].status === "fulfilled"
-      });
-    }
+    void Promise.allSettled([releaseExpiredHolds(), releaseExpiredReservations()]).then((releaseResults) => {
+      if (releaseResults.some((result) => result.status === "rejected")) {
+        console.warn("[workflow] Failed to release expired holds/reservations before loading marketing layout", {
+          holds: releaseResults[0].status === "fulfilled",
+          reservations: releaseResults[1].status === "fulfilled"
+        });
+      }
+    });
   }
+
+  const homePageCopy = await homePageCopyPromise;
 
   return (
     <>
