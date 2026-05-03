@@ -49,7 +49,7 @@ export const emailTemplateTestOptions: Array<{
 
 const sampleBrand: BrandConfig = {
   brandLine: "SK Boutique Hotel",
-  contactEmail: "admin@bkhanhxinh.com",
+  contactEmail: "service@skhotel.com.vn",
   contactPhone: "0908 233 583",
   hotelName: "SK Boutique Hotel"
 };
