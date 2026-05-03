@@ -21,7 +21,7 @@ type RoomView = RoomRow & {
 };
 
 type FloorOption = Pick<FloorRow, "code" | "id" | "name_en" | "name_vi">;
-type RoomTypeOption = Pick<RoomTypeRow, "id" | "name_en" | "name_vi">;
+type RoomTypeOption = Pick<RoomTypeRow, "base_price" | "id" | "manual_override_price" | "name_en" | "name_vi" | "weekend_surcharge">;
 type RoomBookingSummary = {
   bookingCode: string;
   customerName: string;
@@ -130,6 +130,27 @@ function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   return `${formatter.format(new Date(startAt))} → ${formatter.format(new Date(endAt))}`;
 }
 
+function calculateNights(startAt: string, endAt: string) {
+  const diffMs = new Date(endAt).getTime() - new Date(startAt).getTime();
+
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.round(diffMs / 86_400_000));
+}
+
+function calculateManualBookingTotalAmount(roomType: RoomTypeOption | null, startAt: string, endAt: string) {
+  if (!roomType) {
+    return 0;
+  }
+
+  const nights = calculateNights(startAt, endAt);
+  const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
+
+  return Number(Math.max(0, nightlyRate * nights + roomType.weekend_surcharge).toFixed(0));
+}
+
 function bookingStatusLabel(locale: Locale, status: string) {
   const labels: Record<Locale, Record<string, string>> = {
     en: {
@@ -154,6 +175,7 @@ function bookingStatusLabel(locale: Locale, status: string) {
 function ManualReservationForm({
   branchId,
   locale,
+  roomTypes,
   returnToHref,
   room,
   selectedEndDate,
@@ -161,11 +183,15 @@ function ManualReservationForm({
 }: {
   branchId: string;
   locale: Locale;
+  roomTypes: RoomTypeOption[];
   returnToHref: string;
   room: RoomView;
   selectedEndDate: string;
   selectedStartDate: string;
 }) {
+  const selectedRoomType = roomTypes.find((roomType) => roomType.id === room.room_type_id) ?? null;
+  const suggestedTotalAmount = calculateManualBookingTotalAmount(selectedRoomType, selectedStartDate, selectedEndDate);
+
   return (
     <div className="admin-rooms__manual-booking">
       <div className="admin-rooms__section-head">
@@ -176,6 +202,12 @@ function ManualReservationForm({
         {localize(locale, {
           vi: "Tạo booking thủ công sẽ chặn phòng trong khoảng ngày đang lọc và cập nhật số phòng còn lại trên web.",
           en: "Creating a manual booking blocks the room for the selected range and updates remaining-room counts on the public site."
+        })}
+      </p>
+      <p className="admin-rooms__booking-empty" style={{ marginTop: "-0.25rem" }}>
+        {localize(locale, {
+          vi: "Booking thủ công không dùng cọc. Nhập 0 nếu khách chưa thanh toán gì.",
+          en: "Manual bookings do not use a deposit. Enter 0 if nothing has been collected yet."
         })}
       </p>
 
@@ -224,6 +256,17 @@ function ManualReservationForm({
           <label className="portal-field">
             <span className="portal-field__label">{localize(locale, { vi: "Số khách", en: "Guests" })}</span>
             <input className="portal-field__control" defaultValue={1} min={1} name="guestCount" type="number" />
+          </label>
+        </div>
+
+        <div className="portal-grid portal-grid--two">
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Tổng giá trị booking", en: "Booking total value" })}</span>
+            <input className="portal-field__control" defaultValue={suggestedTotalAmount} min={0} name="totalAmount" step="0.01" type="number" />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{localize(locale, { vi: "Số tiền đã nhận", en: "Received amount" })}</span>
+            <input className="portal-field__control" defaultValue={0} min={0} name="depositAmount" step="0.01" type="number" />
           </label>
         </div>
 
@@ -638,6 +681,7 @@ export function AdminRoomsPage({
             <ManualReservationForm
               branchId={branchId}
               locale={locale}
+              roomTypes={roomTypes}
               returnToHref={manualBookingHref}
               room={selectedRoom}
               selectedEndDate={selectedEndDate}

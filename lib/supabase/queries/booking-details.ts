@@ -346,6 +346,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
           room_type_name_en: mappedReservation.primary_room_type_name_en,
           room_type_name_vi: mappedReservation.primary_room_type_name_vi,
           source: "reservation" as const,
+          deposit_amount: mappedReservation.deposit_amount,
           status: mappedReservation.status,
         stay_end_at: mappedReservation.stay_end_at,
         stay_start_at: mappedReservation.stay_start_at,
@@ -369,6 +370,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
           room_type_name_en: mappedRequest.room_type_name_en,
           room_type_name_vi: mappedRequest.room_type_name_vi,
           source: "availability_request" as const,
+          deposit_amount: null,
           status: mappedRequest.status,
           stay_end_at: mappedRequest.stay_end_at,
           stay_start_at: mappedRequest.stay_start_at,
@@ -452,7 +454,9 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
         ).map((availableRoom) => mapRoomSuggestion(availableRoom, branchMap, roomTypeMap))
       : [];
   const totalAmount = booking.total_amount;
-  const verifiedDepositAmount = calculateVerifiedDepositAmount(paymentRequestViews);
+  const isManualReservation = reservation?.source === "admin_manual_booking";
+  const manualReceivedAmount = isManualReservation ? Number(Math.max(0, reservation?.deposit_amount ?? 0).toFixed(2)) : 0;
+  const verifiedDepositAmount = isManualReservation ? manualReceivedAmount : calculateVerifiedDepositAmount(paymentRequestViews);
   const activePaymentRequest =
     paymentRequestViews.find((paymentRequest) => ["pending_verification", "sent"].includes(paymentRequest.status)) ??
     paymentRequestViews[0] ??
@@ -466,18 +470,23 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     }
   }
 
-  const defaultDepositAmount = calculateDepositAmount({
-    totalAmount
-  });
-  const requestedDepositAmount =
-    reservation?.deposit_amount && reservation.deposit_amount > 0
+  const defaultDepositAmount = isManualReservation
+    ? 0
+    : calculateDepositAmount({
+        totalAmount
+      });
+  const requestedDepositAmount = isManualReservation
+    ? 0
+    : reservation?.deposit_amount && reservation.deposit_amount > 0
       ? reservation.deposit_amount
       : activePaymentRequest?.amount ?? defaultDepositAmount;
-  const requestedDepositPercentage = calculateDepositPercentage({
-    depositAmount: requestedDepositAmount,
-    totalAmount
-  });
-  const pendingDepositAmount = activePaymentRequest?.status === "verified" ? 0 : activePaymentRequest?.amount ?? 0;
+  const requestedDepositPercentage = isManualReservation
+    ? 0
+    : calculateDepositPercentage({
+        depositAmount: requestedDepositAmount,
+        totalAmount
+      });
+  const pendingDepositAmount = isManualReservation ? 0 : activePaymentRequest?.status === "verified" ? 0 : activePaymentRequest?.amount ?? 0;
 
   return {
     audit_logs: Array.from(auditLogs),
@@ -495,7 +504,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     financial_summary: {
       active_payment_request_id: activePaymentRequest?.id ?? null,
       default_deposit_amount: defaultDepositAmount,
-      default_deposit_percentage: DEFAULT_BOOKING_DEPOSIT_PERCENT,
+      default_deposit_percentage: isManualReservation ? 0 : DEFAULT_BOOKING_DEPOSIT_PERCENT,
       pending_deposit_amount: pendingDepositAmount,
       remaining_balance_amount: calculateRemainingBalance(totalAmount, verifiedDepositAmount),
       requested_deposit_amount: requestedDepositAmount,

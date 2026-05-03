@@ -183,12 +183,26 @@ function getStatValue(data: WorkflowDashboardData, labelEn: string) {
   return Number(data.stats.find((stat) => stat.label_en === labelEn)?.value ?? 0);
 }
 
+function getCollectedDepositAmount(reservation: WorkflowDashboardData["recent_reservations"][number]) {
+  if (reservation.status !== "confirmed" && reservation.status !== "completed") {
+    return 0;
+  }
+
+  const depositAmount = reservation.deposit_amount ?? 0;
+
+  return Math.max(0, Math.min(depositAmount, reservation.total_amount ?? 0));
+}
+
+function getRemainingBalanceAmount(reservation: WorkflowDashboardData["recent_reservations"][number]) {
+  return Math.max(0, (reservation.total_amount ?? 0) - getCollectedDepositAmount(reservation));
+}
+
 function buildMetricCards(data: WorkflowDashboardData, locale: Locale): DashboardMetricBlueprint[] {
   const confirmedReservations = data.recent_reservations.filter((reservation) => ["confirmed", "completed"].includes(reservation.status));
   const totalBookings = data.recent_reservations.length;
-  const revenue = confirmedReservations.reduce((sum, reservation) => sum + (reservation.total_amount ?? 0), 0);
+  const collectedDeposit = confirmedReservations.reduce((sum, reservation) => sum + getCollectedDepositAmount(reservation), 0);
+  const remainingBalance = confirmedReservations.reduce((sum, reservation) => sum + getRemainingBalanceAmount(reservation), 0);
   const activeHolds = getStatValue(data, "Active holds");
-  const pendingRequests = getStatValue(data, "Open requests");
 
   return [
     {
@@ -212,20 +226,39 @@ function buildMetricCards(data: WorkflowDashboardData, locale: Locale): Dashboar
     },
     {
       detail: {
-        vi: "từ booking đã xác nhận",
-        en: "from confirmed bookings"
+        vi: "từ booking đã xác nhận hoặc hoàn tất",
+        en: "from confirmed or completed bookings"
       },
       icon: "payments",
       label: {
-        vi: "Doanh thu",
-        en: "Revenue"
+        vi: "Cọc đã thu",
+        en: "Deposit collected"
       },
       tone: "default",
       trend: {
         vi: "VND",
         en: "VND"
       },
-      value: formatMoneyVnd(locale, revenue)
+      value: formatMoneyVnd(locale, collectedDeposit)
+    },
+    {
+      detail: {
+        vi: "booking đã xác nhận hoặc hoàn tất nhưng chưa thu đủ",
+        en: "confirmed or completed bookings still owing"
+      },
+      icon: "pending",
+      label: {
+        vi: "Còn phải thu",
+        en: "Remaining balance"
+      },
+      tone: "warning",
+      trend: {
+        vi: "VND",
+        en: "VND"
+      },
+      value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
+        maximumFractionDigits: 0
+      }).format(remainingBalance)
     },
     {
       detail: {
@@ -245,25 +278,6 @@ function buildMetricCards(data: WorkflowDashboardData, locale: Locale): Dashboar
       value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
         maximumFractionDigits: 0
       }).format(activeHolds)
-    },
-    {
-      detail: {
-        vi: "từ inbox thật",
-        en: "from the live inbox"
-      },
-      icon: "pending",
-      label: {
-        vi: "Yêu cầu chờ",
-        en: "Pending requests"
-      },
-      tone: "warning",
-      trend: {
-        vi: "Cần xử lý",
-        en: "Action required"
-      },
-      value: new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN", {
-        maximumFractionDigits: 0
-      }).format(pendingRequests)
     }
   ];
 }

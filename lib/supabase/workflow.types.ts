@@ -101,6 +101,7 @@ export type WorkflowBookingRow = {
   guest_count: number;
   id: string;
   notes: string;
+  deposit_amount: number | null;
   room_code: string | null;
   room_type_id: string;
   room_type_name_en: string;

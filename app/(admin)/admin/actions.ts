@@ -65,6 +65,22 @@ const copy = {
     vi: "Không tìm thấy booking.",
     en: "Booking was not found."
   },
+  manualBookingFinancialsUpdated: {
+    vi: "Đã cập nhật tổng giá trị và số tiền đã nhận của booking thủ công.",
+    en: "Manual booking amounts have been updated."
+  },
+  unableToUpdateManualBookingFinancials: {
+    vi: "Không thể cập nhật số tiền booking thủ công.",
+    en: "Unable to update manual booking amounts."
+  },
+  manualBookingTotalAmountMustBeGreaterThanZero: {
+    vi: "Tổng giá trị booking phải lớn hơn 0.",
+    en: "Booking total value must be greater than zero."
+  },
+  manualBookingIsOnlyEditableForManualSource: {
+    vi: "Chỉ booking thủ công mới có thể chỉnh số tiền theo cách này.",
+    en: "Only manual bookings can be adjusted this way."
+  },
   depositEmailSentAgain: {
     vi: "Email deposit đã được gửi lại.",
     en: "Deposit email sent again."
@@ -193,6 +209,13 @@ function resolveManualReservationErrorMessage(error: unknown): LocalizedText {
     return copy.unableToCreateManualReservation;
   }
 
+  if (
+    detail.includes(copy.manualBookingTotalAmountMustBeGreaterThanZero.vi) ||
+    detail.includes(copy.manualBookingTotalAmountMustBeGreaterThanZero.en)
+  ) {
+    return copy.manualBookingTotalAmountMustBeGreaterThanZero;
+  }
+
   if (detail.includes("Reservation stay window is invalid.")) {
     return copy.invalidManualReservationStayWindow;
   }
@@ -200,6 +223,37 @@ function resolveManualReservationErrorMessage(error: unknown): LocalizedText {
   return {
     en: `${copy.unableToCreateManualReservation.en} Details: ${detail}`,
     vi: `${copy.unableToCreateManualReservation.vi} Chi tiết: ${detail}`
+  };
+}
+
+function resolveManualBookingFinancialsErrorMessage(error: unknown): LocalizedText {
+  const detail = getErrorMessage(error, "").trim();
+
+  if (!detail) {
+    return copy.unableToUpdateManualBookingFinancials;
+  }
+
+  if (detail.includes(copy.bookingNotFound.vi) || detail.includes(copy.bookingNotFound.en)) {
+    return copy.bookingNotFound;
+  }
+
+  if (
+    detail.includes(copy.manualBookingTotalAmountMustBeGreaterThanZero.vi) ||
+    detail.includes(copy.manualBookingTotalAmountMustBeGreaterThanZero.en)
+  ) {
+    return copy.manualBookingTotalAmountMustBeGreaterThanZero;
+  }
+
+  if (
+    detail.includes(copy.manualBookingIsOnlyEditableForManualSource.vi) ||
+    detail.includes(copy.manualBookingIsOnlyEditableForManualSource.en)
+  ) {
+    return copy.manualBookingIsOnlyEditableForManualSource;
+  }
+
+  return {
+    en: `${copy.unableToUpdateManualBookingFinancials.en} Details: ${detail}`,
+    vi: `${copy.unableToUpdateManualBookingFinancials.vi} Chi tiết: ${detail}`
   };
 }
 
@@ -449,7 +503,7 @@ export async function createManualReservationAction(formData: FormData) {
       );
     }
 
-    const customer = await ensureCustomerByEmail({
+  const customer = await ensureCustomerByEmail({
       email: customerEmail,
       fullName: customerName,
       phone: customerPhone,
@@ -458,14 +512,22 @@ export async function createManualReservationAction(formData: FormData) {
     });
     const nights = calculateNights(stayStartAt, stayEndAt);
     const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
-    const totalAmount = Number((nightlyRate * nights + roomType.weekend_surcharge).toFixed(2));
+    const fallbackTotalAmount = Number((nightlyRate * nights + roomType.weekend_surcharge).toFixed(2));
+    const totalAmount = Number(Math.max(0, readOptionalNumber(formData, "totalAmount") ?? fallbackTotalAmount).toFixed(2));
+
+    if (totalAmount <= 0) {
+      throw new Error(localize(locale, copy.manualBookingTotalAmountMustBeGreaterThanZero));
+    }
+
+    const depositAmountInput = readOptionalNumber(formData, "depositAmount") ?? 0;
+    const depositAmount = Number(Math.min(Math.max(0, depositAmountInput), totalAmount).toFixed(2));
     const reservation = await createReservation({
       actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
       basePrice: roomType.base_price,
       branchId,
       createdBy: user?.id ?? readOptionalString(formData, "createdBy"),
       customerId: customer.id,
-      depositAmount: 0,
+      depositAmount,
       guestCount,
       manualOverridePrice: roomType.manual_override_price,
       nightlyRate,
@@ -491,6 +553,30 @@ export async function createManualReservationAction(formData: FormData) {
     if (confirmUpdateError) {
       throw confirmUpdateError;
     }
+
+    try {
+      await logAuditEvent({
+        action: "reservation.manual_created",
+        actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+        actorUserId: user?.id ?? readOptionalString(formData, "createdBy"),
+        branchId,
+        customerId: customer.id,
+        entityId: reservation.id,
+        entityType: "reservation",
+        reservationId: reservation.id,
+        summary: localize(locale, {
+          vi: `Đã tạo booking thủ công ${reservation.booking_code} với tổng ${formatMoneyVnd(totalAmount)} và đã nhận ${formatMoneyVnd(depositAmount)}.`,
+          en: `Manual booking ${reservation.booking_code} was created with total ${formatMoneyVnd(totalAmount)} and received ${formatMoneyVnd(depositAmount)}.`
+        }),
+        metadata: {
+          deposit_amount: depositAmount,
+          reservation_source: "admin_manual_booking",
+          total_amount: totalAmount
+        }
+      });
+    } catch (auditError) {
+      console.warn("[admin] Failed to write manual booking audit log", auditError);
+    }
   } catch (error) {
     console.warn("[admin] Failed to create manual reservation", error);
     redirectWithActionResult(returnTo, "error", resolveManualReservationErrorMessage(error));
@@ -507,6 +593,83 @@ export async function createManualReservationAction(formData: FormData) {
     "success",
     localize(locale, { vi: "Đã đánh dấu phòng là đã đặt.", en: "Room has been marked as booked." })
   );
+}
+
+export async function updateManualReservationFinancialsAction(formData: FormData) {
+  const locale = readLocaleFromFormData(formData);
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const reservationId = readRequiredString(formData, "reservationId");
+  const totalAmountInput = readOptionalNumber(formData, "totalAmount") ?? 0;
+  const depositAmountInput = readOptionalNumber(formData, "depositAmount") ?? 0;
+  const reservation = await getReservationById(reservationId);
+  const reservationBookingCode = reservation?.booking_code ?? "";
+
+  try {
+    if (!reservation) {
+      throw new Error(localize(locale, copy.bookingNotFound));
+    }
+
+    if (reservation.source !== "admin_manual_booking") {
+      throw new Error(localize(locale, copy.manualBookingIsOnlyEditableForManualSource));
+    }
+
+    const totalAmount = Number(Math.max(0, totalAmountInput).toFixed(2));
+
+    if (totalAmount <= 0) {
+      throw new Error(localize(locale, copy.manualBookingTotalAmountMustBeGreaterThanZero));
+    }
+
+    const depositAmount = Number(Math.min(Math.max(0, depositAmountInput), totalAmount).toFixed(2));
+    const supabase = createSupabaseServiceClient();
+    const { error: updateError } = await supabase
+      .from("reservations")
+      .update({
+        deposit_amount: depositAmount,
+        total_amount: totalAmount,
+        updated_by: user?.id ?? readOptionalString(formData, "actorUserId")
+      })
+      .eq("id", reservation.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    try {
+      await logAuditEvent({
+        action: "reservation.manual_financials_updated",
+        actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+        actorUserId: user?.id ?? readOptionalString(formData, "actorUserId"),
+        branchId: reservation.branch_id,
+        customerId: reservation.customer_id,
+        entityId: reservation.id,
+        entityType: "reservation",
+        reservationId: reservation.id,
+        summary: localize(locale, {
+          vi: `Đã cập nhật booking thủ công ${reservation.booking_code}: tổng ${formatMoneyVnd(totalAmount)}, đã nhận ${formatMoneyVnd(depositAmount)}.`,
+          en: `Updated manual booking ${reservation.booking_code}: total ${formatMoneyVnd(totalAmount)}, received ${formatMoneyVnd(depositAmount)}.`
+        }),
+        metadata: {
+          deposit_amount: depositAmount,
+          reservation_source: reservation.source,
+          total_amount: totalAmount
+        }
+      });
+    } catch (auditError) {
+      console.warn("[admin] Failed to write manual booking financial audit log", auditError);
+    }
+  } catch (error) {
+    console.warn("[admin] Failed to update manual booking financials", error);
+    redirectWithActionResult(returnTo, "error", resolveManualBookingFinancialsErrorMessage(error));
+    throw error;
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/bookings");
+  revalidatePath(`/admin/bookings/${reservationBookingCode}`);
+  revalidatePath("/member");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.manualBookingFinancialsUpdated));
 }
 
 export async function confirmAvailabilityRequestAction(formData: FormData) {

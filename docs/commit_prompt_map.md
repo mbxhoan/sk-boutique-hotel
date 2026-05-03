@@ -1715,3 +1715,24 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/mock/member-dashboard.ts`
   - `lib/mock/public-cms.ts`
   - `next.config.ts`
+
+### Entry 148
+- `time`: 2026-05-03T23:28:15+07:00
+- `prompt_summary`: Form booking public đang tái dùng session member cũ khi nhập thông tin khác, và báo cáo doanh thu admin đang cộng full total_amount thay vì số cọc đã thu và số còn phải thu.
+- `commit_message`: `fix(bookings): reset guest session and report collected balances`
+- `main_files`:
+  - `app/(admin)/admin/bookings/page.tsx`
+  - `components/admin-bookings-page.tsx`
+  - `components/admin-dashboard.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `lib/supabase/queries/booking-details.ts`
+
+### Entry 149
+- `time`: 2026-05-04T00:17:51+07:00
+- `prompt_summary`: Booking thủ công trên admin portal cần mặc định không cọc, cho phép staff chỉnh tổng giá trị booking và số tiền đã nhận, đồng thời booking detail phải hiển thị đúng số tiền manual thay vì suy ra 20% deposit.
+- `commit_message`: `feat(manual-booking): allow custom totals and received amounts`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `lib/supabase/queries/booking-details.ts`

@@ -10,6 +10,7 @@ import {
   reissueDepositPaymentRequestAction,
   resendDepositRequestEmailAction,
   releaseExpiredHoldsAction,
+  updateManualReservationFinancialsAction,
   updateAvailabilityRequestStatusAction,
   updateReservationLifecycleAction
 } from "@/app/(admin)/admin/actions";
@@ -178,6 +179,10 @@ function formatConsent(locale: Locale, value: boolean | null | undefined) {
     : localize(locale, { vi: "Chưa đồng ý", en: "Not consented" });
 }
 
+function isManualReservation(detail: BookingDetailData) {
+  return detail.reservation?.source === "admin_manual_booking";
+}
+
 function getWorkflowTitle(detail: BookingDetailData, locale: Locale) {
   const activePaymentRequest =
     detail.payment_requests.find((paymentRequest) => ["sent", "pending_verification"].includes(paymentRequest.status)) ?? null;
@@ -198,12 +203,26 @@ function getWorkflowTitle(detail: BookingDetailData, locale: Locale) {
     });
   }
 
+  if (isManualReservation(detail) && detail.reservation?.status === "completed") {
+    return localize(locale, {
+      vi: "Booking thủ công đã hoàn tất.",
+      en: "The manual booking has been completed."
+    });
+  }
+
   if (detail.reservation?.status === "completed") {
     return localize(locale, { vi: "Booking đã hoàn tất", en: "Booking completed" });
   }
 
   if (detail.reservation?.status === "cancelled" || detail.booking.status === "rejected") {
     return localize(locale, { vi: "Booking đã hủy", en: "Booking cancelled" });
+  }
+
+  if (isManualReservation(detail) && detail.reservation?.status === "confirmed") {
+    return localize(locale, {
+      vi: "Booking thủ công đã được ghi nhận và xác nhận.",
+      en: "The manual booking has been recorded and confirmed."
+    });
   }
 
   if (detail.reservation?.status === "confirmed") {
@@ -365,47 +384,75 @@ function HeroMetrics({
   locale: Locale;
 }) {
   const nights = calculateNights(detail.booking.stay_start_at, detail.booking.stay_end_at);
-  const requestedDepositPercentage = detail.financial_summary.requested_deposit_percentage;
-  const metrics = [
-    {
-      label: locale === "en" ? "Booking value" : "Giá trị booking",
-      note: locale === "en" ? `${nights} nights` : `${nights} đêm`,
-      tone: "accent",
-      value: formatMoney(locale, detail.financial_summary.total_amount)
-    },
-    {
-      label: locale === "en" ? "Deposit target" : "Mục tiêu cọc",
-      note:
-        detail.financial_summary.active_payment_request_id
-          ? locale === "en"
-            ? `${requestedDepositPercentage}% current`
-            : `${requestedDepositPercentage}% hiện tại`
-          : locale === "en"
-            ? `${detail.financial_summary.default_deposit_percentage}% default`
-            : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
-      tone: "soft",
-      value: formatMoney(locale, detail.financial_summary.requested_deposit_amount)
-    },
-    {
-      label: locale === "en" ? "Verified deposit" : "Cọc đã nhận",
-      note:
-        detail.financial_summary.verified_deposit_amount > 0
-          ? locale === "en"
-            ? "Manual verification completed"
-            : "Đã xác nhận thủ công"
-          : locale === "en"
-            ? "Waiting for verification"
-            : "Đang chờ xác nhận",
-      tone: "default",
-      value: formatMoney(locale, detail.financial_summary.verified_deposit_amount)
-    },
-    {
-      label: locale === "en" ? "Remaining balance" : "Số tiền còn lại",
-      note: statusLabel(locale, detail.reservation?.status ?? detail.booking.status),
-      tone: "default",
-      value: formatMoney(locale, detail.financial_summary.remaining_balance_amount)
-    }
-  ] as const;
+  const manualReservation = isManualReservation(detail);
+  const metrics = manualReservation
+    ? ([
+        {
+          label: locale === "en" ? "Booking value" : "Giá trị booking",
+          note: locale === "en" ? `${nights} nights` : `${nights} đêm`,
+          tone: "accent",
+          value: formatMoney(locale, detail.financial_summary.total_amount)
+        },
+        {
+          label: locale === "en" ? "Received amount" : "Số tiền đã nhận",
+          note:
+            detail.financial_summary.verified_deposit_amount > 0
+              ? locale === "en"
+                ? "Recorded manually"
+                : "Đã ghi nhận thủ công"
+              : locale === "en"
+                ? "Nothing collected yet"
+                : "Chưa thu tiền",
+          tone: "soft",
+          value: formatMoney(locale, detail.financial_summary.verified_deposit_amount)
+        },
+        {
+          label: locale === "en" ? "Remaining balance" : "Số tiền còn lại",
+          note: locale === "en" ? "Manual booking" : "Booking thủ công",
+          tone: "default",
+          value: formatMoney(locale, detail.financial_summary.remaining_balance_amount)
+        }
+      ] as const)
+    : ([
+        {
+          label: locale === "en" ? "Booking value" : "Giá trị booking",
+          note: locale === "en" ? `${nights} nights` : `${nights} đêm`,
+          tone: "accent",
+          value: formatMoney(locale, detail.financial_summary.total_amount)
+        },
+        {
+          label: locale === "en" ? "Deposit target" : "Mục tiêu cọc",
+          note:
+            detail.financial_summary.active_payment_request_id
+              ? locale === "en"
+                ? `${detail.financial_summary.requested_deposit_percentage}% current`
+                : `${detail.financial_summary.requested_deposit_percentage}% hiện tại`
+              : locale === "en"
+                ? `${detail.financial_summary.default_deposit_percentage}% default`
+                : `Mặc định ${detail.financial_summary.default_deposit_percentage}%`,
+          tone: "soft",
+          value: formatMoney(locale, detail.financial_summary.requested_deposit_amount)
+        },
+        {
+          label: locale === "en" ? "Verified deposit" : "Cọc đã nhận",
+          note:
+            detail.financial_summary.verified_deposit_amount > 0
+              ? locale === "en"
+                ? "Manual verification completed"
+                : "Đã xác nhận thủ công"
+              : locale === "en"
+                ? "Waiting for verification"
+                : "Đang chờ xác nhận",
+          tone: "default",
+          value: formatMoney(locale, detail.financial_summary.verified_deposit_amount)
+        },
+        {
+          label: locale === "en" ? "Remaining balance" : "Số tiền còn lại",
+          note: statusLabel(locale, detail.reservation?.status ?? detail.booking.status),
+          tone: "default",
+          value: formatMoney(locale, detail.financial_summary.remaining_balance_amount)
+        }
+      ] as const);
 
   return (
     <div className="admin-booking-detail__metrics">
@@ -432,6 +479,7 @@ function ProcessingTimeline({
 }) {
   const request = detail.request;
   const reservation = detail.reservation;
+  const manualReservation = isManualReservation(detail);
   const activePaymentRequest =
     detail.payment_requests.find((paymentRequest) => ["sent", "pending_verification"].includes(paymentRequest.status)) ??
     detail.payment_requests.find((paymentRequest) => paymentRequest.status === "verified") ??
@@ -463,86 +511,146 @@ function ProcessingTimeline({
     time: string | null;
     label: string;
     state: TimelineStepState;
-  }> = [
-    {
-      description: localize(locale, {
-        vi: `Hệ thống ghi nhận yêu cầu lúc ${formatDateTime(locale, detail.booking.created_at)}`,
-        en: `The request entered the system at ${formatDateTime(locale, detail.booking.created_at)}`
-      }),
-      time: formatDateTime(locale, detail.booking.created_at),
-      label: localize(locale, { vi: "Yêu cầu mới", en: "New request" }),
-      state: "done"
-    },
-    {
-      description: availabilityStepDescription,
-      time: reservation?.confirmed_at
-        ? formatDateTime(locale, reservation.confirmed_at)
-        : requestTerminalWithoutReservation && request?.closed_at
-          ? formatDateTime(locale, request.closed_at)
-        : request?.response_due_at
-          ? formatDateTime(locale, request.response_due_at)
-          : null,
-      label: localize(locale, { vi: "Xác nhận còn phòng", en: "Confirm availability" }),
-      state: availabilityStepState
-    },
-    {
-      description:
-        activePaymentRequest?.status === "verified"
-          ? localize(locale, {
-              vi: "Cọc đã được khách chuyển và admin đã xác nhận thủ công.",
-              en: "The deposit was paid and manually verified."
-            })
-          : activePaymentRequest?.latest_proof_uploaded_at
-            ? localize(locale, {
-                vi: "Khách đã tải lên ảnh xác nhận thanh toán và đang chờ admin kiểm tra.",
-                en: "Guest has uploaded the payment proof and is waiting for review."
-              })
-            : activePaymentRequest
+  }> = manualReservation
+    ? [
+        {
+          description: localize(locale, {
+            vi: `Hệ thống ghi nhận booking thủ công lúc ${formatDateTime(locale, detail.booking.created_at)}`,
+            en: `The manual booking entered the system at ${formatDateTime(locale, detail.booking.created_at)}`
+          }),
+          time: formatDateTime(locale, detail.booking.created_at),
+          label: localize(locale, { vi: "Yêu cầu mới", en: "New request" }),
+          state: "done"
+        },
+        {
+          description: localize(locale, {
+            vi: "Admin đã tạo booking thủ công và bỏ qua bước cọc.",
+            en: "Staff created the booking manually and skipped the deposit step."
+          }),
+          time: reservation?.confirmed_at ? formatDateTime(locale, reservation.confirmed_at) : null,
+          label: localize(locale, { vi: "Đặt phòng thủ công", en: "Manual booking" }),
+          state: reservation ? "done" : "active"
+        },
+        {
+          description:
+            detail.financial_summary.verified_deposit_amount > 0
               ? localize(locale, {
-                  vi: "QR cọc đã phát hành, đang chờ khách thanh toán.",
-                  en: "The deposit QR has been issued and is waiting for payment."
-              })
+                  vi: `Đã ghi nhận ${formatMoney(locale, detail.financial_summary.verified_deposit_amount)} từ khách.`,
+                  en: `Recorded ${formatMoney(locale, detail.financial_summary.verified_deposit_amount)} from the guest.`
+                })
               : localize(locale, {
-                  vi: "QR cọc sẽ được phát hành ngay sau khi chốt booking.",
-                  en: "The deposit QR will be generated after booking confirmation."
+                  vi: "Chưa ghi nhận khoản tiền nào cho booking thủ công này.",
+                  en: "No amount has been recorded for this manual booking yet."
                 }),
-      time: activePaymentRequest?.verified_at
-        ? formatDateTime(locale, activePaymentRequest.verified_at)
-        : activePaymentRequest?.latest_proof_uploaded_at
-          ? formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)
-          : activePaymentRequest?.created_at
-            ? formatDateTime(locale, activePaymentRequest.created_at)
-            : null,
-      label: localize(locale, { vi: "Đã thanh toán cọc", en: "Deposit payment" }),
-      state: activePaymentRequest?.status === "verified" ? "done" : activePaymentRequest ? "active" : "pending"
-    },
-    {
-      description:
-        reservation?.status === "completed"
-          ? localize(locale, {
-              vi: "Booking đã kết thúc và được đánh dấu hoàn tất.",
-              en: "The stay was completed and the booking was closed successfully."
-            })
-          : reservation?.status === "confirmed"
-            ? localize(locale, {
-                vi: "Booking đã được xác nhận cuối cùng sau khi cọc được duyệt.",
-                en: "The booking was confirmed after the deposit was verified."
-              })
-            : localize(locale, {
-                vi: "Bước cuối cùng sẽ hoàn tất sau khi admin xác nhận cọc.",
-                en: "The final confirmation will be completed after deposit verification."
-              }),
-      time: reservation?.completed_at
-        ? formatDateTime(locale, reservation.completed_at)
-        : reservation?.cancelled_at
-          ? formatDateTime(locale, reservation.cancelled_at)
-          : reservation?.confirmed_at
+          time:
+            reservation?.updated_at && detail.financial_summary.verified_deposit_amount > 0
+              ? formatDateTime(locale, reservation.updated_at)
+              : reservation?.confirmed_at
+                ? formatDateTime(locale, reservation.confirmed_at)
+                : null,
+          label: localize(locale, { vi: "Số tiền đã nhận", en: "Received amount" }),
+          state: detail.financial_summary.verified_deposit_amount > 0 ? "done" : "pending"
+        },
+        {
+          description:
+            reservation?.status === "completed"
+              ? localize(locale, {
+                  vi: "Booking đã kết thúc và được đánh dấu hoàn tất.",
+                  en: "The stay was completed and the booking was closed successfully."
+                })
+              : localize(locale, {
+                  vi: "Booking thủ công đã sẵn sàng cho vận hành.",
+                  en: "The manual booking is ready for operations."
+                }),
+          time: reservation?.completed_at
+            ? formatDateTime(locale, reservation.completed_at)
+            : reservation?.confirmed_at
+              ? formatDateTime(locale, reservation.confirmed_at)
+              : null,
+          label: localize(locale, { vi: "Xác nhận cuối cùng", en: "Final confirmation" }),
+          state: reservation?.status === "confirmed" || reservation?.status === "completed" ? "done" : "pending"
+        }
+      ]
+    : [
+        {
+          description: localize(locale, {
+            vi: `Hệ thống ghi nhận yêu cầu lúc ${formatDateTime(locale, detail.booking.created_at)}`,
+            en: `The request entered the system at ${formatDateTime(locale, detail.booking.created_at)}`
+          }),
+          time: formatDateTime(locale, detail.booking.created_at),
+          label: localize(locale, { vi: "Yêu cầu mới", en: "New request" }),
+          state: "done"
+        },
+        {
+          description: availabilityStepDescription,
+          time: reservation?.confirmed_at
             ? formatDateTime(locale, reservation.confirmed_at)
-            : null,
-      label: localize(locale, { vi: "Xác nhận cuối cùng", en: "Final confirmation" }),
-      state: reservation?.status === "confirmed" || reservation?.status === "completed" ? "done" : "pending"
-    }
-  ];
+            : requestTerminalWithoutReservation && request?.closed_at
+              ? formatDateTime(locale, request.closed_at)
+              : request?.response_due_at
+                ? formatDateTime(locale, request.response_due_at)
+                : null,
+          label: localize(locale, { vi: "Xác nhận còn phòng", en: "Confirm availability" }),
+          state: availabilityStepState
+        },
+        {
+          description:
+            activePaymentRequest?.status === "verified"
+              ? localize(locale, {
+                  vi: "Cọc đã được khách chuyển và admin đã xác nhận thủ công.",
+                  en: "The deposit was paid and manually verified."
+                })
+              : activePaymentRequest?.latest_proof_uploaded_at
+                ? localize(locale, {
+                    vi: "Khách đã tải lên ảnh xác nhận thanh toán và đang chờ admin kiểm tra.",
+                    en: "Guest has uploaded the payment proof and is waiting for review."
+                  })
+                : activePaymentRequest
+                  ? localize(locale, {
+                      vi: "QR cọc đã phát hành, đang chờ khách thanh toán.",
+                      en: "The deposit QR has been issued and is waiting for payment."
+                  })
+                  : localize(locale, {
+                      vi: "QR cọc sẽ được phát hành ngay sau khi chốt booking.",
+                      en: "The deposit QR will be generated after booking confirmation."
+                    }),
+          time: activePaymentRequest?.verified_at
+            ? formatDateTime(locale, activePaymentRequest.verified_at)
+            : activePaymentRequest?.latest_proof_uploaded_at
+              ? formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)
+              : activePaymentRequest?.created_at
+                ? formatDateTime(locale, activePaymentRequest.created_at)
+                : null,
+          label: localize(locale, { vi: "Đã thanh toán cọc", en: "Deposit payment" }),
+          state: activePaymentRequest?.status === "verified" ? "done" : activePaymentRequest ? "active" : "pending"
+        },
+        {
+          description:
+            reservation?.status === "completed"
+              ? localize(locale, {
+                  vi: "Booking đã kết thúc và được đánh dấu hoàn tất.",
+                  en: "The stay was completed and the booking was closed successfully."
+                })
+              : reservation?.status === "confirmed"
+                ? localize(locale, {
+                    vi: "Booking đã được xác nhận cuối cùng sau khi cọc được duyệt.",
+                    en: "The booking was confirmed after the deposit was verified."
+                  })
+                : localize(locale, {
+                    vi: "Bước cuối cùng sẽ hoàn tất sau khi admin xác nhận cọc.",
+                    en: "The final confirmation will be completed after deposit verification."
+                  }),
+          time: reservation?.completed_at
+            ? formatDateTime(locale, reservation.completed_at)
+            : reservation?.cancelled_at
+              ? formatDateTime(locale, reservation.cancelled_at)
+              : reservation?.confirmed_at
+                ? formatDateTime(locale, reservation.confirmed_at)
+                : null,
+          label: localize(locale, { vi: "Xác nhận cuối cùng", en: "Final confirmation" }),
+          state: reservation?.status === "confirmed" || reservation?.status === "completed" ? "done" : "pending"
+        }
+      ];
 
   return (
     <PortalCard className="admin-booking-detail__surface-card">
@@ -925,17 +1033,19 @@ function FinancialSummaryCard({
   detail: BookingDetailData;
   locale: Locale;
 }) {
+  const manualReservation = isManualReservation(detail);
+
   return (
     <PortalCard className="admin-booking-detail__finance-card">
       <h3 className="admin-booking-detail__finance-title">{locale === "en" ? "Financial summary" : "Tóm tắt tài chính"}</h3>
       <div className="admin-booking-detail__finance-list">
         <div className="admin-booking-detail__finance-row">
-          <span>{locale === "en" ? "Grand total" : "Tổng cộng"}</span>
+          <span>{manualReservation ? (locale === "en" ? "Booking value" : "Giá trị booking") : locale === "en" ? "Grand total" : "Tổng cộng"}</span>
           <strong>{formatMoney(locale, detail.financial_summary.total_amount)}</strong>
         </div>
         <div className="admin-booking-detail__finance-row admin-booking-detail__finance-row--accent">
-          <span>{locale === "en" ? "Deposit target" : "Tiền cọc"}</span>
-          <strong>{formatMoney(locale, detail.financial_summary.requested_deposit_amount)}</strong>
+          <span>{manualReservation ? (locale === "en" ? "Received amount" : "Số tiền đã nhận") : locale === "en" ? "Deposit target" : "Tiền cọc"}</span>
+          <strong>{manualReservation ? formatMoney(locale, detail.financial_summary.verified_deposit_amount) : formatMoney(locale, detail.financial_summary.requested_deposit_amount)}</strong>
         </div>
         <div className="admin-booking-detail__finance-divider" />
         <div className="admin-booking-detail__finance-row admin-booking-detail__finance-row--strong">
@@ -943,6 +1053,61 @@ function FinancialSummaryCard({
           <strong>{formatMoney(locale, detail.financial_summary.remaining_balance_amount)}</strong>
         </div>
       </div>
+    </PortalCard>
+  );
+}
+
+function ManualBookingFinancialCard({
+  detail,
+  locale,
+  returnTo
+}: {
+  detail: BookingDetailData;
+  locale: Locale;
+  returnTo: string;
+}) {
+  const reservation = detail.reservation;
+
+  if (!reservation || reservation.source !== "admin_manual_booking") {
+    return null;
+  }
+
+  return (
+    <PortalCard className="admin-booking-detail__action-card admin-booking-detail__action-card--accent">
+      <div className="admin-booking-detail__action-head">
+        <span className="admin-booking-detail__action-icon" aria-hidden="true">
+          ↔
+        </span>
+        <h3 className="admin-booking-detail__action-title">{locale === "en" ? "Adjust manual amounts" : "Chỉnh số tiền thủ công"}</h3>
+      </div>
+      <p className="admin-booking-detail__action-description">
+        {localize(locale, {
+          vi: "Booking thủ công không dùng cọc. Bạn có thể chỉnh tổng giá trị booking và số tiền đã nhận ngay tại đây.",
+          en: "Manual bookings do not use a deposit. You can update the actual booking value and the collected amount here."
+        })}
+      </p>
+
+      <form action={updateManualReservationFinancialsAction} className="portal-form">
+        <input name="actorRole" type="hidden" value="staff" />
+        <input name="locale" type="hidden" value={locale} />
+        <input name="reservationId" type="hidden" value={reservation.id} />
+        <input name="returnTo" type="hidden" value={returnTo} />
+
+        <div className="portal-grid portal-grid--two">
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Booking value" : "Giá trị booking"}</span>
+            <input className="portal-field__control" defaultValue={detail.financial_summary.total_amount} min={0} name="totalAmount" step="0.01" type="number" />
+          </label>
+          <label className="portal-field">
+            <span className="portal-field__label">{locale === "en" ? "Received amount" : "Số tiền đã nhận"}</span>
+            <input className="portal-field__control" defaultValue={detail.financial_summary.verified_deposit_amount} min={0} name="depositAmount" step="0.01" type="number" />
+          </label>
+        </div>
+
+        <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}>
+          {locale === "en" ? "Save amounts" : "Lưu số tiền"}
+        </PortalSubmitButton>
+      </form>
     </PortalCard>
   );
 }
@@ -1301,6 +1466,7 @@ export function AdminBookingDetailPage({ detail, locale }: AdminBookingDetailPag
               <VerifyDepositCard activePaymentRequest={activePaymentRequest} detail={detail} locale={locale} returnTo={detailHref} />
             </>
           )}
+          <ManualBookingFinancialCard detail={detail} locale={locale} returnTo={detailHref} />
           <FinancialSummaryCard detail={detail} locale={locale} />
         </div>
       </div>

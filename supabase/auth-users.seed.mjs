@@ -33,7 +33,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3",
-    email: "manager@skhotel.com.vn",
+    email: "quanly@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -48,7 +48,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4",
-    email: "staff@skhotel.com.vn",
+    email: "nhanvien@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",

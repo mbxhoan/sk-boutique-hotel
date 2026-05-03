@@ -158,6 +158,42 @@ function formatMoney(locale: Locale, value: number) {
   );
 }
 
+function getSettledDepositAmount(booking: WorkflowBookingRow) {
+  if (booking.source !== "reservation" || (booking.status !== "confirmed" && booking.status !== "completed")) {
+    return 0;
+  }
+
+  const depositAmount = booking.deposit_amount ?? 0;
+
+  return Math.max(0, Math.min(depositAmount, booking.total_amount));
+}
+
+function getRemainingBalanceAmount(booking: WorkflowBookingRow) {
+  return Math.max(0, booking.total_amount - getSettledDepositAmount(booking));
+}
+
+function getSettlementSummary(locale: Locale, booking: WorkflowBookingRow) {
+  if (booking.source !== "reservation" || (booking.status !== "confirmed" && booking.status !== "completed")) {
+    return null;
+  }
+
+  const depositAmount = getSettledDepositAmount(booking);
+
+  if (depositAmount <= 0) {
+    return localize(locale, {
+      vi: "Chưa ghi nhận cọc",
+      en: "No deposit recorded"
+    });
+  }
+
+  const remainingAmount = getRemainingBalanceAmount(booking);
+
+  return localize(locale, {
+    vi: `Cọc: ${formatMoney(locale, depositAmount)} · Còn lại: ${formatMoney(locale, remainingAmount)}`,
+    en: `Deposit: ${formatMoney(locale, depositAmount)} · Remaining: ${formatMoney(locale, remainingAmount)}`
+  });
+}
+
 function formatDateRange(locale: Locale, startAt: string, endAt: string) {
   const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "vi-VN", {
     day: "numeric",
@@ -283,7 +319,9 @@ function buildCsv(rows: WorkflowBookingRow[], locale: Locale) {
     localize(locale, { vi: "Loại phòng", en: "Room type" }),
     localize(locale, { vi: "Ngày ở", en: "Stay dates" }),
     localize(locale, { vi: "Trạng thái", en: "Status" }),
-    localize(locale, { vi: "Tổng tiền", en: "Total" })
+    localize(locale, { vi: "Tổng tiền", en: "Total" }),
+    localize(locale, { vi: "Cọc đã thu", en: "Deposit collected" }),
+    localize(locale, { vi: "Còn lại", en: "Remaining" })
   ];
 
   const lines = rows.map((row) =>
@@ -295,7 +333,9 @@ function buildCsv(rows: WorkflowBookingRow[], locale: Locale) {
       escapeCsv(locale === "en" ? row.room_type_name_en : row.room_type_name_vi),
       escapeCsv(formatDateRange(locale, row.stay_start_at, row.stay_end_at)),
       escapeCsv(statusLabels[locale][row.status]),
-      escapeCsv(formatMoney(locale, row.total_amount))
+      escapeCsv(formatMoney(locale, row.total_amount)),
+      escapeCsv(formatMoney(locale, getSettledDepositAmount(row))),
+      escapeCsv(formatMoney(locale, getRemainingBalanceAmount(row)))
     ].join(",")
   );
 
@@ -345,6 +385,7 @@ function BookingMobileCard({
 }) {
   const tone = statusTone(booking.status);
   const bookingHref = buildBookingDetailHref(locale, booking.booking_code);
+  const settlementSummary = getSettlementSummary(locale, booking);
 
   return (
     <article className={`admin-bookings__mobile-card admin-bookings__mobile-card--${tone}`}>
@@ -404,6 +445,7 @@ function BookingMobileCard({
           <div className="admin-bookings__mobile-block">
             <p className="admin-bookings__mobile-label">{localize(locale, { vi: "Tổng tiền", en: "Total" })}</p>
             <p className="admin-bookings__mobile-value admin-bookings__mobile-value--total">{formatMoney(locale, booking.total_amount)}</p>
+            {settlementSummary ? <p className="admin-bookings__mobile-meta">{settlementSummary}</p> : null}
           </div>
         ) : null}
       </div>
@@ -545,12 +587,9 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
   }
 
   const totalBookingsCount = bookings.length;
-  const confirmedRevenue = bookings
-    .filter((row) => row.status === "confirmed" || row.status === "completed")
-    .reduce((sum, row) => sum + (row.total_amount ?? 0), 0);
-  const pendingRevenue = bookings
-    .filter((row) => row.status === "pending_deposit" || row.status === "draft" || row.status === "in_review" || row.status === "new" || row.status === "quoted")
-    .reduce((sum, row) => sum + (row.total_amount ?? 0), 0);
+  const settledBookings = bookings.filter((row) => row.status === "confirmed" || row.status === "completed");
+  const collectedDeposit = settledBookings.reduce((sum, row) => sum + getSettledDepositAmount(row), 0);
+  const remainingBalance = settledBookings.reduce((sum, row) => sum + getRemainingBalanceAmount(row), 0);
   const confirmedCount = bookings.filter((row) => row.status === "confirmed" || row.status === "completed").length;
   const pendingCount = bookings.filter((row) => ["pending_deposit", "draft", "in_review", "new", "quoted"].includes(row.status as string)).length;
   const cancelledCount = bookings.filter((row) => ["cancelled", "rejected", "expired", "closed"].includes(row.status as string)).length;
@@ -566,8 +605,8 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
       tone: "default" as const
     },
     {
-      label: localize(locale, { vi: "Doanh thu đã xác nhận", en: "Confirmed revenue" }),
-      value: formatMoney(locale, confirmedRevenue),
+      label: localize(locale, { vi: "Cọc đã thu", en: "Deposit collected" }),
+      value: formatMoney(locale, collectedDeposit),
       detail: localize(locale, {
         vi: `${confirmedCount} booking đã xác nhận hoặc hoàn tất`,
         en: `${confirmedCount} confirmed or completed bookings`
@@ -575,11 +614,11 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
       tone: "accent" as const
     },
     {
-      label: localize(locale, { vi: "Doanh thu đang treo", en: "Pending revenue" }),
-      value: formatMoney(locale, pendingRevenue),
+      label: localize(locale, { vi: "Còn phải thu", en: "Remaining balance" }),
+      value: formatMoney(locale, remainingBalance),
       detail: localize(locale, {
-        vi: `${pendingCount} booking chưa thanh toán đủ`,
-        en: `${pendingCount} bookings awaiting payment`
+        vi: `${confirmedCount} booking đã xác nhận hoặc hoàn tất nhưng chưa thu đủ`,
+        en: `${confirmedCount} confirmed or completed bookings still owing`
       }),
       tone: "soft" as const
     },
@@ -776,6 +815,7 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
               {pageRows.length ? (
                 pageRows.map((booking) => {
                   const tone = statusTone(booking.status);
+                  const settlementSummary = getSettlementSummary(locale, booking);
 
                   return (
                     <tr className="admin-bookings__row" key={booking.id}>
@@ -816,7 +856,14 @@ export function AdminBookingsPage({ bookings, locale, totalCount }: AdminBooking
                           <PortalBadge tone={tone}>{statusLabel(locale, booking.status)}</PortalBadge>
                         </td>
                       ) : null}
-                      {visibleColumns.total ? <td className="admin-bookings__total-cell">{formatMoney(locale, booking.total_amount)}</td> : null}
+                      {visibleColumns.total ? (
+                        <td className="admin-bookings__total-cell">
+                          <div className="admin-bookings__primary-value">{formatMoney(locale, booking.total_amount)}</div>
+                          {settlementSummary ? (
+                            <div className="admin-bookings__secondary-value">{settlementSummary}</div>
+                          ) : null}
+                        </td>
+                      ) : null}
                       {visibleColumns.actions ? (
                         <td className="admin-bookings__action-cell">
                           <Link
