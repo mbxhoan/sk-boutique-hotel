@@ -93,7 +93,7 @@ export const adminDashboardCopy = {
         en: "Sensitive actions are recorded with user and branch scope."
       },
       title: {
-        vi: "Payment proof verified",
+        vi: "Ảnh xác nhận thanh toán đã được duyệt",
         en: "Payment proof verified"
       },
       time: "09:44"
@@ -295,7 +295,7 @@ export const adminDashboardCopy = {
     {
       code: "HOLD-2604-22",
       detail: {
-        vi: "Hold sắp hết hạn, khách đã upload proof nhưng chưa verify xong.",
+        vi: "Hold sắp hết hạn, khách đã upload ảnh xác nhận thanh toán nhưng chưa verify xong.",
         en: "Hold is expiring soon; the guest uploaded proof but verification is still pending."
       },
       status: {
@@ -370,7 +370,7 @@ export const adminDashboardCopy = {
     },
     overview: {
       description: {
-        vi: "Tổng quan admin phải nói ngay được hôm nay có bao nhiêu request, hold, proof và audit event.",
+        vi: "Tổng quan admin phải nói ngay được hôm nay có bao nhiêu request, hold, ảnh xác nhận thanh toán và audit event.",
         en: "The admin overview should immediately show today's request, hold, proof, and audit counts."
       },
       eyebrow: {
@@ -410,7 +410,7 @@ export const adminDashboardCopy = {
         en: "No instant booking, only clear manual booking and verification."
       },
       {
-        vi: "Branch scope, content approval, payment proof và audit log phải nhìn thấy ngay.",
+        vi: "Branch scope, content approval, ảnh xác nhận thanh toán và audit log phải nhìn thấy ngay.",
         en: "Branch scope, content approval, payment proof, and audit logs must stay visible."
       },
       {
@@ -419,7 +419,7 @@ export const adminDashboardCopy = {
       }
     ],
     description: {
-      vi: "Admin area này ưu tiên tốc độ xử lý request, hold, payment proof và content approval hơn là sự phô diễn UI.",
+      vi: "Admin area này ưu tiên tốc độ xử lý request, hold, ảnh xác nhận thanh toán và content approval hơn là sự phô diễn UI.",
       en: "This admin area prioritizes request handling, holds, payment proof, and content approval over flashy UI."
     },
     eyebrow: {
@@ -457,11 +457,11 @@ export const adminDashboardCopy = {
     {
       value: "08",
       label: {
-        vi: "Proof chờ duyệt",
+        vi: "Ảnh xác nhận thanh toán chờ duyệt",
         en: "Proofs pending"
       },
       detail: {
-        vi: "Payment proof đã upload nhưng vẫn chờ staff verify.",
+        vi: "Ảnh xác nhận thanh toán đã upload nhưng vẫn chờ staff verify.",
         en: "Payment proofs were uploaded and are still waiting for staff verification."
       }
     },

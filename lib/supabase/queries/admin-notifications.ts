@@ -142,9 +142,9 @@ function buildNotificationCopy(
     case "payment_proof_uploaded":
       return {
         body_en: "A payment proof was uploaded and is waiting for staff review.",
-        body_vi: "Khách đã tải lên proof thanh toán và đang chờ admin kiểm tra.",
+        body_vi: "Khách đã tải lên ảnh xác nhận thanh toán và đang chờ admin kiểm tra.",
         title_en: `Deposit proof uploaded${referenceSuffix}`,
-        title_vi: `Khách đã gửi proof cọc${referenceSuffix}`
+        title_vi: `Khách đã gửi ảnh xác nhận thanh toán${referenceSuffix}`
       };
     case "payment_request_verified":
       return {
@@ -156,9 +156,9 @@ function buildNotificationCopy(
     case "payment_request_rejected":
       return {
         body_en: "The uploaded proof did not pass review and follow-up is still required.",
-        body_vi: "Proof thanh toán chưa đạt yêu cầu kiểm tra và cần xử lý tiếp với khách.",
+        body_vi: "Ảnh xác nhận thanh toán chưa đạt yêu cầu kiểm tra và cần xử lý tiếp với khách.",
         title_en: `Deposit proof rejected${referenceSuffix}`,
-        title_vi: `Đã từ chối proof cọc${referenceSuffix}`
+        title_vi: `Đã từ chối ảnh xác nhận thanh toán${referenceSuffix}`
       };
     case "reservation.cancelled":
       return {

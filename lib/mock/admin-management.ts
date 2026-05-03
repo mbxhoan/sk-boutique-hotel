@@ -143,7 +143,7 @@ export const adminManagementCopy = {
           en: "Role by responsibility"
         },
         detail: {
-          vi: "Mỗi role sẽ chỉ nhìn thấy đúng phạm vi thao tác như content, payment proof hay audit.",
+          vi: "Mỗi role sẽ chỉ nhìn thấy đúng phạm vi thao tác như content, ảnh xác nhận thanh toán hay audit.",
           en: "Each role will only see the correct scope of action such as content, payment proof, or audit."
         }
       },
@@ -153,7 +153,7 @@ export const adminManagementCopy = {
           en: "Sensitive permissions"
         },
         detail: {
-          vi: "Phê duyệt nội dung, verify proof, hủy booking và sửa setting sẽ được kiểm soát rõ hơn.",
+          vi: "Phê duyệt nội dung, verify ảnh xác nhận thanh toán, hủy booking và sửa setting sẽ được kiểm soát rõ hơn.",
           en: "Content approval, proof verification, booking cancellations, and settings will be controlled more tightly."
         }
       },

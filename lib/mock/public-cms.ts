@@ -393,8 +393,8 @@ const articleItems: CmsCollectionItem[] = [
     text("News", "News"),
     text("Deposit QR and manual verification", "Deposit QR and manual verification"),
     text(
-      "Bước QR, proof upload và xác minh thủ công cho phase 1 manual-first.",
-      "The QR step, proof upload, and manual verification flow for phase 1."
+      "Bước QR, ảnh xác nhận thanh toán và xác minh thủ công cho phase 1 manual-first.",
+      "The QR step, payment proof upload, and manual verification flow for phase 1."
     ),
     [text("Payment", "Payment"), text("4 min read", "4 min read"), text("April 2026", "April 2026")],
     "gold"
@@ -1895,7 +1895,7 @@ const newsDetails: CmsPageCopy[] = [
     seo: {
       title: text("Deposit QR and manual verification", "Deposit QR and manual verification"),
       description: text(
-        "Bài viết blog/news về deposit QR, proof upload và manual verification.",
+        "Bài viết blog/news về deposit QR, ảnh xác nhận thanh toán và manual verification.",
         "Blog/news article about deposit QR, proof upload, and manual verification."
       )
     },
@@ -1988,13 +1988,16 @@ const newsDetails: CmsPageCopy[] = [
       collectionSplitSection(
         "body",
         text("Payment body", "Payment body"),
-        text("This is where the QR flow and payment proof notes can be explained.", "This is where the QR flow and payment proof notes can be explained."),
+        text(
+          "Đây là nơi có thể giải thích luồng QR và các ghi chú về ảnh xác nhận thanh toán.",
+          "This is where the QR flow and payment proof notes can be explained."
+        ),
         text(
           "Không nhồi các bước vào một paragraph dài; dùng block rõ ràng.",
           "Avoid stuffing the steps into one long paragraph; use clear blocks."
         ),
         [
-          text("Keep proof upload separate from confirmation.", "Keep proof upload separate from confirmation."),
+          text("Giữ phần tải ảnh xác nhận thanh toán tách riêng khỏi bước xác nhận.", "Keep proof upload separate from confirmation."),
           text("Use article blocks for policy notes.", "Use article blocks for policy notes."),
           text("Support future translation records.", "Support future translation records.")
         ],
@@ -2091,7 +2094,7 @@ const newsDetails: CmsPageCopy[] = [
             eyebrow: text("Bản tiếng Việt", "Vietnamese"),
             title: text("Nội dung VI", "Vietnamese copy"),
             description: text(
-              "Member portal giữ cho người dùng nhìn thấy request, hold, booking và proof status ở một nơi.",
+              "Member portal giữ cho người dùng nhìn thấy request, hold, booking và ảnh xác nhận thanh toán ở một nơi.",
               "The member portal keeps requests, holds, bookings, and proof status in one place."
             ),
             bullets: [

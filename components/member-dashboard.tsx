@@ -107,7 +107,7 @@ export function MemberDashboard({ locale }: MemberDashboardProps) {
               <p className="portal-panel__note-copy">
                 {locale === "en"
                   ? "The member shell makes room for proof uploads, consent logs, and booking documents."
-                  : "Member shell chừa sẵn chỗ cho proof upload, consent log và booking documents."}
+                  : "Member shell chừa sẵn chỗ cho ảnh xác nhận thanh toán, consent log và booking documents."}
               </p>
             </div>
           </PortalCard>
@@ -129,7 +129,7 @@ export function MemberDashboard({ locale }: MemberDashboardProps) {
           <p className="portal-panel__note-copy">
             {locale === "en"
               ? "Once a request, hold, booking, or proof changes state, the update will appear here."
-              : "Khi request, hold, booking hoặc proof thay đổi trạng thái, cập nhật sẽ hiện ở đây."}
+              : "Khi request, hold, booking hoặc ảnh xác nhận thanh toán thay đổi trạng thái, cập nhật sẽ hiện ở đây."}
           </p>
         </PortalCard>
       </section>

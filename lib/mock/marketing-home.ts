@@ -124,7 +124,7 @@ export const marketingHomeCopy = {
         en: "Payment"
       },
       detail: {
-        vi: "QR + booking code + proof upload được thể hiện như một flow thủ công rõ ràng.",
+        vi: "QR + booking code + ảnh xác nhận thanh toán được thể hiện như một flow thủ công rõ ràng.",
         en: "QR, booking code, and proof upload are presented as a clear manual flow."
       }
     },
@@ -181,7 +181,7 @@ export const marketingHomeCopy = {
         en: "The member portal stays compact and clear, with room for request and booking history."
       },
       description: {
-        vi: "Shell member giữ mọi thứ gần nhau: request, hold, booking, proof upload và trạng thái xác thực.",
+        vi: "Shell member giữ mọi thứ gần nhau: request, hold, booking, ảnh xác nhận thanh toán và trạng thái xác thực.",
         en: "The member shell keeps requests, holds, bookings, proof uploads, and verification status close together."
       },
       bullets: [
@@ -240,7 +240,7 @@ export const marketingHomeCopy = {
         en: "Public room type cards"
       },
       {
-        vi: "Manual payment proof",
+        vi: "Ảnh xác nhận thanh toán thủ công",
         en: "Manual payment proof"
       },
       {
@@ -298,7 +298,7 @@ export const marketingHomeCopy = {
         en: "Payment verification"
       },
       description: {
-        vi: "QR, amount, proof upload và xác nhận thủ công được đặt thành một bước vận hành rõ ràng.",
+        vi: "QR, amount, ảnh xác nhận thanh toán và xác nhận thủ công được đặt thành một bước vận hành rõ ràng.",
         en: "QR, amount, proof upload, and manual confirmation are presented as one clear operating step."
       }
     }

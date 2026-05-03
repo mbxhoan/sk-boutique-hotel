@@ -3,8 +3,9 @@
 import { cancelMemberBookingAction } from "@/app/(member)/member/actions";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { useEffect, useState } from "react";
-import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { PaymentProofUploadForm } from "@/components/payment-proof-upload-form";
+import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { MemberProfileEditor } from "@/components/member-profile-editor";
 import { MemberPasswordEditor } from "@/components/member-password-editor";
 import type { Locale } from "@/lib/locale";
@@ -266,14 +267,14 @@ function buildReservationEntry(reservation: WorkflowReservation, paymentRequest:
   if (paymentRequest?.status === "sent") {
     stage = "urgent";
     bodyNote = text(
-      "Yêu cầu cọc đã sẵn sàng để bạn gửi proof.",
-      "The deposit request is ready for you to upload proof."
+      "Yêu cầu cọc đã sẵn sàng để bạn gửi ảnh xác nhận thanh toán.",
+      "The deposit request is ready for you to upload payment proof."
     );
   } else if (paymentRequest?.status === "pending_verification") {
     stage = "waiting";
     bodyNote = text(
-      "Proof đã gửi và đang chờ staff xác nhận.",
-      "The proof has been sent and is waiting for staff verification."
+      "Ảnh xác nhận thanh toán đã gửi và đang chờ staff xác nhận.",
+      "The payment proof has been sent and is waiting for staff verification."
     );
   } else if (reservation.status === "draft" || reservation.status === "pending_deposit") {
     stage = "urgent";
@@ -475,38 +476,43 @@ function PaymentRequestPanel({
             </dl>
           </div>
 
-          <form className="portal-form member-payment-panel__form" action={submitPaymentProofAction} encType="multipart/form-data">
-            <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
-            <input name="locale" type="hidden" value={locale} />
-            <input name="returnTo" type="hidden" value={returnTo} />
-            <input name="uploadedVia" type="hidden" value="member_portal" />
-
-            <label className="portal-field">
-              <span className="portal-field__label">{locale === "en" ? "Payment screenshot" : "Ảnh chụp màn hình thanh toán"}</span>
-              <input className="portal-field__control member-payment-panel__input" name="proofFile" type="file" accept="image/*,.pdf" />
-            </label>
-
-            <label className="portal-field">
-              <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
-              <textarea className="portal-field__control member-payment-panel__input member-payment-panel__input--textarea" name="note" rows={3} />
-            </label>
-
-            <div className="member-payment-panel__actions">
-              <PortalSubmitButton
-                className="button button--solid member-payment-panel__submit"
-                pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}
-              >
-                {locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
-              </PortalSubmitButton>
-            </div>
-          </form>
+          <PaymentProofUploadForm
+            action={submitPaymentProofAction}
+            beforeFileInput={
+              <>
+                <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+                <input name="locale" type="hidden" value={locale} />
+                <input name="returnTo" type="hidden" value={returnTo} />
+                <input name="uploadedVia" type="hidden" value="member_portal" />
+              </>
+            }
+            className="portal-form member-payment-panel__form"
+            helperText={{
+              en: "Images are automatically compressed before upload.",
+              vi: "Ảnh sẽ tự động được nén trước khi gửi."
+            }}
+            label={{
+              en: "Payment proof image",
+              vi: "Ảnh xác nhận thanh toán"
+            }}
+            locale={locale}
+            noteField={
+              <label className="portal-field">
+                <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
+                <textarea className="portal-field__control member-payment-panel__input member-payment-panel__input--textarea" name="note" rows={3} />
+              </label>
+            }
+            pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}
+            submitClassName="button button--solid member-payment-panel__submit"
+            submitLabel={locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
+          />
         </>
       ) : (
               <p className="member-payment-panel__note">
           {paymentRequest.status === "pending_verification"
             ? locale === "en"
-              ? "The proof has been uploaded and is waiting for staff verification."
-              : "Proof đã được upload và đang chờ staff xác minh."
+              ? "The payment proof has been uploaded and is waiting for staff verification."
+              : "Ảnh xác nhận thanh toán đã được upload và đang chờ staff xác minh."
             : paymentRequest.status === "verified"
               ? locale === "en"
                 ? "The deposit has been verified."
@@ -514,7 +520,7 @@ function PaymentRequestPanel({
               : paymentRequest.status === "rejected"
                 ? locale === "en"
                   ? "The deposit proof was rejected by staff."
-                  : "Proof cọc đã bị staff từ chối."
+                  : "Ảnh xác nhận thanh toán cọc đã bị staff từ chối."
                 : locale === "en"
                   ? "This payment request is no longer active."
                   : "Yêu cầu thanh toán này không còn hoạt động."}
@@ -621,8 +627,8 @@ function BookingCard({ entry, locale }: BookingCardProps) {
             <p className="member-booking-card__status-panel-copy">
               {paymentRequest.status === "pending_verification"
                 ? locale === "en"
-                  ? "Proof is already uploaded and is waiting for staff verification."
-                  : "Proof đã upload và đang chờ staff xác minh."
+                  ? "Payment proof is already uploaded and is waiting for staff verification."
+                  : "Ảnh xác nhận thanh toán đã upload và đang chờ staff xác minh."
                 : paymentRequest.status === "verified"
                   ? locale === "en"
                     ? "The deposit has already been verified."
@@ -630,7 +636,7 @@ function BookingCard({ entry, locale }: BookingCardProps) {
                   : paymentRequest.status === "rejected"
                     ? locale === "en"
                       ? "Staff rejected the deposit proof."
-                      : "Staff đã từ chối proof cọc."
+                      : "Staff đã từ chối ảnh xác nhận thanh toán cọc."
                     : locale === "en"
                       ? "This request is not active anymore."
                       : "Yêu cầu này không còn hoạt động."}

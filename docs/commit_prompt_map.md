@@ -1686,3 +1686,32 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/loading.tsx`
   - `components/localized-page-loading-screen.tsx`
   - `lib/locale.ts`
+
+### Entry 146
+- `time`: 2026-05-03T21:37:48+07:00
+- `prompt_summary`: Luồng booking phòng thủ công trên admin portal bị lỗi "Reservation stay window is invalid" vì khoảng ngày mặc định bị rơi vào cùng một ngày, đồng thời cần trả message rõ nguyên nhân hơn cho staff.
+- `commit_message`: `fix(admin-rooms): default manual booking to a one-night stay`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/admin/rooms/page.tsx`
+
+### Entry 147
+- `time`: 2026-05-03T22:29:55+07:00
+- `prompt_summary`: Ảnh xác nhận thanh toán bị giới hạn dung lượng khi upload, cần nén ảnh phía client để cho phép file lớn hơn và đổi các nhãn tiếng Việt từ "proof" sang "ảnh xác nhận thanh toán" để staff và khách dễ hiểu hơn.
+- `commit_message`: `feat(payment-proof): compress uploads and localize vietnamese copy`
+- `main_files`:
+  - `app/(marketing)/thanh-toan/[token]/page.tsx`
+  - `app/actions/payments.ts`
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/member-dashboard.tsx`
+  - `components/member-history-dashboard.tsx`
+  - `components/member-portal-dashboard.tsx`
+  - `components/payment-proof-file-input.tsx`
+  - `components/payment-proof-upload-form.tsx`
+  - `lib/mock/admin-dashboard.ts`
+  - `lib/mock/admin-management.ts`
+  - `lib/mock/marketing-home.ts`
+  - `lib/mock/member-dashboard.ts`
+  - `lib/mock/public-cms.ts`
+  - `next.config.ts`

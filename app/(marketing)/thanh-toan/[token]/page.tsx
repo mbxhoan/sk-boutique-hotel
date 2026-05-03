@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { PageViewTracker } from "@/components/page-view-tracker";
-import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
+import { PaymentProofUploadForm } from "@/components/payment-proof-upload-form";
 import { resolveLocale } from "@/lib/locale";
 import { buildVietQrImageUrl, getPaymentRequestByPublicToken } from "@/lib/supabase/payments";
 
@@ -21,11 +21,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
 
   return {
-    title: locale === "en" ? "Deposit upload" : "Tải proof chuyển khoản",
+    title: locale === "en" ? "Deposit upload" : "Tải ảnh xác nhận thanh toán",
     description:
       locale === "en"
         ? "Upload your deposit proof using the secure payment link."
-        : "Tải lên ảnh chuyển khoản từ link thanh toán bảo mật."
+        : "Tải lên ảnh xác nhận thanh toán từ link thanh toán bảo mật."
   };
 }
 
@@ -70,7 +70,7 @@ export default async function PaymentUploadPage({ params, searchParams }: PagePr
         <PortalSectionHeading
           description={{
             en: "Upload your transfer proof here. Staff will verify it manually before confirmation.",
-            vi: "Tải ảnh chuyển khoản tại đây. Staff sẽ verify thủ công trước khi xác nhận."
+            vi: "Tải ảnh xác nhận thanh toán tại đây. Staff sẽ verify thủ công trước khi xác nhận."
           }}
           eyebrow={{ en: "Deposit QR", vi: "Deposit QR" }}
           locale={locale}
@@ -127,26 +127,39 @@ export default async function PaymentUploadPage({ params, searchParams }: PagePr
             <p className="portal-item-card__detail">
               {locale === "en"
                 ? "Upload a clear transfer image or screenshot. The public link is tokenized and expires automatically."
-                : "Tải ảnh hoặc ảnh chụp màn hình chuyển khoản rõ nét. Link công khai được tokenized và tự hết hạn."}
+                : "Tải ảnh hoặc ảnh chụp màn hình thanh toán rõ nét. Link công khai được tokenized và tự hết hạn."}
             </p>
 
-            <form className="portal-form" action={submitPaymentProofAction}>
-              <input name="paymentToken" type="hidden" value={resolvedParams.token} />
-              <input name="locale" type="hidden" value={locale} />
-              <input name="returnTo" type="hidden" value={`/thanh-toan/${resolvedParams.token}`} />
-              <input name="uploadedVia" type="hidden" value="public_link" />
-              <label className="portal-field">
-                <span className="portal-field__label">{locale === "en" ? "Proof image" : "Ảnh proof"}</span>
-                <input className="portal-field__control" name="proofFile" type="file" accept="image/*,.pdf" />
-              </label>
-              <label className="portal-field">
-                <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
-                <textarea className="portal-field__control" name="note" rows={4} />
-              </label>
-              <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Uploading..." : "Đang tải..."}>
-                {locale === "en" ? "Upload proof" : "Tải proof"}
-              </PortalSubmitButton>
-            </form>
+            <PaymentProofUploadForm
+              action={submitPaymentProofAction}
+              beforeFileInput={
+                <>
+                  <input name="paymentToken" type="hidden" value={resolvedParams.token} />
+                  <input name="locale" type="hidden" value={locale} />
+                  <input name="returnTo" type="hidden" value={`/thanh-toan/${resolvedParams.token}`} />
+                  <input name="uploadedVia" type="hidden" value="public_link" />
+                </>
+              }
+              className="portal-form"
+              helperText={{
+                en: "Images are automatically compressed before upload.",
+                vi: "Ảnh sẽ tự động được nén trước khi gửi."
+              }}
+              label={{
+                en: "Payment proof image",
+                vi: "Ảnh xác nhận thanh toán"
+              }}
+              locale={locale}
+              noteField={
+                <label className="portal-field">
+                  <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
+                  <textarea className="portal-field__control" name="note" rows={4} />
+                </label>
+              }
+              pendingLabel={locale === "en" ? "Uploading..." : "Đang tải..."}
+              submitClassName="button button--solid"
+              submitLabel={locale === "en" ? "Upload proof" : "Tải ảnh xác nhận"}
+            />
           </PortalCard>
         </div>
       </section>

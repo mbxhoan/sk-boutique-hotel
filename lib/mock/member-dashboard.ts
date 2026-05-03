@@ -174,7 +174,7 @@ export const memberDashboardCopy = {
         en: "Temporary hold for one superior room, expiring in 17 minutes."
       },
       note: {
-        vi: "Cần proof upload trước khi staff chuyển sang manual reservation.",
+        vi: "Cần ảnh xác nhận thanh toán trước khi staff chuyển sang manual reservation.",
         en: "Proof upload is needed before staff can move it to manual reservation."
       },
       status: {
@@ -190,7 +190,7 @@ export const memberDashboardCopy = {
     {
       code: "BOOK-2599-14",
       detail: {
-        vi: "Booking đã xác nhận thủ công sau khi proof được duyệt.",
+        vi: "Booking đã xác nhận thủ công sau khi ảnh xác nhận thanh toán được duyệt.",
         en: "Booking confirmed manually after proof was approved."
       },
       note: {
@@ -239,7 +239,7 @@ export const memberDashboardCopy = {
     },
     notifications: {
       description: {
-        vi: "Thông báo realtime giúp khách nhìn thấy trạng thái mới của request, hold, booking và proof.",
+        vi: "Thông báo realtime giúp khách nhìn thấy trạng thái mới của request, hold, booking và ảnh xác nhận thanh toán.",
         en: "Realtime notifications show guests the latest state changes for requests, holds, bookings, and proof."
       },
       eyebrow: {
@@ -303,7 +303,7 @@ export const memberDashboardCopy = {
     },
     bullets: [
       {
-        vi: "Request, hold, booking, và payment proof đều hiển thị trong một shell gọn.",
+        vi: "Request, hold, booking, và ảnh xác nhận thanh toán đều hiển thị trong một shell gọn.",
         en: "Requests, holds, bookings, and payment proof all live inside one compact shell."
       },
       {
@@ -316,7 +316,7 @@ export const memberDashboardCopy = {
       }
     ],
     description: {
-      vi: "Member area này giúp khách xem lịch sử yêu cầu, hold, booking và trạng thái proof mà không làm họ lạc trong giao diện quá phức tạp.",
+      vi: "Member area này giúp khách xem lịch sử yêu cầu, hold, booking và trạng thái ảnh xác nhận thanh toán mà không làm họ lạc trong giao diện quá phức tạp.",
       en: "This member area lets guests review requests, holds, bookings, and proof status without getting lost in a complicated interface."
     },
     eyebrow: {
@@ -358,7 +358,7 @@ export const memberDashboardCopy = {
         en: "Confirmed booking"
       },
       detail: {
-        vi: "Đã có một booking hoàn tất sau khi proof được staff duyệt thủ công.",
+        vi: "Đã có một booking hoàn tất sau khi ảnh xác nhận thanh toán được staff duyệt thủ công.",
         en: "One booking is complete after manual staff verification."
       }
     },

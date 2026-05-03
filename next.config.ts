@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
     "192.168.2.109",
     "192.168.2.43"
   ],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb"
+    }
+  },
   images: {
     qualities: [85, 90]
   }

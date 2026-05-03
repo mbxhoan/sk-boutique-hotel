@@ -2,8 +2,8 @@ import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { submitPaymentProofAction } from "@/app/actions/payments";
 import { MemberLiveUpdates } from "@/components/member-live-updates";
-import { PortalSubmitButton } from "@/components/portal-submit-button";
 import { PortalBadge, PortalCard, PortalSectionHeading, PortalStatCard } from "@/components/portal-ui";
+import { PaymentProofUploadForm } from "@/components/payment-proof-upload-form";
 import type { WorkflowAuditLog, WorkflowMemberHistoryData, WorkflowPaymentRequest } from "@/lib/supabase/workflow.types";
 
 type MemberHistoryDashboardProps = {
@@ -58,7 +58,7 @@ function statusLabel(locale: Locale, status: string) {
       cancelled: "Đã hủy",
       confirmed: "Đã xác nhận",
       pending_deposit: "Chờ deposit",
-      proof_uploaded: "Đã upload proof",
+      proof_uploaded: "Đã upload ảnh xác nhận thanh toán",
       rejected: "Từ chối",
       sent: "Đã gửi",
       pending_verification: "Chờ verify",
@@ -123,29 +123,42 @@ function PaymentRequestCard({
       ) : null}
       {paymentRequest.latest_proof_file_path ? (
         <p className="portal-item-card__note">
-          {locale === "en" ? "Latest proof uploaded." : "Proof gần nhất đã upload."}
+          {locale === "en" ? "Latest proof uploaded." : "Ảnh xác nhận thanh toán gần nhất đã upload."}
           {" "}
           {paymentRequest.latest_proof_review_note ? `• ${paymentRequest.latest_proof_review_note}` : ""}
         </p>
       ) : null}
       {canUpload ? (
-        <form className="portal-form" action={submitPaymentProofAction}>
-          <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
-          <input name="locale" type="hidden" value={locale} />
-          <input name="returnTo" type="hidden" value="/member" />
-          <input name="uploadedVia" type="hidden" value="member_portal" />
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Proof file" : "Tệp proof"}</span>
-            <input className="portal-field__control" name="proofFile" type="file" accept="image/*,.pdf" />
-          </label>
-          <label className="portal-field">
-            <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
-            <textarea className="portal-field__control" name="note" rows={3} />
-          </label>
-          <PortalSubmitButton className="button button--solid" pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}>
-            {locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
-          </PortalSubmitButton>
-        </form>
+        <PaymentProofUploadForm
+          action={submitPaymentProofAction}
+          beforeFileInput={
+            <>
+              <input name="paymentRequestId" type="hidden" value={paymentRequest.id} />
+              <input name="locale" type="hidden" value={locale} />
+              <input name="returnTo" type="hidden" value="/member" />
+              <input name="uploadedVia" type="hidden" value="member_portal" />
+            </>
+          }
+          className="portal-form"
+          helperText={{
+            en: "Images are automatically compressed before upload.",
+            vi: "Ảnh sẽ tự động được nén trước khi gửi."
+          }}
+          label={{
+            en: "Payment proof file",
+            vi: "Ảnh xác nhận thanh toán"
+          }}
+          locale={locale}
+          noteField={
+            <label className="portal-field">
+              <span className="portal-field__label">{locale === "en" ? "Note" : "Ghi chú"}</span>
+              <textarea className="portal-field__control" name="note" rows={3} />
+            </label>
+          }
+          pendingLabel={locale === "en" ? "Submitting..." : "Đang gửi..."}
+          submitClassName="button button--solid"
+          submitLabel={locale === "en" ? "Confirm deposit paid" : "Xác nhận đã thanh toán cọc"}
+        />
       ) : null}
     </PortalCard>
   );
@@ -219,7 +232,7 @@ export function MemberHistoryDashboard({ data, locale }: MemberHistoryDashboardP
         <PortalSectionHeading
           description={{
             en: "Your requests, holds, bookings, and payment proofs stay in one view after sign-in.",
-            vi: "Request, hold, booking và proof của bạn nằm gọn trong một màn hình sau khi đăng nhập."
+            vi: "Request, hold, booking và ảnh xác nhận thanh toán của bạn nằm gọn trong một màn hình sau khi đăng nhập."
           }}
           eyebrow={{ en: "Member history", vi: "Lịch sử thành viên" }}
           locale={locale}

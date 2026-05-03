@@ -262,7 +262,7 @@ function statusLabel(locale: Locale, status: string) {
       active: "Đang giữ",
       confirmed: "Đã xác nhận",
       verified: "Đã duyệt",
-      proof_uploaded: "Đã upload proof"
+      proof_uploaded: "Đã upload ảnh xác nhận thanh toán"
     }
   };
 
@@ -1161,7 +1161,7 @@ function PaymentRequestCard({
       ) : null}
       {paymentRequest.latest_proof_file_path ? (
         <p className="portal-item-card__note">
-          {locale === "en" ? "Latest proof uploaded." : "Proof gần nhất đã upload."}
+          {locale === "en" ? "Latest proof uploaded." : "Ảnh xác nhận thanh toán gần nhất đã upload."}
         </p>
       ) : null}
 
@@ -1415,12 +1415,12 @@ export function AdminWorkflowDashboard({ canOperate, data, locale, testEmailDefa
         <PortalSectionHeading
           description={{
             en: "Deposit requests, proof uploads, and manual verification live here.",
-            vi: "Deposit request, proof upload và verify thủ công nằm ở đây."
+            vi: "Deposit request, ảnh xác nhận thanh toán và verify thủ công nằm ở đây."
           }}
           eyebrow={{ en: "Payments", vi: "Thanh toán" }}
           help={{
             en: "Send the deposit QR first, then verify the proof and let the reservation move to confirmed.",
-            vi: "Gửi QR cọc trước, sau đó verify proof và chuyển reservation sang confirmed."
+            vi: "Gửi QR cọc trước, sau đó verify ảnh xác nhận thanh toán và chuyển reservation sang confirmed."
           }}
           locale={locale}
           title={{ en: "Payment queue", vi: "Hàng đợi payment" }}

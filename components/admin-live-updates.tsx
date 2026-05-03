@@ -25,7 +25,7 @@ function labelForTable(locale: Locale, table: string, eventType: "INSERT" | "UPD
       : {
           availability_requests: "Yêu cầu xem phòng",
           audit_logs: "Audit event",
-          payment_proofs: "Proof thanh toán",
+          payment_proofs: "Ảnh xác nhận thanh toán",
           payment_requests: "Payment request",
           reservations: "Booking",
           room_holds: "Hold phòng"

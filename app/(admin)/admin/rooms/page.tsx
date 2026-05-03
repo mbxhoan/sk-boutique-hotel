@@ -73,12 +73,12 @@ function formatDateKey(date: Date) {
 function normalizeDateRange(startValue?: string | null, endValue?: string | null) {
   const today = startOfDay(new Date());
   const fallbackStart = parseDateKey(startValue) ?? parseDateKey(endValue) ?? today;
-  const fallbackEnd = parseDateKey(endValue) ?? parseDateKey(startValue) ?? fallbackStart;
+  const fallbackEnd = parseDateKey(endValue) ?? parseDateKey(startValue) ?? addDays(fallbackStart, 1);
   const start = fallbackStart <= fallbackEnd ? fallbackStart : fallbackEnd;
   const end = fallbackStart <= fallbackEnd ? fallbackEnd : fallbackStart;
 
   return {
-    end,
+    end: end.getTime() > start.getTime() ? end : addDays(start, 1),
     start
   };
 }

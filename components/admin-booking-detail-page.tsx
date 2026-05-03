@@ -494,7 +494,7 @@ function ProcessingTimeline({
             })
           : activePaymentRequest?.latest_proof_uploaded_at
             ? localize(locale, {
-                vi: "Khách đã tải lên proof thanh toán và đang chờ admin kiểm tra.",
+                vi: "Khách đã tải lên ảnh xác nhận thanh toán và đang chờ admin kiểm tra.",
                 en: "Guest has uploaded the payment proof and is waiting for review."
               })
             : activePaymentRequest
@@ -849,12 +849,12 @@ function VerifyDepositCard({
       {activePaymentRequest?.latest_proof_uploaded_at ? (
         <div className="admin-booking-detail__action-description">
           <p>
-            {locale === "en" ? "Latest proof uploaded at" : "Proof gần nhất được tải lên lúc"} {formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)}
+            {locale === "en" ? "Latest proof uploaded at" : "Ảnh xác nhận thanh toán gần nhất được tải lên lúc"} {formatDateTime(locale, activePaymentRequest.latest_proof_uploaded_at)}
           </p>
           {activePaymentRequest.latest_proof_url && (
             <a href={activePaymentRequest.latest_proof_url} rel="noreferrer" target="_blank">
               <img
-                alt="Payment proof"
+                alt={locale === "en" ? "Payment proof" : "Ảnh xác nhận thanh toán"}
                 src={activePaymentRequest.latest_proof_url}
                 style={{
                   borderRadius: "0.5rem",
@@ -888,7 +888,7 @@ function VerifyDepositCard({
           <textarea
             className="portal-field__control"
             name="reviewNote"
-            placeholder={locale === "en" ? "Optional note for proof review" : "Ghi chú nội bộ khi xác nhận cọc"}
+            placeholder={locale === "en" ? "Optional note for proof review" : "Ghi chú nội bộ khi xác nhận ảnh thanh toán"}
             rows={3}
           />
         </label>
@@ -910,7 +910,7 @@ function VerifyDepositCard({
             pendingLabel={locale === "en" ? "Saving..." : "Đang lưu..."}
             value="rejected"
           >
-            {locale === "en" ? "Reject proof" : "Từ chối proof"}
+            {locale === "en" ? "Reject proof" : "Từ chối ảnh xác nhận"}
           </PortalSubmitButton>
         ) : null}
       </form>
@@ -1030,7 +1030,7 @@ function PaymentHistoryTable({
               <th>{locale === "en" ? "Payment" : "Thanh toán"}</th>
               <th>{locale === "en" ? "Amount" : "Số tiền"}</th>
               <th>{locale === "en" ? "Status" : "Trạng thái"}</th>
-              <th>{locale === "en" ? "Proof" : "Proof"}</th>
+              <th>{locale === "en" ? "Proof" : "Ảnh xác nhận"}</th>
             </tr>
           </thead>
           <tbody>
@@ -1040,7 +1040,7 @@ function PaymentHistoryTable({
                 ? statusLabel(locale, paymentRequest.latest_proof_status)
                 : locale === "en"
                   ? "No proof yet"
-                  : "Chưa có proof";
+                  : "Chưa có ảnh xác nhận";
               const isClickable = hasProof;
 
               return (
@@ -1153,7 +1153,7 @@ function ProofImageModal({
       <div className="proof-modal__card" onClick={(event) => event.stopPropagation()}>
         <header className="proof-modal__head">
           <div>
-            <p className="proof-modal__eyebrow">{locale === "en" ? "Payment proof" : "Ảnh thanh toán"}</p>
+            <p className="proof-modal__eyebrow">{locale === "en" ? "Payment proof" : "Ảnh xác nhận thanh toán"}</p>
             <h3 className="proof-modal__title">{title}</h3>
             <p className="proof-modal__meta">
               {fileName ? `${fileName} · ` : ""}

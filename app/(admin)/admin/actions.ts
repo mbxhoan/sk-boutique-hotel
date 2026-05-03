@@ -117,6 +117,10 @@ const copy = {
     vi: "Không thể tạo booking thủ công.",
     en: "Unable to create manual reservation."
   },
+  invalidManualReservationStayWindow: {
+    vi: "Khoảng ngày đặt phòng không hợp lệ. Vui lòng chọn ngày trả phòng sau ngày nhận phòng.",
+    en: "The booking stay window is invalid. Please choose a checkout date after check-in."
+  },
   unableToRegenerateDepositQr: {
     vi: "Không thể tạo lại QR cọc.",
     en: "Unable to regenerate deposit QR."
@@ -187,6 +191,10 @@ function resolveManualReservationErrorMessage(error: unknown): LocalizedText {
 
   if (!detail) {
     return copy.unableToCreateManualReservation;
+  }
+
+  if (detail.includes("Reservation stay window is invalid.")) {
+    return copy.invalidManualReservationStayWindow;
   }
 
   return {

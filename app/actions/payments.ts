@@ -25,11 +25,11 @@ const copy = {
     en: "Unable to confirm deposit."
   },
   invalidProofFile: {
-    vi: "Vui lòng chọn tệp proof hợp lệ.",
+    vi: "Vui lòng chọn ảnh xác nhận thanh toán hợp lệ.",
     en: "Please select a valid payment proof file."
   },
   memberProfileRequired: {
-    vi: "Cần có hồ sơ member để tải proof thanh toán.",
+    vi: "Cần có hồ sơ member để tải ảnh xác nhận thanh toán.",
     en: "Member profile is required to upload payment proof."
   },
   missingPaymentContext: {
@@ -37,15 +37,15 @@ const copy = {
     en: "Missing payment token or payment request id."
   },
   paymentProofRejected: {
-    vi: "Proof thanh toán đã bị từ chối.",
+    vi: "Ảnh xác nhận thanh toán đã bị từ chối.",
     en: "Payment proof rejected."
   },
   paymentProofRejectedFailed: {
-    vi: "Không thể từ chối proof thanh toán.",
+    vi: "Không thể từ chối ảnh xác nhận thanh toán.",
     en: "Unable to reject payment proof."
   },
   paymentProofUploaded: {
-    vi: "Proof thanh toán đã được tải lên.",
+    vi: "Ảnh xác nhận thanh toán đã được tải lên.",
     en: "Payment proof uploaded."
   },
   paymentRequestCreated: {
@@ -57,7 +57,7 @@ const copy = {
     en: "Payment request does not belong to the current member."
   },
   uploadPaymentProofFailed: {
-    vi: "Không thể tải proof thanh toán.",
+    vi: "Không thể tải ảnh xác nhận thanh toán.",
     en: "Unable to upload payment proof."
   }
 } as const;

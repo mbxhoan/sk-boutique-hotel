@@ -2692,6 +2692,27 @@ textarea {
   box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
 }
 
+.payment-proof-upload {
+  gap: 0.55rem;
+}
+
+.payment-proof-upload__status {
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.payment-proof-upload__status--hint {
+  color: var(--portal-text-soft);
+}
+
+.payment-proof-upload__status--processing {
+  color: var(--portal-accent);
+}
+
+.payment-proof-upload__status--error {
+  color: #b34f4f;
+}
+
 .portal-suggestion-grid {
   display: grid;
   gap: 0.9rem;
