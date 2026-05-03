@@ -3,7 +3,7 @@ export const DEV_AUTH_PASSWORD = "SkbhAdmin2026!";
 export const authUsersSeed = [
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1",
-    email: "sysadmin@skbh.vn",
+    email: "sysadmin@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -18,7 +18,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2",
-    email: "skhotel.phuquoc@gmail.com",
+    email: "admin@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -33,7 +33,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3",
-    email: "manager@skbh.vn",
+    email: "manager@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -48,7 +48,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4",
-    email: "staff@skbh.vn",
+    email: "staff@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -63,7 +63,7 @@ export const authUsersSeed = [
   },
   {
     id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5",
-    email: "member@skbh.vn",
+    email: "member@skhotel.com.vn",
     password: DEV_AUTH_PASSWORD,
     appMetadata: {
       provider: "email",
@@ -81,7 +81,7 @@ export const authUsersSeed = [
 export const memberCustomerSeed = {
   id: "55555555-5555-5555-5555-555555555552",
   authUserId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5",
-  email: "member@skbh.vn",
+  email: "member@skhotel.com.vn",
   fullName: "Demo Member",
   phone: "+84 901 111 111",
   preferredLocale: "vi",

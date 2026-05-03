@@ -62,6 +62,24 @@ export type CmsLocaleZone = {
   eyebrow: LocalizedText;
 };
 
+export type CmsMarketingFacilityItem = {
+  icon?: "water";
+  kind: "check" | "text";
+  label: LocalizedText;
+  value?: LocalizedText;
+};
+
+export type CmsMarketingFacilityColumn = {
+  rows: CmsMarketingFacilityItem[];
+  title: LocalizedText;
+};
+
+export type CmsMarketingShellCopy = {
+  facilities: {
+    columns: CmsMarketingFacilityColumn[];
+  };
+};
+
 export type CmsPageSeo = {
   description: LocalizedText;
   title: LocalizedText;
@@ -162,6 +180,7 @@ export type CmsPageCopy = {
   seo: CmsPageSeo;
   sections: CmsSection[];
   slug: string;
+  marketingShell?: CmsMarketingShellCopy;
 };
 
 const premiumRoomFrame: CmsMediaFrame = {
@@ -1392,7 +1411,7 @@ const roomDetails: CmsPageCopy[] = [
           { value: "5", label: text("Khách", "Guests"), detail: text("Sức chứa 4 Người lớn & 1 Trẻ em.", "Capacity for 4 adults and 1 child."), tone: "paper" },
           { value: "35 m²", label: text("Diện tích", "Area"), detail: text("Gọn nhưng đủ thoáng.", "Compact but still airy."), tone: "gold" },
           { value: text("Giường đôi", "Double bed"), label: text("Bed", "Bed"), detail: text("Bed type linh hoạt.", "Flexible bed type."), tone: "ink" },
-          { value: "From", label: text("Public price", "Public price"), detail: text("Có thể ẩn để chỉ hiện CTA.", "Can be hidden to show CTA only."), tone: "paper" }
+          { value: text("Chỉ từ", "From"), label: text("Public price", "Public price"), detail: text("Có thể ẩn để hiển thị giá teaser.", "Can be hidden to show a teaser price."), tone: "paper" }
         ]
       },
       {
@@ -2135,6 +2154,43 @@ const newsDetails: CmsPageCopy[] = [
   }
 ];
 
+const homeMarketingShell: CmsMarketingShellCopy = {
+  facilities: {
+    columns: [
+      {
+        title: text("Tiện nghi khách sạn", "Hotel amenities"),
+        rows: [
+          { kind: "check", label: text("Ăn sáng miễn phí", "Free breakfast") },
+          { kind: "check", label: text("Giặt ủi trong ngày", "Same-day laundry") },
+          { icon: "water", kind: "check", label: text("Hồ bơi ngoài trời", "Outdoor pool") },
+          { kind: "check", label: text("Cửa sổ", "Windows") },
+          { kind: "check", label: text("Ban công", "Balcony") },
+          { kind: "check", label: text("Kê nệm phụ", "Extra mattress") },
+          { kind: "check", label: text("Bồn tắm", "Bathtub") },
+          { kind: "check", label: text("Bàn làm việc", "Desk") },
+          { kind: "check", label: text("Tủ lạnh", "Fridge") },
+          { kind: "check", label: text("Smart TV / Netflix", "Smart TV / Netflix") },
+          { kind: "check", label: text("Máy sấy tóc", "Hair dryer") },
+          { kind: "check", label: text("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee") }
+        ]
+      },
+      {
+        title: text("Thông tin khác", "Other information"),
+        rows: [
+          { kind: "text", label: text("Loại giường", "Bed type"), value: text("Giường đôi", "Double bed") },
+          { kind: "text", label: text("View phòng", "Room view"), value: text("Sân vườn và hồ bơi", "Garden & pool view") },
+          { kind: "text", label: text("Két sắt", "Safe"), value: text("Chỉ dành cho phòng VIP", "VIP rooms only") },
+          { kind: "text", label: text("Dọn phòng", "Housekeeping"), value: text("Mỗi ngày", "Daily") },
+          { kind: "text", label: text("Dịch vụ phòng", "Room service"), value: text("24/7", "24/7") },
+          { kind: "check", label: text("Không phụ thu cuối tuần", "No weekend surcharge") },
+          { kind: "check", label: text("Cho check-in sớm", "Early check-in available") },
+          { kind: "check", label: text("Không thu phí check-in sớm", "No early check-in fee") }
+        ]
+      }
+    ]
+  }
+};
+
 export const homePageCopy: CmsPageCopy = {
   kind: "home",
   slug: "/",
@@ -2145,7 +2201,8 @@ export const homePageCopy: CmsPageCopy = {
       "From the ambiance and service to the smallest details, everything is arranged for you to enjoy a comfortable and unique vacation."
     )
   },
-  sections: homePageSections
+  sections: homePageSections,
+  marketingShell: homeMarketingShell
 };
 
 export const roomCollectionPageCopy = roomCollectionPage;

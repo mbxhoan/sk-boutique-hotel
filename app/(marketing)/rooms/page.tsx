@@ -3,11 +3,14 @@ import type { Metadata } from "next";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
+import { translate } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
 import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
+import { loadStaticPageBySlug } from "@/lib/supabase/queries/content-pages";
+import type { PageContent } from "@/lib/site-content";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -110,14 +113,37 @@ const roomGalleryFallbacks: Record<string, string[]> = {
   ]
 };
 
+const roomsPageFallback: PageContent = {
+  slug: "/rooms",
+  title: "Phòng",
+  description: "Trang danh sách phòng với hero, call to action và khung nội dung để staff chỉnh sửa.",
+  hero: {
+    layout: "split",
+    eyebrow: "Phòng",
+    title: "Chọn phòng của bạn",
+    description: "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách.",
+    primaryCta: { href: "/lien-he", label: "Kiểm tra phòng trống" },
+    secondaryCta: { href: "/about-us", label: "Xem tiện nghi" },
+    visual: {
+      label: "ROOM COLLECTION",
+      title: "Nội dung đầu trang danh sách phòng",
+      description: "Placeholder cho hero image, badge và copy điều hướng.",
+      variant: "gold",
+      chips: ["Family", "Superior", "Quadruple"]
+    }
+  }
+};
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = await loadStaticPageBySlug("/rooms");
 
   return {
-    title: locale === "en" ? "Choose your room" : "Chọn phòng của bạn",
-    description:
-      locale === "en"
+    title: page ? translate(locale, page.title) : locale === "en" ? "Choose your room" : "Chọn phòng của bạn",
+    description: page
+      ? translate(locale, page.description)
+      : locale === "en"
         ? "View room types, check dates, and open the room canvas without leaving the listing."
         : "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách."
   };
@@ -126,6 +152,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function RoomsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = parseRoomsSearchParams((await searchParams) ?? undefined);
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const page = (await loadStaticPageBySlug("/rooms")) ?? roomsPageFallback;
   const branches = await listBranches();
   const roomTypes = await listRoomTypes();
   const activeRoomType = resolvedSearchParams.room
@@ -190,6 +217,7 @@ export default async function RoomsPage({ searchParams }: PageProps) {
         initialFilters={initialFilters}
         initialRoomSlug={activeRoomType?.slug ?? null}
         locale={locale}
+        pageContent={page}
         roomCarouselImages={roomCarouselImages}
         roomGalleriesBySlug={{
           "family-room": familyGallery,

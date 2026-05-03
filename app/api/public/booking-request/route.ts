@@ -58,7 +58,7 @@ function readBody(body: BookingRequestBody) {
   const stayEndAt = readString(body.stayEndAt);
   const preferredLocale: Locale = body.preferredLocale === "en" ? "en" : "vi";
   const createdBy = readOptionalString(body.createdBy);
-  const source = readString(body.source) || "member_portal";
+  const source = readString(body.source) || "public_site";
   const note = readOptionalString(body.note) ?? "";
   const guestCount = readNumber(body.guestCount) ?? 1;
   const marketingConsent = Boolean(body.marketingConsent);

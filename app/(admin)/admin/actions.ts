@@ -20,6 +20,7 @@ import {
   submitAvailabilityRequest,
   updateAvailabilityRequestStatus
 } from "@/lib/supabase/workflows";
+import { findAvailableRooms } from "@/lib/supabase/queries/availability";
 import {
   createPaymentRequestAction as submitCreatePaymentRequestAction,
   submitPaymentProofAction as submitPaymentProofActionImpl,
@@ -27,15 +28,17 @@ import {
 } from "@/app/actions/payments";
 import { logAuditEvent } from "@/lib/supabase/audit";
 import { listBranches } from "@/lib/supabase/queries/branches";
-import { listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { ensureCustomerByEmail, listCustomersByIds } from "@/lib/supabase/queries/customers";
 import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { getReservationById } from "@/lib/supabase/queries/reservations";
-import { listRoomTypes } from "@/lib/supabase/queries/room-types";
+import { getRoomTypeById, listRoomTypes } from "@/lib/supabase/queries/room-types";
+import { getRoomById } from "@/lib/supabase/queries/rooms";
 import { getSupabaseEmailAdminRecipient, getSupabaseEmailFromAddress } from "@/lib/supabase/env";
 import { getErrorMessage } from "@/lib/supabase/errors";
 import { buildEmailTemplateTestEmail, type EmailTemplateTestKey } from "@/lib/email/test-presets";
 import { getSupabaseUser, getSupabaseUserPortalRole } from "@/lib/supabase/auth";
 import { buildMemberPortalUrl, buildVietQrImageUrl, createPaymentRequest } from "@/lib/supabase/payments";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 const copy = {
   bookingCancelledSuccessfully: {
@@ -110,6 +113,10 @@ const copy = {
     vi: "Không thể tạo yêu cầu thanh toán.",
     en: "Unable to create payment request."
   },
+  unableToCreateManualReservation: {
+    vi: "Không thể tạo booking thủ công.",
+    en: "Unable to create manual reservation."
+  },
   unableToRegenerateDepositQr: {
     vi: "Không thể tạo lại QR cọc.",
     en: "Unable to regenerate deposit QR."
@@ -172,6 +179,19 @@ function resolveConfirmAvailabilityRequestErrorMessage(error: unknown): Localize
   return {
     en: `${copy.unableToConfirmBooking.en} Details: ${detail}`,
     vi: `${copy.unableToConfirmBooking.vi} Chi tiết: ${detail}`
+  };
+}
+
+function resolveManualReservationErrorMessage(error: unknown): LocalizedText {
+  const detail = getErrorMessage(error, "").trim();
+
+  if (!detail) {
+    return copy.unableToCreateManualReservation;
+  }
+
+  return {
+    en: `${copy.unableToCreateManualReservation.en} Details: ${detail}`,
+    vi: `${copy.unableToCreateManualReservation.vi} Chi tiết: ${detail}`
   };
 }
 
@@ -366,6 +386,119 @@ export async function createReservationAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/member");
+}
+
+export async function createManualReservationAction(formData: FormData) {
+  const locale = readLocaleFromFormData(formData);
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const branchId = readRequiredString(formData, "branchId");
+  const roomId = readRequiredString(formData, "roomId");
+  const roomTypeId = readRequiredString(formData, "roomTypeId");
+  const stayStartAt = readRequiredString(formData, "stayStartAt");
+  const stayEndAt = readRequiredString(formData, "stayEndAt");
+  const guestCount = readOptionalNumber(formData, "guestCount") ?? 1;
+  const notes = readOptionalString(formData, "notes") ?? "";
+  const customerName = readRequiredString(formData, "customerName");
+  const customerEmail = readRequiredString(formData, "customerEmail");
+  const customerPhone = readOptionalString(formData, "customerPhone");
+
+  try {
+    const [room, roomType] = await Promise.all([getRoomById(roomId), getRoomTypeById(roomTypeId)]);
+
+    if (!room) {
+      throw new Error(localize(locale, { vi: "Không tìm thấy phòng.", en: "Room was not found." }));
+    }
+
+    if (!roomType) {
+      throw new Error(localize(locale, { vi: "Không tìm thấy hạng phòng.", en: "Room type was not found." }));
+    }
+
+    if (room.branch_id !== branchId || room.room_type_id !== roomTypeId) {
+      throw new Error(
+        localize(locale, {
+          vi: "Phòng được chọn không khớp với chi nhánh hoặc hạng phòng.",
+          en: "The selected room does not match the branch or room type."
+        })
+      );
+    }
+
+    const availableRooms = await findAvailableRooms({
+      branchId,
+      limit: 1000,
+      roomTypeId,
+      stayEndAt,
+      stayStartAt
+    });
+
+    if (!availableRooms.some((availableRoom) => availableRoom.id === room.id)) {
+      throw new Error(
+        localize(locale, {
+          vi: "Phòng này đã được đặt hoặc bị chặn trong khoảng ngày đã chọn.",
+          en: "This room is already booked or blocked for the selected range."
+        })
+      );
+    }
+
+    const customer = await ensureCustomerByEmail({
+      email: customerEmail,
+      fullName: customerName,
+      phone: customerPhone,
+      preferredLocale: locale,
+      source: "admin_manual_booking"
+    });
+    const nights = calculateNights(stayStartAt, stayEndAt);
+    const nightlyRate = roomType.manual_override_price ?? roomType.base_price;
+    const totalAmount = Number((nightlyRate * nights + roomType.weekend_surcharge).toFixed(2));
+    const reservation = await createReservation({
+      actorRole: actorRole ?? readOptionalString(formData, "actorRole") ?? "staff",
+      basePrice: roomType.base_price,
+      branchId,
+      createdBy: user?.id ?? readOptionalString(formData, "createdBy"),
+      customerId: customer.id,
+      depositAmount: 0,
+      guestCount,
+      manualOverridePrice: roomType.manual_override_price,
+      nightlyRate,
+      notes,
+      primaryRoomTypeId: roomTypeId,
+      roomId,
+      status: "confirmed",
+      stayEndAt,
+      stayStartAt,
+      totalAmount,
+      weekendSurcharge: roomType.weekend_surcharge
+    });
+
+    const supabase = createSupabaseServiceClient();
+    const { error: confirmUpdateError } = await supabase
+      .from("reservations")
+      .update({
+        confirmed_at: new Date().toISOString(),
+        updated_by: user?.id ?? null
+      })
+      .eq("id", reservation.id);
+
+    if (confirmUpdateError) {
+      throw confirmUpdateError;
+    }
+  } catch (error) {
+    console.warn("[admin] Failed to create manual reservation", error);
+    redirectWithActionResult(returnTo, "error", resolveManualReservationErrorMessage(error));
+    throw error;
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/rooms");
+  revalidatePath("/member");
+  revalidatePath("/rooms");
+  revalidatePath("/phong");
+  redirectWithActionResult(
+    returnTo,
+    "success",
+    localize(locale, { vi: "Đã đánh dấu phòng là đã đặt.", en: "Room has been marked as booked." })
+  );
 }
 
 export async function confirmAvailabilityRequestAction(formData: FormData) {

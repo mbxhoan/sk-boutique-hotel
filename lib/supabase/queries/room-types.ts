@@ -7,7 +7,7 @@ import type { CmsCollectionItem, CmsPageCopy } from "@/lib/mock/public-cms";
 import { buildRoomDetailHref } from "@/lib/room-routes";
 import { translate } from "@/lib/locale";
 import type { RoomTypeInsert, RoomTypeRow } from "@/lib/supabase/database.types";
-import { formatAreaText, formatCurrencyText, text } from "@/lib/supabase/content";
+import { formatAreaText, formatCurrencyText, formatTeaserCurrencyText, text } from "@/lib/supabase/content";
 import { queryWithServiceFallback, sortByDisplayOrder } from "@/lib/supabase/queries/shared";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -27,7 +27,7 @@ function toRoomCard(roomType: RoomTypeRow): CmsCollectionItem {
   const price = roomType.manual_override_price ?? roomType.base_price;
   const priceMeta = roomType.show_public_price
     ? formatCurrencyText(price) ?? text("Từ 0", "From 0")
-    : text("Ẩn giá công khai", "Price hidden");
+    : formatTeaserCurrencyText(price) ?? text("Chỉ từ 0", "From 0");
 
   return {
     href: buildRoomDetailHref(roomType.slug),
@@ -103,7 +103,7 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
   const publicPrice = roomType.manual_override_price ?? roomType.base_price;
   const priceLabel = roomType.show_public_price
     ? formatCurrencyText(publicPrice) ?? text("Từ 0", "From 0")
-    : text("Ẩn giá công khai", "Price hidden");
+    : formatTeaserCurrencyText(publicPrice) ?? text("Chỉ từ 0", "From 0");
 
   return {
     ...fallbackPage,
@@ -125,12 +125,12 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
                 text(item, roomType.highlights_en[index] ?? roomType.highlights_vi[index] ?? item)
               )
             : section.bullets,
-          frame: {
+              frame: {
             ...section.frame,
             chips: [
               roomType.code,
               text(roomType.bed_type || "Room type", translate("en", roomType.bed_type || "Room type")),
-              roomType.show_public_price ? "From pricing" : "CTA only"
+              roomType.show_public_price ? text("Từ giá", "From pricing") : text("Chỉ từ", "From")
             ]
           }
         };
@@ -170,8 +170,8 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
               value: priceLabel,
               label: text("Public price", "Public price"),
               detail: text(
-                roomType.show_public_price ? "Có thể hiển thị công khai." : "Có thể ẩn để chỉ hiện CTA.",
-                roomType.show_public_price ? "Can be shown publicly." : "Can be hidden to show CTA only."
+                roomType.show_public_price ? "Có thể hiển thị công khai." : "Có thể ẩn để hiển thị giá chỉ từ.",
+                roomType.show_public_price ? "Can be shown publicly." : "Can be hidden to show a teaser price."
               ),
               tone: "paper" as const
             }
@@ -229,8 +229,8 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
           bullets: [
             text(roomType.bed_type || "Bed type", roomType.bed_type || "Bed type"),
             text(
-              roomType.show_public_price ? "Public price visible." : "CTA-only pricing mode.",
-              roomType.show_public_price ? "Public price visible." : "CTA-only pricing mode."
+              roomType.show_public_price ? "Public price visible." : "Teaser price mode.",
+              roomType.show_public_price ? "Public price visible." : "Teaser price mode."
             ),
             text(
               roomType.manual_override_price != null ? "Manual override supported." : "Base price supported.",
@@ -292,6 +292,21 @@ async function getRoomTypeBySlug(slug: string) {
         .select(roomTypeSelect)
         .eq("slug", slug)
         .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? null) as RoomTypeRow | null;
+    },
+    null as RoomTypeRow | null
+  );
+}
+
+export async function getRoomTypeById(roomTypeId: string) {
+  return queryWithServiceFallback(
+    async (client) => {
+      const { data, error } = await client.from("room_types").select(roomTypeSelect).eq("id", roomTypeId).maybeSingle();
 
       if (error) {
         throw error;

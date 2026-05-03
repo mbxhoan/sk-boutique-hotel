@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 
 import "@fontsource/montserrat/400.css";
 import "@fontsource/montserrat/700.css";
@@ -9,6 +10,8 @@ import "@fontsource/be-vietnam-pro/700.css";
 import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/next";
+
+import { NavigationLoadingIndicator } from "@/components/navigation-loading-indicator";
 
 export const metadata: Metadata = {
   title: {
@@ -54,6 +57,9 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="site-body">
+        <Suspense fallback={null}>
+          <NavigationLoadingIndicator />
+        </Suspense>
         {children}
         <Analytics />
       </body>

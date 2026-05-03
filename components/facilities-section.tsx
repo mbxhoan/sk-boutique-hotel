@@ -2,6 +2,7 @@
 
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import type { CmsMarketingShellCopy } from "@/lib/mock/public-cms";
 
 type FacilityRow = {
   icon?: "water";
@@ -26,6 +27,7 @@ type FacilityColumn = {
 
 type FacilitiesSectionProps = {
   className?: string;
+  copy?: CmsMarketingShellCopy["facilities"];
   id?: string;
   locale: Locale;
 };
@@ -121,8 +123,16 @@ function buildColumns(locale: Locale): FacilityColumn[] {
       ];
 }
 
-export function FacilitiesSection({ className, id = "tien-ich", locale }: FacilitiesSectionProps) {
-  const columns = buildColumns(locale);
+function normalizeColumns(copy: FacilitiesSectionProps["copy"], locale: Locale) {
+  if (!copy?.columns?.length) {
+    return buildColumns(locale);
+  }
+
+  return copy.columns;
+}
+
+export function FacilitiesSection({ className, copy, id = "tien-ich", locale }: FacilitiesSectionProps) {
+  const columns = normalizeColumns(copy, locale);
 
   return (
     <section className={`section facilities-band${className ? ` ${className}` : ""}`} id={id}>

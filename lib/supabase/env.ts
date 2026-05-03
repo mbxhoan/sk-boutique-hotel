@@ -73,7 +73,7 @@ export function getSupabaseEmailFunctionNames() {
 }
 
 export function getSupabaseEmailFromAddress() {
-  return getFirstDefinedEnv(emailFromAddressKeys) ?? "admin@bkhanhxinh.com";
+  return getFirstDefinedEnv(emailFromAddressKeys) ?? "service@skhotel.com.vn";
 }
 
 export function getSupabaseEmailFromName() {
@@ -81,5 +81,5 @@ export function getSupabaseEmailFromName() {
 }
 
 export function getSupabaseEmailAdminRecipient() {
-  return getFirstDefinedEnv(emailAdminRecipientKeys) ?? "admin@bkhanhxinh.com";
+  return getFirstDefinedEnv(emailAdminRecipientKeys) ?? "service@skhotel.com.vn";
 }

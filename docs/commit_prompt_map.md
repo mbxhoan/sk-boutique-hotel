@@ -1610,3 +1610,79 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/media-preview-image.tsx`
   - `lib/supabase/booking-finance.ts`
   - `lib/supabase/queries/booking-details.ts`
+
+### Entry 140
+- `time`: 2026-04-30T23:09:42+07:00
+- `prompt_summary`: Muốn chỉnh sửa nội dung public của about-us, rooms và khối tiện nghi khách sạn từ admin portal, để thay đổi trên CMS phản ánh ngay lên website công khai.
+- `commit_message`: `feat(cms): make public marketing content editable from admin portal`
+- `main_files`:
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/layout.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `components/about-us-page.tsx`
+  - `components/facilities-section.tsx`
+  - `components/marketing-bottom-sections.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `lib/locale.ts`
+  - `lib/mock/public-cms.ts`
+  - `lib/site-content.ts`
+  - `lib/supabase/queries/content-pages.ts`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+
+### Entry 141
+- `time`: 2026-04-30T23:46:17+07:00
+- `prompt_summary`: Muốn ẩn giá công khai hiển thị dạng teaser “Chỉ từ xxx”, có thao tác admin đánh dấu phòng đã đặt thủ công theo khoảng ngày để public web trừ số phòng còn lại, và với card sold-out thì vẫn xem được chi tiết nhưng tắt toàn bộ luồng đặt phòng.
+- `commit_message`: `feat(rooms-booking): add teaser pricing, manual blocking, and sold-out cards`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `components/admin-rooms-page.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `components/admin-room-types-manager.tsx`
+  - `lib/supabase/content.ts`
+  - `lib/supabase/queries/customers.ts`
+  - `lib/supabase/queries/room-types.ts`
+  - `app/globals.css`
+
+### Entry 142
+- `time`: 2026-04-30T23:55:52+07:00
+- `prompt_summary`: Chỗ booking form đang mở member portal, nhưng thực tế phải là form nhập thông tin booking như khách mới đặt phòng; member đăng nhập chỉ được tự điền sẵn, không dẫn sang portal.
+- `commit_message`: `fix(booking-form): keep booking inputs guest-style`
+- `main_files`:
+  - `components/room-booking-request-form.tsx`
+  - `app/api/public/booking-request/route.ts`
+
+### Entry 143
+- `time`: 2026-05-01T00:03:13+07:00
+- `prompt_summary`: Vì sao booking superior đã hoàn tất cho khoảng 30/04 đến 01/05 nhưng số phòng trống public vẫn không giảm, và cần làm cho completed booking tiếp tục block availability đúng theo date overlap.
+- `commit_message`: `fix(availability): keep completed bookings blocking room counts`
+- `main_files`:
+  - `supabase/migrations/20260430235900_phase_k_completed_reservation_availability_block.sql`
+
+### Entry 144
+- `time`: 2026-05-03T18:55:16+07:00
+- `prompt_summary`: Người dùng bấm qua các trạng thái/trang bị chậm và không có loading animation, nên cần loading rõ ràng khi chuyển trang và giảm phần layout đang chặn render.
+- `commit_message`: `feat(navigation-loading): show route transition feedback and reduce layout blocking`
+- `main_files`:
+  - `app/(admin)/loading.tsx`
+  - `app/(marketing)/layout.tsx`
+  - `app/(marketing)/loading.tsx`
+  - `app/(member)/layout.tsx`
+  - `app/(member)/loading.tsx`
+  - `app/layout.tsx`
+  - `app/loading.tsx`
+  - `components/navigation-loading-indicator.tsx`
+  - `components/page-loading-screen.tsx`
+
+### Entry 145
+- `time`: 2026-05-03T18:55:16+07:00
+- `prompt_summary`: Muốn message loading chỉ hiển thị đúng một ngôn ngữ theo locale hiện tại, không ghép song ngữ chung trong cùng một box.
+- `commit_message`: `fix(loading-copy): localize loading text by active language`
+- `main_files`:
+  - `app/(admin)/loading.tsx`
+  - `app/(marketing)/loading.tsx`
+  - `app/(member)/loading.tsx`
+  - `app/loading.tsx`
+  - `components/localized-page-loading-screen.tsx`
+  - `lib/locale.ts`

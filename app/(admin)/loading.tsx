@@ -4,8 +4,8 @@ export default function Loading() {
   return (
     <LocalizedPageLoadingScreen
       copy={{
-        en: "Please wait a moment while we prepare your page.",
-        vi: "Vui lòng giữ trong giây lát, chúng tôi đang chuẩn bị thông tin cho bạn."
+        en: "Please wait a moment while we prepare the admin area.",
+        vi: "Vui lòng giữ trong giây lát, chúng tôi đang chuẩn bị giao diện quản trị."
       }}
       title={{
         en: "Loading",
