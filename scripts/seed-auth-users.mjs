@@ -113,54 +113,97 @@ async function upsertAuthUser(supabase, seed, locale) {
 }
 
 async function linkMemberCustomer(supabase, authUserId, locale) {
-  const updateResult = await supabase
+  // Look up by id first (stable across email changes).
+  const lookupById = await supabase
     .from("customers")
-    .update({ auth_user_id: authUserId })
-    .eq("email", memberCustomerSeed.email)
     .select("id, email, auth_user_id")
+    .eq("id", memberCustomerSeed.id)
     .maybeSingle();
 
-  if (updateResult.error) {
-    throw updateResult.error;
+  if (lookupById.error) {
+    throw lookupById.error;
   }
 
-  if (updateResult.data) {
+  if (lookupById.data) {
+    if (lookupById.data.auth_user_id === authUserId) {
+      log(
+        locale,
+        `Customer member đã link sẵn (id ${memberCustomerSeed.id}, email ${lookupById.data.email}).`,
+        `Member customer already linked (id ${memberCustomerSeed.id}, email ${lookupById.data.email}).`
+      );
+      return;
+    }
+
+    const { error } = await supabase
+      .from("customers")
+      .update({ auth_user_id: authUserId })
+      .eq("id", memberCustomerSeed.id);
+
+    if (error) {
+      throw error;
+    }
+
     log(
       locale,
-      `Đã nối customer member với auth user: ${memberCustomerSeed.email}`,
-      `Linked member customer to auth user: ${memberCustomerSeed.email}`
+      `Đã nối customer member theo id (${memberCustomerSeed.id}, email ${lookupById.data.email}).`,
+      `Linked member customer by id (${memberCustomerSeed.id}, email ${lookupById.data.email}).`
     );
     return;
   }
 
-  const upsertResult = await supabase.from("customers").upsert(
-    {
-      id: memberCustomerSeed.id,
-      auth_user_id: authUserId,
-      full_name: memberCustomerSeed.fullName,
-      email: memberCustomerSeed.email,
-      phone: memberCustomerSeed.phone,
-      preferred_locale: memberCustomerSeed.preferredLocale,
-      marketing_consent: memberCustomerSeed.marketingConsent,
-      marketing_consent_at: new Date().toISOString(),
-      marketing_consent_source: memberCustomerSeed.marketingConsentSource,
-      source: memberCustomerSeed.source,
-      notes: memberCustomerSeed.notes,
-      last_seen_at: new Date().toISOString()
-    },
-    {
-      onConflict: "email"
-    }
-  );
+  // Fallback: try by email (in case id was changed but email still matches).
+  const lookupByEmail = await supabase
+    .from("customers")
+    .select("id, email, auth_user_id")
+    .eq("email", memberCustomerSeed.email)
+    .maybeSingle();
 
-  if (upsertResult.error) {
-    throw upsertResult.error;
+  if (lookupByEmail.error) {
+    throw lookupByEmail.error;
+  }
+
+  if (lookupByEmail.data) {
+    const { error } = await supabase
+      .from("customers")
+      .update({ auth_user_id: authUserId })
+      .eq("id", lookupByEmail.data.id);
+
+    if (error) {
+      throw error;
+    }
+
+    log(
+      locale,
+      `Đã nối customer member theo email: ${memberCustomerSeed.email} (id ${lookupByEmail.data.id}).`,
+      `Linked member customer by email: ${memberCustomerSeed.email} (id ${lookupByEmail.data.id}).`
+    );
+    return;
+  }
+
+  // No existing row — insert fresh.
+  const { error: insertError } = await supabase.from("customers").insert({
+    id: memberCustomerSeed.id,
+    auth_user_id: authUserId,
+    full_name: memberCustomerSeed.fullName,
+    email: memberCustomerSeed.email,
+    phone: memberCustomerSeed.phone,
+    preferred_locale: memberCustomerSeed.preferredLocale,
+    marketing_consent: memberCustomerSeed.marketingConsent,
+    marketing_consent_at: new Date().toISOString(),
+    marketing_consent_source: memberCustomerSeed.marketingConsentSource,
+    source: memberCustomerSeed.source,
+    notes: memberCustomerSeed.notes,
+    last_seen_at: new Date().toISOString()
+  });
+
+  if (insertError) {
+    throw insertError;
   }
 
   log(
     locale,
-    `Đã tạo/nối customer member từ script: ${memberCustomerSeed.email}`,
-    `Created/linked member customer from script: ${memberCustomerSeed.email}`
+    `Đã tạo customer member từ script: ${memberCustomerSeed.email}`,
+    `Created member customer from script: ${memberCustomerSeed.email}`
   );
 }
 
@@ -215,10 +258,37 @@ async function main() {
   );
 }
 
+function describeError(error) {
+  if (!error) {
+    return "";
+  }
+
+  if (error instanceof Error) {
+    return error.stack || error.message;
+  }
+
+  if (typeof error === "object") {
+    const parts = [];
+    if (error.message) parts.push(`message: ${error.message}`);
+    if (error.code) parts.push(`code: ${error.code}`);
+    if (error.status ?? error.statusCode) parts.push(`status: ${error.status ?? error.statusCode}`);
+    if (error.details) parts.push(`details: ${error.details}`);
+    if (error.hint) parts.push(`hint: ${error.hint}`);
+    if (parts.length) return parts.join("\n");
+    try {
+      return JSON.stringify(error, null, 2);
+    } catch {
+      return String(error);
+    }
+  }
+
+  return String(error);
+}
+
 main().catch((error) => {
   const locale = process.argv.includes("--en") ? "en" : "vi";
   const summary = locale === "vi" ? "Seed auth users thất bại." : "Auth user seed failed.";
-  const detail = error instanceof Error ? error.message : String(error ?? "");
+  const detail = describeError(error);
 
   if (detail) {
     console.error(`${summary}\n${locale === "vi" ? "Chi tiết" : "Detail"}: ${detail}`);
