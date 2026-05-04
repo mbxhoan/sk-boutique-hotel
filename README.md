@@ -19,7 +19,8 @@ Frontend tĩnh cho website `SK Boutique Hotel`, dựng bằng **Next.js App Rout
 - `SUPABASE_EMAIL_FROM_NAME` mặc định là `SK Boutique Hotel`
 - `SUPABASE_EMAIL_ADMIN_TO` mặc định là `service@skhotel.com.vn`
 - `SUPABASE_EMAIL_ADMIN_BCC` là danh sách bản sao ẩn; nếu không set, các địa chỉ đứng sau mailbox đầu tiên trong `SUPABASE_EMAIL_ADMIN_TO` sẽ được dùng làm bản sao ẩn.
-- Edge Function hiện đang nhận body đơn giản gồm `from`, `to`, `subject`, `html`.
+- Edge Function trên Supabase phải forward thêm `bcc` sang Resend thì mailbox ẩn mới nhận mail thật; nếu function vẫn là bản cũ chỉ đọc `from`, `to`, `subject`, `html` thì `bcc` sẽ bị bỏ qua.
+- `RESEND_API_KEY` phải lấy từ secret/env của function, không hardcode trong source.
 - `from_name` sẽ được gửi theo dạng `SK Boutique Hotel <service@skhotel.com.vn>` để hộp thư hiển thị đúng thương hiệu.
 
 ## Chạy dự án

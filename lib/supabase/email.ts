@@ -17,6 +17,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type SendEmailInput = {
   from: string;
+  bcc?: string[];
   to: string;
   subject: string;
   html: string;
@@ -229,6 +230,7 @@ export async function sendEmail(input: SendEmailInput) {
   const fromHeader = input.from.includes("<") ? input.from.trim() : buildFromHeader(input.from);
   const payload = {
     from: fromHeader,
+    ...(input.bcc && input.bcc.length > 0 ? { bcc: input.bcc } : {}),
     to: input.to.trim(),
     subject: input.subject.trim(),
     html: input.html.trim()
@@ -322,40 +324,28 @@ export async function sendAvailabilityRequestEmails(request: AvailabilityRequest
   const customerDeliveryPromise = sendEmail(customerEmail)
     .then(() => ({ status: "fulfilled" as const }))
     .catch((reason) => ({ status: "rejected" as const, reason }));
-  const adminDeliveryPromise = (async () => {
-    const results: Array<PromiseSettledResult<unknown>> = [];
+  const adminDeliveryPromise = sendEmail({
+    ...adminEmailPayload,
+    bcc: adminBccRecipients.length > 0 ? adminBccRecipients : undefined,
+    to: adminPrimaryRecipient
+  })
+    .then(() => ({ status: "fulfilled" as const }))
+    .catch((reason) => ({ status: "rejected" as const, reason }));
 
-    const adminDeliveryTargets = [adminPrimaryRecipient, ...adminBccRecipients];
+  const [customerDelivery, adminDelivery] = await Promise.all([customerDeliveryPromise, adminDeliveryPromise]);
 
-    for (const to of adminDeliveryTargets) {
-      try {
-        await sendEmail({
-          ...adminEmailPayload,
-          to
-        });
-        results.push({ status: "fulfilled", value: null });
-      } catch (reason) {
-        results.push({ status: "rejected", reason });
-      }
-    }
-
-    return results;
-  })();
-
-  const [customerDelivery, adminDeliveries] = await Promise.all([customerDeliveryPromise, adminDeliveryPromise]);
-  const adminDeliveredCount = adminDeliveries.filter((result) => result.status === "fulfilled").length;
-
-  if (customerDelivery.status === "rejected" || adminDeliveredCount !== 1 + adminBccRecipients.length) {
+  if (customerDelivery.status === "rejected" || adminDelivery.status === "rejected") {
     console.warn("[email] Failed to deliver availability request notification", {
       requestCode: request.request_code,
-      adminDeliveredCount,
-      adminRecipientCount: 1 + adminBccRecipients.length,
-      customerDelivered: customerDelivery.status === "fulfilled"
+      adminBccRecipientCount: adminBccRecipients.length,
+      adminPrimaryRecipient,
+      customerDelivered: customerDelivery.status === "fulfilled",
+      adminDelivered: adminDelivery.status === "fulfilled"
     });
   }
 
   return {
-    admin: adminDeliveredCount === 1 + adminBccRecipients.length,
+    admin: adminDelivery.status === "fulfilled",
     customer: customerDelivery.status === "fulfilled"
   };
 }

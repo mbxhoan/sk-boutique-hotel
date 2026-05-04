@@ -1772,3 +1772,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `README.md`
   - `lib/supabase/email.ts`
   - `lib/supabase/env.ts`
+
+### Entry 154
+- `time`: 2026-05-04T11:48:56+07:00
+- `prompt_summary`: Booking request admin mail vẫn chưa thấy đến inbox đích, cần test kỹ luồng thật và chuyển sang gửi `bcc` đúng nghĩa trên runtime email function đang hoạt động.
+- `commit_message`: `fix(email-notifications): send admin booking mail with bcc payload`
+- `main_files`:
+  - `README.md`
+  - `lib/supabase/email.ts`
+  - `docs/commit_prompt_map.md`
+
+### Entry 155
+- `time`: 2026-05-04T11:57:42+07:00
+- `prompt_summary`: Bổ sung code Edge Function hiện tại cho thấy nó đang bỏ qua `bcc` và còn hardcode Resend key, nên cần ghi rõ contract deploy phải forward `bcc` và đọc API key từ env.
+- `commit_message`: `docs(email-notifications): clarify edge function bcc forwarding contract`
+- `main_files`:
+  - `README.md`
+  - `docs/commit_prompt_map.md`

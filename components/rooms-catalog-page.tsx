@@ -88,8 +88,8 @@ function RoomCard({
       : "Tạm đóng theo lịch"
     : fitState === "recommended"
       ? locale === "en"
-        ? `Fits your ${guestCount}-guest search`
-        : `Phù hợp với nhóm ${guestCount} khách`
+        // ? `Fits your ${guestCount}-guest search`
+        // : `Phù hợp với nhóm ${guestCount} khách`
       : fitState === "sold-out"
         ? locale === "en"
           ? `Sold out for now`
