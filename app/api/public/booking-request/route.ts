@@ -4,7 +4,7 @@ import { isBookingRequestStayWindowValid } from "@/lib/booking-dates";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { getFirstContactDetailsError, normalizeContactDetails, validateContactDetails } from "@/lib/contact-details";
-import { getSupabaseSession } from "@/lib/supabase/auth";
+import { getSupabaseRequestUser } from "@/lib/supabase/auth";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
 import { submitAvailabilityRequest } from "@/lib/supabase/workflows";
 
@@ -115,9 +115,9 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as BookingRequestBody;
     const input = readBody(body);
-    const session = await getSupabaseSession().catch(() => null);
+    const user = await getSupabaseRequestUser(request).catch(() => null);
 
-    if (!session?.user || session.user.id !== input.createdBy) {
+    if (!user || user.id !== input.createdBy) {
       return jsonApiErrorResponse({
         context: {
           branchId: input.branchId,

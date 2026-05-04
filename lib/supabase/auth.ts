@@ -27,6 +27,47 @@ export async function getSupabaseUser() {
   return data.user;
 }
 
+function readBearerToken(authorization: string | null) {
+  if (!authorization) {
+    return null;
+  }
+
+  const [scheme, ...tokenParts] = authorization.trim().split(/\s+/);
+
+  if (scheme?.toLowerCase() !== "bearer" || tokenParts.length === 0) {
+    return null;
+  }
+
+  const token = tokenParts.join(" ").trim();
+
+  return token.length > 0 ? token : null;
+}
+
+export async function getSupabaseRequestUser(request: Request) {
+  const supabase = await createSupabaseServerClient();
+  const accessToken = readBearerToken(request.headers.get("authorization"));
+
+  if (accessToken) {
+    try {
+      const { data, error } = await supabase.auth.getUser(accessToken);
+
+      if (!error && data.user) {
+        return data.user;
+      }
+    } catch {
+      // Fall back to the server session below if the bearer token is missing or stale.
+    }
+  }
+
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session?.user ?? null;
+}
+
 export function getSupabaseUserPortalRole(user: User | null | undefined): AdminPortalRole | null {
   if (!user) {
     return null;

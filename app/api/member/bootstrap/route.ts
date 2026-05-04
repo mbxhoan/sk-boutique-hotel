@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { Locale } from "@/lib/locale";
 import { getFirstContactDetailsError, normalizeContactDetails, validateContactDetails } from "@/lib/contact-details";
-import { getSupabaseSession } from "@/lib/supabase/auth";
+import { getSupabaseRequestUser } from "@/lib/supabase/auth";
 import { upsertCustomerProfile } from "@/lib/supabase/queries/customers";
 import { jsonApiErrorResponse } from "@/lib/server/api-error";
 
@@ -56,9 +56,9 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as BootstrapBody;
     const profile = readBody(body);
-    const session = await getSupabaseSession().catch(() => null);
+    const user = await getSupabaseRequestUser(request).catch(() => null);
 
-    if (!session?.user || session.user.id !== profile.authUserId) {
+    if (!user || user.id !== profile.authUserId) {
       return jsonApiErrorResponse({
         context: {
           authUserId: profile.authUserId,

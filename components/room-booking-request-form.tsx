@@ -104,6 +104,10 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
     return localize(locale, "Không thể tạo hồ sơ thành viên.", "Unable to create the member profile.");
   }
 
+  if (message.includes("unauthorized bootstrap request")) {
+    return localize(locale, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", "Your session has expired. Please sign in again.");
+  }
+
   if (message.includes("no rooms are available for the selected stay window")) {
     return localize(locale, "Hết phòng trong khoảng thời gian bạn chọn.", "No rooms are available for the selected stay window.");
   }
@@ -191,7 +195,21 @@ export function RoomBookingRequestForm({
     });
   }
 
-  async function bootstrapMemberProfile(authUserId: string, contactName: string, contactEmail: string, contactPhone: string) {
+  async function bootstrapMemberProfile(
+    authUserId: string,
+    contactName: string,
+    contactEmail: string,
+    contactPhone: string,
+    accessToken: string | null
+  ) {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json"
+    };
+
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch("/api/member/bootstrap", {
       body: JSON.stringify({
         authUserId,
@@ -201,9 +219,7 @@ export function RoomBookingRequestForm({
         preferredLocale: locale,
         source: "public_site"
       }),
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers,
       method: "POST"
     });
 
@@ -218,8 +234,17 @@ export function RoomBookingRequestForm({
     contactName: string,
     contactEmail: string,
     contactPhone: string,
-    requestMarketingConsent: boolean
+    requestMarketingConsent: boolean,
+    accessToken: string | null
   ) {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json"
+    };
+
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch("/api/public/booking-request", {
       body: JSON.stringify({
         branchId,
@@ -239,9 +264,7 @@ export function RoomBookingRequestForm({
         stayEndAt,
         stayStartAt
       }),
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers,
       method: "POST"
     });
 
@@ -276,6 +299,7 @@ export function RoomBookingRequestForm({
       const contactDetails = validation.values;
       const supabase = createSupabaseBrowserClient();
       let authUserId: string | null = null;
+      let accessToken: string | null = null;
       const authCredentials = {
         email: contactDetails.email,
         password: DEFAULT_MEMBER_PASSWORD
@@ -308,11 +332,13 @@ export function RoomBookingRequestForm({
             }
 
             authUserId = fallbackSignInData.user?.id ?? null;
+            accessToken = fallbackSignInData.session?.access_token ?? null;
           } else {
             throw signUpError;
           }
         } else {
           authUserId = signUpData.session?.user?.id ?? null;
+          accessToken = signUpData.session?.access_token ?? null;
 
           if (!authUserId) {
             const { data: fallbackSignInData, error: fallbackSignInError } = await supabase.auth.signInWithPassword(authCredentials);
@@ -322,24 +348,32 @@ export function RoomBookingRequestForm({
             }
 
             authUserId = fallbackSignInData.user?.id ?? null;
+            accessToken = fallbackSignInData.session?.access_token ?? null;
           }
         }
       } else {
         authUserId = signInData.user?.id ?? null;
+        accessToken = signInData.session?.access_token ?? null;
       }
 
       if (!authUserId) {
         throw new Error(localize(locale, "Không thể xác thực tài khoản.", "Unable to authenticate the account."));
       }
 
-      await bootstrapMemberProfile(authUserId, contactDetails.fullName, contactDetails.email, contactDetails.phone);
+      if (!accessToken) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        accessToken = sessionData.session?.access_token ?? null;
+      }
+
+      await bootstrapMemberProfile(authUserId, contactDetails.fullName, contactDetails.email, contactDetails.phone, accessToken);
 
       await submitBookingRequest(
         authUserId,
         contactDetails.fullName,
         contactDetails.email,
         contactDetails.phone,
-        marketingConsent
+        marketingConsent,
+        accessToken
       );
 
       router.push(appendLocaleQuery("/member", locale));

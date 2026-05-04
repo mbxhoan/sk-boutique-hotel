@@ -186,12 +186,24 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
   const alternateLabel = isSignUp ? localize(locale, copy.labels.goToSignIn) : localize(locale, copy.labels.goToSignUp);
   const hint = isSignUp ? localize(locale, copy.hints.signUp) : localize(locale, copy.hints.signIn);
 
-  async function bootstrapMemberProfile(authUserId: string, contactName: string, contactEmail: string, contactPhone: string | null) {
+  async function bootstrapMemberProfile(
+    authUserId: string,
+    contactName: string,
+    contactEmail: string,
+    contactPhone: string | null,
+    accessToken: string | null
+  ) {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json"
+    };
+
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch("/api/member/bootstrap", {
       body: JSON.stringify(buildBootstrapPayload(locale, authUserId, contactEmail, contactName, contactPhone)),
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers,
       method: "POST"
     });
 
@@ -210,6 +222,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
       const trimmedEmail = email.trim();
       const trimmedFullName = fullName.trim();
       const trimmedPhone = phone.trim();
+      let accessToken: string | null = null;
 
       if (!trimmedEmail) {
         throw new Error(localize(locale, { vi: "Vui lòng nhập email.", en: "Please enter your email." }));
@@ -258,11 +271,13 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
             }
 
             authUserId = signInData.user?.id ?? null;
+            accessToken = signInData.session?.access_token ?? null;
           } else {
             throw signUpError;
           }
         } else {
           authUserId = data.user?.id ?? null;
+          accessToken = data.session?.access_token ?? null;
         }
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -275,6 +290,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         }
 
         authUserId = data.user?.id ?? null;
+        accessToken = data.session?.access_token ?? null;
       }
 
       if (!authUserId) {
@@ -286,7 +302,18 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         throw new Error(localize(locale, copy.errors.bootstrap));
       }
 
-      await bootstrapMemberProfile(authUserId, trimmedFullName || normalizeFallbackName(trimmedEmail), trimmedEmail, trimmedPhone || null);
+      if (!accessToken) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        accessToken = sessionData.session?.access_token ?? null;
+      }
+
+      await bootstrapMemberProfile(
+        authUserId,
+        trimmedFullName || normalizeFallbackName(trimmedEmail),
+        trimmedEmail,
+        trimmedPhone || null,
+        accessToken
+      );
 
       setIsRedirecting(true);
       router.replace(appendLocaleQuery(nextHref, locale));

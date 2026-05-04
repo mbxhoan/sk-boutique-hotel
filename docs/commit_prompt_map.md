@@ -1745,3 +1745,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `docs/03-workflows.md`
   - `lib/supabase/email.ts`
   - `lib/supabase/env.ts`
+
+### Entry 151
+- `time`: 2026-05-04T11:24:15+07:00
+- `prompt_summary`: Khi nhập lại thông tin booking cũ, luồng tạo hồ sơ thành viên bị lỗi unauthorized vì API bootstrap chỉ tin vào session cookie; cần làm cho bootstrap/booking request nhận được auth token từ browser và vẫn xác thực đúng người dùng.
+- `commit_message`: `fix(member-bootstrap): accept browser access tokens for booking flows`
+- `main_files`:
+  - `app/api/member/bootstrap/route.ts`
+  - `app/api/public/booking-request/route.ts`
+  - `components/member-auth-form.tsx`
+  - `components/room-booking-request-form.tsx`
+  - `lib/supabase/auth.ts`
