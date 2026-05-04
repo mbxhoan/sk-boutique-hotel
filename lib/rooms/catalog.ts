@@ -25,6 +25,7 @@ export type RoomCatalogEntry = {
   galleryBadge: LocalizedText;
   highlights: LocalizedText[];
   guestCapacity: number;
+  isClosed: boolean;
   metaFacts: {
     label: LocalizedText;
     value: LocalizedText;
@@ -115,7 +116,11 @@ function buildGallery(roomType: RoomTypeRow, overrideGallery?: string[]) {
   ];
 }
 
-function buildAvailabilityLabel(availableRooms: number) {
+function buildAvailabilityLabel(availableRooms: number, isClosed = false) {
+  if (isClosed) {
+    return text("Tạm đóng theo lịch", "Temporarily closed");
+  }
+
   if (availableRooms <= 0) {
     return text("Hết phòng", "Sold out");
   }
@@ -188,7 +193,8 @@ function buildMetaFacts(roomType: RoomTypeRow) {
 export function buildRoomCatalogEntry(
   roomType: RoomTypeRow,
   availableRooms: number,
-  overrideGallery?: string[]
+  overrideGallery?: string[],
+  isClosed = false
 ): RoomCatalogEntry {
   const currentPrice = roomType.manual_override_price ?? roomType.base_price;
   const originalPrice = roomType.manual_override_price != null ? roomType.base_price : null;
@@ -199,10 +205,11 @@ export function buildRoomCatalogEntry(
       : null;
   const { breakfast, cancellation } = buildPriceOptions(roomType);
   const gallery = buildGallery(roomType, overrideGallery);
+  const effectiveAvailable = isClosed ? 0 : availableRooms;
 
   return {
-    availabilityLabel: buildAvailabilityLabel(availableRooms),
-    availableRooms,
+    availabilityLabel: buildAvailabilityLabel(effectiveAvailable, isClosed),
+    availableRooms: effectiveAvailable,
     bedLabel: text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
     bookingCtaLabel: text("Xem lựa chọn và đặt phòng", "View options and book"),
     breakfastOptions: breakfast,
@@ -217,6 +224,7 @@ export function buildRoomCatalogEntry(
     ),
     highlights: localizedArray(roomType.highlights_vi, roomType.highlights_en),
     guestCapacity,
+    isClosed,
     metaFacts: buildMetaFacts(roomType),
     occupancyAdults: roomType.occupancy_adults,
     occupancyChildren: roomType.occupancy_children,

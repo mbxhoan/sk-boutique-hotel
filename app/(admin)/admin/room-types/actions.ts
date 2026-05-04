@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getSupabaseUser } from "@/lib/supabase/auth";
 import type { RoomTypeInsert } from "@/lib/supabase/database.types";
+import {
+  cancelRoomTypeClosure,
+  createRoomTypeClosure
+} from "@/lib/supabase/queries/room-type-closures";
 import { upsertRoomType } from "@/lib/supabase/queries/room-types";
 
 function readRequiredString(formData: FormData, key: string) {
@@ -112,4 +117,78 @@ export async function saveRoomTypeAction(formData: FormData) {
   revalidatePath(`/rooms/${savedRoomType.slug}`);
   revalidatePath(`/phong/${savedRoomType.slug}`);
   revalidatePath("/");
+}
+
+function readDateOnly(formData: FormData, key: string) {
+  const value = formData.get(key);
+
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new Error(`Missing required field: ${key}`);
+  }
+
+  return value.trim();
+}
+
+function toStartOfDayIso(dateOnly: string) {
+  const parsed = new Date(`${dateOnly}T00:00:00`);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Invalid date value: ${dateOnly}`);
+  }
+
+  return parsed.toISOString();
+}
+
+function toEndOfDayIso(dateOnly: string) {
+  const parsed = new Date(`${dateOnly}T00:00:00`);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Invalid date value: ${dateOnly}`);
+  }
+
+  parsed.setDate(parsed.getDate() + 1);
+
+  return parsed.toISOString();
+}
+
+export async function addRoomTypeClosureAction(formData: FormData) {
+  const roomTypeId = readRequiredString(formData, "roomTypeId");
+  const startDate = readDateOnly(formData, "startDate");
+  const endDate = readDateOnly(formData, "endDate");
+  const reason = readOptionalString(formData, "reason");
+
+  const startAt = toStartOfDayIso(startDate);
+  const endAt = toEndOfDayIso(endDate);
+
+  if (new Date(endAt).getTime() <= new Date(startAt).getTime()) {
+    throw new Error("Closure end date must be on or after the start date.");
+  }
+
+  const user = await getSupabaseUser();
+
+  await createRoomTypeClosure({
+    roomTypeId,
+    startAt,
+    endAt,
+    reason,
+    createdBy: user?.id ?? null
+  });
+
+  revalidatePath("/admin/room-types");
+  revalidatePath("/rooms");
+  revalidatePath("/phong");
+}
+
+export async function cancelRoomTypeClosureAction(formData: FormData) {
+  const closureId = readRequiredString(formData, "closureId");
+  const user = await getSupabaseUser();
+
+  await cancelRoomTypeClosure({
+    closureId,
+    cancelledBy: user?.id ?? null
+  });
+
+  revalidatePath("/admin/room-types");
+  revalidatePath("/rooms");
+  revalidatePath("/phong");
 }

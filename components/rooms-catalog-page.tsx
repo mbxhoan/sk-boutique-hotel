@@ -17,6 +17,7 @@ import type { PageContent } from "@/lib/site-content";
 import { translate } from "@/lib/locale";
 
 type RoomsCatalogPageProps = {
+  closedRoomTypeIds?: string[];
   defaultBranchId: string | null;
   initialFilters: RoomsSearchState;
   initialRoomSlug?: string | null;
@@ -59,7 +60,13 @@ function RoomCard({
   });
   const isCapacityMatch = room.guestCapacity >= guestCount;
   const isAvailable = room.availableRooms > 0;
-  const fitState = isAvailable && isCapacityMatch ? "recommended" : isAvailable ? "soft" : "sold-out";
+  const fitState = room.isClosed
+    ? "sold-out"
+    : isAvailable && isCapacityMatch
+      ? "recommended"
+      : isAvailable
+        ? "soft"
+        : "sold-out";
   const currentPrice = room.priceVisible ? formatCompactPrice(locale, room.currentPrice) : null;
   const teaserPrice = room.priceVisible ? null : formatTeaserCurrencyText(room.currentPrice);
   const originalPrice = room.priceVisible && room.originalPrice != null ? formatCompactPrice(locale, room.originalPrice) : null;
@@ -75,8 +82,11 @@ function RoomCard({
     locale === "en"
       ? `Up to ${adultsLabel} + ${childrenLabel}`
       : `Tối đa ${adultsLabel} + ${childrenLabel}`;
-  const matchLabel =
-    fitState === "recommended"
+  const matchLabel = room.isClosed
+    ? locale === "en"
+      ? "Temporarily closed"
+      : "Tạm đóng theo lịch"
+    : fitState === "recommended"
       ? locale === "en"
         ? `Fits your ${guestCount}-guest search`
         : `Phù hợp với nhóm ${guestCount} khách`
@@ -162,7 +172,15 @@ function RoomCard({
           )}
 
           <span className={`button button--solid rooms-card__cta${isAvailable ? "" : " rooms-card__cta--sold-out"}`}>
-            {isAvailable ? room.bookingCtaLabel[locale] : locale === "en" ? "Sold out" : "Hết phòng"}
+            {room.isClosed
+              ? locale === "en"
+                ? "Temporarily closed"
+                : "Tạm đóng"
+              : isAvailable
+                ? room.bookingCtaLabel[locale]
+                : locale === "en"
+                  ? "Sold out"
+                  : "Hết phòng"}
           </span>
         </div>
       </article>
@@ -171,6 +189,7 @@ function RoomCard({
 }
 
 export function RoomsCatalogPage({
+  closedRoomTypeIds,
   defaultBranchId,
   initialFilters,
   initialRoomSlug,
@@ -183,12 +202,18 @@ export function RoomsCatalogPage({
   roomsHeroImage
 }: RoomsCatalogPageProps) {
   const router = useRouter();
+  const closedSet = useMemo(() => new Set(closedRoomTypeIds ?? []), [closedRoomTypeIds]);
   const roomEntries = useMemo(
     () =>
       roomTypes.map((roomType) =>
-        buildRoomCatalogEntry(roomType, roomAvailabilityByTypeId[roomType.id] ?? 0, roomGalleriesBySlug[roomType.slug])
+        buildRoomCatalogEntry(
+          roomType,
+          roomAvailabilityByTypeId[roomType.id] ?? 0,
+          roomGalleriesBySlug[roomType.slug],
+          closedSet.has(roomType.id)
+        )
       ),
-    [roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
+    [closedSet, roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
   );
   const [visibleRoomSlug, setVisibleRoomSlug] = useState<string | null>(initialRoomSlug ?? null);
   const activeRoom = roomEntries.find((room) => room.slug === visibleRoomSlug) ?? null;

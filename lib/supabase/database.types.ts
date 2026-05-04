@@ -1104,8 +1104,54 @@ export interface Database {
         } & RowTimestampFields>;
         Relationships: [];
       };
+      room_type_closures: {
+        Row: {
+          branch_id: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          closure_window: string;
+          created_at: string;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          reason: string;
+          room_type_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_type_closure_status"];
+          updated_at: string;
+          updated_by: string | null;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          branch_id: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          reason: string;
+          room_type_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_type_closure_status"];
+          updated_by: string | null;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          branch_id: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          reason: string;
+          room_type_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_type_closure_status"];
+          updated_by: string | null;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
     };
     Enums: {
+      room_type_closure_status: "active" | "cancelled";
       availability_request_status:
         | "new"
         | "in_review"
@@ -1246,6 +1292,44 @@ export interface Database {
           status: Database["public"]["Enums"]["reservation_status"];
         }[];
       };
+      room_type_is_closed: {
+        Args: {
+          p_branch_id?: string | null;
+          p_room_type_id: string;
+          p_stay_end_at: string;
+          p_stay_start_at: string;
+        };
+        Returns: boolean;
+      };
+      list_room_type_closure_overlaps: {
+        Args: {
+          p_branch_id?: string | null;
+          p_stay_end_at: string;
+          p_stay_start_at: string;
+        };
+        Returns: {
+          branch_id: string | null;
+          room_type_id: string;
+        }[];
+      };
+      create_room_type_closure: {
+        Args: {
+          p_branch_id?: string | null;
+          p_created_by?: string | null;
+          p_end_at: string;
+          p_reason?: string | null;
+          p_room_type_id: string;
+          p_start_at: string;
+        };
+        Returns: Database["public"]["Tables"]["room_type_closures"]["Row"];
+      };
+      cancel_room_type_closure: {
+        Args: {
+          p_cancelled_by?: string | null;
+          p_closure_id: string;
+        };
+        Returns: Database["public"]["Tables"]["room_type_closures"]["Row"];
+      };
       submit_availability_request: {
         Args: {
           p_branch_id: string;
@@ -1326,3 +1410,7 @@ export type ReservationStatus = Database["public"]["Enums"]["reservation_status"
 export type ReservationRoomItemStatus = Database["public"]["Enums"]["reservation_room_item_status"];
 export type RoomStatus = Database["public"]["Enums"]["room_status"];
 export type AnalyticsEventType = Database["public"]["Enums"]["analytics_event_type"];
+export type RoomTypeClosureRow = TableRow<"room_type_closures">;
+export type RoomTypeClosureInsert = TableInsert<"room_type_closures">;
+export type RoomTypeClosureUpdate = TableUpdate<"room_type_closures">;
+export type RoomTypeClosureStatus = Database["public"]["Enums"]["room_type_closure_status"];

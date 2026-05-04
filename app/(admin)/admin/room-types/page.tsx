@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AdminRoomTypesManager } from "@/components/admin-room-types-manager";
 import { resolveLocale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import { listActiveClosures } from "@/lib/supabase/queries/room-type-closures";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 
 type PageProps = {
@@ -26,8 +27,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 export default async function AdminRoomTypesPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const roomTypes = await listRoomTypes({ includeInactive: true });
+  const [roomTypes, activeClosures] = await Promise.all([
+    listRoomTypes({ includeInactive: true }),
+    listActiveClosures()
+  ]);
   const locale = resolveLocale(resolvedSearchParams.lang);
 
-  return <AdminRoomTypesManager locale={locale} roomTypes={roomTypes} />;
+  return <AdminRoomTypesManager activeClosures={activeClosures} locale={locale} roomTypes={roomTypes} />;
 }

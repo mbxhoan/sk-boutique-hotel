@@ -12,6 +12,7 @@ const emailFunctionNameKeys = ["SUPABASE_EMAIL_FUNCTION_NAME"] as const;
 const emailFromAddressKeys = ["SUPABASE_EMAIL_FROM_ADDRESS"] as const;
 const emailFromNameKeys = ["SUPABASE_EMAIL_FROM_NAME"] as const;
 const emailAdminRecipientKeys = ["SUPABASE_EMAIL_ADMIN_TO"] as const;
+const emailAdminBccKeys = ["SUPABASE_EMAIL_ADMIN_BCC"] as const;
 // Accept comma, semicolon, or newline separated notification recipients.
 const emailRecipientSplitPattern = /[,\n;]+/g;
 
@@ -111,4 +112,14 @@ export function getSupabaseEmailAdminRecipient() {
 
 export function getSupabaseEmailAdminRecipients() {
   return getEmailRecipients(emailAdminRecipientKeys, "service@skhotel.com.vn");
+}
+
+export function getSupabaseEmailAdminBccRecipients() {
+  const primaryRecipient = getSupabaseEmailAdminRecipient().toLowerCase();
+  const explicitBccRecipients = parseEmailRecipientList(getFirstDefinedEnv(emailAdminBccKeys));
+  const fallbackBccRecipients = getSupabaseEmailAdminRecipients().slice(1);
+
+  return Array.from(
+    new Set([...fallbackBccRecipients, ...explicitBccRecipients].filter((recipient) => recipient.toLowerCase() !== primaryRecipient))
+  );
 }

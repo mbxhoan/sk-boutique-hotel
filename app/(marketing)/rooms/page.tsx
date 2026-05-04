@@ -8,6 +8,7 @@ import { parseRoomsSearchParams } from "@/lib/room-routes";
 import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { findAvailableRooms } from "@/lib/supabase/queries/availability";
+import { listClosureOverlaps } from "@/lib/supabase/queries/room-type-closures";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
 import { loadStaticPageBySlug } from "@/lib/supabase/queries/content-pages";
 import type { PageContent } from "@/lib/site-content";
@@ -187,6 +188,13 @@ export default async function RoomsPage({ searchParams }: PageProps) {
     })
   : [];
 
+  const closureOverlaps = await listClosureOverlaps({
+    branchId: defaultBranchId,
+    stayStartAt: initialFilters.checkin,
+    stayEndAt: initialFilters.checkout
+  });
+  const closedRoomTypeIds = new Set(closureOverlaps.map((entry) => entry.room_type_id));
+
   const roomAvailabilityByTypeId = availableRooms.reduce<Record<string, number>>((accumulator, room) => {
     accumulator[room.room_type_id] = (accumulator[room.room_type_id] ?? 0) + 1;
 
@@ -213,6 +221,7 @@ export default async function RoomsPage({ searchParams }: PageProps) {
         />
       ) : null}
       <RoomsCatalogPage
+        closedRoomTypeIds={Array.from(closedRoomTypeIds)}
         defaultBranchId={defaultBranchId}
         initialFilters={initialFilters}
         initialRoomSlug={activeRoomType?.slug ?? null}

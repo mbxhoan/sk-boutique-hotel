@@ -9,10 +9,15 @@ import { resolveMediaSource } from "@/lib/media/library";
 import type { Locale } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { formatAreaText } from "@/lib/supabase/content";
-import type { RoomTypeRow } from "@/lib/supabase/database.types";
-import { saveRoomTypeAction } from "@/app/(admin)/admin/room-types/actions";
+import type { RoomTypeClosureRow, RoomTypeRow } from "@/lib/supabase/database.types";
+import {
+  addRoomTypeClosureAction,
+  cancelRoomTypeClosureAction,
+  saveRoomTypeAction
+} from "@/app/(admin)/admin/room-types/actions";
 
 type AdminRoomTypesManagerProps = {
+  activeClosures: RoomTypeClosureRow[];
   locale: Locale;
   roomTypes: RoomTypeRow[];
 };
@@ -49,7 +54,31 @@ function previewImageFor(roomType: RoomTypeRow) {
   return resolveMediaSource(rawPath, {}) || "/home/pool3.jpg";
 }
 
-export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManagerProps) {
+function formatClosureRange(locale: Locale, startAt: string, endAt: string) {
+  const tz = "Asia/Ho_Chi_Minh";
+  const startDate = new Date(startAt);
+  const endDate = new Date(endAt);
+  endDate.setUTCMilliseconds(endDate.getUTCMilliseconds() - 1);
+
+  const formatter = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: tz
+  });
+
+  return `${formatter.format(startDate)} → ${formatter.format(endDate)}`;
+}
+
+function todayDateString() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function AdminRoomTypesManager({ activeClosures, locale, roomTypes }: AdminRoomTypesManagerProps) {
   const [selectedSlug, setSelectedSlug] = useState(roomTypes[0]?.slug ?? "");
 
   useEffect(() => {
@@ -59,6 +88,9 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
   }, [roomTypes, selectedSlug]);
 
   const selectedRoomType = roomTypes.find((roomType) => roomType.slug === selectedSlug) ?? roomTypes[0] ?? null;
+  const selectedClosures = selectedRoomType
+    ? activeClosures.filter((closure) => closure.room_type_id === selectedRoomType.id)
+    : [];
 
   if (!selectedRoomType) {
     return (
@@ -462,6 +494,112 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
               </div>
             </div>
           </form>
+
+          <PortalCard className="admin-room-types__card admin-room-types__closures" tone="default">
+            <div className="admin-room-types__card-head">
+              <div>
+                <p className="portal-panel__eyebrow">
+                  {localize(locale, { vi: "Tạm đóng", en: "Closures" })}
+                </p>
+                <h3 className="admin-room-types__card-title">
+                  {localize(locale, { vi: "Tạm đóng hạng phòng", en: "Temporary closures" })}
+                </h3>
+                <p className="admin-room-types__card-copy">
+                  {localize(locale, {
+                    vi: "Đóng toàn bộ hạng phòng trong một khoảng thời gian. Khi đóng, các phòng thuộc hạng này sẽ không thể đặt mới và web sẽ hiển thị Hết phòng cho khoảng đó.",
+                    en: "Close the entire room type for a date range. While closed, no new bookings can be made and the public site shows Sold out for that range."
+                  })}
+                </p>
+              </div>
+            </div>
+
+            <form action={addRoomTypeClosureAction} className="admin-room-types__closure-form">
+              <input name="roomTypeId" type="hidden" value={selectedRoomType.id} />
+              <div className="admin-room-types__grid admin-room-types__grid--three">
+                <label className="portal-field">
+                  <span className="portal-field__label">
+                    {localize(locale, { vi: "Từ ngày", en: "Start date" })}
+                  </span>
+                  <input
+                    className="portal-field__control"
+                    defaultValue={todayDateString()}
+                    name="startDate"
+                    required
+                    type="date"
+                  />
+                </label>
+                <label className="portal-field">
+                  <span className="portal-field__label">
+                    {localize(locale, { vi: "Đến ngày", en: "End date" })}
+                  </span>
+                  <input className="portal-field__control" name="endDate" required type="date" />
+                </label>
+                <label className="portal-field">
+                  <span className="portal-field__label">
+                    {localize(locale, { vi: "Lý do (tuỳ chọn)", en: "Reason (optional)" })}
+                  </span>
+                  <input
+                    className="portal-field__control"
+                    name="reason"
+                    placeholder={localize(locale, { vi: "Bảo trì, sự kiện riêng...", en: "Maintenance, private event..." })}
+                  />
+                </label>
+              </div>
+
+              <div className="admin-room-types__closure-actions">
+                <PortalSubmitButton
+                  className="button button--solid"
+                  pendingLabel={localize(locale, { vi: "Đang đóng...", en: "Closing..." })}
+                >
+                  {localize(locale, { vi: "Tạm đóng hạng phòng", en: "Close room type" })}
+                </PortalSubmitButton>
+                <p className="admin-room-types__card-copy">
+                  {localize(locale, {
+                    vi: "Khoảng đóng tính theo ngày, kéo dài qua hết ngày Đến ngày (đến hết 23:59 ngày đó).",
+                    en: "Closure spans full days through the end of the End date (until 23:59 of that day)."
+                  })}
+                </p>
+              </div>
+            </form>
+
+            <div className="admin-room-types__closure-list">
+              <p className="portal-panel__eyebrow">
+                {localize(locale, { vi: "Đang đóng", en: "Active closures" })}
+              </p>
+              {selectedClosures.length === 0 ? (
+                <p className="portal-description">
+                  {localize(locale, {
+                    vi: "Hạng phòng này hiện không có khoảng đóng nào.",
+                    en: "This room type has no active closures."
+                  })}
+                </p>
+              ) : (
+                <ul className="admin-room-types__closure-items">
+                  {selectedClosures.map((closure) => (
+                    <li className="admin-room-types__closure-item" key={closure.id}>
+                      <div>
+                        <strong className="admin-room-types__closure-range">
+                          {formatClosureRange(locale, closure.start_at, closure.end_at)}
+                        </strong>
+                        {closure.reason ? (
+                          <p className="admin-room-types__closure-reason">{closure.reason}</p>
+                        ) : null}
+                      </div>
+                      <form action={cancelRoomTypeClosureAction}>
+                        <input name="closureId" type="hidden" value={closure.id} />
+                        <PortalSubmitButton
+                          className="button button--ghost"
+                          pendingLabel={localize(locale, { vi: "Đang huỷ...", en: "Cancelling..." })}
+                        >
+                          {localize(locale, { vi: "Huỷ đóng", en: "Cancel" })}
+                        </PortalSubmitButton>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </PortalCard>
         </div>
       </div>
     </div>

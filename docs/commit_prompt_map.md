@@ -1756,3 +1756,19 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/member-auth-form.tsx`
   - `components/room-booking-request-form.tsx`
   - `lib/supabase/auth.ts`
+
+### Entry 152
+- `time`: 2026-05-04T11:27:43+07:00
+- `prompt_summary`: Admin booking notification vẫn chưa tới đủ mọi mailbox đã khai báo trong `SUPABASE_EMAIL_ADMIN_TO`, cần làm cho luồng gửi multi-recipient ổn định hơn.
+- `commit_message`: `fix(email-notifications): stabilize multi-recipient booking delivery`
+- `main_files`:
+  - `lib/supabase/email.ts`
+
+### Entry 153
+- `time`: 2026-05-04T11:30:07+07:00
+- `prompt_summary`: Muốn mailbox chính nhận booking request là `skhotel.phuquoc@gmail.com` và mailbox `mbxhoan001@gmail.com` nhận bản sao ẩn, thay vì cả hai cùng được đối xử như admin recipients ngang hàng.
+- `commit_message`: `fix(email-notifications): send booking mail to a primary inbox with bcc copies`
+- `main_files`:
+  - `README.md`
+  - `lib/supabase/email.ts`
+  - `lib/supabase/env.ts`
