@@ -1,3 +1,5 @@
+import { isValidEmailAddress } from "@/lib/contact-details";
+
 const publicUrlKeys = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL"] as const;
 const publicKeyKeys = [
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -10,6 +12,8 @@ const emailFunctionNameKeys = ["SUPABASE_EMAIL_FUNCTION_NAME"] as const;
 const emailFromAddressKeys = ["SUPABASE_EMAIL_FROM_ADDRESS"] as const;
 const emailFromNameKeys = ["SUPABASE_EMAIL_FROM_NAME"] as const;
 const emailAdminRecipientKeys = ["SUPABASE_EMAIL_ADMIN_TO"] as const;
+// Accept comma, semicolon, or newline separated notification recipients.
+const emailRecipientSplitPattern = /[,\n;]+/g;
 
 function getFirstDefinedEnv(keys: readonly string[]) {
   for (const key of keys) {
@@ -21,6 +25,27 @@ function getFirstDefinedEnv(keys: readonly string[]) {
   }
 
   return null;
+}
+
+function parseEmailRecipientList(value: string | null | undefined) {
+  if (!value) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .split(emailRecipientSplitPattern)
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0 && isValidEmailAddress(item))
+    )
+  );
+}
+
+function getEmailRecipients(keys: readonly string[], fallback: string) {
+  const recipients = parseEmailRecipientList(getFirstDefinedEnv(keys));
+
+  return recipients.length > 0 ? recipients : [fallback];
 }
 
 function requireEnv(keys: readonly string[], label: string) {
@@ -81,5 +106,9 @@ export function getSupabaseEmailFromName() {
 }
 
 export function getSupabaseEmailAdminRecipient() {
-  return getFirstDefinedEnv(emailAdminRecipientKeys) ?? "service@skhotel.com.vn";
+  return getSupabaseEmailAdminRecipients()[0];
+}
+
+export function getSupabaseEmailAdminRecipients() {
+  return getEmailRecipients(emailAdminRecipientKeys, "service@skhotel.com.vn");
 }

@@ -63,10 +63,18 @@ function RoomCard({
   const currentPrice = room.priceVisible ? formatCompactPrice(locale, room.currentPrice) : null;
   const teaserPrice = room.priceVisible ? null : formatTeaserCurrencyText(room.currentPrice);
   const originalPrice = room.priceVisible && room.originalPrice != null ? formatCompactPrice(locale, room.originalPrice) : null;
+  const adultsLabel =
+    locale === "en"
+      ? `${room.occupancyAdults} ${room.occupancyAdults === 1 ? "adult" : "adults"}`
+      : `${room.occupancyAdults} người lớn`;
+  const childrenLabel =
+    locale === "en"
+      ? `${room.occupancyChildren} ${room.occupancyChildren === 1 ? "child" : "children"}`
+      : `${room.occupancyChildren} trẻ em`;
   const capacityLabel =
     locale === "en"
-      ? `${room.guestCapacity} guest max`
-      : `Tối đa ${room.guestCapacity} khách`;
+      ? `Up to ${adultsLabel} + ${childrenLabel}`
+      : `Tối đa ${adultsLabel} + ${childrenLabel}`;
   const matchLabel =
     fitState === "recommended"
       ? locale === "en"
@@ -119,10 +127,6 @@ function RoomCard({
           </div>
 
           <div className="rooms-card__facts">
-            <div className="rooms-card__fact">
-              <span className="rooms-card__fact-label">{locale === "en" ? "Bed" : "Giường"}</span>
-              <strong className="rooms-card__fact-value">{room.bedLabel[locale]}</strong>
-            </div>
             {room.metaFacts.map((fact) => (
               <div className="rooms-card__fact" key={fact.label.vi}>
                 <span className="rooms-card__fact-label">{fact.label[locale]}</span>

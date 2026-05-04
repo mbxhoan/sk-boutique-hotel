@@ -1736,3 +1736,12 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-booking-detail-page.tsx`
   - `components/admin-rooms-page.tsx`
   - `lib/supabase/queries/booking-details.ts`
+
+### Entry 150
+- `time`: 2026-05-04T11:09:55+07:00
+- `prompt_summary`: Khi có yêu cầu đặt phòng, hệ thống cần gửi email thông báo cho nhiều địa chỉ admin cùng lúc, thay vì chỉ một email nhận thông báo.
+- `commit_message`: `feat(email-notifications): support multiple admin recipients`
+- `main_files`:
+  - `docs/03-workflows.md`
+  - `lib/supabase/email.ts`
+  - `lib/supabase/env.ts`

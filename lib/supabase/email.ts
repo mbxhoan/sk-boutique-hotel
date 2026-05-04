@@ -4,7 +4,7 @@ import {
   createDepositRequestCustomerEmail
 } from "@/lib/email/templates";
 import {
-  getSupabaseEmailAdminRecipient,
+  getSupabaseEmailAdminRecipients,
   getSupabaseEmailFromAddress,
   getSupabaseEmailFromName,
   getSupabaseEmailFunctionNames,
@@ -262,7 +262,6 @@ export async function sendAvailabilityRequestEmails(request: AvailabilityRequest
   const locale = request.preferred_locale === "en" ? "en" : "vi";
   const labels = localizedLabels(locale);
   const { branch, roomType } = await buildAvailabilityRequestContext(request);
-  const adminRecipient = getSupabaseEmailAdminRecipient();
   const roomTypeName =
     locale === "en"
       ? roomType?.name_en ?? roomType?.name_vi ?? request.room_type_id
@@ -280,6 +279,7 @@ export async function sendAvailabilityRequestEmails(request: AvailabilityRequest
     locale === "en"
       ? `New availability request - ${request.request_code}`
       : `Yêu cầu xem phòng mới - ${request.request_code}`;
+  const adminRecipients = getSupabaseEmailAdminRecipients();
   const customerIntro = labels.customerIntro;
   const adminIntro = labels.adminGreeting;
   const customerClosing =
@@ -313,24 +313,37 @@ export async function sendAvailabilityRequestEmails(request: AvailabilityRequest
 
   const adminEmailPayload = {
     from: fromAddress,
-    to: adminRecipient,
     subject: adminSubject,
     html: buildHtmlEmail(adminSubject, adminIntro, adminDetailRows, adminClosing, locale)
-  } satisfies SendEmailInput;
+  } satisfies Omit<SendEmailInput, "to">;
 
-  const results = await Promise.allSettled([sendEmail(customerEmail), sendEmail(adminEmailPayload)]);
+  const customerDeliveryPromise = sendEmail(customerEmail)
+    .then(() => ({ status: "fulfilled" as const }))
+    .catch((reason) => ({ status: "rejected" as const, reason }));
+  const adminDeliveryPromise = Promise.allSettled(
+    adminRecipients.map((to) =>
+      sendEmail({
+        ...adminEmailPayload,
+        to
+      })
+    )
+  );
 
-  if (results.some((result) => result.status === "rejected")) {
+  const [customerDelivery, adminDeliveries] = await Promise.all([customerDeliveryPromise, adminDeliveryPromise]);
+  const adminDeliveredCount = adminDeliveries.filter((result) => result.status === "fulfilled").length;
+
+  if (customerDelivery.status === "rejected" || adminDeliveredCount !== adminRecipients.length) {
     console.warn("[email] Failed to deliver availability request notification", {
       requestCode: request.request_code,
-      adminDelivered: results[1].status === "fulfilled",
-      customerDelivered: results[0].status === "fulfilled"
+      adminDeliveredCount,
+      adminRecipientCount: adminRecipients.length,
+      customerDelivered: customerDelivery.status === "fulfilled"
     });
   }
 
   return {
-    admin: results[1].status === "fulfilled",
-    customer: results[0].status === "fulfilled"
+    admin: adminDeliveredCount === adminRecipients.length,
+    customer: customerDelivery.status === "fulfilled"
   };
 }
 

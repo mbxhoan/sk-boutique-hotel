@@ -131,8 +131,10 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   </div>
                   <p className="admin-room-types__room-title">{localize(locale, { vi: roomType.name_vi, en: roomType.name_en })}</p>
                   <p className="admin-room-types__room-meta">
-                    {formatAreaText(roomType.size_sqm)?.[locale] ?? "-"} · {roomType.occupancy_adults + roomType.occupancy_children}{" "}
-                    {locale === "en" ? "guests" : "khách"}
+                    {formatAreaText(roomType.size_sqm)?.[locale] ?? "-"} ·{" "}
+                    {locale === "en"
+                      ? `${roomType.occupancy_adults} ${roomType.occupancy_adults === 1 ? "adult" : "adults"} + ${roomType.occupancy_children} ${roomType.occupancy_children === 1 ? "child" : "children"}`
+                      : `${roomType.occupancy_adults} người lớn + ${roomType.occupancy_children} trẻ em`}
                   </p>
                   <div className="admin-room-types__room-footer">
                     <span>{roomType.slug}</span>
@@ -171,7 +173,7 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   <div className="admin-room-types__card-head">
                     <div>
                       <p className="portal-panel__eyebrow">{localize(locale, { vi: "Tổng quan", en: "Overview" })}</p>
-                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "General Info", en: "General Info" })}</h3>
+                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Thông tin chung", en: "General Info" })}</h3>
                       <p className="admin-room-types__card-copy">
                         {localize(locale, {
                           vi: "Tên, mã, mô tả ngắn và các thông số chính của hạng phòng.",
@@ -254,10 +256,10 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   <div className="admin-room-types__card-head">
                     <div>
                       <p className="portal-panel__eyebrow">{localize(locale, { vi: "Nội dung", en: "Content" })}</p>
-                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Story & summary", en: "Story & summary" })}</h3>
+                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Tóm tắt", en: "Story & summary" })}</h3>
                       <p className="admin-room-types__card-copy">
                         {localize(locale, {
-                          vi: "Nội dung dài cho room detail, được dùng cho SEO và phần giới thiệu.",
+                          vi: "Nội dung dài cho chi tiết phòng, được dùng cho SEO và phần giới thiệu.",
                           en: "Long-form copy for room detail, SEO, and the room introduction."
                         })}
                       </p>
@@ -291,7 +293,7 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   <div className="admin-room-types__card-head">
                     <div>
                       <p className="portal-panel__eyebrow">{localize(locale, { vi: "Tiện ích", en: "Amenities" })}</p>
-                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Highlights", en: "Highlights" })}</h3>
+                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Nổi bật", en: "Highlights" })}</h3>
                       <p className="admin-room-types__card-copy">
                         {localize(locale, {
                           vi: "Danh sách điểm nhấn hiển thị ở website công khai.",
@@ -303,11 +305,11 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
 
                   <div className="admin-room-types__grid admin-room-types__grid--two">
                     <label className="portal-field">
-                      <span className="portal-field__label">{localize(locale, { vi: "Highlights VI", en: "Highlights VI" })}</span>
+                      <span className="portal-field__label">{localize(locale, { vi: "Nổi bật - VI", en: "Highlights VI" })}</span>
                       <textarea className="portal-field__control" defaultValue={joinLines(selectedRoomType.highlights_vi)} name="highlightsVi" rows={8} />
                     </label>
                     <label className="portal-field">
-                      <span className="portal-field__label">{localize(locale, { vi: "Highlights EN", en: "Highlights EN" })}</span>
+                      <span className="portal-field__label">{localize(locale, { vi: "Nổi bật - EN", en: "Highlights EN" })}</span>
                       <textarea className="portal-field__control" defaultValue={joinLines(selectedRoomType.highlights_en)} name="highlightsEn" rows={8} />
                     </label>
                   </div>
@@ -340,11 +342,11 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
 
                   <div className="admin-room-types__grid admin-room-types__grid--two">
                     <label className="portal-field">
-                      <span className="portal-field__label">{localize(locale, { vi: "SEO description VI", en: "SEO description VI" })}</span>
+                      <span className="portal-field__label">{localize(locale, { vi: "Mô tả SEO - VI", en: "SEO description VI" })}</span>
                       <textarea className="portal-field__control" defaultValue={selectedRoomType.seo_description_vi} name="seoDescriptionVi" rows={4} />
                     </label>
                     <label className="portal-field">
-                      <span className="portal-field__label">{localize(locale, { vi: "SEO description EN", en: "SEO description EN" })}</span>
+                      <span className="portal-field__label">{localize(locale, { vi: "Mô tả SEO - EN", en: "SEO description EN" })}</span>
                       <textarea className="portal-field__control" defaultValue={selectedRoomType.seo_description_en} name="seoDescriptionEn" rows={4} />
                     </label>
                   </div>
@@ -356,7 +358,7 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   <div className="admin-room-types__card-head">
                     <div>
                       <p className="portal-panel__eyebrow">{localize(locale, { vi: "Giá", en: "Pricing" })}</p>
-                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Pricing & Availability", en: "Pricing & Availability" })}</h3>
+                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Giá & Tình trạng", en: "Pricing & Availability" })}</h3>
                       <p className="admin-room-types__card-copy">
                         {localize(locale, {
                           vi: "Giá cơ bản, override và trạng thái public của hạng phòng.",
@@ -412,10 +414,10 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                   <div className="admin-room-types__card-head">
                     <div>
                       <p className="portal-panel__eyebrow">{localize(locale, { vi: "Hình ảnh", en: "Image" })}</p>
-                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Primary Image", en: "Primary Image" })}</h3>
+                      <h3 className="admin-room-types__card-title">{localize(locale, { vi: "Ảnh chính", en: "Primary Image" })}</h3>
                       <p className="admin-room-types__card-copy">
                         {localize(locale, {
-                          vi: "Ảnh cover hiển thị trên web và cards liên quan.",
+                          vi: "Ảnh chính hiển thị trên web và nơi liên quan.",
                           en: "The cover image used across public pages and related cards."
                         })}
                       </p>
@@ -451,7 +453,7 @@ export function AdminRoomTypesManager({ locale, roomTypes }: AdminRoomTypesManag
                     <p className="portal-panel__eyebrow">{localize(locale, { vi: "Gợi ý", en: "Hint" })}</p>
                     <p className="portal-description">
                       {localize(locale, {
-                        vi: "Dùng đường dẫn ảnh public hoặc chọn asset từ thư viện media.",
+                        vi: "Dùng đường dẫn ảnh public hoặc chọn từ thư viện ảnh.",
                         en: "Use a public image path or choose an asset from the media library."
                       })}
                     </p>

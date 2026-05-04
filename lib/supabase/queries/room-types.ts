@@ -36,8 +36,8 @@ function toRoomCard(roomType: RoomTypeRow): CmsCollectionItem {
     description: text(pickRoomDescription(roomType), pickRoomDescriptionEn(roomType)),
     meta: [
       text(
-        `${roomType.occupancy_adults + roomType.occupancy_children} khách`,
-        `${roomType.occupancy_adults + roomType.occupancy_children} guests`
+        `${roomType.occupancy_adults} người lớn + ${roomType.occupancy_children} trẻ em`,
+        `${roomType.occupancy_adults} ${roomType.occupancy_adults === 1 ? "adult" : "adults"} + ${roomType.occupancy_children} ${roomType.occupancy_children === 1 ? "child" : "children"}`
       ),
       formatAreaText(roomType.size_sqm) ?? text(roomType.bed_type || "-", translate("en", roomType.bed_type || "-")),
       priceMeta
@@ -147,11 +147,14 @@ function patchRoomDetailPage(roomType: RoomTypeRow, roomTypes: RoomTypeRow[], fa
           items: [
             {
               value: text(
-                `${roomType.occupancy_adults + roomType.occupancy_children} khách`,
-                `${roomType.occupancy_adults + roomType.occupancy_children} guests`
+                `${roomType.occupancy_adults} NL + ${roomType.occupancy_children} TE`,
+                `${roomType.occupancy_adults} ${roomType.occupancy_adults === 1 ? "adult" : "adults"} + ${roomType.occupancy_children} ${roomType.occupancy_children === 1 ? "child" : "children"}`
               ),
-              label: text("Khách", "Guests"),
-              detail: text("Sức chứa cho lưu trú ngắn ngày.", "Capacity for short stays."),
+              label: text("Sức chứa", "Capacity"),
+              detail: text(
+                `Tối đa ${roomType.occupancy_adults} người lớn và ${roomType.occupancy_children} trẻ em.`,
+                `Up to ${roomType.occupancy_adults} ${roomType.occupancy_adults === 1 ? "adult" : "adults"} and ${roomType.occupancy_children} ${roomType.occupancy_children === 1 ? "child" : "children"}.`
+              ),
               tone: "paper" as const
             },
             {

@@ -16,7 +16,7 @@
 5. System creates availability request
 6. System sends acknowledgement email
 7. System creates/updates customer profile
-8. Internal users receive realtime and/or email notification
+8. Internal users receive realtime and/or email notification to one or more configured admin recipients
 9. Staff handles request within SLA (default 30 minutes, editable)
 
 ## 2. Hold Room Workflow

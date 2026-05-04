@@ -29,6 +29,8 @@ export type RoomCatalogEntry = {
     label: LocalizedText;
     value: LocalizedText;
   }[];
+  occupancyAdults: number;
+  occupancyChildren: number;
   originalPrice: number | null;
   priceVisible: boolean;
   roomTypeId: string;
@@ -159,10 +161,17 @@ function buildPriceOptions(roomType: RoomTypeRow) {
 function buildMetaFacts(roomType: RoomTypeRow) {
   return [
     {
-      label: text("Khách", "Guests"),
+      label: text("Người lớn", "Adults"),
       value: text(
-        `${roomType.occupancy_adults + roomType.occupancy_children} khách`,
-        `${roomType.occupancy_adults + roomType.occupancy_children} guests`
+        `${roomType.occupancy_adults} người lớn`,
+        `${roomType.occupancy_adults} ${roomType.occupancy_adults === 1 ? "adult" : "adults"}`
+      )
+    },
+    {
+      label: text("Trẻ em", "Children"),
+      value: text(
+        `${roomType.occupancy_children} trẻ em`,
+        `${roomType.occupancy_children} ${roomType.occupancy_children === 1 ? "child" : "children"}`
       )
     },
     {
@@ -209,6 +218,8 @@ export function buildRoomCatalogEntry(
     highlights: localizedArray(roomType.highlights_vi, roomType.highlights_en),
     guestCapacity,
     metaFacts: buildMetaFacts(roomType),
+    occupancyAdults: roomType.occupancy_adults,
+    occupancyChildren: roomType.occupancy_children,
     originalPrice,
     priceVisible: roomType.show_public_price,
     roomTypeId: roomType.id,
