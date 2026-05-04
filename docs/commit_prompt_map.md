@@ -1789,3 +1789,18 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `main_files`:
   - `README.md`
   - `docs/commit_prompt_map.md`
+
+### Entry 156
+- `time`: 2026-05-04T12:11:04+07:00
+- `prompt_summary`: Thay đổi thông tin ngân hàng mặc định sang ACB với beneficiary `CTY TNHH YASAKA-VIETNAM-CN PHU QUOC`, account no `197188856`, SWIFT `ASCBVNVX`, và CITAD `79307001`, đồng thời cập nhật deposit email để hiển thị mã ngân hàng mới.
+- `commit_message`: `feat(payments): update default deposit bank metadata`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `docs/email-templates/email-templates.ts`
+  - `lib/email/test-presets.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/email.ts`
+  - `lib/supabase/payments.ts`
+  - `lib/supabase/queries/branch-bank-accounts.ts`
+  - `supabase/migrations/20260504120000_update_default_branch_bank_account.sql`
+  - `supabase/seed.sql`

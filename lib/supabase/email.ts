@@ -36,9 +36,11 @@ export type SendDepositRequestEmailInput = {
   paymentAccountName: string;
   paymentAccountNumber: string;
   paymentBankName: string;
+  paymentCitadCode: string;
   paymentDeadline: string;
   paymentQrUrl: string;
   paymentTransferNote: string;
+  paymentSwiftCode: string;
   roomType: string;
 };
 
@@ -363,9 +365,11 @@ export async function sendDepositRequestCustomerEmail(input: SendDepositRequestE
     paymentAccountName: input.paymentAccountName,
     paymentAccountNumber: input.paymentAccountNumber,
     paymentBankName: input.paymentBankName,
+    paymentCitadCode: input.paymentCitadCode,
     paymentDeadline: input.paymentDeadline,
     paymentQrUrl: input.paymentQrUrl,
     paymentTransferNote: input.paymentTransferNote,
+    paymentSwiftCode: input.paymentSwiftCode,
     roomType: input.roomType
   });
 

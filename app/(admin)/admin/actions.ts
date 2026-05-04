@@ -29,6 +29,7 @@ import {
 import { logAuditEvent } from "@/lib/supabase/audit";
 import { listBranches } from "@/lib/supabase/queries/branches";
 import { ensureCustomerByEmail, listCustomersByIds } from "@/lib/supabase/queries/customers";
+import { getBranchBankAccountById } from "@/lib/supabase/queries/branch-bank-accounts";
 import { getPaymentRequestById } from "@/lib/supabase/queries/payment-requests";
 import { getReservationById } from "@/lib/supabase/queries/reservations";
 import { getRoomTypeById, listRoomTypes } from "@/lib/supabase/queries/room-types";
@@ -319,6 +320,7 @@ async function loadPaymentRequestDetail(paymentRequestId: string) {
     listRoomTypes(),
     listCustomersByIds([paymentRequest.customer_id])
   ]);
+  const branchBankAccount = await getBranchBankAccountById(paymentRequest.branch_bank_account_id);
 
   const branch = branches.find((item) => item.id === paymentRequest.branch_id) ?? null;
   const roomType = roomTypes.find((item) => item.id === reservation.primary_room_type_id) ?? null;
@@ -331,6 +333,7 @@ async function loadPaymentRequestDetail(paymentRequestId: string) {
   return {
     branch,
     customer,
+    branchBankAccount,
     paymentRequest,
     reservation,
     roomType
@@ -869,7 +872,7 @@ export async function resendDepositRequestEmailAction(formData: FormData) {
   const locale = readLocaleFromFormData(formData);
 
   try {
-    const { branch, customer, paymentRequest, reservation, roomType } = await loadPaymentRequestDetail(paymentRequestId);
+    const { branch, branchBankAccount, customer, paymentRequest, reservation, roomType } = await loadPaymentRequestDetail(paymentRequestId);
     const nights = calculateNights(reservation.stay_start_at, reservation.stay_end_at);
     const depositAmount = formatMoneyVnd(paymentRequest.amount);
     const branchName = branch?.name_vi ?? branch?.name_en ?? paymentRequest.branch_id;
@@ -891,9 +894,11 @@ export async function resendDepositRequestEmailAction(formData: FormData) {
       paymentAccountName: paymentRequest.account_name,
       paymentAccountNumber: paymentRequest.account_number,
       paymentBankName: paymentRequest.bank_name,
+      paymentCitadCode: branchBankAccount?.citad_code ?? "",
       paymentDeadline,
       paymentQrUrl: buildVietQrImageUrl(paymentRequest),
       paymentTransferNote: paymentRequest.transfer_content,
+      paymentSwiftCode: branchBankAccount?.swift_code ?? "",
       roomType: roomTypeName
     });
 

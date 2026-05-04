@@ -49,6 +49,8 @@ const depositRequest = createDepositRequestCustomerEmail(brand, {
   paymentBankName: "TPBank",
   paymentAccountNumber: "0123456789",
   paymentAccountName: "CONG TY TNHH ABC",
+  paymentSwiftCode: "TPBVVNVX",
+  paymentCitadCode: "970423",
   paymentTransferNote: "SK DP BK-240001",
   paymentQrUrl: "https://example.com/qr/bk-240001.png",
   bookingUrl: "https://example.com/member/bookings/BK-240001"

@@ -373,6 +373,8 @@ export type DepositRequestCustomerEmailData = {
   paymentBankName: string;
   paymentAccountNumber: string;
   paymentAccountName: string;
+  paymentSwiftCode: string;
+  paymentCitadCode: string;
   paymentTransferNote: string;
   paymentQrUrl: string;
   bookingUrl: string;
@@ -400,6 +402,8 @@ export function createDepositRequestCustomerEmail(
         { label: "Ngân hàng", value: data.paymentBankName },
         { label: "Số tài khoản", value: data.paymentAccountNumber },
         { label: "Chủ tài khoản", value: data.paymentAccountName },
+        { label: "SWIFT code", value: data.paymentSwiftCode },
+        { label: "CITAD code", value: data.paymentCitadCode },
         { label: "Nội dung chuyển khoản", value: data.paymentTransferNote }
       ]
     }

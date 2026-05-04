@@ -3,7 +3,7 @@ import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 
 const branchBankAccountSelect = `
   id, branch_id, bank_name, bank_bin, account_name, account_number,
-  account_label, qr_provider, is_default, is_active, sort_order, created_at, updated_at
+  account_label, swift_code, citad_code, qr_provider, is_default, is_active, sort_order, created_at, updated_at
 `;
 
 type BranchBankAccountQueryOptions = {

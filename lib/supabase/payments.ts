@@ -230,15 +230,15 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
     throw new Error("This booking can no longer issue a deposit QR.");
   }
 
-  const bankAccountQuery = input.branchBankAccountId
+      const bankAccountQuery = input.branchBankAccountId
     ? supabase
         .from("branch_bank_accounts")
-        .select("id, branch_id, bank_name, bank_bin, account_name, account_number, account_label, qr_provider, is_default, is_active, sort_order, created_at, updated_at")
+        .select("id, branch_id, bank_name, bank_bin, account_name, account_number, account_label, swift_code, citad_code, qr_provider, is_default, is_active, sort_order, created_at, updated_at")
         .eq("id", input.branchBankAccountId)
         .maybeSingle()
     : supabase
         .from("branch_bank_accounts")
-        .select("id, branch_id, bank_name, bank_bin, account_name, account_number, account_label, qr_provider, is_default, is_active, sort_order, created_at, updated_at")
+        .select("id, branch_id, bank_name, bank_bin, account_name, account_number, account_label, swift_code, citad_code, qr_provider, is_default, is_active, sort_order, created_at, updated_at")
         .eq("branch_id", reservation.branch_id)
         .eq("is_active", true)
         .order("is_default", { ascending: false })
@@ -367,6 +367,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
         paymentAccountName: bankAccount.account_name,
         paymentAccountNumber: bankAccount.account_number,
         paymentBankName: bankAccount.bank_name,
+        paymentCitadCode: bankAccount.citad_code,
         paymentDeadline: formatEmailDate(uploadLinkExpiresAt),
         paymentQrUrl: buildVietQrImageUrl({
           account_name: bankAccount.account_name,
@@ -378,6 +379,7 @@ export async function createPaymentRequest(input: CreatePaymentRequestInput) {
           transfer_content: transferContent
         }),
         paymentTransferNote: transferContent,
+        paymentSwiftCode: bankAccount.swift_code,
         roomType: roomType?.name_vi ?? roomType?.name_en ?? reservation.primary_room_type_id
       });
     } catch (emailError) {

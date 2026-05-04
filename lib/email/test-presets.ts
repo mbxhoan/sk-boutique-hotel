@@ -97,9 +97,11 @@ export function buildEmailTemplateTestEmail(templateKey: EmailTemplateTestKey): 
         paymentAccountName: "CONG TY TNHH ABC",
         paymentAccountNumber: "0123456789",
         paymentBankName: "TPBank",
+        paymentCitadCode: "970423",
         paymentDeadline: "18/04/2026 11:00",
         paymentQrUrl: sampleQrUrl,
         paymentTransferNote: "SK DP BK-240001",
+        paymentSwiftCode: "TPBVVNVX",
         roomType: "Deluxe Double"
       });
     case "booking_confirmed_customer":

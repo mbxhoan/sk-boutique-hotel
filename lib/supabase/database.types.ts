@@ -524,11 +524,13 @@ export interface Database {
           bank_name: string;
           branch_id: string;
           created_at: string;
+          citad_code: string;
           id: string;
           is_active: boolean;
           is_default: boolean;
           qr_provider: string;
           sort_order: number;
+          swift_code: string;
           updated_at: string;
         } & RowTimestampFields;
         Insert: StandardInsert<{
@@ -538,11 +540,13 @@ export interface Database {
           bank_bin: string;
           bank_name: string;
           branch_id: string;
+          citad_code: string;
           id: string;
           is_active: boolean;
           is_default: boolean;
           qr_provider: string;
           sort_order: number;
+          swift_code: string;
         } & RowTimestampFields>;
         Update: StandardUpdate<{
           account_label: string;
@@ -551,11 +555,13 @@ export interface Database {
           bank_bin: string;
           bank_name: string;
           branch_id: string;
+          citad_code: string;
           id: string;
           is_active: boolean;
           is_default: boolean;
           qr_provider: string;
           sort_order: number;
+          swift_code: string;
         } & RowTimestampFields>;
         Relationships: [];
       };
