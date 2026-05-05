@@ -65,7 +65,6 @@ function roomAmenities(locale: Locale) {
     ? [
         "Alarm clock",
         "Safe",
-        "Coffee / tea maker",
         "Hair dryer",
         "Minibar",
         "Flat-screen TV",
@@ -75,7 +74,6 @@ function roomAmenities(locale: Locale) {
     : [
         "Đồng hồ báo thức",
         "Két an toàn",
-        "Máy pha trà/cà phê",
         "Máy sấy tóc",
         "Minibar",
         "TV màn hình phẳng",

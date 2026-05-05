@@ -114,6 +114,12 @@ export type WorkflowBookingRow = {
   updated_at: string;
 };
 
+export type WorkflowCustomerJourney = {
+  confirmed_stay_count: number;
+  is_returning_guest: boolean;
+  prior_confirmed_stay_count: number;
+};
+
 export type WorkflowAuditLog = AuditLogRow & {
   branch_name_en: string | null;
   branch_name_vi: string | null;

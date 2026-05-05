@@ -25,6 +25,35 @@ type FacilityColumn = {
   rows: FacilityRow[];
 };
 
+const temporarilyHiddenAmenityLabels = [
+  "smart tv / netflix",
+  "kettle / tea / coffee",
+  "coffee / tea maker",
+  "máy pha trà/cà phê",
+  "máy pha cà phê",
+  "máy pha trà",
+  "netflix",
+  "netfilx"
+];
+
+function isTemporarilyHiddenAmenity(row: FacilityRow) {
+  const labels = [row.label.en, row.label.vi]
+    .map((value) => value.trim().toLowerCase());
+
+  return labels.some((label) =>
+    temporarilyHiddenAmenityLabels.some((hiddenLabel) => label.includes(hiddenLabel))
+  );
+}
+
+function filterHiddenAmenities(columns: FacilityColumn[]) {
+  return columns
+    .map((column) => ({
+      ...column,
+      rows: column.rows.filter((row) => !isTemporarilyHiddenAmenity(row))
+    }))
+    .filter((column) => column.rows.length > 0);
+}
+
 type FacilitiesSectionProps = {
   className?: string;
   copy?: CmsMarketingShellCopy["facilities"];
@@ -56,7 +85,7 @@ function WaterIcon() {
 }
 
 function buildColumns(locale: Locale): FacilityColumn[] {
-  return locale === "en"
+  const columns: FacilityColumn[] = locale === "en"
     ? [
         {
           title: { en: "Hotel amenities", vi: "Tiện nghi khách sạn" },
@@ -70,9 +99,7 @@ function buildColumns(locale: Locale): FacilityColumn[] {
             { kind: "check", label: { en: "Bathtub", vi: "Bồn tắm" } },
             { kind: "check", label: { en: "Desk", vi: "Bàn làm việc" } },
             { kind: "check", label: { en: "Fridge", vi: "Tủ lạnh" } },
-            { kind: "check", label: { en: "Smart TV / Netflix", vi: "Smart TV / Netflix" } },
             { kind: "check", label: { en: "Hair dryer", vi: "Máy sấy tóc" } },
-            { kind: "check", label: { en: "Kettle / tea / coffee", vi: "Ấm đun nước / trà / cà phê" } }
           ]
         },
         {
@@ -102,9 +129,7 @@ function buildColumns(locale: Locale): FacilityColumn[] {
             { kind: "check", label: { en: "Bathtub", vi: "Bồn tắm" } },
             { kind: "check", label: { en: "Desk", vi: "Bàn làm việc" } },
             { kind: "check", label: { en: "Fridge", vi: "Tủ lạnh" } },
-            { kind: "check", label: { en: "Smart TV / Netflix", vi: "Smart TV / Netflix" } },
             { kind: "check", label: { en: "Hair dryer", vi: "Máy sấy tóc" } },
-            { kind: "check", label: { en: "Kettle / tea / coffee", vi: "Ấm đun nước / trà / cà phê" } }
           ]
         },
         {
@@ -121,6 +146,7 @@ function buildColumns(locale: Locale): FacilityColumn[] {
           ]
         }
       ];
+  return filterHiddenAmenities(columns);
 }
 
 function normalizeColumns(copy: FacilitiesSectionProps["copy"], locale: Locale) {
@@ -128,7 +154,7 @@ function normalizeColumns(copy: FacilitiesSectionProps["copy"], locale: Locale) 
     return buildColumns(locale);
   }
 
-  return copy.columns;
+  return filterHiddenAmenities(copy.columns);
 }
 
 export function FacilitiesSection({ className, copy, id = "tien-ich", locale }: FacilitiesSectionProps) {

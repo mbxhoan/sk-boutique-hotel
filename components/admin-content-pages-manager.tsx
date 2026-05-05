@@ -56,6 +56,192 @@ function sortPages(pages: ContentPageRow[]) {
   return [...pages].sort((left, right) => left.sort_order - right.sort_order || right.updated_at.localeCompare(left.updated_at));
 }
 
+type PromotionProgramStatus = "active" | "scheduled" | "draft" | "paused";
+
+type PromotionProgram = {
+  code: string;
+  scope: {
+    en: string;
+    vi: string;
+  };
+  status: PromotionProgramStatus;
+  summary: {
+    en: string;
+    vi: string;
+  };
+  title: {
+    en: string;
+    vi: string;
+  };
+  window: {
+    en: string;
+    vi: string;
+  };
+};
+
+type PromotionProgramsPageContent = {
+  promotionPrograms?: PromotionProgram[];
+};
+
+const fallbackPromotionPrograms: PromotionProgram[] = [
+  {
+    code: "WKND-2026",
+    scope: {
+      en: "Applies to Superior and Deluxe rooms at the central branch.",
+      vi: "Áp dụng cho phòng Superior và Deluxe tại chi nhánh trung tâm."
+    },
+    status: "active",
+    summary: {
+      en: "Weekend offer for 2-night stays with a seasonal bonus benefit.",
+      vi: "Ưu đãi cuối tuần cho khách đặt 2 đêm, tặng thêm quyền lợi nhỏ theo mùa."
+    },
+    title: {
+      en: "Weekend Escape",
+      vi: "Kỳ nghỉ cuối tuần"
+    },
+    window: {
+      en: "Book by 30 Jun, stay through 31 Aug",
+      vi: "Đặt trước đến 30/06, lưu trú đến 31/08"
+    }
+  },
+  {
+    code: "LONG-7",
+    scope: {
+      en: "For business travelers or stays of 7 nights and above.",
+      vi: "Dành cho khách công tác hoặc lưu trú dài ngày từ 7 đêm trở lên."
+    },
+    status: "scheduled",
+    summary: {
+      en: "Flexible long-stay pricing that can be activated per season.",
+      vi: "Giá linh hoạt cho kỳ lưu trú dài, dễ kích hoạt theo từng mùa."
+    },
+    title: {
+      en: "Long Stay",
+      vi: "Lưu trú dài ngày"
+    },
+    window: {
+      en: "Scheduled for the next quarter",
+      vi: "Kích hoạt theo quý"
+    }
+  },
+  {
+    code: "BDAY-GIFT",
+    scope: {
+      en: "For birthday, anniversary, or gift-ready stays.",
+      vi: "Phòng đặt cho dịp sinh nhật, kỷ niệm hoặc nhu cầu tặng quà."
+    },
+    status: "draft",
+    summary: {
+      en: "Can include cake, flowers, or a room welcome setup.",
+      vi: "Có thể gắn bánh, hoa hoặc setup chào mừng trong phòng."
+    },
+    title: {
+      en: "Birthday Gift",
+      vi: "Gói sinh nhật"
+    },
+    window: {
+      en: "Pending approval before publishing",
+      vi: "Cần duyệt trước khi xuất bản"
+    }
+  },
+  {
+    code: "EARLY-BOOK",
+    scope: {
+      en: "For guests who confirm early before arrival.",
+      vi: "Áp dụng cho khách chốt phòng trước khi đến."
+    },
+    status: "paused",
+    summary: {
+      en: "Early-booking discount for dates with strong inventory.",
+      vi: "Ưu đãi đặt sớm dành cho phòng còn nhiều inventory."
+    },
+    title: {
+      en: "Early Bird",
+      vi: "Đặt sớm"
+    },
+    window: {
+      en: "Paused until the peak season window",
+      vi: "Tạm dừng để chờ mùa cao điểm"
+    }
+  }
+];
+
+function isPromotionProgram(value: unknown): value is PromotionProgram {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  return (
+    typeof candidate.code === "string" &&
+    typeof candidate.status === "string" &&
+    typeof candidate.summary === "object" &&
+    !!candidate.summary &&
+    typeof candidate.scope === "object" &&
+    !!candidate.scope &&
+    typeof candidate.title === "object" &&
+    !!candidate.title &&
+    typeof candidate.window === "object" &&
+    !!candidate.window
+  );
+}
+
+function promotionStatusTone(status: PromotionProgramStatus) {
+  if (status === "active") {
+    return "accent" as const;
+  }
+
+  if (status === "scheduled") {
+    return "soft" as const;
+  }
+
+  return "neutral" as const;
+}
+
+function promotionStatusLabel(locale: Locale, status: PromotionProgramStatus) {
+  const labels: Record<Locale, Record<PromotionProgramStatus, string>> = {
+    en: {
+      active: "Active",
+      draft: "Draft",
+      paused: "Paused",
+      scheduled: "Scheduled"
+    },
+    vi: {
+      active: "Đang chạy",
+      draft: "Bản nháp",
+      paused: "Tạm dừng",
+      scheduled: "Đã lên lịch"
+    }
+  };
+
+  return labels[locale][status];
+}
+
+function promotionBoardTone(status: PromotionProgramStatus) {
+  return status === "active" ? "default" : "muted";
+}
+
+function extractPromotionPrograms(page: ContentPageRow | undefined) {
+  const content = page?.content_json;
+
+  if (!content || typeof content !== "object" || Array.isArray(content)) {
+    return fallbackPromotionPrograms;
+  }
+
+  const candidate = (content as PromotionProgramsPageContent).promotionPrograms;
+
+  if (!candidate) {
+    return fallbackPromotionPrograms;
+  }
+
+  if (!Array.isArray(candidate)) {
+    return fallbackPromotionPrograms;
+  }
+
+  return candidate.filter(isPromotionProgram);
+}
+
 function PageEditor({
   locale,
   page
@@ -148,34 +334,36 @@ function PageEditor({
   );
 }
 
-function BannerCard({
-  active,
-  label,
-  note,
-  tone,
-  locale
+function PromotionProgramCard({
+  locale,
+  program
 }: {
-  active: boolean;
-  label: string;
-  note: string;
   locale: Locale;
-  tone: "default" | "muted";
+  program: PromotionProgram;
 }) {
+  const statusLabel = promotionStatusLabel(locale, program.status);
+  const title = localize(locale, program.title);
+  const summary = localize(locale, program.summary);
+  const scope = localize(locale, program.scope);
+  const window = localize(locale, program.window);
+  const active = program.status === "active";
+
   return (
-    <article className={`admin-content__banner admin-content__banner--${tone}${active ? " admin-content__banner--active" : ""}`}>
+    <article className={`admin-content__banner admin-content__banner--${promotionBoardTone(program.status)}${active ? " admin-content__banner--active" : ""}`}>
       <div className="admin-content__banner-head">
-        <h3 className="admin-content__banner-title">{label}</h3>
-        <label className="admin-content__switch" aria-label={label}>
+        <div>
+          <PortalBadge tone="soft">{program.code}</PortalBadge>{" "}
+          <PortalBadge tone={promotionStatusTone(program.status)}>{statusLabel}</PortalBadge>
+          <h3 className="admin-content__banner-title">{title}</h3>
+        </div>
+        <label className="admin-content__switch" aria-label={title}>
           <input checked={active} readOnly type="checkbox" />
           <span />
         </label>
       </div>
-      <p className="admin-content__banner-copy">{note}</p>
-      <p className="admin-content__banner-slot">
-        {tone === "default"
-          ? localize(locale, { vi: "Banner hero trang chủ", en: "Homepage hero banner" })
-          : localize(locale, { vi: "Chỉ trang ưu đãi", en: "Offers page only" })}
-      </p>
+      <p className="admin-content__banner-copy">{summary}</p>
+      <p className="admin-content__banner-copy">{localize(locale, { vi: `Phạm vi: ${scope}`, en: `Scope: ${scope}` })}</p>
+      <p className="admin-content__banner-slot">{window}</p>
     </article>
   );
 }
@@ -307,6 +495,8 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
   const collectionDescription = collection
     ? localize(locale, { vi: collection.description_vi || collection.name_vi, en: collection.description_en || collection.name_en })
     : localize(locale, { vi: "Ảnh gần đây dùng cho trang và banner.", en: "Recent uploads used across pages and banners." });
+  const offersPage = sortedPages.find((page) => page.slug === "/uu-dai");
+  const promotionPrograms = extractPromotionPrograms(offersPage);
 
   return (
     <div className="admin-page admin-content">
@@ -315,8 +505,8 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
           <h1 className="admin-page__title">{localize(locale, { vi: "Quản lý nội dung", en: "Content management" })}</h1>
           <p className="admin-page__description">
             {localize(locale, {
-              vi: "Quản lý nội dung public, media và banner khuyến mãi.",
-              en: "Manage public-facing website content, media, and promotional banners."
+              vi: "Quản lý nội dung public, media và chương trình khuyến mãi.",
+              en: "Manage public-facing website content, media, and promotion campaigns."
             })}
           </p>
         </div>
@@ -360,32 +550,20 @@ export function AdminContentPagesManager({ assets, collections, locale, pages }:
         <PortalCard className="admin-content__panel admin-content__panel--banners">
           <div className="admin-content__panel-head admin-content__panel-head--stacked">
             <div>
-              <h2 className="admin-content__panel-title">{localize(locale, { vi: "Banner hiện hoạt", en: "Active banners" })}</h2>
-              <p className="admin-content__panel-copy">{localize(locale, { vi: "Quản lý banner khuyến mãi toàn site.", en: "Manage global site promotions." })}</p>
+              <h2 className="admin-content__panel-title">{localize(locale, { vi: "Chương trình khuyến mãi", en: "Promotion programs" })}</h2>
+              <p className="admin-content__panel-copy">
+                {localize(locale, {
+                  vi: "Theo dõi mã chiến dịch, phạm vi áp dụng, trạng thái và khung thời gian của từng campaign.",
+                  en: "Track campaign codes, scope, status, and active windows."
+                })}
+              </p>
             </div>
           </div>
 
           <div className="admin-content__banners">
-            <BannerCard
-              active
-              label={localize(locale, { vi: "Kỳ nghỉ hè 2024", en: "Summer Escape 2024" })}
-              note={localize(locale, {
-                vi: '"Đặt 3 đêm, tặng đêm thứ 4 tại một số chi nhánh boutique."',
-                en: '"Book 3 nights, get the 4th free at select boutique locations."'
-              })}
-              locale={locale}
-              tone="default"
-            />
-            <BannerCard
-              active={false}
-              label={localize(locale, { vi: "Gói spa mùa đông", en: "Winter Retreat Spa Package" })}
-              note={localize(locale, {
-                vi: '"Tặng massage 60 phút khi đặt suite."',
-                en: '"Complimentary 60-minute massage with suite bookings."'
-              })}
-              locale={locale}
-              tone="muted"
-            />
+            {promotionPrograms.map((program) => (
+              <PromotionProgramCard key={program.code} locale={locale} program={program} />
+            ))}
           </div>
         </PortalCard>
       </div>

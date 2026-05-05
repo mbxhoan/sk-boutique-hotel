@@ -304,6 +304,7 @@ function GuestBookingCard({
   const guestPhone = detail.customer?.phone ?? request?.contact_phone ?? null;
   const nights = calculateNights(booking.stay_start_at, booking.stay_end_at);
   const roomTypeLabel = locale === "en" ? booking.room_type_name_en : booking.room_type_name_vi;
+  const guestJourney = detail.customer_journey;
   const guestInitials = guestName
     .split(" ")
     .filter(Boolean)
@@ -313,6 +314,20 @@ function GuestBookingCard({
 
   const specialRequest = request?.note || booking.notes || null;
   const branchLabel = locale === "en" ? booking.branch_name_en : booking.branch_name_vi;
+  const guestJourneyLabel = guestJourney.is_returning_guest
+    ? localize(locale, { vi: "Khách quay lại", en: "Returning guest" })
+    : localize(locale, { vi: "Khách mới", en: "New guest" });
+  const guestJourneyCopy = guestJourney.is_returning_guest
+    ? localize(locale, {
+        vi: `Đã có ${guestJourney.prior_confirmed_stay_count} booking lưu trú xác nhận trước đó trong hệ thống.`,
+        en: `Based on ${guestJourney.prior_confirmed_stay_count} confirmed stay${
+          guestJourney.prior_confirmed_stay_count === 1 ? "" : "s"
+        } already on record.`
+      })
+    : localize(locale, {
+        vi: "Đây là booking lưu trú xác nhận đầu tiên trong hệ thống.",
+        en: "This is the first confirmed stay on record."
+      });
 
   return (
     <PortalCard className="admin-booking-detail__surface-card admin-booking-detail__guest-card">
@@ -332,6 +347,10 @@ function GuestBookingCard({
             <div className="admin-booking-detail__guest-contact">
               <p>{guestPhone ?? "—"}</p>
               <p>{guestEmail}</p>
+            </div>
+            <div className="admin-booking-detail__guest-journey">
+              <PortalBadge tone={guestJourney.is_returning_guest ? "accent" : "soft"}>{guestJourneyLabel}</PortalBadge>
+              <p className="admin-booking-detail__guest-journey-copy">{guestJourneyCopy}</p>
             </div>
           </div>
         </div>

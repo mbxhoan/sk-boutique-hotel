@@ -57,6 +57,17 @@ export type CardSectionData = {
   cards: CardItem[];
 };
 
+export type PromotionProgramStatus = "active" | "scheduled" | "draft" | "paused";
+
+export type PromotionProgramData = {
+  code: string;
+  scope: LocalizedText;
+  status: PromotionProgramStatus;
+  summary: LocalizedText;
+  title: LocalizedText;
+  window: LocalizedText;
+};
+
 export type TimelineItem = {
   step: string;
   title: string;
@@ -125,6 +136,7 @@ export type PageContent = {
   description: string;
   hero: HeroData;
   metrics?: MetricItem[];
+  promotionPrograms?: PromotionProgramData[];
   splitSections?: SplitSectionData[];
   cardSections?: CardSectionData[];
   timelineSection?: TimelineSectionData;
@@ -585,6 +597,88 @@ export const pages: PageContent[] = [
       { value: "04", label: "Gói mẫu", detail: "Weekend, long stay, birthday, early bird" },
       { value: "02", label: "Mùa campaign", detail: "Có thể đổi theo quý hoặc theo lễ" },
       { value: "24h", label: "Khung ưu đãi", detail: "Placeholder cho thời hạn chiến dịch" }
+    ],
+    promotionPrograms: [
+      {
+        code: "WKND-2026",
+        scope: {
+          vi: "Áp dụng cho phòng Superior và Deluxe tại chi nhánh trung tâm.",
+          en: "Applies to Superior and Deluxe rooms at the central branch."
+        },
+        status: "active",
+        summary: {
+          vi: "Ưu đãi cuối tuần cho khách đặt 2 đêm, tặng thêm quyền lợi nhỏ theo mùa.",
+          en: "Weekend offer for 2-night stays with a seasonal bonus benefit."
+        },
+        title: {
+          vi: "Kỳ nghỉ cuối tuần",
+          en: "Weekend Escape"
+        },
+        window: {
+          vi: "Đặt trước đến 30/06, lưu trú đến 31/08",
+          en: "Book by 30 Jun, stay through 31 Aug"
+        }
+      },
+      {
+        code: "LONG-7",
+        scope: {
+          vi: "Dành cho khách công tác hoặc lưu trú dài ngày từ 7 đêm trở lên.",
+          en: "For business travelers or stays of 7 nights and above."
+        },
+        status: "scheduled",
+        summary: {
+          vi: "Giá linh hoạt cho kỳ lưu trú dài, dễ kích hoạt theo từng mùa.",
+          en: "Flexible long-stay pricing that can be activated per season."
+        },
+        title: {
+          vi: "Lưu trú dài ngày",
+          en: "Long Stay"
+        },
+        window: {
+          vi: "Kích hoạt theo quý",
+          en: "Scheduled for the next quarter"
+        }
+      },
+      {
+        code: "BDAY-GIFT",
+        scope: {
+          vi: "Phòng đặt cho dịp sinh nhật, kỷ niệm hoặc nhu cầu tặng quà.",
+          en: "For birthday, anniversary, or gift-ready stays."
+        },
+        status: "draft",
+        summary: {
+          vi: "Có thể gắn bánh, hoa hoặc setup chào mừng trong phòng.",
+          en: "Can include cake, flowers, or a room welcome setup."
+        },
+        title: {
+          vi: "Gói sinh nhật",
+          en: "Birthday Gift"
+        },
+        window: {
+          vi: "Cần duyệt trước khi xuất bản",
+          en: "Pending approval before publishing"
+        }
+      },
+      {
+        code: "EARLY-BOOK",
+        scope: {
+          vi: "Áp dụng cho khách chốt phòng trước khi đến.",
+          en: "For guests who confirm early before arrival."
+        },
+        status: "paused",
+        summary: {
+          vi: "Ưu đãi đặt sớm dành cho phòng còn nhiều inventory.",
+          en: "Early-booking discount for dates with strong inventory."
+        },
+        title: {
+          vi: "Đặt sớm",
+          en: "Early Bird"
+        },
+        window: {
+          vi: "Tạm dừng để chờ mùa cao điểm",
+          en: "Paused until the peak season window"
+        }
+      }
     ],
     splitSections: [
       {

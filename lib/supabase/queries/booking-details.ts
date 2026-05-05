@@ -8,7 +8,7 @@ import { getAvailabilityRequestById, getAvailabilityRequestByRequestCode } from 
 import { getLatestPaymentProofByRequestId } from "@/lib/supabase/queries/payment-proofs";
 import { listPaymentRequests } from "@/lib/supabase/queries/payment-requests";
 import { getPrimaryReservationRoomItemByReservationId } from "@/lib/supabase/queries/reservation-room-items";
-import { getReservationByBookingCode, listReservations } from "@/lib/supabase/queries/reservations";
+import { countReservations, getReservationByBookingCode, listReservations } from "@/lib/supabase/queries/reservations";
 import { getRoomById } from "@/lib/supabase/queries/rooms";
 import { listRoomHolds } from "@/lib/supabase/queries/room-holds";
 import { listRoomTypes } from "@/lib/supabase/queries/room-types";
@@ -29,6 +29,7 @@ import type {
   WorkflowBranchBankAccountOption,
   WorkflowBranchOption,
   WorkflowBookingRow,
+  WorkflowCustomerJourney,
   WorkflowPaymentProof,
   WorkflowPaymentRequest,
   WorkflowReservation,
@@ -259,6 +260,7 @@ export type BookingDetailData = {
   branch_options: WorkflowBranchOption[];
   booking: WorkflowBookingRow;
   customer: CustomerRow | null;
+  customer_journey: WorkflowCustomerJourney;
   financial_summary: BookingDetailFinancialSummary;
   payment_proofs: WorkflowPaymentProof[];
   payment_requests: WorkflowPaymentRequest[];
@@ -324,6 +326,12 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
   const customer =
     (reservation ? customerMap[reservation.customer_id] ?? null : request?.customer_id ? customerMap[request.customer_id] ?? null : null) ??
     emailCustomer;
+  const customerConfirmedStayCountPromise = customer?.id
+    ? countReservations({
+        customerId: customer.id,
+        status: ["confirmed", "completed"]
+      })
+    : Promise.resolve(0);
   const roomItem = reservation ? await getPrimaryReservationRoomItemByReservationId(reservation.id) : null;
   const room = roomItem ? await getRoomById(roomItem.room_id) : null;
 
@@ -487,6 +495,17 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
         totalAmount
       });
   const pendingDepositAmount = isManualReservation ? 0 : activePaymentRequest?.status === "verified" ? 0 : activePaymentRequest?.amount ?? 0;
+  const customerConfirmedStayCount = await customerConfirmedStayCountPromise;
+  const currentReservationCountsTowardHistory =
+    reservation?.customer_id && customer?.id === reservation.customer_id && (reservation.status === "confirmed" || reservation.status === "completed")
+      ? 1
+      : 0;
+  const priorConfirmedStayCount = Math.max(0, customerConfirmedStayCount - currentReservationCountsTowardHistory);
+  const customerJourney: WorkflowCustomerJourney = {
+    confirmed_stay_count: customerConfirmedStayCount,
+    is_returning_guest: priorConfirmedStayCount > 0,
+    prior_confirmed_stay_count: priorConfirmedStayCount
+  };
 
   return {
     audit_logs: Array.from(auditLogs),
@@ -501,6 +520,7 @@ export async function loadBookingDetailByCode(bookingCode: string): Promise<Book
     })),
     booking,
     customer,
+    customer_journey: customerJourney,
     financial_summary: {
       active_payment_request_id: activePaymentRequest?.id ?? null,
       default_deposit_amount: defaultDepositAmount,

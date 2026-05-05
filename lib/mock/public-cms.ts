@@ -689,9 +689,7 @@ const homePageSections: CmsSection[] = [
   //         amenityCheckItem("Bồn tắm", "Bathtub"),
   //         amenityCheckItem("Bàn làm việc", "Desk"),
   //         amenityCheckItem("Tủ lạnh", "Fridge"),
-  //         amenityCheckItem("Smart TV / Netflix", "Smart TV / Netflix"),
-  //         amenityCheckItem("Máy sấy tóc", "Hair dryer"),
-  //         amenityCheckItem("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee")
+  //         amenityCheckItem("Máy sấy tóc", "Hair dryer")
   //       ]
   //     },
   //     {
@@ -2172,9 +2170,7 @@ const homeMarketingShell: CmsMarketingShellCopy = {
           { kind: "check", label: text("Bồn tắm", "Bathtub") },
           { kind: "check", label: text("Bàn làm việc", "Desk") },
           { kind: "check", label: text("Tủ lạnh", "Fridge") },
-          { kind: "check", label: text("Smart TV / Netflix", "Smart TV / Netflix") },
-          { kind: "check", label: text("Máy sấy tóc", "Hair dryer") },
-          { kind: "check", label: text("Ấm đun nước / trà / cà phê", "Kettle / tea / coffee") }
+          { kind: "check", label: text("Máy sấy tóc", "Hair dryer") }
         ]
       },
       {

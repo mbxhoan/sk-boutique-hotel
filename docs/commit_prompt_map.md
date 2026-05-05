@@ -1804,3 +1804,20 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/branch-bank-accounts.ts`
   - `supabase/migrations/20260504120000_update_default_branch_bank_account.sql`
   - `supabase/seed.sql`
+
+### Entry 157
+- `time`: 2026-05-05T09:12:55+07:00
+- `prompt_summary`: Tạm ẩn các tiện ích Netflix/máy pha trà-cà phê, nâng cấp quản lý khuyến mãi theo chương trình, và phân biệt booking là khách mới hay khách quay lại để staff áp dụng ưu đãi loyalty.
+- `commit_message`: `feat(content): add campaign board and returning-guest flag`
+- `main_files`:
+  - `app/globals.css`
+  - `components/admin-booking-detail-page.tsx`
+  - `components/admin-content-pages-manager.tsx`
+  - `components/facilities-section.tsx`
+  - `components/room-canvas-modal.tsx`
+  - `docs/commit_prompt_map.md`
+  - `lib/mock/public-cms.ts`
+  - `lib/site-content.ts`
+  - `lib/supabase/queries/booking-details.ts`
+  - `lib/supabase/workflow.types.ts`
+  - `supabase/seed-content-pages.sql`

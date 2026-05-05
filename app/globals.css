@@ -12078,6 +12078,21 @@ textarea {
   margin: 0;
 }
 
+.admin-booking-detail__guest-journey {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.78rem;
+}
+
+.admin-booking-detail__guest-journey-copy {
+  margin: 0;
+  color: #6a7280;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
 .admin-booking-detail__booking-meta {
   display: grid;
   gap: 0.9rem;
