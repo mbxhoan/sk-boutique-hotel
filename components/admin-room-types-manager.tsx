@@ -28,6 +28,12 @@ const previewFallbacks: Record<string, string> = {
   "superior-room": "/assets/room_types/superior/1.png"
 };
 
+const legacyRoomTypeCoverMap: Record<string, string> = {
+  "family-room": "/assets/room_types/family/1.png",
+  "superior-room": "/assets/room_types/superior/1.png",
+  "quadruple-room": "/assets/room_types/quadruple/1.png"
+};
+
 function formatMoney(value: number | null | undefined) {
   if (value == null) {
     return "-";
@@ -49,8 +55,20 @@ function splitLines(value: string | null | undefined) {
     .filter(Boolean);
 }
 
+function normalizeRoomTypeCoverPath(rawPath: string | null | undefined, slug: string) {
+  if (!rawPath) {
+    return null;
+  }
+
+  if (rawPath.startsWith("room-types/")) {
+    return legacyRoomTypeCoverMap[slug] ?? `/${rawPath}`;
+  }
+
+  return rawPath;
+}
+
 function previewImageFor(roomType: RoomTypeRow) {
-  const rawPath = roomType.cover_image_path || previewFallbacks[roomType.slug] || "/home/pool3.jpg";
+  const rawPath = normalizeRoomTypeCoverPath(roomType.cover_image_path, roomType.slug) || previewFallbacks[roomType.slug] || "/home/pool3.jpg";
   return resolveMediaSource(rawPath, {}) || "/home/pool3.jpg";
 }
 

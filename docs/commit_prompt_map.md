@@ -120,6 +120,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
 - `prompt_summary`: Sửa lỗi `supabase db reset --linked --debug` do seed `room_types` dư 1 expression so với schema, khiến INSERT fail ở bước import seed.
 
 ### Entry 007
+- `time`: 2026-05-05T10:00:00+07:00
+- `prompt_summary`: Fix admin room type cover preview by mapping legacy cover paths to real public assets and updating seed cover_image_path values.
+- `commit_message`: `fix(admin-room-types): restore room type cover preview in admin UI`
+- `main_files`:
+  - `components/admin-room-types-manager.tsx`
+  - `supabase/seed.sql`
+
+### Entry 007
 - `time`: 2026-04-29T14:02:05+07:00
 - `prompt_summary`: Move admin portal settings menu item to footer above support so `Cài đặt` appears below main navigation and above `Hỗ trợ`.
 - `commit_message`: `fix(admin-shell): move settings below nav and above support`
