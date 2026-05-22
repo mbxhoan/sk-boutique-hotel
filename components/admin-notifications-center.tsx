@@ -432,6 +432,7 @@ function NotificationItemButton({
 }) {
   const title = localize(locale, { en: item.title_en, vi: item.title_vi });
   const body = localize(locale, { en: item.body_en, vi: item.body_vi });
+  const branchName = locale === "en" ? item.branch_name_en ?? item.branch_name_vi : item.branch_name_vi ?? item.branch_name_en;
 
   return (
     <button
@@ -448,7 +449,7 @@ function NotificationItemButton({
         <p className="admin-notifications__item-body">{body}</p>
         <div className="admin-notifications__item-meta">
           <span>{formatRelativeTime(locale, item.happened_at)}</span>
-          {item.branch_name_en || item.branch_name_vi ? <span>{locale === "en" ? item.branch_name_en : item.branch_name_vi}</span> : null}
+          {branchName ? <span>{branchName}</span> : null}
         </div>
       </div>
     </button>
@@ -483,6 +484,10 @@ function NotificationDialog() {
   const title = localize(locale, { en: selectedNotification.title_en, vi: selectedNotification.title_vi });
   const body = localize(locale, { en: selectedNotification.body_en, vi: selectedNotification.body_vi });
   const href = appendLocaleQuery(selectedNotification.href, locale);
+  const branchName =
+    locale === "en"
+      ? selectedNotification.branch_name_en ?? selectedNotification.branch_name_vi
+      : selectedNotification.branch_name_vi ?? selectedNotification.branch_name_en;
 
   return (
     <div
@@ -509,9 +514,7 @@ function NotificationDialog() {
             <p className="admin-notifications__dialog-message">{body}</p>
             <div className="admin-notifications__dialog-meta">
               <span>{formatRelativeTime(locale, selectedNotification.happened_at)}</span>
-              {selectedNotification.branch_name_en || selectedNotification.branch_name_vi ? (
-                <span>{locale === "en" ? selectedNotification.branch_name_en : selectedNotification.branch_name_vi}</span>
-              ) : null}
+              {branchName ? <span>{branchName}</span> : null}
             </div>
           </div>
         </div>
@@ -695,7 +698,7 @@ export function AdminNotificationsMenu({ locale, viewAllHref }: AdminNotificatio
         >
             <div className="admin-notifications__panel-head">
               <div>
-                <p className="admin-notifications__eyebrow">{locale === "en" ? "Ops inbox" : "Ops inbox"}</p>
+                <p className="admin-notifications__eyebrow">{locale === "en" ? "Ops inbox" : "Hộp thư vận hành"}</p>
                 <h3 className="admin-notifications__panel-title" id="admin-notifications-menu-title">
                   {locale === "en" ? "Notifications" : "Thông báo"}
                 </h3>

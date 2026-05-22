@@ -27,16 +27,32 @@ type LoadAdminNotificationsOptions = {
   limit?: number;
 };
 
-function readMetadataString(log: AuditLogRow, key: string) {
+function readMetadataValue(log: AuditLogRow, key: string) {
   const metadata = log.metadata;
 
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
     return null;
   }
 
-  const value = (metadata as Record<string, unknown>)[key];
+  return (metadata as Record<string, unknown>)[key] ?? null;
+}
+
+function readMetadataString(log: AuditLogRow, key: string) {
+  const value = readMetadataValue(log, key);
 
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
+function readNestedMetadataString(log: AuditLogRow, key: string, nestedKey: string) {
+  const value = readMetadataValue(log, key);
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const nestedValue = (value as Record<string, unknown>)[nestedKey];
+
+  return typeof nestedValue === "string" && nestedValue.trim().length > 0 ? nestedValue.trim() : null;
 }
 
 function buildReferenceLabel({
@@ -116,12 +132,33 @@ function buildNotificationCopy(
   const referenceSuffix = referenceLabel ? ` ${referenceLabel}` : "";
 
   switch (log.action) {
+    case "availability_request.created":
+      return {
+        body_en: "A new availability request was submitted and is waiting for staff review.",
+        body_vi: "Hệ thống vừa nhận một yêu cầu kiểm tra phòng trống mới và đang chờ nhân sự xử lý.",
+        title_en: `Availability request${referenceSuffix}`,
+        title_vi: `Yêu cầu kiểm tra phòng trống${referenceSuffix}`
+      };
     case "availability_request.confirmed":
       return {
         body_en: "Room availability was confirmed and the deposit QR was issued for guest follow-up.",
         body_vi: "Admin đã chốt phòng, chuyển yêu cầu thành booking chờ cọc và phát hành QR cọc cho khách.",
         title_en: `Booking confirmed${referenceSuffix}`,
         title_vi: `Đã chốt booking${referenceSuffix}`
+      };
+    case "room_type_closure.created":
+      return {
+        body_en: "A room type closure window was created and those rooms will stay unavailable during the selected dates.",
+        body_vi: "Đã tạo lịch đóng hạng phòng và các phòng thuộc hạng này sẽ không được nhận booking trong khoảng ngày đã chọn.",
+        title_en: "Room type closure scheduled",
+        title_vi: "Đã lên lịch đóng hạng phòng"
+      };
+    case "room_type_closure.cancelled":
+      return {
+        body_en: "The room type closure window was cancelled and availability can be reopened for the affected dates.",
+        body_vi: "Đã gỡ lịch đóng hạng phòng và có thể mở lại khả dụng cho các ngày bị ảnh hưởng.",
+        title_en: "Room type closure cancelled",
+        title_vi: "Đã gỡ lịch đóng hạng phòng"
       };
     case "payment_request_created":
     case "payment_request.reissued":
@@ -173,6 +210,27 @@ function buildNotificationCopy(
         body_vi: "Booking đã được chốt hoàn tất trong hệ thống vận hành.",
         title_en: `Booking completed${referenceSuffix}`,
         title_vi: `Booking hoàn tất${referenceSuffix}`
+      };
+    case "room_status.scheduled": {
+      const status = readNestedMetadataString(log, "schedule", "status");
+      const statusLabelEn =
+        status === "maintenance" ? "maintenance" : status === "cleaning" ? "cleaning" : status === "occupied" ? "occupied" : "manual status";
+      const statusLabelVi =
+        status === "maintenance" ? "Bảo trì" : status === "cleaning" ? "Đang dọn" : status === "occupied" ? "Đang ở" : "trạng thái thủ công";
+
+      return {
+        body_en: `A ${statusLabelEn} window was scheduled for this room and will stop automatically after the selected dates.`,
+        body_vi: `Đã lên lịch trạng thái ${statusLabelVi.toLowerCase()} cho phòng này và hệ thống sẽ tự kết thúc sau khoảng ngày đã chọn.`,
+        title_en: "Room status scheduled",
+        title_vi: "Đã lên lịch trạng thái phòng"
+      };
+    }
+    case "room_status.cleared":
+      return {
+        body_en: "The manual room status window was cleared, so the room can return to available whenever no booking or hold exists.",
+        body_vi: "Đã gỡ lịch trạng thái thủ công, vì vậy phòng có thể quay về Trống nếu không còn booking hoặc hold.",
+        title_en: "Room status cleared",
+        title_vi: "Đã gỡ lịch trạng thái phòng"
       };
     default:
       if (log.action.startsWith("availability_request.status.")) {

@@ -11404,7 +11404,7 @@ textarea {
 .admin-notifications-page__eyebrow {
   margin: 0 0 0.22rem;
   color: #8a6b31;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   line-height: 1.4;
@@ -11416,7 +11416,7 @@ textarea {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(1.55rem, 2vw, 2.05rem);
+  font-size: clamp(1.42rem, 1.8vw, 1.88rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
 }
@@ -11426,7 +11426,7 @@ textarea {
   border: 0;
   background: transparent;
   color: #8a6b31;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -11458,7 +11458,7 @@ textarea {
 .admin-notifications__empty {
   padding: 1.1rem;
   color: #5c6676;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
 }
 
 .admin-notifications__panel-footer {
@@ -11471,7 +11471,7 @@ textarea {
 
 .admin-notifications__view-all {
   color: #8a6b31;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
@@ -11480,7 +11480,7 @@ textarea {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 0.9rem;
   align-items: flex-start;
-  padding: 1rem 1.05rem;
+  padding: 0.92rem 1rem;
   border-bottom: 1px solid rgba(0, 12, 30, 0.05);
   border-left: 0;
   border-right: 0;
@@ -11550,9 +11550,9 @@ textarea {
 .admin-notifications__item-title {
   margin: 0;
   color: var(--ink);
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .admin-notifications__item-dot {
@@ -11568,6 +11568,7 @@ textarea {
 .admin-notifications-page__description {
   margin: 0.32rem 0 0;
   color: #586272;
+  font-size: 0.86rem;
   line-height: 1.6;
 }
 
@@ -11577,7 +11578,7 @@ textarea {
   gap: 0.65rem;
   margin-top: 0.52rem;
   color: #8a93a2;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 600;
 }
 
@@ -11679,7 +11680,7 @@ textarea {
 .admin-notifications__toast-title {
   margin: 0;
   color: var(--ink);
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -11687,7 +11688,7 @@ textarea {
 .admin-notifications__toast-body {
   margin: 0.25rem 0 0;
   color: #5d6675;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   line-height: 1.55;
 }
 
@@ -11739,7 +11740,7 @@ textarea {
 .admin-notifications__dialog-title {
   margin: 0.2rem 0 0;
   color: var(--ink);
-  font-size: 1.2rem;
+  font-size: 1.08rem;
   font-weight: 800;
   line-height: 1.35;
 }
@@ -11772,6 +11773,7 @@ textarea {
 .admin-notifications__dialog-message {
   margin: 0;
   color: #3f4958;
+  font-size: 0.88rem;
   line-height: 1.7;
 }
 
@@ -11781,7 +11783,7 @@ textarea {
   gap: 0.65rem;
   margin-top: 0.7rem;
   color: #8791a0;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 

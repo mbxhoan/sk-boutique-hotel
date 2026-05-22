@@ -1847,3 +1847,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/database.types.ts`
   - `lib/supabase/queries/room-status-overrides.ts`
   - `supabase/migrations/20260522152000_add_room_status_overrides.sql`
+
+### Entry 159
+- `time`: 2026-05-22T15:29:58+07:00
+- `prompt_summary`: Ở notification center admin, giảm nhẹ cỡ chữ và sửa copy VI/EN để khi đang dùng tiếng Việt không còn hiện các nội dung tiếng Anh như `Room type...` hoặc `Availability request...`.
+- `commit_message`: `fix(admin-notifications): localize vi copy and tighten notification typography`
+- `main_files`:
+  - `app/globals.css`
+  - `components/admin-notifications-center.tsx`
+  - `docs/commit_prompt_map.md`
+  - `lib/supabase/queries/admin-notifications.ts`
