@@ -6,6 +6,12 @@ import { redirect } from "next/navigation";
 import { buildActionResultHref, readSafeReturnTo } from "@/lib/action-result";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 import { readLocaleFromFormData } from "@/lib/locale";
+import {
+  buildDayRangeTimestamps,
+  getTodayHotelDateKey,
+  roomOperationalOverrideStatuses,
+  type RoomOperationalOverrideStatus
+} from "@/lib/rooms/operational-status";
 import { sendEmail } from "@/lib/supabase/email";
 import { sendDepositRequestCustomerEmail } from "@/lib/supabase/email";
 import { updateReservationLifecycle } from "@/lib/supabase/booking-lifecycle";
@@ -138,6 +144,50 @@ const copy = {
     vi: "Khoảng ngày đặt phòng không hợp lệ. Vui lòng chọn ngày trả phòng sau ngày nhận phòng.",
     en: "The booking stay window is invalid. Please choose a checkout date after check-in."
   },
+  noManualRoomStatusToClear: {
+    vi: "Không có lịch trạng thái thủ công nào trong khoảng ngày đã chọn để đưa phòng về Trống.",
+    en: "There is no manual room-status schedule in the selected date range to clear."
+  },
+  roomNotFound: {
+    vi: "Không tìm thấy phòng.",
+    en: "Room was not found."
+  },
+  roomStatusInvalidTarget: {
+    vi: "Trạng thái phòng không hợp lệ.",
+    en: "The room status is invalid."
+  },
+  roomStatusRequiresAdminRole: {
+    vi: "Chỉ admin hoặc manager mới có thể cập nhật trạng thái vận hành của phòng.",
+    en: "Only admins or managers can update a room operational status."
+  },
+  roomStatusStartMustBeTodayOrLater: {
+    vi: "Ngày bắt đầu trạng thái phải từ hôm nay trở đi.",
+    en: "The room status start date must be today or later."
+  },
+  roomStatusUpdated: {
+    vi: "Lịch trạng thái phòng đã được cập nhật.",
+    en: "The room status schedule has been updated."
+  },
+  roomStatusWindowInvalid: {
+    vi: "Khoảng ngày trạng thái phòng không hợp lệ.",
+    en: "The room status date range is invalid."
+  },
+  roomStatusWindowOverlapsBooking: {
+    vi: "Khoảng ngày đã chọn đang có booking của phòng này.",
+    en: "The selected date range already has a booking for this room."
+  },
+  roomStatusWindowOverlapsHold: {
+    vi: "Khoảng ngày đã chọn đang có hold của phòng này.",
+    en: "The selected date range already has a hold for this room."
+  },
+  roomStatusWindowOverlapsManualStatus: {
+    vi: "Khoảng ngày đã chọn đã có một lịch trạng thái thủ công khác.",
+    en: "The selected date range already has another manual room-status schedule."
+  },
+  unableToUpdateRoomStatus: {
+    vi: "Không thể cập nhật trạng thái phòng.",
+    en: "Unable to update the room status."
+  },
   unableToRegenerateDepositQr: {
     vi: "Không thể tạo lại QR cọc.",
     en: "Unable to regenerate deposit QR."
@@ -255,6 +305,55 @@ function resolveManualBookingFinancialsErrorMessage(error: unknown): LocalizedTe
   return {
     en: `${copy.unableToUpdateManualBookingFinancials.en} Details: ${detail}`,
     vi: `${copy.unableToUpdateManualBookingFinancials.vi} Chi tiết: ${detail}`
+  };
+}
+
+function resolveRoomOperationalStatusErrorMessage(error: unknown): LocalizedText {
+  const detail = getErrorMessage(error, "").trim();
+
+  if (!detail) {
+    return copy.unableToUpdateRoomStatus;
+  }
+
+  if (detail.includes("Room was not found.")) {
+    return copy.roomNotFound;
+  }
+
+  if (detail.includes("Room status window is invalid.")) {
+    return copy.roomStatusWindowInvalid;
+  }
+
+  if (detail.includes("Room already has a booking in the selected date range.")) {
+    return copy.roomStatusWindowOverlapsBooking;
+  }
+
+  if (detail.includes("Room already has a hold in the selected date range.")) {
+    return copy.roomStatusWindowOverlapsHold;
+  }
+
+  if (detail.includes("Room already has another manual status in the selected date range.")) {
+    return copy.roomStatusWindowOverlapsManualStatus;
+  }
+
+  if (detail.includes(copy.roomStatusRequiresAdminRole.vi) || detail.includes(copy.roomStatusRequiresAdminRole.en)) {
+    return copy.roomStatusRequiresAdminRole;
+  }
+
+  if (detail.includes(copy.noManualRoomStatusToClear.vi) || detail.includes(copy.noManualRoomStatusToClear.en)) {
+    return copy.noManualRoomStatusToClear;
+  }
+
+  if (detail.includes(copy.roomStatusStartMustBeTodayOrLater.vi) || detail.includes(copy.roomStatusStartMustBeTodayOrLater.en)) {
+    return copy.roomStatusStartMustBeTodayOrLater;
+  }
+
+  if (detail.includes(copy.roomStatusInvalidTarget.vi) || detail.includes(copy.roomStatusInvalidTarget.en)) {
+    return copy.roomStatusInvalidTarget;
+  }
+
+  return {
+    en: `${copy.unableToUpdateRoomStatus.en} Details: ${detail}`,
+    vi: `${copy.unableToUpdateRoomStatus.vi} Chi tiết: ${detail}`
   };
 }
 
@@ -596,6 +695,150 @@ export async function createManualReservationAction(formData: FormData) {
     "success",
     localize(locale, { vi: "Đã đánh dấu phòng là đã đặt.", en: "Room has been marked as booked." })
   );
+}
+
+function roomOperationalStatusLabel(locale: ReturnType<typeof readLocaleFromFormData>, status: RoomOperationalOverrideStatus) {
+  return localize(locale, {
+    en: {
+      cleaning: "Cleaning",
+      maintenance: "Maintenance",
+      occupied: "Occupied"
+    }[status],
+    vi: {
+      cleaning: "Đang dọn",
+      maintenance: "Bảo trì",
+      occupied: "Đang ở"
+    }[status]
+  });
+}
+
+export async function updateRoomOperationalStatusAction(formData: FormData) {
+  const locale = readLocaleFromFormData(formData);
+  const returnTo = readSafeReturnTo(readOptionalString(formData, "returnTo"));
+  const user = await getSupabaseUser().catch(() => null);
+  const actorRole = user ? getSupabaseUserPortalRole(user) : null;
+  const roomId = readRequiredString(formData, "roomId");
+  const targetStatus = readRequiredString(formData, "targetStatus");
+  const startDate = readRequiredString(formData, "startDate");
+  const endDate = readRequiredString(formData, "endDate");
+  const room = await getRoomById(roomId);
+
+  try {
+    if (!room) {
+      throw new Error(localize(locale, copy.roomNotFound));
+    }
+
+    if (!actorRole || !["system_admin", "admin", "manager"].includes(actorRole)) {
+      throw new Error(localize(locale, copy.roomStatusRequiresAdminRole));
+    }
+
+    if (startDate < getTodayHotelDateKey()) {
+      throw new Error(localize(locale, copy.roomStatusStartMustBeTodayOrLater));
+    }
+
+    const roomWindow = buildDayRangeTimestamps(startDate, endDate);
+
+    if (!roomWindow) {
+      throw new Error(localize(locale, copy.roomStatusWindowInvalid));
+    }
+
+    const supabase = createSupabaseServiceClient();
+
+    if (targetStatus === "available") {
+      const { data, error } = await supabase.rpc("clear_room_status_overrides", {
+        p_end_at: roomWindow.endAt,
+        p_room_id: room.id,
+        p_start_at: roomWindow.startAt,
+        p_updated_by: user?.id ?? null
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error(localize(locale, copy.noManualRoomStatusToClear));
+      }
+
+      try {
+        await logAuditEvent({
+          action: "room_status.cleared",
+          actorRole,
+          actorUserId: user?.id ?? null,
+          branchId: room.branch_id,
+          entityId: room.id,
+          entityType: "room",
+          metadata: {
+            cleared_range: {
+              end_date: endDate,
+              start_date: startDate
+            },
+            cleared_windows: data
+          },
+          roomId: room.id,
+          summary: localize(locale, {
+            vi: `Đã đưa phòng ${room.code} về Trống trong khoảng ${startDate} → ${endDate} nếu không có booking hoặc hold.`,
+            en: `Room ${room.code} was reset to Available for ${startDate} → ${endDate} when no booking or hold exists.`
+          })
+        });
+      } catch (auditError) {
+        console.warn("[admin] Failed to write room status clear audit log", auditError);
+      }
+    } else {
+      if (!roomOperationalOverrideStatuses.includes(targetStatus as RoomOperationalOverrideStatus)) {
+        throw new Error(localize(locale, copy.roomStatusInvalidTarget));
+      }
+
+      const status = targetStatus as RoomOperationalOverrideStatus;
+      const { error } = await supabase.rpc("set_room_status_override", {
+        p_created_by: user?.id ?? null,
+        p_end_at: roomWindow.endAt,
+        p_note: "",
+        p_room_id: room.id,
+        p_start_at: roomWindow.startAt,
+        p_status: status
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      try {
+        await logAuditEvent({
+          action: "room_status.scheduled",
+          actorRole,
+          actorUserId: user?.id ?? null,
+          branchId: room.branch_id,
+          entityId: room.id,
+          entityType: "room",
+          metadata: {
+            schedule: {
+              end_date: endDate,
+              start_date: startDate,
+              status
+            }
+          },
+          roomId: room.id,
+          summary: localize(locale, {
+            vi: `Đã đặt trạng thái ${roomOperationalStatusLabel(locale, status)} cho phòng ${room.code} từ ${startDate} đến ${endDate}.`,
+            en: `Room ${room.code} was scheduled as ${roomOperationalStatusLabel(locale, status)} from ${startDate} to ${endDate}.`
+          })
+        });
+      } catch (auditError) {
+        console.warn("[admin] Failed to write room status schedule audit log", auditError);
+      }
+    }
+  } catch (error) {
+    console.warn("[admin] Failed to update room operational status", error);
+    redirectWithActionResult(returnTo, "error", resolveRoomOperationalStatusErrorMessage(error));
+    throw error;
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/rooms");
+  revalidatePath("/rooms");
+  revalidatePath("/phong");
+  redirectWithActionResult(returnTo, "success", localize(locale, copy.roomStatusUpdated));
 }
 
 export async function updateManualReservationFinancialsAction(formData: FormData) {

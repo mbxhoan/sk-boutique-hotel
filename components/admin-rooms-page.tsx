@@ -5,11 +5,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { createManualReservationAction } from "@/app/(admin)/admin/actions";
+import { AdminRoomStatusDialog, type RoomStatusScheduleItem } from "@/components/admin-room-status-dialog";
 import { PortalCard } from "@/components/portal-ui";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
 import type { Locale } from "@/lib/locale";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
+import type { RoomDateWindow, RoomOperationalStatus } from "@/lib/rooms/operational-status";
 import type { FloorRow, RoomRow, RoomTypeRow } from "@/lib/supabase/database.types";
 
 type RoomView = RoomRow & {
@@ -43,8 +45,11 @@ type AdminRoomsPageProps = {
   selectedRoomId: string | null;
   selectedStartDate: string;
   selectedEndDate: string;
+  selectedRoomStatusSchedules: RoomStatusScheduleItem[];
   roomBookings: RoomBookingSummary[];
   roomTypes: RoomTypeOption[];
+  statusAssignmentWindows: RoomDateWindow[];
+  statusClearWindows: RoomDateWindow[];
 };
 
 function statusLabel(locale: Locale, status: RoomView["display_status"]) {
@@ -301,12 +306,16 @@ export function AdminRoomsPage({
   selectedRoomId,
   selectedStartDate,
   selectedEndDate,
+  selectedRoomStatusSchedules,
   roomBookings,
-  roomTypes
+  roomTypes,
+  statusAssignmentWindows,
+  statusClearWindows
 }: AdminRoomsPageProps) {
   const resolvedRooms = buildRoomViews(rooms);
   const [searchQuery, setSearchQuery] = useState("");
   const [roomTypeFilter, setRoomTypeFilter] = useState("all");
+  const [pendingStatus, setPendingStatus] = useState<RoomOperationalStatus | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -324,6 +333,10 @@ export function AdminRoomsPage({
     setSearchQuery("");
     setRoomTypeFilter("all");
   }, [branchId]);
+
+  useEffect(() => {
+    setPendingStatus(null);
+  }, [branchId, selectedRoomId]);
 
   function buildCurrentHref(nextParams: Record<string, string | null | undefined>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -360,6 +373,8 @@ export function AdminRoomsPage({
       ? selectedFloor.name_en ?? selectedFloor.code
       : selectedFloor.name_vi ?? selectedFloor.code
     : branchName;
+  const statusDialogWindows = pendingStatus === "available" ? statusClearWindows : statusAssignmentWindows;
+  const canResetToAvailable = selectedRoomStatusSchedules.length > 0;
 
   function buildFloorHref(floor: FloorOption) {
     const params = new URLSearchParams();
@@ -639,6 +654,8 @@ export function AdminRoomsPage({
             <div className="admin-rooms__status-grid">
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "available" ? " admin-rooms__status-button--selected" : ""}`}
+                disabled={!selectedRoom || !canResetToAvailable}
+                onClick={() => setPendingStatus("available")}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--available" />
@@ -646,6 +663,8 @@ export function AdminRoomsPage({
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "occupied" ? " admin-rooms__status-button--selected" : ""}`}
+                disabled={!selectedRoom}
+                onClick={() => setPendingStatus("occupied")}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--occupied" />
@@ -653,6 +672,8 @@ export function AdminRoomsPage({
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "cleaning" ? " admin-rooms__status-button--selected" : ""}`}
+                disabled={!selectedRoom}
+                onClick={() => setPendingStatus("cleaning")}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--cleaning" />
@@ -660,12 +681,35 @@ export function AdminRoomsPage({
               </button>
               <button
                 className={`admin-rooms__status-button${selectedRoom?.display_status === "maintenance" ? " admin-rooms__status-button--selected" : ""}`}
+                disabled={!selectedRoom}
+                onClick={() => setPendingStatus("maintenance")}
                 type="button"
               >
                 <span className="admin-rooms__status-dot admin-rooms__status-dot--maintenance" />
                 {localize(locale, { vi: "Bảo trì", en: "Maintenance" })}
               </button>
             </div>
+            <p className="admin-rooms__status-helper">
+              {selectedRoomStatusSchedules.length
+                ? localize(locale, {
+                    vi: `Đang có ${selectedRoomStatusSchedules.length} lịch trạng thái thủ công cho phòng này.`,
+                    en: `${selectedRoomStatusSchedules.length} manual room-status schedule(s) exist for this room.`
+                  })
+                : localize(locale, {
+                    vi: "Chưa có lịch trạng thái thủ công nào cho phòng này.",
+                    en: "No manual room-status schedule exists for this room yet."
+                  })}
+            </p>
+            {selectedRoomStatusSchedules.length ? (
+              <ol className="admin-rooms__status-timeline">
+                {selectedRoomStatusSchedules.slice(0, 3).map((schedule) => (
+                  <li className="admin-rooms__status-timeline-item" key={schedule.id}>
+                    <strong>{schedule.status === "occupied" ? localize(locale, { vi: "Đang ở", en: "Occupied" }) : schedule.status === "cleaning" ? localize(locale, { vi: "Đang dọn", en: "Cleaning" }) : localize(locale, { vi: "Bảo trì", en: "Maintenance" })}</strong>
+                    <span>{`${schedule.startDate} → ${schedule.endDate}`}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
           </div>
 
           <div className="admin-rooms__notes-section">
@@ -674,7 +718,14 @@ export function AdminRoomsPage({
               className="admin-rooms__notes"
               defaultValue={locale === "en" ? selectedRoom?.notes_en ?? selectedRoom?.notes_vi ?? "" : selectedRoom?.notes_vi ?? selectedRoom?.notes_en ?? ""}
               placeholder={localize(locale, { vi: "Thêm ghi chú tại đây...", en: "Add notes here..." })}
+              readOnly
             />
+            <p className="admin-rooms__notes-helper">
+              {localize(locale, {
+                vi: "Ghi chú đang hiển thị ở chế độ chỉ đọc; phần đổi trạng thái phòng được lưu trực tiếp trong popup theo ngày.",
+                en: "Notes are read-only on this screen; room-status changes are saved directly inside the date-range popup."
+              })}
+            </p>
           </div>
 
           {selectedRoom && branchId ? (
@@ -689,9 +740,12 @@ export function AdminRoomsPage({
             />
           ) : null}
 
-          <button className="button button--solid admin-rooms__save" type="button">
-            {localize(locale, { vi: "LƯU THAY ĐỔI", en: "SAVE CHANGES" })}
-          </button>
+          <p className="admin-rooms__save-note">
+            {localize(locale, {
+              vi: "Trạng thái phòng được lưu trực tiếp trong popup theo khoảng ngày để tránh đè lên booking hiện có.",
+              en: "Room statuses are saved directly in the date-range popup so they never overwrite an existing booking."
+            })}
+          </p>
 
           <div className="admin-rooms__booking-history">
             <div className="admin-rooms__section-head">
@@ -734,6 +788,22 @@ export function AdminRoomsPage({
           </div>
         </PortalCard>
       </div>
+
+      {selectedRoom && pendingStatus ? (
+        <AdminRoomStatusDialog
+          defaultEndDate={selectedEndDate}
+          defaultStartDate={selectedStartDate}
+          locale={locale}
+          onClose={() => setPendingStatus(null)}
+          open={Boolean(pendingStatus)}
+          returnToHref={manualBookingHref}
+          roomCode={selectedRoom.code}
+          roomId={selectedRoom.id}
+          scheduledStatuses={selectedRoomStatusSchedules}
+          status={pendingStatus}
+          windows={statusDialogWindows}
+        />
+      ) : null}
     </div>
   );
 }

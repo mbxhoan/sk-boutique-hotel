@@ -14473,6 +14473,11 @@ textarea {
   text-align: left;
 }
 
+.admin-rooms__status-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .admin-rooms__status-button--selected {
   background: #526986;
   border-color: #526986;
@@ -14502,6 +14507,39 @@ textarea {
   background: #d5d8dc;
 }
 
+.admin-rooms__status-helper {
+  margin: 0;
+  color: #5f6776;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.admin-rooms__status-timeline {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-rooms__status-timeline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.72rem 0.82rem;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #425168;
+  font-size: 0.84rem;
+}
+
+.admin-rooms__status-timeline-item strong {
+  color: var(--ink);
+  font-size: 0.88rem;
+}
+
 .admin-rooms__notes {
   min-height: 7.25rem;
   padding: 0.9rem;
@@ -14510,6 +14548,13 @@ textarea {
   background: #eef4ff;
   color: var(--ink);
   resize: vertical;
+}
+
+.admin-rooms__notes-helper {
+  margin: 0;
+  color: #5f6776;
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
 .admin-rooms__manual-booking {
@@ -14648,6 +14693,196 @@ textarea {
   width: calc(100% - 2.3rem);
   min-height: 3.1rem;
   border-radius: 0.42rem;
+}
+
+.admin-rooms__save-note {
+  margin: 0 1.15rem 1.15rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 0.5rem;
+  background: rgba(252, 250, 246, 0.92);
+  color: #5f6776;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.room-status-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+
+.room-status-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(10, 18, 34, 0.44);
+}
+
+.room-status-dialog__card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: 1rem auto;
+  padding: 1.2rem;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 0.9rem;
+  background: linear-gradient(180deg, #fffdfa 0%, #f7f4ee 100%);
+  box-shadow: 0 26px 68px rgba(10, 18, 34, 0.2);
+  overflow: auto;
+}
+
+.room-status-dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.room-status-dialog__eyebrow {
+  margin: 0;
+  color: var(--gold-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.room-status-dialog__title {
+  margin: 0.35rem 0 0;
+  color: var(--ink);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.room-status-dialog__copy {
+  margin: 0.45rem 0 0;
+  color: #5f6776;
+  line-height: 1.55;
+}
+
+.room-status-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgba(197, 160, 89, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #425168;
+}
+
+.room-status-dialog__body,
+.room-status-dialog__form,
+.room-status-dialog__schedule {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.room-status-dialog__window-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.86);
+  color: #425168;
+  font-size: 0.86rem;
+}
+
+.room-status-dialog__window-meta strong {
+  color: var(--ink);
+}
+
+.room-status-dialog__empty {
+  padding: 1rem;
+  border: 1px dashed rgba(197, 160, 89, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: #5f6776;
+}
+
+.room-status-dialog__empty p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.room-status-dialog__schedule {
+  padding-top: 0.2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.16);
+}
+
+.room-status-dialog__schedule-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.room-status-dialog__schedule-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.room-status-dialog__schedule-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--gold-strong);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.room-status-dialog__schedule-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.room-status-dialog__schedule-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.room-status-dialog__schedule-label,
+.room-status-dialog__schedule-range,
+.room-status-dialog__schedule-note {
+  margin: 0;
+}
+
+.room-status-dialog__schedule-label {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.room-status-dialog__schedule-range,
+.room-status-dialog__schedule-note {
+  color: #5f6776;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .admin-content__publish-button {

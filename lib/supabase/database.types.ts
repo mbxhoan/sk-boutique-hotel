@@ -307,6 +307,73 @@ export interface Database {
           }
         ];
       };
+      room_status_overrides: {
+        Row: {
+          branch_id: string;
+          created_at: string;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          note: string;
+          room_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_status_override_status"];
+          updated_at: string;
+          updated_by: string | null;
+        } & RowTimestampFields;
+        Insert: StandardInsert<{
+          branch_id: string;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          note: string;
+          room_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_status_override_status"];
+          updated_by: string | null;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          branch_id: string;
+          created_by: string | null;
+          end_at: string;
+          id: string;
+          note: string;
+          room_id: string;
+          start_at: string;
+          status: Database["public"]["Enums"]["room_status_override_status"];
+          updated_by: string | null;
+        } & RowTimestampFields>;
+        Relationships: [
+          {
+            foreignKeyName: "room_status_overrides_branch_id_fkey";
+            columns: ["branch_id"];
+            isOneToOne: false;
+            referencedRelation: "branches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "room_status_overrides_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "room_status_overrides_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "rooms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "room_status_overrides_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       content_pages: {
         Row: {
           content_json: Json;
@@ -1181,6 +1248,7 @@ export interface Database {
       reservation_room_item_status: "active" | "released" | "cancelled";
       reservation_status: "draft" | "pending_deposit" | "confirmed" | "cancelled" | "completed" | "expired";
       room_hold_status: "active" | "converted" | "released" | "expired" | "cancelled";
+      room_status_override_status: "occupied" | "cleaning" | "maintenance";
       room_status: "available" | "held" | "booked" | "blocked" | "maintenance";
     };
     Functions: {
@@ -1237,6 +1305,34 @@ export interface Database {
           p_stay_start_at?: string | null;
         };
         Returns: Database["public"]["Tables"]["rooms"]["Row"][];
+      };
+      room_has_status_override: {
+        Args: {
+          p_room_id: string;
+          p_stay_end_at: string;
+          p_stay_start_at: string;
+        };
+        Returns: boolean;
+      };
+      set_room_status_override: {
+        Args: {
+          p_created_by?: string | null;
+          p_end_at: string;
+          p_note?: string | null;
+          p_room_id: string;
+          p_start_at: string;
+          p_status: Database["public"]["Enums"]["room_status_override_status"];
+        };
+        Returns: Database["public"]["Tables"]["room_status_overrides"]["Row"];
+      };
+      clear_room_status_overrides: {
+        Args: {
+          p_end_at: string;
+          p_room_id: string;
+          p_start_at: string;
+          p_updated_by?: string | null;
+        };
+        Returns: number;
       };
       log_audit_event: {
         Args: {
@@ -1370,6 +1466,7 @@ export type BranchRow = TableRow<"branches">;
 export type FloorRow = TableRow<"floors">;
 export type RoomTypeRow = TableRow<"room_types">;
 export type RoomRow = TableRow<"rooms">;
+export type RoomStatusOverrideRow = TableRow<"room_status_overrides">;
 export type CustomerRow = TableRow<"customers">;
 export type BranchBankAccountRow = TableRow<"branch_bank_accounts">;
 export type AvailabilityRequestRow = TableRow<"availability_requests">;
@@ -1384,6 +1481,7 @@ export type BranchInsert = TableInsert<"branches">;
 export type FloorInsert = TableInsert<"floors">;
 export type RoomTypeInsert = TableInsert<"room_types">;
 export type RoomInsert = TableInsert<"rooms">;
+export type RoomStatusOverrideInsert = TableInsert<"room_status_overrides">;
 export type CustomerInsert = TableInsert<"customers">;
 export type BranchBankAccountInsert = TableInsert<"branch_bank_accounts">;
 export type AvailabilityRequestInsert = TableInsert<"availability_requests">;
@@ -1398,6 +1496,7 @@ export type BranchUpdate = TableUpdate<"branches">;
 export type FloorUpdate = TableUpdate<"floors">;
 export type RoomTypeUpdate = TableUpdate<"room_types">;
 export type RoomUpdate = TableUpdate<"rooms">;
+export type RoomStatusOverrideUpdate = TableUpdate<"room_status_overrides">;
 export type CustomerUpdate = TableUpdate<"customers">;
 export type BranchBankAccountUpdate = TableUpdate<"branch_bank_accounts">;
 export type AvailabilityRequestUpdate = TableUpdate<"availability_requests">;
@@ -1414,6 +1513,7 @@ export type PaymentRequestStatus = Database["public"]["Enums"]["payment_request_
 export type RoomHoldStatus = Database["public"]["Enums"]["room_hold_status"];
 export type ReservationStatus = Database["public"]["Enums"]["reservation_status"];
 export type ReservationRoomItemStatus = Database["public"]["Enums"]["reservation_room_item_status"];
+export type RoomStatusOverrideStatus = Database["public"]["Enums"]["room_status_override_status"];
 export type RoomStatus = Database["public"]["Enums"]["room_status"];
 export type AnalyticsEventType = Database["public"]["Enums"]["analytics_event_type"];
 export type RoomTypeClosureRow = TableRow<"room_type_closures">;

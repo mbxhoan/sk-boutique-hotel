@@ -1829,3 +1829,21 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `lib/supabase/queries/booking-details.ts`
   - `lib/supabase/workflow.types.ts`
   - `supabase/seed-content-pages.sql`
+
+## 2026-05-22
+
+### Entry 158
+- `time`: 2026-05-22T15:00:45+07:00
+- `prompt_summary`: Trong trang Quản lý phòng, cho admin đổi trạng thái phòng theo khoảng ngày bằng popup, tự trả về Trống sau khi hết hạn nếu không có booking, và bộ chọn ngày phải né các ngày đã có booking của chính phòng đó.
+- `commit_message`: `feat(admin-rooms): schedule manual room statuses around booking windows`
+- `main_files`:
+  - `app/(admin)/admin/actions.ts`
+  - `app/(admin)/admin/rooms/page.tsx`
+  - `app/globals.css`
+  - `components/admin-room-status-dialog.tsx`
+  - `components/admin-rooms-page.tsx`
+  - `docs/commit_prompt_map.md`
+  - `lib/rooms/operational-status.ts`
+  - `lib/supabase/database.types.ts`
+  - `lib/supabase/queries/room-status-overrides.ts`
+  - `supabase/migrations/20260522152000_add_room_status_overrides.sql`
