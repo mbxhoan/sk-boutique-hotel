@@ -11,6 +11,7 @@ import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/next";
 
+import { GoogleTagManager } from "@/components/google-tag-manager";
 import { NavigationLoadingIndicator } from "@/components/navigation-loading-indicator";
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ export default function RootLayout({
         </Suspense>
         {children}
         <Analytics />
+        <GoogleTagManager />
       </body>
     </html>
   );

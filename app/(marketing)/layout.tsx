@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
+import { ChatWidget } from "@/components/chat-widget";
+import { JsonLd, hotelJsonLd, organizationJsonLd, websiteJsonLd } from "@/components/json-ld";
 import { MarketingBottomSections } from "@/components/marketing-bottom-sections";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -29,6 +31,9 @@ export default async function MarketingLayout({
 
   return (
     <>
+      <JsonLd data={hotelJsonLd} />
+      <JsonLd data={organizationJsonLd} />
+      <JsonLd data={websiteJsonLd} />
       <Suspense fallback={null}>
         <SiteHeader />
       </Suspense>
@@ -41,6 +46,7 @@ export default async function MarketingLayout({
       <Suspense fallback={null}>
         <SiteFooter />
       </Suspense>
+      <ChatWidget />
     </>
   );
 }

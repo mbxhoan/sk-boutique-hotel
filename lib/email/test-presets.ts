@@ -54,9 +54,9 @@ const sampleBrand: BrandConfig = {
   hotelName: "SK Boutique Hotel"
 };
 
-const sampleRequestUrl = "https://bkhanhxinh.com/member/requests/RQ-240001";
-const sampleAdminUrl = "https://bkhanhxinh.com/admin?request=RQ-240001";
-const sampleBookingUrl = "https://bkhanhxinh.com/member/bookings/BK-240001";
+const sampleRequestUrl = "https://skhotel.com.vn/member/requests/RQ-240001";
+const sampleAdminUrl = "https://skhotel.com.vn/admin?request=RQ-240001";
+const sampleBookingUrl = "https://skhotel.com.vn/member/bookings/BK-240001";
 const sampleQrUrl = "https://placehold.co/320x320/png?text=QR";
 
 export function buildEmailTemplateTestEmail(templateKey: EmailTemplateTestKey): EmailTemplate {

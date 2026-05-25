@@ -18,7 +18,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
   return {
     title: localize(locale, page.seo.title),
-    description: localize(locale, page.seo.description)
+    description: localize(locale, page.seo.description),
+    alternates: { canonical: "/" }
   };
 }
 

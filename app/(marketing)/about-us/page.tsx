@@ -21,7 +21,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
   return {
     title: page ? translate(locale, page.title) : localize(locale, aboutUsSeo.title),
-    description: page ? translate(locale, page.description) : localize(locale, aboutUsSeo.description)
+    description: page ? translate(locale, page.description) : localize(locale, aboutUsSeo.description),
+    alternates: { canonical: "/about-us" }
   };
 }
 

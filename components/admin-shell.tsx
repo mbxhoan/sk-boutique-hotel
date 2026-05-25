@@ -90,6 +90,14 @@ const adminNavItems: AdminNavItem[] = [
     }
   },
   {
+    icon: "support",
+    href: "/admin/chat",
+    label: {
+      vi: "Live Chat",
+      en: "Live Chat"
+    }
+  },
+  {
     icon: "settings",
     href: "/admin/roles",
     label: {

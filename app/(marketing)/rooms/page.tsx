@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { JsonLd, roomsBreadcrumbJsonLd } from "@/components/json-ld";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
@@ -146,7 +147,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       ? translate(locale, page.description)
       : locale === "en"
         ? "View room types, check dates, and open the room canvas without leaving the listing."
-        : "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách."
+        : "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách.",
+    alternates: { canonical: "/rooms" }
   };
 }
 
@@ -210,6 +212,7 @@ export default async function RoomsPage({ searchParams }: PageProps) {
 
   return (
     <>
+      <JsonLd data={roomsBreadcrumbJsonLd()} />
       <PageViewTracker eventType="page_view" locale={locale} pagePath="/rooms" entityType="room_collection" />
       {activeRoomType ? (
         <PageViewTracker
