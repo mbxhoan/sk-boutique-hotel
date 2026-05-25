@@ -287,7 +287,7 @@ export async function listRoomTypes(options: { includeInactive?: boolean } = {})
   );
 }
 
-async function getRoomTypeBySlug(slug: string) {
+export async function getRoomTypeBySlug(slug: string) {
   return queryWithServiceFallback(
     async (client) => {
       const { data, error } = await client

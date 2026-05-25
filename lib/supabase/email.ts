@@ -405,3 +405,45 @@ export async function sendBookingConfirmedCustomerEmail(input: SendBookingConfir
 
   return email;
 }
+
+export type SendChatNotificationEmailInput = {
+  guestName: string | null;
+  guestEmail: string | null;
+  guestPhone: string | null;
+  firstMessage: string;
+  sourceUrl: string | null;
+  adminChatUrl: string;
+};
+
+export async function sendChatNotificationEmail(input: SendChatNotificationEmailInput) {
+  if (!hasSupabaseServiceConfig()) {
+    return null;
+  }
+
+  const subject = "[SK Boutique Hotel] Khách nhắn tin qua Live Chat";
+  const adminTo = getSupabaseEmailAdminRecipient();
+  const adminBcc = getSupabaseEmailAdminBccRecipients();
+
+  const html = buildHtmlEmail(
+    subject,
+    "Có khách vừa gửi tin nhắn qua Live Chat. Vui lòng phản hồi sớm.",
+    [
+      ["Tên khách", input.guestName ?? "Ẩn danh"],
+      ["Email", input.guestEmail ?? "—"],
+      ["Điện thoại", input.guestPhone ?? "—"],
+      ["Tin nhắn", input.firstMessage],
+      ["Trang nguồn", input.sourceUrl ?? "—"],
+      ["Xem chat", input.adminChatUrl]
+    ],
+    "Đăng nhập vào admin panel để phản hồi khách ngay.",
+    "vi"
+  );
+
+  await sendEmail({
+    from: getSupabaseEmailFromAddress(),
+    to: adminTo,
+    ...(adminBcc.length > 0 ? { bcc: adminBcc } : {}),
+    subject,
+    html
+  });
+}

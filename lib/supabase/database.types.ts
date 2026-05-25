@@ -1273,6 +1273,8 @@ export interface Database {
           conversation_id: string;
           sender_type: "guest" | "admin" | "system";
           message: string;
+          attachment_url: string | null;
+          attachment_type: string | null;
           read_at: string | null;
           created_at: string;
         };
@@ -1281,6 +1283,8 @@ export interface Database {
           conversation_id: string;
           sender_type: "guest" | "admin" | "system";
           message: string;
+          attachment_url?: string | null;
+          attachment_type?: string | null;
           read_at?: string | null;
           created_at?: string;
         };
@@ -1289,6 +1293,8 @@ export interface Database {
           conversation_id?: string;
           sender_type?: "guest" | "admin" | "system";
           message?: string;
+          attachment_url?: string | null;
+          attachment_type?: string | null;
           read_at?: string | null;
           created_at?: string;
         };
@@ -1297,6 +1303,82 @@ export interface Database {
             foreignKeyName: "chat_messages_conversation_id_fkey";
             columns: ["conversation_id"];
             referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      events: {
+        Row: {
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
+      event_images: {
+        Row: {
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Update: StandardUpdate<{
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Relationships: [
+          {
+            foreignKeyName: "event_images_event_id_fkey";
+            columns: ["event_id"];
+            referencedRelation: "events";
             referencedColumns: ["id"];
           }
         ];
@@ -1605,3 +1687,9 @@ export type ChatConversationUpdate = TableUpdate<"chat_conversations">;
 export type ChatMessageRow = TableRow<"chat_messages">;
 export type ChatMessageInsert = TableInsert<"chat_messages">;
 export type ChatMessageUpdate = TableUpdate<"chat_messages">;
+export type EventRow = TableRow<"events">;
+export type EventInsert = TableInsert<"events">;
+export type EventUpdate = TableUpdate<"events">;
+export type EventImageRow = TableRow<"event_images">;
+export type EventImageInsert = TableInsert<"event_images">;
+export type EventImageUpdate = TableUpdate<"event_images">;

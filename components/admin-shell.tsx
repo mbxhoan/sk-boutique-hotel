@@ -90,6 +90,14 @@ const adminNavItems: AdminNavItem[] = [
     }
   },
   {
+    icon: "content",
+    href: "/admin/events",
+    label: {
+      vi: "Sự kiện",
+      en: "Events"
+    }
+  },
+  {
     icon: "support",
     href: "/admin/chat",
     label: {

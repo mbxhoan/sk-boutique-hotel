@@ -165,7 +165,8 @@ export const headerMenu: HeaderMenuConfig = {
       href: "#about-sk",
       label: { vi: "Về SK", en: "About SK" },
       children: [
-        { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } }
+        { href: "/about-us", label: { vi: "Về chúng tôi", en: "About us" } },
+        { href: "/su-kien", label: { vi: "Sự kiện", en: "Events" } }
       ]
     },
     {
