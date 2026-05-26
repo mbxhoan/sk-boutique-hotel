@@ -1234,6 +1234,9 @@ export interface Database {
           status: "new" | "open" | "closed";
           assigned_to: string | null;
           last_message_at: string | null;
+          nudge_sent_at: string | null;
+          guest_language: "vi" | "en" | null;
+          chat_intent: "booking" | "pricing" | "checkin_checkout" | "other" | null;
           created_at: string;
           updated_at: string;
         };
@@ -1248,6 +1251,9 @@ export interface Database {
           status?: "new" | "open" | "closed";
           assigned_to?: string | null;
           last_message_at?: string | null;
+          nudge_sent_at?: string | null;
+          guest_language?: "vi" | "en" | null;
+          chat_intent?: "booking" | "pricing" | "checkin_checkout" | "other" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -1262,6 +1268,9 @@ export interface Database {
           status?: "new" | "open" | "closed";
           assigned_to?: string | null;
           last_message_at?: string | null;
+          nudge_sent_at?: string | null;
+          guest_language?: "vi" | "en" | null;
+          chat_intent?: "booking" | "pricing" | "checkin_checkout" | "other" | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -1318,6 +1327,7 @@ export interface Database {
           cover_image_path: string | null;
           event_date: string | null;
           is_published: boolean;
+          show_detail_link: boolean;
           sort_order: number;
           created_at: string;
           updated_at: string;
@@ -1332,6 +1342,7 @@ export interface Database {
           cover_image_path: string | null;
           event_date: string | null;
           is_published: boolean;
+          show_detail_link: boolean;
           sort_order: number;
         } & RowTimestampFields>;
         Update: StandardUpdate<{
@@ -1344,6 +1355,7 @@ export interface Database {
           cover_image_path: string | null;
           event_date: string | null;
           is_published: boolean;
+          show_detail_link: boolean;
           sort_order: number;
         } & RowTimestampFields>;
         Relationships: [];

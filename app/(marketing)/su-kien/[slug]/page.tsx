@@ -47,7 +47,7 @@ export default async function EventDetailPageRoute({ params, searchParams }: Pag
 
   const event = await getEventBySlug(slug);
 
-  if (!event) {
+  if (!event || !event.show_detail_link) {
     notFound();
   }
 

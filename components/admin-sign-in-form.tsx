@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { markSessionNotPersisted, markSessionPersisted } from "@/lib/auth-persistence";
 import { appendLocaleQuery } from "@/lib/locale";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
 
@@ -94,6 +95,7 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
   const nextHref = nextHrefCandidate?.startsWith("/") ? nextHrefCandidate : "/admin";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +114,12 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
 
       if (authError) {
         throw authError;
+      }
+
+      if (rememberMe) {
+        markSessionPersisted();
+      } else {
+        markSessionNotPersisted();
       }
 
       setIsRedirecting(true);
@@ -165,6 +173,16 @@ export function AdminSignInForm({ locale }: AdminSignInFormProps) {
             />
           </label>
         </div>
+
+        <label className="member-auth-form__remember">
+          <input
+            checked={rememberMe}
+            className="member-auth-form__remember-checkbox"
+            onChange={(e) => setRememberMe(e.target.checked)}
+            type="checkbox"
+          />
+          {locale === "vi" ? "Ghi nhớ đăng nhập" : "Remember me"}
+        </label>
 
         <div className="member-auth-form__actions member-auth-form__actions--primary">
           <button

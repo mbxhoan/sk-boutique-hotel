@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { appendLocaleQuery } from "@/lib/locale";
+import { markSessionNotPersisted, markSessionPersisted } from "@/lib/auth-persistence";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { DEFAULT_MEMBER_PASSWORD, resolveMemberAuthError } from "@/lib/member-auth";
 import { localize, type LocalizedText } from "@/lib/mock/i18n";
@@ -164,6 +165,7 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState(DEFAULT_MEMBER_PASSWORD);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -315,6 +317,14 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
         accessToken
       );
 
+      if (!isSignUp) {
+        if (rememberMe) {
+          markSessionPersisted();
+        } else {
+          markSessionNotPersisted();
+        }
+      }
+
       setIsRedirecting(true);
       router.replace(appendLocaleQuery(nextHref, locale));
       router.refresh();
@@ -400,6 +410,18 @@ export function MemberAuthForm({ locale, mode }: MemberAuthFormProps) {
           </label>
         ) : null}
       </div>
+
+      {!isSignUp ? (
+        <label className="member-auth-form__remember">
+          <input
+            checked={rememberMe}
+            className="member-auth-form__remember-checkbox"
+            onChange={(e) => setRememberMe(e.target.checked)}
+            type="checkbox"
+          />
+          {locale === "vi" ? "Ghi nhớ đăng nhập" : "Remember me"}
+        </label>
+      ) : null}
 
       <div className="member-auth-form__actions member-auth-form__actions--primary">
         <button

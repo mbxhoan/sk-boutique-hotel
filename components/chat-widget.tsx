@@ -19,10 +19,67 @@ type GuestInfo = {
   phone: string;
 };
 
+type Lang = "vi" | "en";
 type WidgetView = "closed" | "form" | "chat";
 
 const STORAGE_KEY = "sk_chat_conversation_id";
+const STORAGE_LANG_KEY = "sk_chat_language";
 const TYPING_DEBOUNCE_MS = 2000;
+
+const T = {
+  vi: {
+    brandSub: "Chat với lễ tân",
+    greeting: (name: string) => `Xin chào, ${name}!`,
+    formIntro: "Vui lòng cho chúng tôi biết thông tin của bạn để hỗ trợ tốt hơn.",
+    nameLabel: "Họ tên *",
+    emailLabel: "Email *",
+    phoneLabel: "Số điện thoại",
+    namePlaceholder: "Nguyễn Văn A",
+    emailPlaceholder: "email@example.com",
+    phonePlaceholder: "Không bắt buộc",
+    startBtn: "Bắt đầu chat",
+    errorName: "Vui lòng nhập họ tên.",
+    errorEmail: "Vui lòng nhập email.",
+    errorEmailInvalid: "Email không hợp lệ.",
+    welcomePrompt: "Xin chào! Bạn cần hỗ trợ gì?",
+    options: [
+      { label: "🛏️ Tôi muốn đặt phòng", text: "Tôi muốn đặt phòng" },
+      { label: "💰 Hỏi về giá & ưu đãi", text: "Cho tôi biết về giá phòng và ưu đãi hiện tại" },
+      { label: "🕐 Hỗ trợ check-in / check-out", text: "Tôi cần hỗ trợ về giờ check-in / check-out" },
+      { label: "❓ Câu hỏi khác", text: "Tôi có một câu hỏi khác" }
+    ],
+    inputPlaceholder: "Nhập tin nhắn... (Enter gửi)",
+    sentLabel: "✓ Đã gửi",
+    typingLabel: "Đang nhập...",
+    langToggleLabel: "Ngôn ngữ"
+  },
+  en: {
+    brandSub: "Chat with reception",
+    greeting: (name: string) => `Hello, ${name}!`,
+    formIntro: "Please share your details so we can assist you better.",
+    nameLabel: "Full name *",
+    emailLabel: "Email *",
+    phoneLabel: "Phone number",
+    namePlaceholder: "John Smith",
+    emailPlaceholder: "email@example.com",
+    phonePlaceholder: "Optional",
+    startBtn: "Start chat",
+    errorName: "Please enter your name.",
+    errorEmail: "Please enter your email.",
+    errorEmailInvalid: "Invalid email address.",
+    welcomePrompt: "Hello! How can we help you?",
+    options: [
+      { label: "🛏️ I want to book a room", text: "I want to book a room" },
+      { label: "💰 Ask about rates & offers", text: "Ask about rates & offers" },
+      { label: "🕐 Check-in / check-out support", text: "I need support with check-in / check-out" },
+      { label: "❓ Other questions", text: "I have another question" }
+    ],
+    inputPlaceholder: "Type a message... (Enter to send)",
+    sentLabel: "✓ Sent",
+    typingLabel: "Typing...",
+    langToggleLabel: "Language"
+  }
+};
 
 // --- Icons ---
 
@@ -80,7 +137,6 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// --- Typing dots animation (pure CSS via style tag) ---
 const typingStyles = `
 @keyframes sk-typing-bounce {
   0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
@@ -97,6 +153,13 @@ const typingStyles = `
 .sk-typing-dot:nth-child(1) { animation-delay: 0s; }
 .sk-typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .sk-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@media (max-width: 480px) {
+  .sk-chat-panel {
+    width: calc(100vw - 2rem) !important;
+    right: 1rem !important;
+    left: 1rem !important;
+  }
+}
 `;
 
 function TypingBubble({ label }: { label: string }) {
@@ -112,10 +175,43 @@ function TypingBubble({ label }: { label: string }) {
   );
 }
 
+// --- Language Toggle ---
+
+function LangToggle({ lang, onChange }: { lang: Lang; onChange: (l: Lang) => void }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", background: "rgba(255,255,255,0.12)", borderRadius: "0.375rem", padding: "0.15rem" }}>
+      {(["vi", "en"] as Lang[]).map((l) => (
+        <button
+          key={l}
+          onClick={() => onChange(l)}
+          style={{
+            background: lang === l ? "rgba(255,255,255,0.9)" : "none",
+            border: "none",
+            borderRadius: "0.25rem",
+            color: lang === l ? "var(--ink)" : "rgba(255,255,255,0.7)",
+            cursor: "pointer",
+            fontFamily: "var(--font-display)",
+            fontSize: "0.65rem",
+            fontWeight: 700,
+            letterSpacing: "0.05em",
+            padding: "0.2rem 0.4rem",
+            lineHeight: 1,
+            transition: "all 0.15s"
+          }}
+          type="button"
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // --- Main component ---
 
 export function ChatWidget() {
   const [view, setView] = useState<WidgetView>("closed");
+  const [lang, setLang] = useState<Lang>("vi");
   const [guestInfo, setGuestInfo] = useState<GuestInfo>({ name: "", email: "", phone: "" });
   const [formError, setFormError] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -128,15 +224,29 @@ export function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const supabaseRef = useRef(createSupabaseBrowserClient());
+  const supabase = supabaseRef.current;
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  const supabase = createSupabaseBrowserClient();
+  const t = T[lang];
 
-  // Restore conversationId from sessionStorage
+  // Restore state from sessionStorage; fall back to URL ?lang= param
   useEffect(() => {
     const stored = sessionStorage.getItem(STORAGE_KEY);
     if (stored) setConversationId(stored);
+    const storedLang = sessionStorage.getItem(STORAGE_LANG_KEY) as Lang | null;
+    if (storedLang === "vi" || storedLang === "en") {
+      setLang(storedLang);
+    } else {
+      const urlLang = new URLSearchParams(window.location.search).get("lang");
+      if (urlLang === "vi" || urlLang === "en") setLang(urlLang);
+    }
   }, []);
+
+  // Persist language choice
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_LANG_KEY, lang);
+  }, [lang]);
 
   // Subscribe to messages + presence when conversationId is known
   useEffect(() => {
@@ -188,9 +298,8 @@ export function ChatWidget() {
       void presenceChannel.unsubscribe();
       presenceChannelRef.current = null;
     };
-  }, [conversationId, supabase]);
+  }, [conversationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Scroll to bottom on new messages or open
   useEffect(() => {
     if (view === "chat") {
       setHasUnread(false);
@@ -210,7 +319,11 @@ export function ChatWidget() {
     setView("closed");
   }
 
-  // Broadcast typing state to presence channel
+  function handleLangChange(newLang: Lang) {
+    if (conversationId) return; // language locked once chat has started
+    setLang(newLang);
+  }
+
   const broadcastTyping = useCallback((typing: boolean) => {
     const ch = presenceChannelRef.current;
     if (!ch) return;
@@ -225,9 +338,9 @@ export function ChatWidget() {
   }
 
   function validateForm() {
-    if (!guestInfo.name.trim()) return "Vui lòng nhập họ tên.";
-    if (!guestInfo.email.trim()) return "Vui lòng nhập email.";
-    if (!isValidEmail(guestInfo.email)) return "Email không hợp lệ.";
+    if (!guestInfo.name.trim()) return t.errorName;
+    if (!guestInfo.email.trim()) return t.errorEmail;
+    if (!isValidEmail(guestInfo.email)) return t.errorEmailInvalid;
     return "";
   }
 
@@ -242,6 +355,28 @@ export function ChatWidget() {
     setView("chat");
   }
 
+  async function createConversationWithMessage(text: string | null) {
+    const res = await fetch("/api/public/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        guestName: guestInfo.name || null,
+        guestEmail: guestInfo.email || null,
+        guestPhone: guestInfo.phone || null,
+        sourceUrl: window.location.href,
+        guestLanguage: lang
+      })
+    });
+
+    if (!res.ok) throw new Error("Failed to start chat");
+    const { conversationId: newId } = (await res.json()) as { conversationId: string };
+    sessionStorage.setItem(STORAGE_KEY, newId);
+    sessionStorage.setItem(STORAGE_LANG_KEY, lang);
+    setConversationId(newId);
+    return newId;
+  }
+
   async function handleSend() {
     const text = input.trim();
     if ((!text && !uploading) || sending) return;
@@ -254,23 +389,7 @@ export function ChatWidget() {
 
     try {
       if (!conversationId) {
-        const res = await fetch("/api/public/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: text,
-            guestName: guestInfo.name || null,
-            guestEmail: guestInfo.email || null,
-            guestPhone: guestInfo.phone || null,
-            sourceUrl: window.location.href
-          })
-        });
-
-        if (!res.ok) throw new Error("Failed to start chat");
-
-        const { conversationId: newId } = (await res.json()) as { conversationId: string };
-        sessionStorage.setItem(STORAGE_KEY, newId);
-        setConversationId(newId);
+        await createConversationWithMessage(text);
       } else {
         await supabase.from("chat_messages").insert({
           conversation_id: conversationId,
@@ -289,7 +408,6 @@ export function ChatWidget() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Ensure we have a conversation first
     let convId = conversationId;
     if (!convId) {
       const error = validateForm();
@@ -301,20 +419,7 @@ export function ChatWidget() {
 
       setUploading(true);
       try {
-        const res = await fetch("/api/public/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            guestName: guestInfo.name || null,
-            guestEmail: guestInfo.email || null,
-            guestPhone: guestInfo.phone || null,
-            sourceUrl: window.location.href
-          })
-        });
-        const { conversationId: newId } = (await res.json()) as { conversationId: string };
-        sessionStorage.setItem(STORAGE_KEY, newId);
-        setConversationId(newId);
-        convId = newId;
+        convId = await createConversationWithMessage(null);
       } catch {
         setUploading(false);
         return;
@@ -333,13 +438,12 @@ export function ChatWidget() {
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage.from("chat-attachments").getPublicUrl(path);
-      const publicUrl = urlData.publicUrl;
 
       await supabase.from("chat_messages").insert({
         conversation_id: convId,
         sender_type: "guest",
         message: "",
-        attachment_url: publicUrl,
+        attachment_url: urlData.publicUrl,
         attachment_type: "image"
       });
     } catch (err) {
@@ -361,6 +465,7 @@ export function ChatWidget() {
 
   const panelStyle: React.CSSProperties = {
     width: "22rem",
+    maxWidth: "calc(100vw - 2rem)",
     background: "var(--surface-container-lowest)",
     border: "1px solid var(--border-subtle)",
     borderRadius: "1rem",
@@ -377,6 +482,7 @@ export function ChatWidget() {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: "0.5rem",
     flexShrink: 0
   };
 
@@ -389,18 +495,19 @@ export function ChatWidget() {
         {view === "form" && (
           <div style={panelStyle}>
             <div style={headerStyle}>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.03em" }}>SK Boutique Hotel</p>
-                <p style={{ margin: "0.15rem 0 0", fontSize: "0.7rem", opacity: 0.65 }}>Chat với lễ tân</p>
+                <p style={{ margin: "0.15rem 0 0", fontSize: "0.7rem", opacity: 0.65 }}>{t.brandSub}</p>
               </div>
-              <button aria-label="Đóng" onClick={handleClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", opacity: 0.7, padding: "0.25rem", lineHeight: 1 }}>
+              <LangToggle lang={lang} onChange={handleLangChange} />
+              <button aria-label="Đóng" onClick={handleClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", opacity: 0.7, padding: "0.25rem", lineHeight: 1, flexShrink: 0 }}>
                 <CloseIcon />
               </button>
             </div>
 
             <form onSubmit={handleFormSubmit} style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "0.625rem" }}>
               <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--muted)", lineHeight: 1.5 }}>
-                Vui lòng cho chúng tôi biết thông tin của bạn để hỗ trợ tốt hơn.
+                {t.formIntro}
               </p>
 
               {formError && (
@@ -412,12 +519,12 @@ export function ChatWidget() {
               {(["name", "email", "phone"] as const).map((field) => (
                 <div key={field}>
                   <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 600, color: "var(--ink)", marginBottom: "0.25rem" }}>
-                    {field === "name" ? "Họ tên *" : field === "email" ? "Email *" : "Số điện thoại"}
+                    {field === "name" ? t.nameLabel : field === "email" ? t.emailLabel : t.phoneLabel}
                   </label>
                   <input
                     autoComplete={field === "name" ? "name" : field === "email" ? "email" : "tel"}
                     onChange={(e) => setGuestInfo((prev) => ({ ...prev, [field]: e.target.value }))}
-                    placeholder={field === "name" ? "Nguyễn Văn A" : field === "email" ? "email@example.com" : "Không bắt buộc"}
+                    placeholder={field === "name" ? t.namePlaceholder : field === "email" ? t.emailPlaceholder : t.phonePlaceholder}
                     required={field !== "phone"}
                     style={{
                       width: "100%",
@@ -453,7 +560,7 @@ export function ChatWidget() {
                 }}
                 type="submit"
               >
-                Bắt đầu chat
+                {t.startBtn}
               </button>
             </form>
           </div>
@@ -463,13 +570,21 @@ export function ChatWidget() {
         {view === "chat" && (
           <div style={{ ...panelStyle, height: "44rem", maxHeight: "calc(100dvh - 6rem)" }}>
             <div style={headerStyle}>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.03em" }}>SK Boutique Hotel</p>
                 <p style={{ margin: "0.15rem 0 0", fontSize: "0.7rem", opacity: 0.65 }}>
-                  {guestInfo.name ? `Xin chào, ${guestInfo.name.split(" ").at(-1)}!` : "Chat với lễ tân"}
+                  {guestInfo.name ? t.greeting(guestInfo.name.split(" ").at(-1)!) : t.brandSub}
                 </p>
               </div>
-              <button aria-label="Đóng chat" onClick={handleClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", opacity: 0.7, padding: "0.25rem", lineHeight: 1 }}>
+              {/* Language selector (locked to badge once conversation started) */}
+              {conversationId ? (
+                <span style={{ fontSize: "0.62rem", fontWeight: 700, background: "rgba(255,255,255,0.15)", color: "#fff", borderRadius: "0.25rem", padding: "0.15rem 0.4rem", letterSpacing: "0.05em", flexShrink: 0 }}>
+                  {lang.toUpperCase()}
+                </span>
+              ) : (
+                <LangToggle lang={lang} onChange={handleLangChange} />
+              )}
+              <button aria-label="Đóng chat" onClick={handleClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", opacity: 0.7, padding: "0.25rem", lineHeight: 1, flexShrink: 0 }}>
                 <CloseIcon />
               </button>
             </div>
@@ -479,39 +594,17 @@ export function ChatWidget() {
               {messages.length === 0 && !conversationId && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingTop: "0.5rem" }}>
                   <p style={{ margin: 0, textAlign: "center", fontSize: "0.8rem", color: "var(--muted)", lineHeight: 1.5 }}>
-                    Xin chào! Bạn cần hỗ trợ gì?
+                    {t.welcomePrompt}
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    {[
-                      { label: "🛏️ Tôi muốn đặt phòng", text: "Tôi muốn đặt phòng" },
-                      { label: "💰 Hỏi về giá & ưu đãi", text: "Cho tôi biết về giá phòng và ưu đãi hiện tại" },
-                      { label: "🕐 Hỗ trợ check-in / check-out", text: "Tôi cần hỗ trợ về giờ check-in / check-out" },
-                      { label: "❓ Câu hỏi khác", text: "Tôi có một câu hỏi khác" }
-                    ].map(({ label, text }) => (
+                    {t.options.map(({ label, text }) => (
                       <button
                         key={label}
                         onClick={() => {
-                          setInput(text);
                           void (async () => {
                             setSending(true);
                             try {
-                              const res = await fetch("/api/public/chat", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                  message: text,
-                                  guestName: guestInfo.name || null,
-                                  guestEmail: guestInfo.email || null,
-                                  guestPhone: guestInfo.phone || null,
-                                  sourceUrl: window.location.href
-                                })
-                              });
-                              if (res.ok) {
-                                const { conversationId: newId } = (await res.json()) as { conversationId: string };
-                                sessionStorage.setItem(STORAGE_KEY, newId);
-                                setConversationId(newId);
-                                setInput("");
-                              }
+                              await createConversationWithMessage(text);
                             } finally {
                               setSending(false);
                             }
@@ -557,29 +650,28 @@ export function ChatWidget() {
                       {msg.attachment_url && msg.attachment_type === "image" ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          alt="Ảnh đính kèm"
+                          alt="Attachment"
                           onClick={() => window.open(msg.attachment_url!, "_blank")}
                           src={msg.attachment_url}
                           style={{ display: "block", maxWidth: "100%", borderRadius: "0.75rem", cursor: "pointer" }}
                         />
                       ) : null}
-                      {msg.message && <span>{msg.message}</span>}
+                      {msg.message && <span style={{ whiteSpace: "pre-line" }}>{msg.message}</span>}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.65rem", color: "var(--muted)", padding: "0 0.25rem" }}>
                       <span>{formatTime(msg.created_at)}</span>
-                      {isGuest && <span>✓ Đã gửi</span>}
+                      {isGuest && <span>{t.sentLabel}</span>}
                     </div>
                   </div>
                 );
               })}
 
-              {adminTyping && <TypingBubble label="Đang nhập..." />}
+              {adminTyping && <TypingBubble label={t.typingLabel} />}
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input area */}
             <div style={{ padding: "0.75rem", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "0.5rem", alignItems: "flex-end", flexShrink: 0 }}>
-              {/* Image upload button */}
               <button
                 aria-label="Gửi ảnh"
                 disabled={uploading}
@@ -596,7 +688,7 @@ export function ChatWidget() {
                 disabled={sending}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Nhập tin nhắn... (Enter gửi)"
+                placeholder={t.inputPlaceholder}
                 rows={1}
                 style={{ flex: 1, resize: "none", border: "1px solid var(--border-subtle)", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontFamily: "var(--font-body)", fontSize: "0.82rem", background: "var(--surface-container-low)", color: "var(--text)", outline: "none", lineHeight: 1.5 }}
                 value={input}

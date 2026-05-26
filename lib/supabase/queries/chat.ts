@@ -93,3 +93,35 @@ export async function markMessagesRead(conversationId: string): Promise<void> {
 
   if (error) throw error;
 }
+
+export type ConversationNeedingNudge = {
+  id: string;
+  guest_name: string | null;
+  guest_email: string | null;
+  guest_phone: string | null;
+  source_url: string | null;
+  oldest_unread_at: string;
+  unread_count: number;
+  first_unread_message: string | null;
+};
+
+export async function getConversationsNeedingNudge(thresholdMinutes: number): Promise<ConversationNeedingNudge[]> {
+  const client = createSupabaseServiceClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client as any).rpc("get_conversations_needing_nudge", {
+    threshold_minutes: thresholdMinutes
+  });
+
+  if (error) throw error;
+  return ((data ?? []) as unknown) as ConversationNeedingNudge[];
+}
+
+export async function markConversationNudgeSent(conversationId: string): Promise<void> {
+  const client = createSupabaseServiceClient();
+  const { error } = await client
+    .from("chat_conversations")
+    .update({ nudge_sent_at: new Date().toISOString() })
+    .eq("id", conversationId);
+
+  if (error) throw error;
+}

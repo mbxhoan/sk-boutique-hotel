@@ -49,9 +49,9 @@ export async function createEventAction(formData: FormData) {
   const slug = readRequiredString(formData, "slug");
   const descriptionVi = readOptionalString(formData, "descriptionVi");
   const descriptionEn = readOptionalString(formData, "descriptionEn");
-  const coverImagePath = readOptionalString(formData, "coverImagePath") || null;
   const eventDate = readOptionalString(formData, "eventDate") || null;
   const isPublished = readBoolean(formData, "isPublished");
+  const showDetailLink = readBoolean(formData, "showDetailLink");
   const sortOrder = readOptionalNumber(formData, "sortOrder");
 
   await upsertEvent({
@@ -60,9 +60,10 @@ export async function createEventAction(formData: FormData) {
     slug,
     description_vi: descriptionVi,
     description_en: descriptionEn,
-    cover_image_path: coverImagePath,
+    cover_image_path: null,
     event_date: eventDate,
     is_published: isPublished,
+    show_detail_link: showDetailLink,
     sort_order: sortOrder
   });
 
@@ -76,9 +77,9 @@ export async function updateEventAction(formData: FormData) {
   const slug = readRequiredString(formData, "slug");
   const descriptionVi = readOptionalString(formData, "descriptionVi");
   const descriptionEn = readOptionalString(formData, "descriptionEn");
-  const coverImagePath = readOptionalString(formData, "coverImagePath") || null;
   const eventDate = readOptionalString(formData, "eventDate") || null;
   const isPublished = readBoolean(formData, "isPublished");
+  const showDetailLink = readBoolean(formData, "showDetailLink");
   const sortOrder = readOptionalNumber(formData, "sortOrder");
 
   await updateEvent(id, {
@@ -87,9 +88,9 @@ export async function updateEventAction(formData: FormData) {
     slug,
     description_vi: descriptionVi,
     description_en: descriptionEn,
-    cover_image_path: coverImagePath,
     event_date: eventDate,
     is_published: isPublished,
+    show_detail_link: showDetailLink,
     sort_order: sortOrder
   });
 
@@ -142,4 +143,52 @@ export async function deleteEventImageAction(formData: FormData) {
   const id = readRequiredString(formData, "id");
   await deleteEventImage(id);
   revalidateAll();
+}
+
+export async function uploadEventCoverImageAction(formData: FormData) {
+  const eventId = readRequiredString(formData, "eventId");
+  const slug = readOptionalString(formData, "slug");
+  const file = formData.get("file");
+
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("No file provided");
+  }
+
+  const client = createSupabaseServiceClient();
+  const ext = fileExt(file);
+  const filePath = `events/${eventId}/cover-${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await client.storage.from("event-images").upload(filePath, file, {
+    contentType: file.type || "image/jpeg",
+    upsert: false
+  });
+
+  if (uploadError) throw uploadError;
+
+  const baseUrl = getSupabaseUrl().replace(/\/$/, "");
+  const publicUrl = `${baseUrl}/storage/v1/object/public/event-images/${filePath}`;
+
+  await updateEvent(eventId, { cover_image_path: publicUrl });
+
+  revalidateAll(slug || undefined);
+}
+
+export async function toggleEventPublishedAction(formData: FormData) {
+  const id = readRequiredString(formData, "id");
+  const slug = readOptionalString(formData, "slug");
+  const isPublished = readBoolean(formData, "isPublished");
+
+  await updateEvent(id, { is_published: isPublished });
+
+  revalidateAll(slug || undefined);
+}
+
+export async function toggleEventDetailLinkAction(formData: FormData) {
+  const id = readRequiredString(formData, "id");
+  const slug = readOptionalString(formData, "slug");
+  const showDetailLink = readBoolean(formData, "showDetailLink");
+
+  await updateEvent(id, { show_detail_link: showDetailLink });
+
+  revalidateAll(slug || undefined);
 }

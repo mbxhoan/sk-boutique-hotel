@@ -114,6 +114,16 @@ export function getSupabaseEmailAdminRecipients() {
   return getEmailRecipients(emailAdminRecipientKeys, "service@skhotel.com.vn");
 }
 
+export function getCronSecret() {
+  return process.env.CRON_SECRET ?? null;
+}
+
+export function getChatNudgeMinutes(): number {
+  const raw = process.env.CHAT_NUDGE_MINUTES;
+  const parsed = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
+}
+
 export function getSupabaseEmailAdminBccRecipients() {
   const primaryRecipient = getSupabaseEmailAdminRecipient().toLowerCase();
   const explicitBccRecipients = parseEmailRecipientList(getFirstDefinedEnv(emailAdminBccKeys));
