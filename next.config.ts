@@ -2,10 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [
-    "localhost", 
-    "127.0.0.1", 
+    "localhost",
+    "127.0.0.1",
     "192.168.2.109",
-    "192.168.2.43"
+    "192.168.2.43",
+    "192.168.2.157"
   ],
   experimental: {
     serverActions: {
@@ -13,7 +14,8 @@ const nextConfig: NextConfig = {
     }
   },
   images: {
-    qualities: [85, 90]
+    qualities: [85, 90],
+    minimumCacheTTL: 86400
   }
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import { PortalSubmitButton } from "@/components/portal-submit-button";
@@ -94,6 +94,28 @@ function todayDateString() {
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const dd = String(now.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+}
+
+function CopyLinkButton({ locale, slug }: { locale: Locale; slug: string }) {
+  const [copied, setCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleCopy() {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    void navigator.clipboard.writeText(`${origin}/rooms/${slug}`).then(() => {
+      setCopied(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <button className="btn btn--outline" onClick={handleCopy} title={localize(locale, { vi: "Sao chép link preview phòng", en: "Copy room preview link" })} type="button">
+      {copied
+        ? localize(locale, { vi: "✓ Đã sao chép", en: "✓ Copied" })
+        : localize(locale, { vi: "Sao chép link phòng", en: "Copy room link" })}
+    </button>
+  );
 }
 
 export function AdminRoomTypesManager({ activeClosures, locale, roomTypes }: AdminRoomTypesManagerProps) {
@@ -209,6 +231,7 @@ export function AdminRoomTypesManager({ activeClosures, locale, roomTypes }: Adm
                 <PortalBadge tone={selectedRoomType.is_active ? "accent" : "neutral"}>
                   {selectedRoomType.is_active ? localize(locale, { vi: "Đang hoạt động", en: "Active" }) : localize(locale, { vi: "Tạm ẩn", en: "Hidden" })}
                 </PortalBadge>
+                <CopyLinkButton locale={locale} slug={selectedRoomType.slug} />
                 <PortalSubmitButton className="button button--solid" pendingLabel={localize(locale, { vi: "Đang lưu...", en: "Saving..." })}>
                   {localize(locale, { vi: "Lưu thay đổi", en: "Save changes" })}
                 </PortalSubmitButton>

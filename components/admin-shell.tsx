@@ -16,6 +16,7 @@ import { appendLocaleQuery, localeLabel, resolveLocale } from "@/lib/locale";
 import type { AdminNotificationItem } from "@/lib/supabase/queries/admin-notifications";
 import type { BranchRow } from "@/lib/supabase/database.types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { shouldForceSignOut, markSessionPersisted } from "@/lib/auth-persistence";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -87,6 +88,22 @@ const adminNavItems: AdminNavItem[] = [
     label: {
       vi: "Nội dung",
       en: "Content"
+    }
+  },
+  {
+    icon: "content",
+    href: "/admin/events",
+    label: {
+      vi: "Sự kiện",
+      en: "Events"
+    }
+  },
+  {
+    icon: "support",
+    href: "/admin/chat",
+    label: {
+      vi: "Live Chat",
+      en: "Live Chat"
     }
   },
   {
@@ -367,6 +384,16 @@ export function AdminShell({ children, branches, notifications }: AdminShellProp
     pathname.startsWith("/admin/rooms") ||
     pathname.startsWith("/admin/room-types") ||
     pathname.startsWith("/admin/media");
+
+  useEffect(() => {
+    if (shouldForceSignOut()) {
+      const supabase = createSupabaseBrowserClient();
+      void supabase.auth.signOut().then(() => {
+        markSessionPersisted();
+        router.replace("/admin/sign-in");
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setIsMobileNavOpen(false);

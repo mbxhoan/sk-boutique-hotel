@@ -1222,6 +1222,179 @@ export interface Database {
         } & RowTimestampFields>;
         Relationships: [];
       };
+      chat_conversations: {
+        Row: {
+          id: string;
+          guest_name: string | null;
+          guest_phone: string | null;
+          guest_email: string | null;
+          source_url: string | null;
+          utm_source: string | null;
+          utm_campaign: string | null;
+          status: "new" | "open" | "closed";
+          assigned_to: string | null;
+          last_message_at: string | null;
+          nudge_sent_at: string | null;
+          guest_language: "vi" | "en" | null;
+          chat_intent: "booking" | "pricing" | "checkin_checkout" | "other" | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          guest_name?: string | null;
+          guest_phone?: string | null;
+          guest_email?: string | null;
+          source_url?: string | null;
+          utm_source?: string | null;
+          utm_campaign?: string | null;
+          status?: "new" | "open" | "closed";
+          assigned_to?: string | null;
+          last_message_at?: string | null;
+          nudge_sent_at?: string | null;
+          guest_language?: "vi" | "en" | null;
+          chat_intent?: "booking" | "pricing" | "checkin_checkout" | "other" | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          guest_name?: string | null;
+          guest_phone?: string | null;
+          guest_email?: string | null;
+          source_url?: string | null;
+          utm_source?: string | null;
+          utm_campaign?: string | null;
+          status?: "new" | "open" | "closed";
+          assigned_to?: string | null;
+          last_message_at?: string | null;
+          nudge_sent_at?: string | null;
+          guest_language?: "vi" | "en" | null;
+          chat_intent?: "booking" | "pricing" | "checkin_checkout" | "other" | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          sender_type: "guest" | "admin" | "system";
+          message: string;
+          attachment_url: string | null;
+          attachment_type: string | null;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          sender_type: "guest" | "admin" | "system";
+          message: string;
+          attachment_url?: string | null;
+          attachment_type?: string | null;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          conversation_id?: string;
+          sender_type?: "guest" | "admin" | "system";
+          message?: string;
+          attachment_url?: string | null;
+          attachment_type?: string | null;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      events: {
+        Row: {
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          show_detail_link: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          show_detail_link: boolean;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          description_vi: string;
+          description_en: string;
+          cover_image_path: string | null;
+          event_date: string | null;
+          is_published: boolean;
+          show_detail_link: boolean;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
+      event_images: {
+        Row: {
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Update: StandardUpdate<{
+          id: string;
+          event_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Relationships: [
+          {
+            foreignKeyName: "event_images_event_id_fkey";
+            columns: ["event_id"];
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Enums: {
       room_type_closure_status: "active" | "cancelled";
@@ -1520,3 +1693,15 @@ export type RoomTypeClosureRow = TableRow<"room_type_closures">;
 export type RoomTypeClosureInsert = TableInsert<"room_type_closures">;
 export type RoomTypeClosureUpdate = TableUpdate<"room_type_closures">;
 export type RoomTypeClosureStatus = Database["public"]["Enums"]["room_type_closure_status"];
+export type ChatConversationRow = TableRow<"chat_conversations">;
+export type ChatConversationInsert = TableInsert<"chat_conversations">;
+export type ChatConversationUpdate = TableUpdate<"chat_conversations">;
+export type ChatMessageRow = TableRow<"chat_messages">;
+export type ChatMessageInsert = TableInsert<"chat_messages">;
+export type ChatMessageUpdate = TableUpdate<"chat_messages">;
+export type EventRow = TableRow<"events">;
+export type EventInsert = TableInsert<"events">;
+export type EventUpdate = TableUpdate<"events">;
+export type EventImageRow = TableRow<"event_images">;
+export type EventImageInsert = TableInsert<"event_images">;
+export type EventImageUpdate = TableUpdate<"event_images">;

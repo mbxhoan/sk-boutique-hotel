@@ -405,3 +405,96 @@ export async function sendBookingConfirmedCustomerEmail(input: SendBookingConfir
 
   return email;
 }
+
+export type SendChatNotificationEmailInput = {
+  guestName: string | null;
+  guestEmail: string | null;
+  guestPhone: string | null;
+  firstMessage: string;
+  sourceUrl: string | null;
+  adminChatUrl: string;
+};
+
+export type SendChatNudgeEmailInput = {
+  conversationId: string;
+  guestName: string | null;
+  guestEmail: string | null;
+  guestPhone: string | null;
+  firstUnreadMessage: string | null;
+  unreadCount: number;
+  minutesWaiting: number;
+  adminChatUrl: string;
+};
+
+export async function sendChatNudgeEmail(input: SendChatNudgeEmailInput) {
+  if (!hasSupabaseServiceConfig()) {
+    return null;
+  }
+
+  const minutesLabel = input.minutesWaiting >= 60
+    ? `${Math.floor(input.minutesWaiting / 60)} giờ ${input.minutesWaiting % 60} phút`
+    : `${input.minutesWaiting} phút`;
+
+  const subject = `[SK Boutique Hotel] ⚠️ Khách đang chờ phản hồi – ${minutesLabel} chưa được đọc`;
+  const adminTo = getSupabaseEmailAdminRecipient();
+  const adminBcc = getSupabaseEmailAdminBccRecipients();
+
+  const rows: Array<[string, string]> = [
+    ["Tên khách", input.guestName ?? "Ẩn danh"],
+    ["Email", input.guestEmail ?? "—"],
+    ["Điện thoại", input.guestPhone ?? "—"],
+    ["Chờ phản hồi", minutesLabel],
+    ["Số tin chưa đọc", String(input.unreadCount)],
+    ["Nội dung mới nhất", input.firstUnreadMessage ?? "—"],
+    ["Trả lời ngay", input.adminChatUrl]
+  ];
+
+  const html = buildHtmlEmail(
+    subject,
+    `Khách hàng đã gửi tin nhắn và đang chờ phản hồi. Tin nhắn chưa được đọc trong ${minutesLabel}.`,
+    rows,
+    "Vui lòng đăng nhập admin và phản hồi khách ngay để đảm bảo trải nghiệm tốt nhất.",
+    "vi"
+  );
+
+  await sendEmail({
+    from: getSupabaseEmailFromAddress(),
+    to: adminTo,
+    ...(adminBcc.length > 0 ? { bcc: adminBcc } : {}),
+    subject,
+    html
+  });
+}
+
+export async function sendChatNotificationEmail(input: SendChatNotificationEmailInput) {
+  if (!hasSupabaseServiceConfig()) {
+    return null;
+  }
+
+  const subject = "[SK Boutique Hotel] Khách nhắn tin qua Live Chat";
+  const adminTo = getSupabaseEmailAdminRecipient();
+  const adminBcc = getSupabaseEmailAdminBccRecipients();
+
+  const html = buildHtmlEmail(
+    subject,
+    "Có khách vừa gửi tin nhắn qua Live Chat. Vui lòng phản hồi sớm.",
+    [
+      ["Tên khách", input.guestName ?? "Ẩn danh"],
+      ["Email", input.guestEmail ?? "—"],
+      ["Điện thoại", input.guestPhone ?? "—"],
+      ["Tin nhắn", input.firstMessage],
+      ["Trang nguồn", input.sourceUrl ?? "—"],
+      ["Xem chat", input.adminChatUrl]
+    ],
+    "Đăng nhập vào admin panel để phản hồi khách ngay.",
+    "vi"
+  );
+
+  await sendEmail({
+    from: getSupabaseEmailFromAddress(),
+    to: adminTo,
+    ...(adminBcc.length > 0 ? { bcc: adminBcc } : {}),
+    subject,
+    html
+  });
+}

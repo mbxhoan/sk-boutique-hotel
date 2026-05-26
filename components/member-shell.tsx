@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { markSessionPersisted, shouldForceSignOut } from "@/lib/auth-persistence";
 
 import { LogoMark } from "@/components/logo-mark";
 import { PortalBadge, PortalCard, PortalBulletList } from "@/components/portal-ui";
@@ -30,6 +32,16 @@ export function MemberShell({ children }: MemberShellProps) {
   const search = searchParams.toString();
   const locale = resolveLocale(searchParams.get("lang"));
   const localeToggle = locale === "en" ? "vi" : "en";
+
+  useEffect(() => {
+    if (shouldForceSignOut()) {
+      const supabase = createSupabaseBrowserClient();
+      void supabase.auth.signOut().then(() => {
+        markSessionPersisted();
+        router.replace(appendLocaleQuery("/member/sign-in", locale));
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
