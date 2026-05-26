@@ -58,7 +58,7 @@ const translations: Record<string, string> = {
   "Di sản, con người và sự tinh gọn": "Heritage, people, and refinement",
   "Placeholder cho ảnh kiến trúc hoặc trang lịch sử.": "Placeholder for architectural imagery or a history page.",
   "Khởi đầu": "Start",
-  "Một mốc thời gian phù hợp với tag ETS.2020": "A milestone that fits the ETS.2020 tag.",
+  "Một mốc thời gian phù hợp với tag EST.2020": "A milestone that fits the EST.2020 tag.",
   "Giá trị cốt lõi": "Core values",
   "Tinh tế, riêng tư, nhất quán": "Refined, private, consistent",
   "Tầm nhìn": "Vision",

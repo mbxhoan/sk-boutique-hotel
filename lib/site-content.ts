@@ -902,7 +902,7 @@ export const pages: PageContent[] = [
       }
     },
     metrics: [
-      { value: "2020", label: "Khởi đầu", detail: "Một mốc thời gian phù hợp với tag ETS.2020" },
+      { value: "2020", label: "Khởi đầu", detail: "Một mốc thời gian phù hợp với tag EST.2020" },
       { value: "03", label: "Giá trị cốt lõi", detail: "Tinh tế, riêng tư, nhất quán" },
       { value: "01", label: "Tầm nhìn", detail: "Giữ trải nghiệm boutique ở mọi điểm chạm" },
       { value: "∞", label: "Khách hàng", detail: "Template mở rộng được cho nhiều phân khúc" }
