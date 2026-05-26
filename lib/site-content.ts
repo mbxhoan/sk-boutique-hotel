@@ -199,6 +199,7 @@ export const siteInfo = {
   gg_map_address: "SK Boutique Hotel Phú Quốc",
   address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
   phone: "+84 908 233 583",
+  phone2: "+84 981 887 028",
   zalo: "0908 233 583",
   facebook: "https://www.facebook.com/p/SK-Boutique-Hotel-100088332707267/",
   email: "skhotel.phuquoc@gmail.com",
@@ -1087,6 +1088,7 @@ export const pages: PageContent[] = [
       description: "Đây là nơi bạn nối form thật khi sẵn sàng.",
       details: [
         { label: "Hotline", value: siteInfo.phone, href: "tel:+84908233583" },
+        { label: "Hotline 2", value: siteInfo.phone2, href: "tel:+84981887028" },
         { label: "Zalo", value: siteInfo.zalo, href: "https://zalo.me/0908233583" },
         { label: "Facebook", value: "SK Boutique Hotel", href: siteInfo.facebook },
         { label: "Email", value: siteInfo.email, href: `mailto:${siteInfo.email}` },
@@ -1331,7 +1333,7 @@ export const pages: PageContent[] = [
             kicker: "HOTLINE",
             title: "Gọi nhanh",
             description: "Phù hợp với khách cần phản hồi ngay hoặc thay đổi gấp.",
-            meta: siteInfo.phone
+            meta: `${siteInfo.phone} / ${siteInfo.phone2}`
           },
           {
             kicker: "EMAIL",

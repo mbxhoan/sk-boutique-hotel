@@ -69,7 +69,7 @@ export function AdminBookingReceiptPrint({ detail, locale }: AdminBookingReceipt
           <h1 className="booking-receipt-print__hotel">SK Boutique Hotel</h1>
           <div className="booking-receipt-print__contact">
             <span>📍 {siteInfo.address}</span>
-            <span>📞 {siteInfo.phone}</span>
+            <span>📞 {siteInfo.phone} / {siteInfo.phone2}</span>
             <span>✉️ {siteInfo.email}</span>
           </div>
         </header>

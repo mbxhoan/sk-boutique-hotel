@@ -105,6 +105,10 @@ export function SiteFooter() {
                   <a className="site-footer__detail-link" href={`tel:${siteInfo.phone.replace(/\s+/g, "")}`}>
                     {siteInfo.phone}
                   </a>
+                  {" / "}
+                  <a className="site-footer__detail-link" href={`tel:${siteInfo.phone2.replace(/\s+/g, "")}`}>
+                    {siteInfo.phone2}
+                  </a>
                 </dd>
               </div>
               <div className="site-footer__detail">
