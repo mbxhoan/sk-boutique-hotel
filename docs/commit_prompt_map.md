@@ -1857,3 +1857,23 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/admin-notifications-center.tsx`
   - `docs/commit_prompt_map.md`
   - `lib/supabase/queries/admin-notifications.ts`
+
+## 2026-05-27
+
+### Entry 160
+- `time`: 2026-05-27T09:19:02+07:00
+- `prompt_summary`: Đổi seed sự kiện sang `Summer Together 2026` với gallery 2 ảnh từ thư mục `/events/2026-summer-together`, đồng thời cập nhật dữ liệu cho các DB đã migrate trước đó.
+- `commit_message`: `fix(events): seed Summer Together 2026 with two gallery images`
+- `main_files`:
+  - `supabase/migrations/20260526000002_events.sql`
+  - `supabase/migrations/20260527092000_update_summer_together_event_gallery.sql`
+  - `docs/commit_prompt_map.md`
+
+### Entry 161
+- `time`: 2026-05-27T09:31:00+07:00
+- `prompt_summary`: Tối ưu thumbnail chia sẻ Facebook bằng social card nền sáng chuyên dụng, tránh để dark theme làm logo chìm khi preview link website.
+- `commit_message`: `fix(metadata): replace dark logo preview with bright branded social card`
+- `main_files`:
+  - `app/api/og/home/route.tsx`
+  - `app/layout.tsx`
+  - `docs/commit_prompt_map.md`

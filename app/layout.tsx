@@ -30,23 +30,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SK Boutique Hotel",
     description:
-      "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area.",
+      "Boutique comfort in Phu Quoc with calm stays, direct support, and a premium hotel experience.",
     images: [
       {
         alt: "SK Boutique Hotel",
         height: 630,
-        url: "/opengraph-image.jpg",
+        url: "/api/og/home",
         width: 1200
       }
     ],
+    siteName: "SK Boutique Hotel",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "SK Boutique Hotel",
     description:
-      "SK Boutique Hotel - nền tảng front-end manual-first với marketing site, member area và admin area.",
-    images: ["/opengraph-image.jpg"]
+      "Boutique comfort in Phu Quoc with calm stays, direct support, and a premium hotel experience.",
+    images: ["/api/og/home"]
   }
 };
 

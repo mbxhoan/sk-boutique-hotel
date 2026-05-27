@@ -74,12 +74,18 @@ values (
   'Summer Together 2026',
   'Lễ hội mùa hè đặc biệt tại SK Boutique Hotel — nơi những kỷ niệm mùa hè được tạo nên cùng nhau. Tận hưởng không gian resort xanh mát, các hoạt động vui chơi, ẩm thực phong phú và những trải nghiệm độc đáo chỉ có tại Phú Quốc.',
   'A special summer festival at SK Boutique Hotel — where summer memories are made together. Enjoy lush resort grounds, fun activities, diverse cuisine, and unique experiences only at Phu Quoc.',
-  '/events/2026-summer-together.png',
+  '/events/2026-summer-together/2.jpg',
   '2026-06-21',
   true,
   0
 );
 
 insert into public.event_images (event_id, image_path, caption_vi, caption_en, sort_order)
-select id, '/events/2026-summer-together.png', 'Summer Together 2026', 'Summer Together 2026', 0
-from public.events where slug = 'summer-together-2026';
+select id, image_path, 'Summer Together 2026', 'Summer Together 2026', sort_order
+from public.events
+cross join (
+  values
+    ('/events/2026-summer-together/1.jpg', 0),
+    ('/events/2026-summer-together/2.jpg', 1)
+) as seeded_images(image_path, sort_order)
+where slug = 'summer-together-2026';
