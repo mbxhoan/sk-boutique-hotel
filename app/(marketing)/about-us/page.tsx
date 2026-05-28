@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AboutUsPage as AboutUsSection, aboutUsSeo } from "@/components/about-us-page";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { translate } from "@/lib/locale";
 import { localize } from "@/lib/mock/i18n";
 import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
@@ -19,11 +20,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
   const page = await loadStaticPageBySlug("/about-us");
 
-  return {
+  return buildPageMetadata({
     title: page ? translate(locale, page.title) : localize(locale, aboutUsSeo.title),
     description: page ? translate(locale, page.description) : localize(locale, aboutUsSeo.description),
-    alternates: { canonical: "/about-us" }
-  };
+    path: "/about-us",
+    ogImagePath: "/api/og/about",
+    locale
+  });
 }
 
 export default async function AboutUsPageRoute({ searchParams }: PageProps) {

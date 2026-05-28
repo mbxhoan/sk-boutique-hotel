@@ -1887,3 +1887,18 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/globals.css`
   - `lib/site-content.ts`
   - `lib/locale.ts`
+
+### Entry 163
+- `time`: 2026-05-28T10:22:30+07:00
+- `prompt_summary`: Kiểm tra và hoàn thiện việc triển khai plan Full Open Graph + Social Sharing Meta Tags, tích hợp buildPageMetadata trên tất cả các trang marketing và sửa lỗi thiếu show_detail_link trong eventSelect query.
+- `commit_message`: `feat(metadata): complete open graph integration and event detail link select query`
+- `main_files`:
+  - `lib/supabase/queries/events.ts`
+  - `app/(marketing)/rooms/[slug]/page.tsx`
+  - `app/(marketing)/su-kien/[slug]/page.tsx`
+  - `app/(marketing)/rooms/page.tsx`
+  - `app/(marketing)/page.tsx`
+  - `app/(marketing)/about-us/page.tsx`
+  - `app/(marketing)/su-kien/page.tsx`
+  - `app/(marketing)/[slug]/page.tsx`
+  - `app/(marketing)/thanh-toan/[token]/page.tsx`

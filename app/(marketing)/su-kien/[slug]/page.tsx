@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { EventDetailPage } from "@/components/event-detail-page";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { localize } from "@/lib/mock/i18n";
 import { getEventBySlug, listEventImages, listEvents } from "@/lib/supabase/queries/events";
 
@@ -30,14 +31,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const title = locale === "vi" ? event.title_vi : event.title_en;
   const description = locale === "vi" ? event.description_vi : event.description_en;
 
-  return {
+  return buildPageMetadata({
     title,
-    description: description || undefined,
-    alternates: { canonical: `/su-kien/${slug}` },
-    openGraph: event.cover_image_path
-      ? { images: [{ url: event.cover_image_path }] }
-      : undefined
-  };
+    description: description || "",
+    path: `/su-kien/${slug}`,
+    ogImagePath: `/api/og/event?slug=${slug}`,
+    locale,
+    type: "article"
+  });
 }
 
 export default async function EventDetailPageRoute({ params, searchParams }: PageProps) {

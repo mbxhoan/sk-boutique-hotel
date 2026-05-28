@@ -5,6 +5,7 @@ import { PageViewTracker } from "@/components/page-view-tracker";
 import { PortalBadge, PortalCard, PortalSectionHeading } from "@/components/portal-ui";
 import { PaymentProofUploadForm } from "@/components/payment-proof-upload-form";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { buildVietQrImageUrl, getPaymentRequestByPublicToken } from "@/lib/supabase/payments";
 
 type PageProps = {
@@ -16,16 +17,23 @@ type PageProps = {
   }>;
 };
 
-export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
 
   return {
-    title: locale === "en" ? "Deposit upload" : "Tải ảnh xác nhận thanh toán",
-    description:
-      locale === "en"
-        ? "Upload your deposit proof using the secure payment link."
-        : "Tải lên ảnh xác nhận thanh toán từ link thanh toán bảo mật."
+    ...buildPageMetadata({
+      title: locale === "en" ? "Deposit upload" : "Tải ảnh xác nhận thanh toán",
+      description:
+        locale === "en"
+          ? "Upload your deposit proof using the secure payment link."
+          : "Tải lên ảnh xác nhận thanh toán từ link thanh toán bảo mật.",
+      path: `/thanh-toan/${resolvedParams.token}`,
+      ogImagePath: "/api/og/home",
+      locale
+    }),
+    robots: { index: false, follow: false }
   };
 }
 

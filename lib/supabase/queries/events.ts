@@ -2,7 +2,7 @@ import type { EventImageInsert, EventImageRow, EventInsert, EventRow, EventUpdat
 import { queryWithServiceFallback } from "@/lib/supabase/queries/shared";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
-const eventSelect = "id, slug, title_vi, title_en, description_vi, description_en, cover_image_path, event_date, is_published, sort_order, created_at, updated_at";
+const eventSelect = "id, slug, title_vi, title_en, description_vi, description_en, cover_image_path, event_date, is_published, show_detail_link, sort_order, created_at, updated_at";
 const eventImageSelect = "id, event_id, image_path, caption_vi, caption_en, sort_order, created_at";
 
 export async function listEvents(options: { includeUnpublished?: boolean } = {}) {

@@ -5,6 +5,7 @@ import { JsonLd, roomDetailBreadcrumbJsonLd } from "@/components/json-ld";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomPreviewPage } from "@/components/room-preview-page";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { buildRoomCatalogEntry } from "@/lib/rooms/catalog";
 import { siteInfo } from "@/lib/site-content";
 import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
@@ -67,14 +68,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     ? roomType.summary_vi || roomType.description_vi || roomType.story_vi
     : roomType.summary_en || roomType.description_en || roomType.story_en;
 
-  return {
+  return buildPageMetadata({
     title,
-    description,
-    alternates: { canonical: `/rooms/${slug}` },
-    openGraph: roomType.cover_image_path
-      ? { images: [{ url: roomType.cover_image_path }] }
-      : undefined
-  };
+    description: description || "",
+    path: `/rooms/${slug}`,
+    ogImagePath: `/api/og/room?slug=${slug}`,
+    locale,
+    type: "article"
+  });
 }
 
 export default async function RoomPreviewPageRoute({ params, searchParams }: PageProps) {

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { MarketingHome } from "@/components/marketing-home";
 import { localize } from "@/lib/mock/i18n";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { loadHomePageCopy } from "@/lib/supabase/queries/content-pages";
 
 type PageProps = {
@@ -16,11 +17,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
   const page = await loadHomePageCopy();
 
-  return {
+  return buildPageMetadata({
     title: localize(locale, page.seo.title),
     description: localize(locale, page.seo.description),
-    alternates: { canonical: "/" }
-  };
+    path: "/",
+    ogImagePath: "/api/og/home",
+    locale
+  });
 }
 
 export default async function MarketingHomePage({ searchParams }: PageProps) {

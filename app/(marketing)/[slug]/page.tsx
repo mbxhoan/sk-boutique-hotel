@@ -5,6 +5,7 @@ import { PageViewTracker } from "@/components/page-view-tracker";
 import { PageTemplate } from "@/components/page-template";
 import { isTemporarilyHiddenSlug } from "@/lib/hidden-routes";
 import { resolveLocale, translate } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { getContentStaticRouteParams, loadStaticPageBySlug } from "@/lib/supabase/queries/content-pages";
 
 type PageProps = {
@@ -35,10 +36,13 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     return {};
   }
 
-  return {
+  return buildPageMetadata({
     title: translate(locale, page.title),
-    description: translate(locale, page.description)
-  };
+    description: translate(locale, page.description),
+    path: `/${slug}`,
+    ogImagePath: "/api/og/home",
+    locale
+  });
 }
 
 export default async function StaticPage({ params, searchParams }: PageProps) {

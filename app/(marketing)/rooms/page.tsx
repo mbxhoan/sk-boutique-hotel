@@ -4,6 +4,7 @@ import { JsonLd, roomsBreadcrumbJsonLd } from "@/components/json-ld";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { RoomsCatalogPage } from "@/components/rooms-catalog-page";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { translate } from "@/lib/locale";
 import { parseRoomsSearchParams } from "@/lib/room-routes";
 import { loadMediaCollectionImageUrls } from "@/lib/supabase/queries/media";
@@ -141,15 +142,20 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const locale = resolveLocale(resolvedSearchParams.lang);
   const page = await loadStaticPageBySlug("/rooms");
 
-  return {
-    title: page ? translate(locale, page.title) : locale === "en" ? "Choose your room" : "Chọn phòng của bạn",
-    description: page
-      ? translate(locale, page.description)
-      : locale === "en"
-        ? "View room types, check dates, and open the room canvas without leaving the listing."
-        : "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách.",
-    alternates: { canonical: "/rooms" }
-  };
+  const title = page ? translate(locale, page.title) : locale === "en" ? "Choose your room" : "Chọn phòng của bạn";
+  const description = page
+    ? translate(locale, page.description)
+    : locale === "en"
+      ? "View room types, check dates, and open the room canvas without leaving the listing."
+      : "Xem các hạng phòng, kiểm tra ngày và mở popup chi tiết ngay trên trang danh sách.";
+
+  return buildPageMetadata({
+    title,
+    description,
+    path: "/rooms",
+    ogImagePath: "/api/og/rooms",
+    locale
+  });
 }
 
 export default async function RoomsPage({ searchParams }: PageProps) {
