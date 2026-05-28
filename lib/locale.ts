@@ -138,7 +138,17 @@ const translations: Record<string, string> = {
   "Một số chủ đề cần chặn?": "Need to block some topics?",
   "Địa chỉ mẫu, Quận trung tâm, TP.HCM": "Sample address, central district, Ho Chi Minh City",
   "Khả năng mở rộng": "Scalability",
-  "Frontend foundation manual-first, sẵn sàng cho Supabase sau này.": "A manual-first front-end foundation ready for Supabase later."
+  "Frontend foundation manual-first, sẵn sàng cho Supabase sau này.": "A manual-first front-end foundation ready for Supabase later.",
+  "Triết lý vận hành cốt lõi.": "Core operational philosophy.",
+  "Chúng tôi tin rằng sự tinh khiết trong thiết kế và sự tỉ mỉ trong phục vụ sẽ tạo nên kỳ nghỉ trọn vẹn.": "We believe that purity in design and meticulous service create a complete stay.",
+  "Hành trình phát triển.": "Our Journey of Growth.",
+  "Các dấu mốc đánh dấu sự chuyển mình và nâng cấp dịch vụ của SK Boutique Hotel.": "Key milestones marking the evolution and service upgrades of SK Boutique Hotel.",
+  "Ra mắt không gian ẩm thực": "Introducing dining space",
+  "Ra mắt không gian ẩm thực bản địa và các tiện ích chăm sóc sức khỏe.": "Introducing local dining spaces and wellness amenities.",
+  "Số hóa và nâng tầm dịch vụ": "Digital transformation and service elevation",
+  "Tối ưu hóa quy trình đặt phòng trực tuyến và nâng cao trải nghiệm khách hàng.": "Optimizing online booking flows and enhancing guest experience.",
+  "Đồng hành cùng hành trình của bạn.": "Accompanying your journey.",
+  "Chúng tôi luôn mong muốn mang lại cảm giác thân thuộc như trở về nhà tại mỗi điểm đến của SK Boutique Hotel.": "We always aspire to bring a warm sense of returning home at every destination of SK Boutique Hotel."
 };
 
 export function resolveLocale(input?: string | null): Locale {

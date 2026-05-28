@@ -950,8 +950,8 @@ export const pages: PageContent[] = [
     cardSections: [
       {
         eyebrow: "CỐT LÕI",
-        title: "Bốn giá trị có thể dùng làm nội dung thương hiệu.",
-        description: "Mỗi card phù hợp cho phần About, Brand hoặc một slide giới thiệu.",
+        title: "Triết lý vận hành cốt lõi.",
+        description: "Chúng tôi tin rằng sự tinh khiết trong thiết kế và sự tỉ mỉ trong phục vụ sẽ tạo nên kỳ nghỉ trọn vẹn.",
         cards: [
           {
             kicker: "CRAFT",
@@ -982,8 +982,8 @@ export const pages: PageContent[] = [
     ],
     timelineSection: {
       eyebrow: "MỐC THỜI GIAN",
-      title: "Một timeline ngắn để kể câu chuyện phát triển.",
-      description: "Khung này đủ cho những khách sạn muốn giới thiệu quá trình hình thành.",
+      title: "Hành trình phát triển.",
+      description: "Các dấu mốc đánh dấu sự chuyển mình và nâng cấp dịch vụ của SK Boutique Hotel.",
       items: [
         {
           step: "2020",
@@ -997,21 +997,21 @@ export const pages: PageContent[] = [
         },
         {
           step: "2024",
-          title: "Mở rộng danh mục dịch vụ",
-          description: "Thêm các lớp nội dung mới cho dining, wellness và hỗ trợ."
+          title: "Ra mắt không gian ẩm thực",
+          description: "Ra mắt không gian ẩm thực bản địa và các tiện ích chăm sóc sức khỏe."
         },
         {
           step: "2026",
-          title: "Đưa template lên website",
-          description: "Bộ khung UI hiện tại được dựng để bạn triển khai nhanh hơn."
+          title: "Số hóa và nâng tầm dịch vụ",
+          description: "Tối ưu hóa quy trình đặt phòng trực tuyến và nâng cao trải nghiệm khách hàng."
         }
       ]
     },
     closingSection: {
       eyebrow: "CÂU CHUYỆN THƯƠNG HIỆU",
-      title: "Một câu chuyện đủ ngắn để nhớ, đủ rõ để tin.",
+      title: "Đồng hành cùng hành trình của bạn.",
       description:
-        "Bạn có thể thay phần này bằng nội dung thật về lịch sử, đội ngũ và triết lý phục vụ của khách sạn.",
+        "Chúng tôi luôn mong muốn mang lại cảm giác thân thuộc như trở về nhà tại mỗi điểm đến của SK Boutique Hotel.",
       cta: { label: "Xem liên hệ", href: "/lien-he" },
       secondaryCta: { label: "Xem tuyển dụng", href: "/tuyen-dung" }
     }

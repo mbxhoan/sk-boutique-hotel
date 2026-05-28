@@ -1902,3 +1902,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/(marketing)/su-kien/page.tsx`
   - `app/(marketing)/[slug]/page.tsx`
   - `app/(marketing)/thanh-toan/[token]/page.tsx`
+
+### Entry 164
+- `time`: 2026-05-28T10:35:00+07:00
+- `prompt_summary`: Tự động điều chỉnh các copywriting placeholders trên trang /about-us trong database seed và file code tĩnh thành nội dung có ý nghĩa, tinh giản, cô đọng, tự nhiên, bilingually song ngữ.
+- `commit_message`: `fix(about-us-copy): replace placeholders in database and local files with meaningful copy`
+- `main_files`:
+  - `lib/site-content.ts`
+  - `lib/locale.ts`
+  - `supabase/seed.sql`
+  - `supabase/seed-content-pages.sql`
+  - `docs/commit_prompt_map.md`
