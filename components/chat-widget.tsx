@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { siteInfo } from "@/lib/site-content";
 
 type Message = {
   id: string;
@@ -115,6 +116,14 @@ function ImageIcon() {
       <rect height="18" rx="2" ry="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" width="18" x="3" y="3" />
       <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
       <polyline points="21 15 16 10 5 21" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22">
+      <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
     </svg>
   );
 }
@@ -704,6 +713,32 @@ export function ChatWidget() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Facebook Floating Button */}
+        {view === "closed" && (
+          <a
+            aria-label="Facebook fanpage"
+            href={siteInfo.facebook}
+            rel="noreferrer noopener"
+            style={{
+              width: "3.25rem",
+              height: "3.25rem",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, var(--gold) 0%, #785a19 100%)",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(197, 160, 89, 0.25)",
+              transition: "transform 0.2s ease, opacity 0.2s ease",
+            }}
+            target="_blank"
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; }}
+          >
+            <FacebookIcon />
+          </a>
         )}
 
         {/* FAB */}

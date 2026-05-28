@@ -1923,3 +1923,14 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `components/rooms-catalog-page.tsx`
   - `app/globals.css`
   - `docs/commit_prompt_map.md`
+
+### Entry 166
+- `time`: 2026-05-28T14:52:00+07:00
+- `prompt_summary`: Cấu hình facebook URL mới cho siteInfo và seed data, thêm nút liên kết facebook nổi (FAB) cạnh live chat widget.
+- `commit_message`: `feat(facebook-link): update facebook URL and add floating action button near chatbox`
+- `main_files`:
+  - `lib/site-content.ts`
+  - `components/chat-widget.tsx`
+  - `supabase/seed-content-pages.sql`
+  - `supabase/seed.sql`
+  - `docs/commit_prompt_map.md`

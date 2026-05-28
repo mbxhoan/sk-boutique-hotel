@@ -201,7 +201,7 @@ export const siteInfo = {
   phone: "+84 908 233 583",
   phone2: "+84 981 887 028",
   zalo: "0908 233 583",
-  facebook: "https://www.facebook.com/p/SK-Boutique-Hotel-100088332707267/",
+  facebook: "https://www.facebook.com/profile.php?id=61590065745988",
   email: "skhotel.phuquoc@gmail.com",
   hours: "08:00 - 22:00",
   legal: "© 2026 SK Boutique Hotel. Front-end foundation manual-first, sẵn sàng cho Supabase sau này."
