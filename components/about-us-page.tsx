@@ -199,15 +199,17 @@ export function AboutUsPage({
           </div>
 
           <div className="hero__visual about-us-hero__visual">
-            <div className="about-us-hero__media">
-              <Image
-                alt={translate(locale, heroCaptionTitle)}
-                className="about-us-hero__media-image"
-                fill
-                priority
-                sizes="(min-width: 1080px) 48vw, 100vw"
-                src={customerImages[0] ?? customerImages[customerImages.length - 1] ?? "/customers/customers1.jpg"}
-              />
+            <div className="about-us-hero__container">
+              <div className="about-us-hero__media">
+                <Image
+                  alt={translate(locale, heroCaptionTitle)}
+                  className="about-us-hero__media-image"
+                  fill
+                  priority
+                  sizes="(min-width: 1080px) 48vw, 100vw"
+                  src={customerImages[0] ?? customerImages[customerImages.length - 1] ?? "/customers/customers1.jpg"}
+                />
+              </div>
               <div className="about-us-hero__caption">
                 <p className="about-us-hero__caption-eyebrow">{translate(locale, heroCaptionEyebrow)}</p>
                 <p className="about-us-hero__caption-title">{translate(locale, heroCaptionTitle)}</p>

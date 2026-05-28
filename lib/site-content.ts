@@ -888,59 +888,59 @@ export const pages: PageContent[] = [
     hero: {
       layout: "split",
       eyebrow: "Về chúng tôi",
-      title: "Một câu chuyện nhỏ về sự chăm chút lớn.",
+      title: "Sự tận tâm trong từng chi tiết.",
       description:
-        "Khối nội dung này kể lại tinh thần SK Boutique Hotel theo kiểu editorial: ngắn, rõ, giàu hình ảnh và đủ sâu để tạo niềm tin.",
+        "SK Boutique Hotel được kiến tạo để mang lại một không gian lưu trú ấm cúng, tinh tế và riêng tư tuyệt đối cho khách hàng.",
       primaryCta: { label: "Liên hệ", href: "/lien-he" },
-      secondaryCta: { label: "Chi nhánh", href: "/chi-nhanh" },
+      secondaryCta: { label: "Đặt phòng", href: "/rooms" },
       visual: {
         label: "HERITAGE TIMELINE",
         title: "Di sản, con người và sự tinh gọn",
-        description: "Placeholder cho ảnh kiến trúc hoặc trang lịch sử.",
+        description: "Không gian lưu giữ nét kiến trúc hài hòa cùng dòng thời gian.",
         variant: "paper",
         chips: ["2020", "2022", "2024"]
       }
     },
     metrics: [
-      { value: "2020", label: "Khởi đầu", detail: "Một mốc thời gian phù hợp với tag EST.2020" },
+      { value: "2020", label: "Khởi đầu", detail: "Hành trình kiến tạo không gian nghỉ dưỡng boutique tại Phú Quốc." },
       { value: "03", label: "Giá trị cốt lõi", detail: "Tinh tế, riêng tư, nhất quán" },
       { value: "01", label: "Tầm nhìn", detail: "Giữ trải nghiệm boutique ở mọi điểm chạm" },
-      { value: "∞", label: "Khách hàng", detail: "Template mở rộng được cho nhiều phân khúc" }
+      { value: "∞", label: "Khách hàng", detail: "Sự hài lòng từ những vị khách trân quý nét đẹp tĩnh lặng." }
     ],
     splitSections: [
       {
         eyebrow: "CÂU CHUYỆN",
-        title: "Khách sạn boutique sống bằng cảm giác, không chỉ bằng phòng ngủ.",
+        title: "Trải nghiệm lưu trú bằng mọi giác quan.",
         description:
-          "Từ thiết kế tới cách nói chuyện, mọi thứ đều nên cùng chung một ngôn ngữ: ấm, gọn, và có chủ đích.",
+          "Tại SK, chúng tôi tin rằng một kỳ nghỉ trọn vẹn được tạo nên từ sự thấu hiểu và chăm chút chu đáo nhất.",
         bullets: [
-          "Chúng tôi đặt trải nghiệm thị giác lên trước để tạo ấn tượng đầu tiên tốt.",
-          "Sau đó là dịch vụ và sự nhất quán, vì đó mới là điều khách nhớ lâu.",
-          "Website được viết như một ấn phẩm nhỏ: ít chữ thừa, nhiều không gian cho hình ảnh.",
-          "Mỗi section đều có thể thay thành dữ liệu thật mà không cần đập lại giao diện."
+          "Chúng tôi trân trọng từng khoảnh khắc bình yên và sự riêng tư của bạn.",
+          "Không gian nghỉ ngơi ấm cúng mang lại cảm giác thân thuộc như trở về nhà.",
+          "Thiết kế hướng tới tự nhiên, tận dụng tối đa ánh sáng và khí trời bản địa.",
+          "Sự tỉ mỉ được thể hiện qua từng vật dụng và dịch vụ chăm sóc khách hàng."
         ],
         visual: {
           label: "FOUNDING STORY",
           title: "Tập trung vào cảm giác chạm",
-          description: "Khung lớn cho hình ảnh lịch sử, mặt tiền hoặc bản vẽ.",
+          description: "Từng góc nhỏ tại SK đều mang câu chuyện về lòng hiếu khách.",
           variant: "ink",
           note: "Add heritage imagery here"
         }
       },
       {
         eyebrow: "GIÁ TRỊ",
-        title: "Sự tinh tế đến từ chi tiết nhỏ.",
+        title: "Sự tinh tế trong từng điểm chạm.",
         description:
-          "Ba giá trị dưới đây có thể được dùng làm nội dung thương hiệu hoặc trong phần giới thiệu ngắn.",
+          "Chúng tôi theo đuổi những giá trị nguyên bản để mang lại trải nghiệm nghỉ dưỡng đích thực.",
         bullets: [
-          "Tinh tế: mọi thứ đều có lý do tồn tại, không có chi tiết thừa.",
-          "Riêng tư: không gian và ngôn từ đều giữ một khoảng cách lịch thiệp.",
-          "Nhất quán: từ header đến footer đều cùng một nhịp thị giác."
+          "Tinh tế: Mọi chi tiết thiết kế đều có lý do tồn tại, lược bỏ sự rườm rà.",
+          "Riêng tư: Không gian được sắp đặt mang lại sự tự do và kín đáo tối đa.",
+          "Chân thành: Lòng hiếu khách mộc mạc và sự hỗ trợ tận tâm trong suốt kỳ nghỉ."
         ],
         visual: {
           label: "VALUE SYSTEM",
           title: "Tĩnh, gọn, và đáng nhớ",
-          description: "Một khối minimal để chèn ảnh đội ngũ hoặc không gian.",
+          description: "Màu sắc tự nhiên giao hòa cùng vật liệu mộc và ánh nắng bản địa.",
           variant: "gold",
           chips: ["Quiet luxury", "Editorial", "Boutique"]
         },

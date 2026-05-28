@@ -1877,3 +1877,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `app/api/og/home/route.tsx`
   - `app/layout.tsx`
   - `docs/commit_prompt_map.md`
+
+### Entry 162
+- `time`: 2026-05-28T10:14:27+07:00
+- `prompt_summary`: Thu hẹp khoảng cách hover menu Về SK, đổi CTA Chi nhánh về Đặt phòng (/rooms) trên trang About Us, sửa giao diện mobile để timeline card không che ảnh khách hàng, và tự động thay thế copywriting placeholders bằng nội dung tối giản, tự nhiên song ngữ.
+- `commit_message`: `fix(about-us-ui): tighten header submenu spacing, stack mobile caption, and replace copywriting placeholders`
+- `main_files`:
+  - `components/about-us-page.tsx`
+  - `app/globals.css`
+  - `lib/site-content.ts`
+  - `lib/locale.ts`
