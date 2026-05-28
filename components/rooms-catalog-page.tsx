@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { AvailabilityCheckBar } from "@/components/availability-check-bar";
 import { RoomCanvasModal } from "@/components/room-canvas-modal";
 import { RoomsImageCarousel } from "@/components/rooms-image-carousel";
+import { RoomComparisonTable } from "@/components/room-comparison-table";
 import type { Locale } from "@/lib/locale";
 import { buildRoomDetailHref, buildRoomsHref, type RoomsSearchState } from "@/lib/room-routes";
 import { buildRoomCatalogEntry, formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
@@ -278,6 +279,8 @@ export function RoomsCatalogPage({
       </section>
 
       <RoomsImageCarousel images={roomCarouselImages} locale={locale} />
+
+      <RoomComparisonTable roomEntries={roomEntries} locale={locale} filters={initialFilters} />
 
       <RoomCanvasModal
         bookingContext={{

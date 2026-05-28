@@ -1913,3 +1913,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed.sql`
   - `supabase/seed-content-pages.sql`
   - `docs/commit_prompt_map.md`
+
+### Entry 165
+- `time`: 2026-05-28T14:48:00+07:00
+- `prompt_summary`: Thêm component so sánh phòng (quick room comparison) vào trang /rooms bên dưới slider ảnh phòng dựa trên thông tin hạng phòng đã có, hỗ trợ song ngữ (VI/EN) và cuộn ngang responsive trên mobile.
+- `commit_message`: `feat(rooms-comparison): add responsive bilingual room comparison table`
+- `main_files`:
+  - `components/room-comparison-table.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
