@@ -280,7 +280,7 @@ export function RoomsCatalogPage({
 
       <RoomsImageCarousel images={roomCarouselImages} locale={locale} />
 
-      <RoomComparisonTable roomEntries={roomEntries} locale={locale} filters={initialFilters} />
+      <RoomComparisonTable roomEntries={roomEntries} locale={locale} />
 
       <RoomCanvasModal
         bookingContext={{

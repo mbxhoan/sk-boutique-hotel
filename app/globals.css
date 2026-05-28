@@ -10519,27 +10519,24 @@ textarea {
 
 /* Room Comparison Section */
 .room-comparison {
-  padding-block: clamp(2.5rem, 6vw, 5rem);
+  padding-block: clamp(2.8rem, 6.5vw, 5.4rem);
 }
 
 .room-comparison__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 2.5rem;
+  display: grid;
+  gap: 1.2rem 2.2rem;
+  margin-bottom: clamp(1.8rem, 4vw, 2.6rem);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 960px) {
   .room-comparison__header {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 25rem);
+    align-items: center;
   }
 }
 
 .room-comparison__title-block {
-  flex: 1;
+  min-width: 0;
 }
 
 .room-comparison__eyebrow {
@@ -10555,141 +10552,119 @@ textarea {
 .room-comparison__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  max-width: 9ch;
+  font-size: clamp(2.9rem, 7vw, 5rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
   color: var(--ink);
 }
 
 .room-comparison__subtitle {
   margin: 0;
-  max-width: 28rem;
+  max-width: 25rem;
   color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-@media (min-width: 768px) {
-  .room-comparison__subtitle {
-    padding-bottom: 0.4rem;
-  }
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.55;
 }
 
 .room-comparison__table-container {
   width: 100%;
   overflow-x: auto;
-  border-radius: 1rem;
+  border-radius: 1.55rem;
   background: var(--surface-container-lowest);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 26px 56px rgba(0, 12, 30, 0.08);
   border: 1px solid var(--border-subtle);
   -webkit-overflow-scrolling: touch;
 }
 
 .room-comparison__table {
   width: 100%;
+  min-width: 780px;
   border-collapse: collapse;
-  min-width: 800px;
+  table-layout: fixed;
+  background: var(--surface-container-lowest);
 }
 
-.room-comparison__th,
-.room-comparison__td {
-  padding: 1.25rem 1.5rem;
+.room-comparison__col--feature {
+  width: 32%;
+}
+
+.room-comparison__col--room {
+  width: 22.666%;
+}
+
+.room-comparison__cell {
+  padding: 1.35rem 1.5rem;
   vertical-align: middle;
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.room-comparison__cell:not(:last-child) {
+  border-right: 1px solid var(--border-subtle);
+}
+
 .room-comparison__th {
-  background: var(--surface-container-low);
+  padding-block: 1.4rem 1.2rem;
+  background: rgba(245, 243, 239, 0.35);
   font-weight: 700;
   color: var(--ink);
   text-align: center;
 }
 
 .room-comparison__th:first-child {
-  background: var(--surface-container-low);
-  width: 25%;
+  background: rgba(245, 243, 239, 0.35);
 }
 
 .room-comparison__th-title {
   display: block;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-family: var(--font-display);
+  line-height: 1.2;
 }
 
 .room-comparison__th-size {
   display: block;
-  font-size: 0.75rem;
+  margin-top: 0.35rem;
+  font-size: 0.76rem;
   font-weight: 500;
   color: var(--muted);
-  margin-top: 0.25rem;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .room-comparison__row-label {
   text-align: left;
   font-weight: 500;
   color: var(--muted);
-  font-size: 0.9rem;
-  width: 25%;
+  font-size: 1rem;
 }
 
 .room-comparison__td-value {
   text-align: center;
-  font-size: 0.95rem;
-  color: var(--text);
-  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .room-comparison__check {
   color: var(--gold-strong);
-  font-weight: bold;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.22rem;
+  line-height: 1;
 }
 
 .room-comparison__dash {
-  color: var(--surface-container-highest);
-  font-size: 1.1rem;
+  color: rgba(0, 12, 30, 0.34);
+  font-size: 1.08rem;
 }
 
 .room-comparison__price {
   color: var(--gold-strong);
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.05rem;
-}
-
-.room-comparison__footer-cell {
-  padding: 1.5rem;
-  text-align: center;
-  border-bottom: none;
-  background: var(--surface-container-low);
-}
-
-.room-comparison__footer-cell:first-child {
-  background: var(--surface-container-low);
-}
-
-.room-comparison__btn-select {
-  width: 100%;
-  max-width: 12rem;
-}
-
-.room-comparison__btn-closed {
-  display: inline-block;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  color: var(--ink);
-  border-bottom: 1.5px solid var(--gold);
-  padding-bottom: 0.2rem;
-  cursor: default;
-  transition: color 0.2s ease;
-}
-
-.room-comparison__btn-closed:hover {
-  color: var(--gold-strong);
+  font-size: 1.28rem;
+  letter-spacing: -0.03em;
 }
 
 @media (min-width: 960px) {
@@ -10881,9 +10856,50 @@ textarea {
     min-height: clamp(12rem, 46vw, 22rem);
     border-radius: 0.85rem;
   }
+
+  .room-comparison__title {
+    max-width: 10ch;
+  }
 }
 
 @media (max-width: 720px) {
+  .room-comparison__header {
+    gap: 0.95rem;
+  }
+
+  .room-comparison__title {
+    max-width: none;
+    font-size: clamp(2.2rem, 11vw, 3.1rem);
+  }
+
+  .room-comparison__subtitle {
+    font-size: 0.95rem;
+  }
+
+  .room-comparison__table {
+    min-width: 700px;
+  }
+
+  .room-comparison__cell {
+    padding: 1rem 1rem;
+  }
+
+  .room-comparison__th-title {
+    font-size: 1.02rem;
+  }
+
+  .room-comparison__row-label {
+    font-size: 0.92rem;
+  }
+
+  .room-comparison__td-value {
+    font-size: 0.98rem;
+  }
+
+  .room-comparison__price {
+    font-size: 1.12rem;
+  }
+
   .home-availability {
     padding-block: 0.75rem 1.45rem;
   }

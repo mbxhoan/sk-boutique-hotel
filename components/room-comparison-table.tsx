@@ -1,14 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import type { Locale } from "@/lib/locale";
-import { buildRoomDetailHref, type RoomsSearchState } from "@/lib/room-routes";
 import type { RoomCatalogEntry } from "@/lib/rooms/catalog";
 
 type RoomComparisonTableProps = {
   roomEntries: RoomCatalogEntry[];
   locale: Locale;
-  filters: RoomsSearchState;
 };
 
 type RoomTraitValues = {
@@ -85,10 +82,7 @@ const translations = {
     rowPoolView: "View hồ bơi",
     rowBathtub: "Bồn tắm",
     rowSmartTv: "Smart TV",
-    rowPrice: "Giá / đêm (đã giảm)",
-    btnSelect: "CHỌN",
-    btnClosed: "TẠM ĐÓNG",
-    btnSoldOut: "HẾT PHÒNG"
+    rowPrice: "Giá / đêm (đã giảm)"
   },
   en: {
     eyebrow: "QUICK COMPARISON",
@@ -100,10 +94,7 @@ const translations = {
     rowPoolView: "Pool view",
     rowBathtub: "Bathtub",
     rowSmartTv: "Smart TV",
-    rowPrice: "Price / night (discounted)",
-    btnSelect: "SELECT",
-    btnClosed: "TEMPORARILY CLOSED",
-    btnSoldOut: "SOLD OUT"
+    rowPrice: "Price / night (discounted)"
   }
 };
 
@@ -156,20 +147,17 @@ function formatPriceMillions(price: number | null, locale: "vi" | "en"): string 
   return `${formatted}M`;
 }
 
-export function RoomComparisonTable({ roomEntries, locale, filters }: RoomComparisonTableProps) {
+function getComparisonRoomName(title: string) {
+  const compactTitle = title.replace(/^phòng\s+/i, "").replace(/\s+room$/i, "").trim();
+  return compactTitle || title;
+}
+
+export function RoomComparisonTable({ roomEntries, locale }: RoomComparisonTableProps) {
   const t = translations[locale];
-  
-  // Prepare traits for each room
+
   const roomsWithTraits = roomEntries.map(room => ({
     room,
-    traits: getRoomTraits(room, locale),
-    href: buildRoomDetailHref(room.slug, {
-      adults: filters.adults,
-      children: filters.children,
-      checkin: filters.checkin,
-      checkout: filters.checkout,
-      lang: locale
-    })
+    traits: getRoomTraits(room, locale)
   }));
 
   if (!roomsWithTraits.length) {
@@ -189,43 +177,46 @@ export function RoomComparisonTable({ roomEntries, locale, filters }: RoomCompar
 
         <div className="room-comparison__table-container">
           <table className="room-comparison__table">
+            <colgroup>
+              <col className="room-comparison__col room-comparison__col--feature" />
+              {roomsWithTraits.map(({ room }) => (
+                <col className="room-comparison__col room-comparison__col--room" key={room.roomTypeId} />
+              ))}
+            </colgroup>
             <thead>
               <tr>
-                <th className="room-comparison__th" aria-label="Room features header"></th>
+                <th className="room-comparison__cell room-comparison__th" aria-label="Room features header"></th>
                 {roomsWithTraits.map(({ room }) => (
-                  <th key={room.roomTypeId} className="room-comparison__th" scope="col">
-                    <span className="room-comparison__th-title">{room.title[locale]}</span>
+                  <th key={room.roomTypeId} className="room-comparison__cell room-comparison__th" scope="col">
+                    <span className="room-comparison__th-title">{getComparisonRoomName(room.title[locale])}</span>
                     <span className="room-comparison__th-size">{room.sizeLabel ? room.sizeLabel[locale] : "—"}</span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {/* Capacity Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowCapacity}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowCapacity}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.capacity}
                   </td>
                 ))}
               </tr>
 
-              {/* Bed Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowBed}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowBed}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.bed}
                   </td>
                 ))}
               </tr>
 
-              {/* Balcony Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowBalcony}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowBalcony}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.balcony ? (
                       <span className="room-comparison__check" aria-label="Yes">✓</span>
                     ) : (
@@ -235,11 +226,10 @@ export function RoomComparisonTable({ roomEntries, locale, filters }: RoomCompar
                 ))}
               </tr>
 
-              {/* Pool View Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowPoolView}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowPoolView}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.poolView ? (
                       <span className="room-comparison__check" aria-label="Yes">✓</span>
                     ) : (
@@ -249,11 +239,10 @@ export function RoomComparisonTable({ roomEntries, locale, filters }: RoomCompar
                 ))}
               </tr>
 
-              {/* Bathtub Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowBathtub}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowBathtub}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.bathtub ? (
                       <span className="room-comparison__check" aria-label="Yes">✓</span>
                     ) : (
@@ -263,57 +252,24 @@ export function RoomComparisonTable({ roomEntries, locale, filters }: RoomCompar
                 ))}
               </tr>
 
-              {/* Smart TV Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowSmartTv}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowSmartTv}</td>
                 {roomsWithTraits.map(({ room, traits }) => (
-                  <td key={room.roomTypeId} className="room-comparison__td-value">
+                  <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value">
                     {traits.smartTv}
                   </td>
                 ))}
               </tr>
 
-              {/* Price Row */}
               <tr>
-                <td className="room-comparison__row-label">{t.rowPrice}</td>
+                <td className="room-comparison__cell room-comparison__row-label">{t.rowPrice}</td>
                 {roomsWithTraits.map(({ room }) => {
                   const displayPrice = room.priceVisible && room.currentPrice != null
                     ? formatPriceMillions(room.currentPrice, locale)
                     : (locale === "en" ? "Contact" : "Liên hệ");
                   return (
-                    <td key={room.roomTypeId} className="room-comparison__td-value room-comparison__price">
+                    <td key={room.roomTypeId} className="room-comparison__cell room-comparison__td-value room-comparison__price">
                       {displayPrice}
-                    </td>
-                  );
-                })}
-              </tr>
-
-              {/* Action Buttons Row */}
-              <tr>
-                <td className="room-comparison__footer-cell" aria-label="Actions cell"></td>
-                {roomsWithTraits.map(({ room, href }) => {
-                  const isAvailable = room.availableRooms > 0;
-                  
-                  return (
-                    <td key={room.roomTypeId} className="room-comparison__footer-cell">
-                      {room.isClosed ? (
-                        <span className="room-comparison__btn-closed">
-                          {t.btnClosed}
-                        </span>
-                      ) : isAvailable ? (
-                        <Link
-                          href={href}
-                          className="button button--solid room-comparison__btn-select"
-                        >
-                          {locale === "en" 
-                            ? `${t.btnSelect} ${room.title[locale].toUpperCase()}`
-                            : `${t.btnSelect} ${room.title[locale].toUpperCase()}`}
-                        </Link>
-                      ) : (
-                        <span className="room-comparison__btn-closed">
-                          {t.btnSoldOut}
-                        </span>
-                      )}
                     </td>
                   );
                 })}

@@ -1934,3 +1934,13 @@ Mục đích: lưu quan hệ giữa prompt/user request và commit message đề
   - `supabase/seed-content-pages.sql`
   - `supabase/seed.sql`
   - `docs/commit_prompt_map.md`
+
+### Entry 167
+- `time`: 2026-05-28T15:05:35+07:00
+- `prompt_summary`: Chỉnh lại giao diện bảng so sánh hạng phòng ở trang `/rooms` cho sát mẫu tham chiếu, tận dụng dữ liệu room type hiện có và bỏ toàn bộ hàng nút chọn/tạm đóng ở cuối bảng.
+- `commit_message`: `fix(rooms-comparison): align quick comparison table with reference layout`
+- `main_files`:
+  - `components/room-comparison-table.tsx`
+  - `components/rooms-catalog-page.tsx`
+  - `app/globals.css`
+  - `docs/commit_prompt_map.md`
