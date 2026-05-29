@@ -170,7 +170,7 @@ export function RoomComparisonTable({ roomEntries, locale }: RoomComparisonTable
         <div className="room-comparison__header">
           <div className="room-comparison__title-block">
             <p className="room-comparison__eyebrow">{t.eyebrow}</p>
-            <h2 className="room-comparison__title">{t.title}</h2>
+            <h5 className="room-comparison__title">{t.title}</h5>
           </div>
           <p className="room-comparison__subtitle">{t.subtitle}</p>
         </div>

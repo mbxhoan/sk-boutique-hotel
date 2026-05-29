@@ -11092,7 +11092,7 @@ textarea {
 
   .room-comparison__title {
     max-width: none;
-    font-size: clamp(2.2rem, 11vw, 3.1rem);
+    font-size: clamp(2.2rem, 11vw, 2.1rem);
   }
 
   .room-comparison__subtitle {
