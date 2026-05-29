@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { isBookingRequestStayWindowValid } from "@/lib/booking-dates";
+import { trackLead } from "@/lib/meta-pixel";
 import {
   getContactDetailFieldError,
   getFirstContactDetailsError,
@@ -20,14 +21,17 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type RoomBookingRequestFormProps = {
   branchId: string;
+  cancellationLabel?: string;
   guestCount: number;
   locale: Locale;
   availableRooms: number;
   quotedCurrency?: string;
   quotedNightlyRate?: number | null;
   quotedTotalAmount?: number | null;
+  roomTitle: string;
   roomTypeId: string;
   stayEndAt: string;
+  stayNights: number;
   stayStartAt: string;
 };
 
@@ -131,16 +135,25 @@ function resolveBookingRequestError(locale: Locale, error: unknown) {
   return resolveMemberAuthError(locale, error);
 }
 
+function formatDateDisplay(value: string) {
+  const d = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return value;
+  return new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "numeric", year: "numeric" }).format(d);
+}
+
 export function RoomBookingRequestForm({
   branchId,
   availableRooms,
+  cancellationLabel,
   guestCount,
   locale,
   quotedCurrency = "VND",
   quotedNightlyRate = null,
   quotedTotalAmount = null,
+  roomTitle,
   roomTypeId,
   stayEndAt,
+  stayNights,
   stayStartAt
 }: RoomBookingRequestFormProps) {
   const router = useRouter();
@@ -154,6 +167,7 @@ export function RoomBookingRequestForm({
   const [profileFieldErrors, setProfileFieldErrors] = useState<ContactDetailsErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   function setProfileDraftField(field: keyof ContactDetailsDraft, value: string) {
     setProfileDraft((current) => ({
@@ -274,7 +288,7 @@ export function RoomBookingRequestForm({
     }
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleValidateAndOpenConfirm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setProfileFieldErrors({});
@@ -284,19 +298,23 @@ export function RoomBookingRequestForm({
       return;
     }
 
+    const validation = validateContactDetails(locale, profileDraft, { phoneRequired: true });
+    const validationError = getFirstContactDetailsError(validation.errors);
+    setProfileFieldErrors(validation.errors);
+
+    if (validationError) {
+      return;
+    }
+
+    setConfirmOpen(true);
+  }
+
+  async function handleConfirmSubmit() {
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      const validation = validateContactDetails(locale, profileDraft, { phoneRequired: true });
-      const validationError = getFirstContactDetailsError(validation.errors);
-
-      setProfileFieldErrors(validation.errors);
-
-      if (validationError) {
-        return;
-      }
-
-      const contactDetails = validation.values;
+      const contactDetails = validateContactDetails(locale, profileDraft, { phoneRequired: true }).values;
       const supabase = createSupabaseBrowserClient();
       let authUserId: string | null = null;
       let accessToken: string | null = null;
@@ -376,9 +394,18 @@ export function RoomBookingRequestForm({
         accessToken
       );
 
+      // Fire after confirmed submission — no PII sent
+      trackLead({
+        content_name: roomTitle,
+        content_category: "Hotel Room Booking",
+        value: quotedTotalAmount,
+        currency: quotedCurrency
+      });
+
       router.push(appendLocaleQuery("/member", locale));
       router.refresh();
     } catch (submittedError) {
+      setConfirmOpen(false);
       setError(resolveBookingRequestError(locale, submittedError));
     } finally {
       setIsSubmitting(false);
@@ -386,7 +413,8 @@ export function RoomBookingRequestForm({
   }
 
   return (
-    <form className="room-booking-panel__form" onSubmit={handleSubmit}>
+    <>
+    <form className="room-booking-panel__form" onSubmit={handleValidateAndOpenConfirm}>
       <div className="room-booking-panel__grid">
         <label className="room-booking-panel__field">
           <span>{localize(locale, "Họ và tên", "Full name")}</span>
@@ -495,5 +523,90 @@ export function RoomBookingRequestForm({
 
       {error ? <p className="room-booking-panel__error">{error}</p> : null}
     </form>
+
+    {confirmOpen ? (
+      <div className="booking-confirm-modal" role="presentation">
+        <button
+          aria-label={localize(locale, "Đóng xác nhận", "Close confirmation")}
+          className="booking-confirm-modal__backdrop"
+          onClick={() => setConfirmOpen(false)}
+          type="button"
+        />
+        <section
+          aria-label={localize(locale, "Xác nhận yêu cầu đặt phòng", "Confirm booking request")}
+          aria-modal="true"
+          className="booking-confirm-modal__dialog"
+          role="dialog"
+        >
+          <div className="booking-confirm-modal__head">
+            <p className="booking-confirm-modal__eyebrow">
+              {localize(locale, "Xác nhận yêu cầu đặt phòng", "Confirm booking request")}
+            </p>
+            <p className="booking-confirm-modal__hint">
+              {localize(locale, "Vui lòng kiểm tra lại thông tin trước khi gửi yêu cầu.", "Please review your details before sending the request.")}
+            </p>
+          </div>
+
+          <div className="booking-confirm-modal__body">
+            <div className="booking-confirm-modal__row">
+              <span>{localize(locale, "Hạng phòng", "Room type")}</span>
+              <strong>{roomTitle}</strong>
+            </div>
+            <div className="booking-confirm-modal__row">
+              <span>{localize(locale, "Nhận phòng", "Check-in")}</span>
+              <strong>{formatDateDisplay(stayStartAt)}</strong>
+            </div>
+            <div className="booking-confirm-modal__row">
+              <span>{localize(locale, "Trả phòng", "Check-out")}</span>
+              <strong>{formatDateDisplay(stayEndAt)}</strong>
+            </div>
+            <div className="booking-confirm-modal__row">
+              <span>{localize(locale, "Số đêm", "Nights")}</span>
+              <strong>{stayNights}</strong>
+            </div>
+            <div className="booking-confirm-modal__row">
+              <span>{localize(locale, "Số khách", "Guests")}</span>
+              <strong>{guestCount}</strong>
+            </div>
+            {cancellationLabel ? (
+              <div className="booking-confirm-modal__row">
+                <span>{localize(locale, "Chính sách hủy", "Cancellation")}</span>
+                <strong>{cancellationLabel}</strong>
+              </div>
+            ) : null}
+            {quotedTotalAmount != null ? (
+              <div className="booking-confirm-modal__row booking-confirm-modal__row--total">
+                <span>{localize(locale, "Tổng tạm tính", "Estimated total")}</span>
+                <strong>
+                  {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(quotedTotalAmount)}&nbsp;đ
+                </strong>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="booking-confirm-modal__actions">
+            <button
+              className="button booking-confirm-modal__back"
+              disabled={isSubmitting}
+              onClick={() => setConfirmOpen(false)}
+              type="button"
+            >
+              {localize(locale, "Quay lại chỉnh sửa", "Go back")}
+            </button>
+            <button
+              className="button button--solid booking-confirm-modal__confirm"
+              disabled={isSubmitting}
+              onClick={handleConfirmSubmit}
+              type="button"
+            >
+              {isSubmitting
+                ? localize(locale, "Đang gửi...", "Sending...")
+                : localize(locale, "Xác nhận gửi yêu cầu", "Confirm request")}
+            </button>
+          </div>
+        </section>
+      </div>
+    ) : null}
+    </>
   );
 }

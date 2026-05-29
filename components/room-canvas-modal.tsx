@@ -8,6 +8,17 @@ import { formatRoomCurrency, type RoomCatalogEntry } from "@/lib/rooms/catalog";
 import { formatTeaserCurrencyText } from "@/lib/supabase/content";
 import { RoomBookingRequestForm } from "@/components/room-booking-request-form";
 
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function addOneDayKey(key: string) {
+  const d = new Date(`${key}T00:00:00`);
+  d.setDate(d.getDate() + 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 type RoomCanvasModalProps = {
   locale: Locale;
   bookingContext: {
@@ -98,6 +109,9 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
   const [bookingOpen, setBookingOpen] = useState(false);
   const [imageZoomOpen, setImageZoomOpen] = useState(false);
   const bookingPanelRef = useRef<HTMLDivElement | null>(null);
+  const [localCheckin, setLocalCheckin] = useState(bookingContext.stayStartAt);
+  const [localCheckout, setLocalCheckout] = useState(bookingContext.stayEndAt);
+  const [localDateError, setLocalDateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open || !room) {
@@ -110,7 +124,10 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     setCancellationIndex(cancellationSelected >= 0 ? cancellationSelected : 0);
     setBookingOpen(false);
     setImageZoomOpen(false);
-  }, [open, room]);
+    setLocalCheckin(bookingContext.stayStartAt);
+    setLocalCheckout(bookingContext.stayEndAt);
+    setLocalDateError(null);
+  }, [open, room, bookingContext.stayStartAt, bookingContext.stayEndAt]);
 
   useEffect(() => {
     if (!open) {
@@ -165,16 +182,35 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
     });
   }, [bookingOpen]);
 
+  function handleCheckinChange(value: string) {
+    const today = getTodayKey();
+    if (value < today) return;
+    setLocalCheckin(value);
+    setLocalDateError(null);
+    if (localCheckout <= value) {
+      setLocalCheckout(addOneDayKey(value));
+    }
+  }
+
+  function handleCheckoutChange(value: string) {
+    if (value <= localCheckin) {
+      setLocalDateError(locale === "en" ? "Check-out must be after check-in." : "Ngày trả phòng phải sau ngày nhận phòng.");
+      return;
+    }
+    setLocalCheckout(value);
+    setLocalDateError(null);
+  }
+
   if (!open || !room) {
     return null;
   }
 
   const cancellationOption = room.cancellationOptions[cancellationIndex] ?? room.cancellationOptions[0];
-  const basePrice = room.currentPrice ?? 0;
   const breakfastIncluded = room.breakfastOptions[0] ?? null;
-  const totalPrice = room.priceVisible ? basePrice + cancellationOption.delta : null;
-  const stayNights = calculateNights(bookingContext.stayStartAt, bookingContext.stayEndAt);
-  const quotedNightlyRate = totalPrice != null ? Number((totalPrice / stayNights).toFixed(2)) : null;
+  const stayNights = calculateNights(localCheckin, localCheckout);
+  const nightlyRate = (room.currentPrice ?? 0) + cancellationOption.delta;
+  const totalPrice = room.priceVisible ? nightlyRate * stayNights : null;
+  const quotedNightlyRate = room.priceVisible ? nightlyRate : null;
   const originalPrice = room.originalPrice;
   const currentImage = room.gallery[activeImageIndex] ?? room.gallery[0];
   const isSoldOut = room.availableRooms <= 0;
@@ -419,16 +455,52 @@ export function RoomCanvasModal({ bookingContext, locale, onClose, open, room }:
                 <strong>{room.bookingCtaLabel[locale]}</strong>
               </div>
 
+              <div className="room-booking-panel__stay">
+                <p className="room-booking-panel__stay-label">
+                  {locale === "en" ? "Stay duration" : "Thời gian lưu trú"}
+                </p>
+                <div className="room-booking-panel__stay-row">
+                  <label className="room-booking-panel__date-field">
+                    <span>{locale === "en" ? "Check-in" : "Nhận phòng"}</span>
+                    <input
+                      className="room-booking-panel__date-input"
+                      min={getTodayKey()}
+                      onChange={(e) => handleCheckinChange(e.target.value)}
+                      type="date"
+                      value={localCheckin}
+                    />
+                  </label>
+                  <label className="room-booking-panel__date-field">
+                    <span>{locale === "en" ? "Check-out" : "Trả phòng"}</span>
+                    <input
+                      className="room-booking-panel__date-input"
+                      min={addOneDayKey(localCheckin)}
+                      onChange={(e) => handleCheckoutChange(e.target.value)}
+                      type="date"
+                      value={localCheckout}
+                    />
+                  </label>
+                  <div className="room-booking-panel__nights">
+                    <span>{locale === "en" ? "Nights" : "Số đêm"}</span>
+                    <strong>{stayNights}</strong>
+                  </div>
+                </div>
+                {localDateError ? <p className="room-booking-panel__error">{localDateError}</p> : null}
+              </div>
+
               <RoomBookingRequestForm
                 branchId={bookingContext.branchId}
                 availableRooms={room.availableRooms}
+                cancellationLabel={cancellationOption.label[locale]}
                 guestCount={bookingContext.guestCount}
                 locale={locale}
                 quotedNightlyRate={quotedNightlyRate}
                 quotedTotalAmount={totalPrice}
+                roomTitle={room.title[locale]}
                 roomTypeId={room.roomTypeId}
-                stayEndAt={bookingContext.stayEndAt}
-                stayStartAt={bookingContext.stayStartAt}
+                stayEndAt={localCheckout}
+                stayNights={stayNights}
+                stayStartAt={localCheckin}
               />
             </div>
           ) : null}
