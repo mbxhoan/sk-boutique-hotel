@@ -211,10 +211,11 @@ export function RoomsCatalogPage({
           roomType,
           roomAvailabilityByTypeId[roomType.id] ?? 0,
           roomGalleriesBySlug[roomType.slug],
-          closedSet.has(roomType.id)
+          closedSet.has(roomType.id),
+          initialFilters.checkin
         )
       ),
-    [closedSet, roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
+    [closedSet, initialFilters.checkin, roomAvailabilityByTypeId, roomGalleriesBySlug, roomTypes]
   );
   const [visibleRoomSlug, setVisibleRoomSlug] = useState<string | null>(initialRoomSlug ?? null);
   const activeRoom = roomEntries.find((room) => room.slug === visibleRoomSlug) ?? null;

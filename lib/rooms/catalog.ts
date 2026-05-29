@@ -135,9 +135,24 @@ function buildAvailabilityLabel(availableRooms: number, isClosed = false) {
   );
 }
 
-function buildPriceOptions(roomType: RoomTypeRow) {
+function buildFreeCancellationNote(checkinDate?: string) {
+  if (!checkinDate) return undefined;
+  const checkin = new Date(`${checkinDate}T00:00:00`);
+  if (Number.isNaN(checkin.getTime())) return undefined;
+  // Deadline = 1 day before checkin at 23:59
+  const deadline = new Date(checkin);
+  deadline.setDate(deadline.getDate() - 1);
+  const vi = new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "numeric" })
+    .format(deadline)
+    .replace("/", " thg ");
+  const en = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(deadline);
+  return text(`Trước ${vi} 11:59 CH`, `Before ${en}, 11:59 PM`);
+}
+
+function buildPriceOptions(roomType: RoomTypeRow, checkinDate?: string) {
   const price = roomType.manual_override_price ?? roomType.base_price;
   const flexibleCancelDelta = Math.round(price * 0.144);
+  const freeCancelNote = buildFreeCancellationNote(checkinDate);
 
   return {
     breakfast: [
@@ -157,7 +172,7 @@ function buildPriceOptions(roomType: RoomTypeRow) {
       {
         delta: flexibleCancelDelta,
         label: text("Hủy miễn phí", "Free cancellation"),
-        note: text("Trước 21 thg 4 11:59 CH", "Before Apr 21, 11:59 PM")
+        note: freeCancelNote
       }
     ] satisfies RoomPriceOption[]
   };
@@ -194,7 +209,8 @@ export function buildRoomCatalogEntry(
   roomType: RoomTypeRow,
   availableRooms: number,
   overrideGallery?: string[],
-  isClosed = false
+  isClosed = false,
+  checkinDate?: string
 ): RoomCatalogEntry {
   const currentPrice = roomType.manual_override_price ?? roomType.base_price;
   const originalPrice = roomType.manual_override_price != null ? roomType.base_price : null;
@@ -203,7 +219,7 @@ export function buildRoomCatalogEntry(
     originalPrice && currentPrice
       ? Math.max(0, Math.round((1 - currentPrice / originalPrice) * 100))
       : null;
-  const { breakfast, cancellation } = buildPriceOptions(roomType);
+  const { breakfast, cancellation } = buildPriceOptions(roomType, checkinDate);
   const gallery = buildGallery(roomType, overrideGallery);
   const effectiveAvailable = isClosed ? 0 : availableRooms;
 
@@ -241,8 +257,8 @@ export function buildRoomCatalogEntry(
   };
 }
 
-export function buildRoomCatalogEntries(roomTypes: RoomTypeRow[], availableRoomsByTypeId: Record<string, number>) {
-  return roomTypes.map((roomType) => buildRoomCatalogEntry(roomType, availableRoomsByTypeId[roomType.id] ?? 0));
+export function buildRoomCatalogEntries(roomTypes: RoomTypeRow[], availableRoomsByTypeId: Record<string, number>, checkinDate?: string) {
+  return roomTypes.map((roomType) => buildRoomCatalogEntry(roomType, availableRoomsByTypeId[roomType.id] ?? 0, undefined, false, checkinDate));
 }
 
 export function formatRoomPricePrefix(locale: Locale, price: number) {

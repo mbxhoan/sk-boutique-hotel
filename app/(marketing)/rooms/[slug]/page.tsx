@@ -13,7 +13,7 @@ import { getRoomTypeBySlug, getRoomStaticParams } from "@/lib/supabase/queries/r
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ lang?: string }>;
+  searchParams?: Promise<{ lang?: string; checkin?: string }>;
 };
 
 function roomGalleryCollectionSlug(roomSlug: string) {
@@ -82,6 +82,7 @@ export default async function RoomPreviewPageRoute({ params, searchParams }: Pag
   const { slug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
+  const checkin = resolvedSearchParams.checkin;
 
   const roomType = await getRoomTypeBySlug(slug);
 
@@ -93,7 +94,7 @@ export default async function RoomPreviewPageRoute({ params, searchParams }: Pag
   const fallback = galleryFallbacks[slug] ?? [];
   const gallery = await loadMediaCollectionImageUrls(collectionSlug, fallback, 20);
 
-  const room = buildRoomCatalogEntry(roomType, 0, gallery.length > 0 ? gallery : fallback);
+  const room = buildRoomCatalogEntry(roomType, 0, gallery.length > 0 ? gallery : fallback, false, checkin);
   const roomName = locale === "vi" ? roomType.name_vi : roomType.name_en;
 
   return (
