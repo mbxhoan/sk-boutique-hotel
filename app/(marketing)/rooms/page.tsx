@@ -153,7 +153,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     title,
     description,
     path: "/rooms",
-    ogImagePath: "/api/og/rooms",
+    ogImagePath: "/assets/reception/1.png",
     locale
   });
 }

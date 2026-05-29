@@ -36,7 +36,7 @@ export const metadata: Metadata = {
       {
         alt: "SK Boutique Hotel",
         height: 630,
-        url: "/api/og/home",
+        url: "/assets/reception/1.png",
         width: 1200
       }
     ],
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     title: "SK Boutique Hotel",
     description:
       "Boutique comfort in Phu Quoc with calm stays, direct support, and a premium hotel experience.",
-    images: ["/api/og/home"]
+    images: ["/assets/reception/1.png"]
   }
 };
 

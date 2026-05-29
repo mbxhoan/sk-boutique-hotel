@@ -16,6 +16,11 @@ type PageProps = {
   searchParams?: Promise<{ lang?: string; checkin?: string }>;
 };
 
+function getRoomOgImage(slug: string): string {
+  const type = slug.replace(/-room$/, "");
+  return `/assets/room_types/${type}/1.png`;
+}
+
 function roomGalleryCollectionSlug(roomSlug: string) {
   return `room-${roomSlug.replace(/-room$/, "")}`;
 }
@@ -72,7 +77,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     title,
     description: description || "",
     path: `/rooms/${slug}`,
-    ogImagePath: `/api/og/room?slug=${slug}`,
+    ogImagePath: getRoomOgImage(slug),
     locale,
     type: "article"
   });
