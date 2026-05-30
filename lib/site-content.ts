@@ -162,6 +162,10 @@ export const headerMenu: HeaderMenuConfig = {
       label: { vi: "Vị trí", en: "Location" }
     },
     {
+      href: "/news",
+      label: { vi: "Tạp chí", en: "Journal" }
+    },
+    {
       href: "#about-sk",
       label: { vi: "Về SK", en: "About SK" },
       children: [
@@ -185,7 +189,7 @@ export const footerLinks = navItems;
 export const socialLinks = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com",
+    href: "https://www.facebook.com/profile.php?id=61590065745988",
     icon: "/templates/components/SocialFacebook.svg"
   },
   {
@@ -200,7 +204,7 @@ export const siteInfo = {
   address: "Khu nghỉ dưỡng phức hợp Marina, Bim Group, MP-135, Marina Square, Ấp Đường Bào, Phú Quốc, An Giang 92509",
   phone: "+84 908 233 583",
   zalo: "0908 233 583",
-  facebook: "https://www.facebook.com/p/SK-Boutique-Hotel-100088332707267/",
+  facebook: "https://www.facebook.com/profile.php?id=61590065745988",
   email: "skhotel.phuquoc@gmail.com",
   hours: "08:00 - 22:00",
   legal: "© 2026 SK Boutique Hotel. Front-end foundation manual-first, sẵn sàng cho Supabase sau này."

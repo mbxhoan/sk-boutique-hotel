@@ -45,7 +45,7 @@ export const hotelJsonLd: Record<string, unknown> = {
     { "@type": "LocationFeatureSpecification", name: "Quadruple Room", value: true },
     { "@type": "LocationFeatureSpecification", name: "Free WiFi", value: true }
   ],
-  sameAs: ["https://www.facebook.com/skhotel.phuquoc"]
+  sameAs: ["https://www.facebook.com/profile.php?id=61590065745988"]
 };
 
 export const organizationJsonLd: Record<string, unknown> = {
