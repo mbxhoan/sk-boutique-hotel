@@ -112,15 +112,40 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
     if (map[network]) window.open(map[network], "_blank", "noopener,width=600,height=520");
   }
 
+  function fallbackCopy(text: string) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch {
+      /* ignore — still show feedback below */
+    }
+  }
+
   function copyLink() {
     const text = window.location.href;
-    const onOk = () => {
+    const onDone = () => {
       showToast(locale === "vi" ? "Đã sao chép liên kết" : "Link copied");
       setCopied(true);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = setTimeout(() => setCopied(false), 1800);
     };
-    navigator.clipboard?.writeText(text).then(onOk).catch(onOk);
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(onDone, () => {
+        fallbackCopy(text);
+        onDone();
+      });
+    } else {
+      fallbackCopy(text);
+      onDone();
+    }
   }
 
   const body = localize(locale, { vi: post.body_vi, en: post.body_en });
