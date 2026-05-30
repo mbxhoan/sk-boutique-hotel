@@ -99,6 +99,14 @@ const adminNavItems: AdminNavItem[] = [
     }
   },
   {
+    icon: "content",
+    href: "/admin/news-posts",
+    label: {
+      vi: "Tạp chí",
+      en: "Journal"
+    }
+  },
+  {
     icon: "support",
     href: "/admin/chat",
     label: {

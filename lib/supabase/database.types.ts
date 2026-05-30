@@ -1395,6 +1395,121 @@ export interface Database {
           }
         ];
       };
+      news_posts: {
+        Row: {
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          excerpt_vi: string;
+          excerpt_en: string;
+          body_vi: string;
+          body_en: string;
+          cover_image_path: string | null;
+          author_name: string;
+          author_role_vi: string;
+          author_role_en: string;
+          author_bio_vi: string;
+          author_bio_en: string;
+          author_image_path: string | null;
+          category: string;
+          tags: string[];
+          read_time_vi: string;
+          read_time_en: string;
+          is_published: boolean;
+          is_featured: boolean;
+          published_at: string | null;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          excerpt_vi: string;
+          excerpt_en: string;
+          body_vi: string;
+          body_en: string;
+          cover_image_path: string | null;
+          author_name: string;
+          author_role_vi: string;
+          author_role_en: string;
+          author_bio_vi: string;
+          author_bio_en: string;
+          author_image_path: string | null;
+          category: string;
+          tags: string[];
+          read_time_vi: string;
+          read_time_en: string;
+          is_published: boolean;
+          is_featured: boolean;
+          published_at: string | null;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Update: StandardUpdate<{
+          id: string;
+          slug: string;
+          title_vi: string;
+          title_en: string;
+          excerpt_vi: string;
+          excerpt_en: string;
+          body_vi: string;
+          body_en: string;
+          cover_image_path: string | null;
+          author_name: string;
+          author_role_vi: string;
+          author_role_en: string;
+          author_bio_vi: string;
+          author_bio_en: string;
+          author_image_path: string | null;
+          category: string;
+          tags: string[];
+          read_time_vi: string;
+          read_time_en: string;
+          is_published: boolean;
+          is_featured: boolean;
+          published_at: string | null;
+          sort_order: number;
+        } & RowTimestampFields>;
+        Relationships: [];
+      };
+      news_post_images: {
+        Row: {
+          id: string;
+          post_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: StandardInsert<{
+          id: string;
+          post_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Update: StandardUpdate<{
+          id: string;
+          post_id: string;
+          image_path: string;
+          caption_vi: string;
+          caption_en: string;
+          sort_order: number;
+        }>;
+        Relationships: [
+          {
+            foreignKeyName: "news_post_images_post_id_fkey";
+            columns: ["post_id"];
+            referencedRelation: "news_posts";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Enums: {
       room_type_closure_status: "active" | "cancelled";
@@ -1705,3 +1820,9 @@ export type EventUpdate = TableUpdate<"events">;
 export type EventImageRow = TableRow<"event_images">;
 export type EventImageInsert = TableInsert<"event_images">;
 export type EventImageUpdate = TableUpdate<"event_images">;
+export type NewsPostRow = TableRow<"news_posts">;
+export type NewsPostInsert = TableInsert<"news_posts">;
+export type NewsPostUpdate = TableUpdate<"news_posts">;
+export type NewsPostImageRow = TableRow<"news_post_images">;
+export type NewsPostImageInsert = TableInsert<"news_post_images">;
+export type NewsPostImageUpdate = TableUpdate<"news_post_images">;
