@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tạp chí — SK Boutique Hotel</title>
+<link rel="icon" href="public/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  /* ===== Page-specific ===== */
+
+  /* ----- Hero ----- */
+  .blog-hero {
+    padding: 56px 0 24px;
+    position: relative;
+  }
+  .blog-hero__head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 56px;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .blog-hero__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(48px, 8vw, 112px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin: 12px 0 0;
+  }
+  .blog-hero__title em {
+    font-family: "Dancing Script", cursive;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    font-size: 0.92em;
+    line-height: 1.25;
+    display: inline-block;
+    padding: 0.08em 0 0.18em;
+  }
+  .blog-hero__sub {
+    max-width: 380px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+  .blog-hero__meta {
+    display: flex;
+    gap: 32px;
+    color: var(--text-faint);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .blog-hero__meta strong {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.4rem;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    font-family: var(--font-display);
+    margin-right: 6px;
+  }
+
+  /* ----- Featured Article (Heritage Overlay) ----- */
+  .featured {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 0;
+    position: relative;
+    min-height: 560px;
+  }
+  .featured__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-sm);
+    aspect-ratio: 4 / 5;
+    background: var(--surface-highest);
+  }
+  .featured__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s var(--ease-out);
+  }
+  .featured:hover .featured__media img { transform: scale(1.04); }
+  .featured__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,12,30,0.35));
+    pointer-events: none;
+  }
+
+  .featured__panel {
+    background: var(--bg-elevated);
+    align-self: center;
+    margin-left: -80px;
+    margin-bottom: -40px;
+    padding: 56px;
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow-soft);
+    border-radius: var(--r-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .featured__cat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .featured__cat .eyebrow { letter-spacing: 0.2em; }
+  .featured__cat-divider { width: 32px; height: 1px; background: var(--accent); }
+  .featured__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .featured__title a {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 480ms var(--ease-out);
+  }
+  .featured__title a:hover { background-size: 100% 1px; }
+  .featured__excerpt {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
+    text-wrap: pretty;
+  }
+  .featured__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .featured__avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--surface-highest);
+    background-image: url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80&fit=crop&crop=faces");
+    background-size: cover;
+    background-position: center;
+  }
+  .featured__meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint); }
+
+  @media (max-width: 880px) {
+    .featured { grid-template-columns: 1fr; min-height: auto; gap: 0; }
+    .featured__media { aspect-ratio: 4 / 3; }
+    .featured__panel { margin: -32px 16px 0; padding: 32px; }
+  }
+
+  /* ----- Sub-featured ----- */
+  .sub-featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 96px;
+    padding-top: 48px;
+    border-top: 0;
+    position: relative;
+  }
+  .sub-featured::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in oklab, var(--outline-variant) 50%, transparent), transparent);
+  }
+  .sub-card {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .sub-card__media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--r-sm);
+    background: var(--surface-highest);
+  }
+  .sub-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .sub-card:hover .sub-card__media img { transform: scale(1.05); }
+  .sub-card__body { padding-top: 8px; }
+  .sub-card__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 12px 0 12px;
+    text-wrap: balance;
+  }
+  .sub-card__excerpt {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin: 0 0 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sub-card__meta {
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 880px) {
+    .sub-featured { grid-template-columns: 1fr; }
+    .sub-card { grid-template-columns: 1fr; }
+    .sub-card__media { aspect-ratio: 16 / 10; }
+  }
+
+  /* ----- Filter bar ----- */
+  .filter-section {
+    margin-top: 128px;
+    padding: 48px 0 0;
+  }
+  .filter-section__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 36px;
+  }
+  .filter-section h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 12px 0 0;
+  }
+  .filter-section__sort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .filter-section__sort select {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--outline-variant) 40%, transparent);
+    color: var(--text);
+    font-family: inherit;
+    padding: 6px 28px 6px 4px;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' stroke='%23775a19' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+  }
+  .filter-section__sort select:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 0 16px;
+    margin-bottom: 32px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline-variant) transparent;
+  }
+  .chip-row::-webkit-scrollbar { height: 4px; }
+  .chip-row::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--outline-variant) 40%, transparent); border-radius: 2px; }
+
+  /* ----- Grid ----- */
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 32px;
+  }
+  @media (max-width: 980px) {
+    .post-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .post-grid { grid-template-columns: 1fr; gap: 36px; }
+  }
+
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+  }
+  .post-card__media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--r-sm);
+    background: var(--surface-highest);
+    margin-bottom: 22px;
+    position: relative;
+  }
+  .post-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s var(--ease-out);
+  }
+  .post-card:hover .post-card__media img { transform: scale(1.06); }
+  .post-card__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,12,30,0.2));
+    opacity: 0.5;
+    transition: opacity 320ms;
+  }
+  .post-card:hover .post-card__media::after { opacity: 0.8; }
+
+  .post-card__badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+  }
+
+  .post-card__cat {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .post-card__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.32rem;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .post-card__title a {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 480ms var(--ease-out);
+  }
+  .post-card__title a:hover { background-size: 100% 1px; }
+  .post-card__excerpt {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-card__meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .post-card__meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint); }
+
+  /* Promo card variant */
+  .post-card--promo .post-card__media {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  .post-card--promo .post-card__title { color: var(--text); }
+
+  .countdown {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: color-mix(in oklab, var(--gold) 8%, var(--bg-elevated));
+    border-radius: var(--r-sm);
+  }
+  [data-theme="dark"] .countdown {
+    background: color-mix(in oklab, var(--gold) 14%, var(--bg-elevated));
+  }
+  .countdown__label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-right: auto;
+  }
+  .countdown__cell {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    min-width: 28px;
+    text-align: center;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown__cell sub {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.56rem;
+    font-weight: 500;
+    color: var(--text-faint);
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .countdown__sep {
+    color: var(--text-faint);
+    font-size: 0.9rem;
+    padding-bottom: 8px;
+  }
+
+  /* ----- Pagination ----- */
+  .pagination {
+    margin-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .page-btn {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid color-mix(in oklab, var(--outline-variant) 30%, transparent);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.92rem;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: all 240ms var(--ease-out);
+    display: grid;
+    place-items: center;
+  }
+  .page-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .page-btn.is-active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .page-ellipsis { color: var(--text-faint); padding: 0 8px; }
+  .page-info {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* ----- Newsletter strip ----- */
+  .newsletter {
+    margin-top: 120px;
+    padding: 72px 0;
+    background: var(--bg-sunken);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .newsletter::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 30%, color-mix(in oklab, var(--gold) 12%, transparent), transparent 40%),
+      radial-gradient(circle at 85% 70%, color-mix(in oklab, var(--gold) 8%, transparent), transparent 40%);
+    pointer-events: none;
+  }
+  .newsletter > .shell { position: relative; }
+  .newsletter h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 8px 0 12px;
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .newsletter p {
+    color: var(--text-muted);
+    max-width: 540px;
+    margin: 0 auto 32px;
+  }
+  .newsletter__form {
+    display: flex;
+    gap: 8px;
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--bg-elevated);
+    padding: 6px;
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-card);
+  }
+  .newsletter__form input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    padding: 12px 16px;
+    font-family: inherit;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .newsletter__form input:focus { outline: none; }
+  .newsletter__form button {
+    background: linear-gradient(135deg, var(--gold), var(--gold-2));
+    color: var(--cream);
+    border: 0;
+    padding: 12px 22px;
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 200ms;
+  }
+  .newsletter__form button:hover { transform: translateY(-1px); }
+  [data-theme="dark"] .newsletter__form button { color: #0a0a0a; }
+
+  /* Reveal stagger */
+  .post-grid .post-card:nth-child(1) { --reveal-delay: 0ms; }
+  .post-grid .post-card:nth-child(2) { --reveal-delay: 80ms; }
+  .post-grid .post-card:nth-child(3) { --reveal-delay: 160ms; }
+  .post-grid .post-card:nth-child(4) { --reveal-delay: 240ms; }
+  .post-grid .post-card:nth-child(5) { --reveal-delay: 320ms; }
+  .post-grid .post-card:nth-child(6) { --reveal-delay: 400ms; }
+  .post-grid .post-card:nth-child(7) { --reveal-delay: 0ms; }
+  .post-grid .post-card:nth-child(8) { --reveal-delay: 80ms; }
+  .post-grid .post-card:nth-child(9) { --reveal-delay: 160ms; }
+
+  /* Empty state when filter has no results */
+  .empty-state {
+    grid-column: 1 / -1;
+    padding: 80px 0;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .empty-state h4 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+
+  /* Floating quick links on side (desktop only) */
+  .quick-rail {
+    position: fixed;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .quick-rail a {
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    border-radius: 50%;
+    box-shadow: var(--shadow-card);
+    transition: all 240ms;
+  }
+  .quick-rail a:hover {
+    color: var(--accent);
+    transform: scale(1.08);
+  }
+  .quick-rail a svg { width: 16px; height: 16px; }
+  @media (max-width: 1180px) {
+    .quick-rail { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <a href="Home.html" class="brand">
+      <span class="brand__mark"><img src="public/logo.png" alt="SK Boutique Hotel" /></span>
+    </a>
+    <nav class="nav">
+      <a href="Rooms.html" data-vi="PHÒNG" data-en="ROOMS">PHÒNG</a>
+      <a href="Home.html#location" data-vi="VỊ TRÍ" data-en="LOCATION">VỊ TRÍ</a>
+      <a href="Home.html#story" data-vi="VỀ SK" data-en="ABOUT">VỀ SK</a>
+      <a href="Blog List.html" class="is-active" data-vi="TẠP CHÍ" data-en="JOURNAL">TẠP CHÍ</a>
+      <a href="#" data-vi="THÀNH VIÊN" data-en="MEMBERS">THÀNH VIÊN</a>
+    </nav>
+    <div class="header-tools">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang="vi" onclick="setLang('vi')" class="is-active">VI</button>
+        <button data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Đổi giao diện sáng/tối">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="book-btn" data-vi="ĐẶT PHÒNG" data-en="BOOK NOW">ĐẶT PHÒNG</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ QUICK RAIL ============ -->
+<aside class="quick-rail" aria-label="Quick links">
+  <a href="https://www.facebook.com/" target="_blank" rel="noopener" title="Facebook">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88V14.9H7.9V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.9h-2.34v6.98C18.34 21.13 22 17 22 12z"/></svg>
+  </a>
+  <a href="#" title="Zalo">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.86 2 10.6c0 2.5 1.31 4.74 3.4 6.27V21l3.78-2.13c.91.16 1.85.25 2.82.25 5.52 0 10-3.86 10-8.6S17.52 2 12 2z"/></svg>
+  </a>
+  <a href="#" title="Liên hệ">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+  </a>
+</aside>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="blog-hero shell">
+    <div class="blog-hero__head reveal">
+      <div>
+        <p class="eyebrow" data-vi="SK BOUTIQUE — TẠP CHÍ" data-en="SK BOUTIQUE — JOURNAL">SK BOUTIQUE — TẠP CHÍ</p>
+        <h1 class="blog-hero__title">
+          Câu chuyện<br/><em>đảo ngọc</em>
+        </h1>
+      </div>
+      <div>
+        <p class="blog-hero__sub" data-vi="Cẩm nang du lịch Phú Quốc, trải nghiệm tại khách sạn, ẩm thực đảo và những ưu đãi dành riêng cho khách của SK Boutique Hotel." data-en="Phu Quoc travel guides, hotel stories, island cuisine, and exclusive offers reserved for guests of SK Boutique Hotel.">
+          Cẩm nang du lịch Phú Quốc, trải nghiệm tại khách sạn, ẩm thực đảo và những ưu đãi dành riêng cho khách của SK Boutique Hotel.
+        </p>
+        <div class="blog-hero__meta">
+          <span><strong>48</strong> <span data-vi="bài viết" data-en="articles">bài viết</span></span>
+          <span><strong>7</strong> <span data-vi="chuyên mục" data-en="categories">chuyên mục</span></span>
+          <span><strong>2026</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured (Heritage Overlay) -->
+    <article class="featured reveal" data-cat="cam-nang">
+      <div class="featured__media">
+        <img src="https://images.unsplash.com/photo-1559494007-9f5847c49d94?auto=format&fit=crop&w=1400&q=80" alt="Phú Quốc bãi biển" loading="eager" />
+      </div>
+      <div class="featured__panel">
+        <div class="featured__cat">
+          <span class="eyebrow" data-vi="CẨM NANG DU LỊCH" data-en="TRAVEL GUIDE">CẨM NANG DU LỊCH</span>
+          <span class="featured__cat-divider"></span>
+          <span class="post-card__meta" style="text-transform:uppercase; letter-spacing:0.12em; font-size:0.72rem; color:var(--text-faint);" data-vi="12 PHÚT ĐỌC" data-en="12 MIN READ">12 PHÚT ĐỌC</span>
+        </div>
+        <h2 class="featured__title">
+          <a href="Blog Detail.html" data-vi="Phú Quốc 3 ngày 2 đêm: lộ trình hoàn hảo cho cặp đôi yêu nhau" data-en="Phu Quoc 3 days 2 nights: the perfect couple's itinerary">Phú Quốc 3 ngày 2 đêm: lộ trình hoàn hảo cho cặp đôi yêu nhau</a>
+        </h2>
+        <p class="featured__excerpt" data-vi="Từ bãi Sao trong xanh đến hoàng hôn tại mũi Gành Dầu, từ chợ đêm Dinh Cậu đến những bữa tối lãng mạn — một lộ trình được biên soạn bởi đội concierge SK Boutique để bạn không phải lo nghĩ gì ngoài việc tận hưởng." data-en="From the crystalline Sao Beach to sunset at Ganh Dau Cape, from Dinh Cau night market to romantic dinners — an itinerary curated by SK Boutique's concierge so you only need to enjoy.">
+          Từ bãi Sao trong xanh đến hoàng hôn tại mũi Gành Dầu, từ chợ đêm Dinh Cậu đến những bữa tối lãng mạn — một lộ trình được biên soạn bởi đội concierge SK Boutique để bạn không phải lo nghĩ gì ngoài việc tận hưởng.
+        </p>
+        <div class="featured__meta">
+          <span class="featured__avatar"></span>
+          <span data-vi="SK Concierge" data-en="SK Concierge">SK Concierge</span>
+          <span class="featured__meta-dot"></span>
+          <span data-vi="24 THG 5, 2026" data-en="MAY 24, 2026">24 THG 5, 2026</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Sub featured -->
+    <div class="sub-featured">
+      <a class="sub-card reveal" href="Blog Detail.html" data-cat="trai-nghiem">
+        <div class="sub-card__media">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80" alt="Hoàng hôn hồ bơi" loading="lazy" />
+        </div>
+        <div class="sub-card__body">
+          <p class="post-card__cat" data-vi="TRẢI NGHIỆM" data-en="EXPERIENCE">TRẢI NGHIỆM</p>
+          <h3 class="sub-card__title" data-vi="Hoàng hôn trên hồ bơi: chiếc ghế đẹp nhất tại SK" data-en="Sunset by the pool: the best seat at SK">Hoàng hôn trên hồ bơi: chiếc ghế đẹp nhất tại SK</h3>
+          <p class="sub-card__excerpt" data-vi="Bạn không cần đi đâu xa để chạm tay vào hoàng hôn đảo ngọc. Chỉ cần một ly mocktail, một chiếc ghế phơi nắng và 18 phút buông bỏ." data-en="You don't need to wander far to touch the island's sunset. Just a mocktail, a sunbed, and 18 minutes of letting go.">
+            Bạn không cần đi đâu xa để chạm tay vào hoàng hôn đảo ngọc. Chỉ cần một ly mocktail, một chiếc ghế phơi nắng và 18 phút buông bỏ.
+          </p>
+          <div class="sub-card__meta" data-vi="6 PHÚT ĐỌC · 22 THG 5" data-en="6 MIN READ · MAY 22">6 PHÚT ĐỌC · 22 THG 5</div>
+        </div>
+      </a>
+      <a class="sub-card reveal" style="--reveal-delay: 120ms" href="Blog Detail.html" data-cat="am-thuc">
+        <div class="sub-card__media">
+          <img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=900&q=80" alt="Hải sản Phú Quốc" loading="lazy" />
+        </div>
+        <div class="sub-card__body">
+          <p class="post-card__cat" data-vi="ẨM THỰC" data-en="CUISINE">ẨM THỰC</p>
+          <h3 class="sub-card__title" data-vi="Hải sản đảo ngọc: nơi nào ăn ngon nhất hè này?" data-en="Pearl Island seafood: where to eat best this summer?">Hải sản đảo ngọc: nơi nào ăn ngon nhất hè này?</h3>
+          <p class="sub-card__excerpt" data-vi="Bốn quán hải sản — bốn câu chuyện rất khác — được đội ngũ SK Boutique chấm và ghi chú lại sau ba tháng đi ăn (rất nghiêm túc)." data-en="Four seafood spots — four very different stories — graded and noted by SK Boutique's team after three months of (very serious) tastings.">
+            Bốn quán hải sản — bốn câu chuyện rất khác — được đội ngũ SK Boutique chấm và ghi chú lại sau ba tháng đi ăn (rất nghiêm túc).
+          </p>
+          <div class="sub-card__meta" data-vi="8 PHÚT ĐỌC · 20 THG 5" data-en="8 MIN READ · MAY 20">8 PHÚT ĐỌC · 20 THG 5</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ FILTER + GRID ============ -->
+  <section class="filter-section shell">
+    <div class="filter-section__head reveal">
+      <div>
+        <p class="eyebrow" data-vi="TẤT CẢ BÀI VIẾT" data-en="ALL ARTICLES">TẤT CẢ BÀI VIẾT</p>
+        <h2 data-vi="Chuyện chưa kể" data-en="Untold stories">Chuyện chưa kể</h2>
+      </div>
+      <div class="filter-section__sort">
+        <span data-vi="Sắp xếp theo" data-en="Sort by">Sắp xếp theo</span>
+        <select aria-label="Sort">
+          <option data-vi="Mới nhất" data-en="Latest">Mới nhất</option>
+          <option data-vi="Đọc nhiều" data-en="Most read">Đọc nhiều</option>
+          <option data-vi="Sắp hết hạn" data-en="Ending soon">Sắp hết hạn</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="chip-row reveal" id="chipRow">
+      <button class="chip is-active" data-filter="all"><span data-vi="Tất cả" data-en="All">Tất cả</span><span class="chip__count">48</span></button>
+      <button class="chip" data-filter="cam-nang"><span data-vi="Cẩm nang Phú Quốc" data-en="Phu Quoc guide">Cẩm nang Phú Quốc</span><span class="chip__count">14</span></button>
+      <button class="chip" data-filter="khuyen-mai"><span data-vi="Khuyến mãi" data-en="Promotions">Khuyến mãi</span><span class="chip__count">9</span></button>
+      <button class="chip" data-filter="trai-nghiem"><span data-vi="Trải nghiệm" data-en="Experiences">Trải nghiệm</span><span class="chip__count">8</span></button>
+      <button class="chip" data-filter="am-thuc"><span data-vi="Ẩm thực" data-en="Cuisine">Ẩm thực</span><span class="chip__count">7</span></button>
+      <button class="chip" data-filter="su-kien"><span data-vi="Sự kiện" data-en="Events">Sự kiện</span><span class="chip__count">5</span></button>
+      <button class="chip" data-filter="tin-tuc"><span data-vi="Tin tức" data-en="News">Tin tức</span><span class="chip__count">3</span></button>
+      <button class="chip" data-filter="meo-dat-phong"><span data-vi="Mẹo đặt phòng" data-en="Booking tips">Mẹo đặt phòng</span><span class="chip__count">2</span></button>
+    </div>
+
+    <div class="post-grid" id="postGrid">
+      <!-- Cards rendered by JS -->
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+    <div class="page-info" id="pageInfo"></div>
+  </section>
+
+  <!-- ============ NEWSLETTER ============ -->
+  <section class="newsletter">
+    <div class="shell reveal">
+      <p class="eyebrow" data-vi="THƯ TỪ ĐẢO NGỌC" data-en="LETTER FROM THE ISLAND">THƯ TỪ ĐẢO NGỌC</p>
+      <h3 data-vi="Nhận ưu đãi & cẩm nang mỗi tháng" data-en="Get monthly offers & guides">Nhận ưu đãi & cẩm nang mỗi tháng</h3>
+      <p data-vi="Đăng ký nhận thư của SK Boutique — voucher ẩn cho thành viên, gợi ý lộ trình theo mùa, và những điều mà chỉ người Phú Quốc mới biết." data-en="Subscribe to SK Boutique's letter — hidden vouchers for members, seasonal itinerary tips, and things only locals know.">
+        Đăng ký nhận thư của SK Boutique — voucher ẩn cho thành viên, gợi ý lộ trình theo mùa, và những điều mà chỉ người Phú Quốc mới biết.
+      </p>
+      <form class="newsletter__form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Đã gửi ✓'; this.querySelector('button').disabled=true;">
+        <input type="email" required placeholder="email@cuaban.com" aria-label="Email" />
+        <button type="submit" data-vi="ĐĂNG KÝ" data-en="SUBSCRIBE">ĐĂNG KÝ</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="shell">
+    <div class="site-footer__inner">
+      <div>
+        <p class="site-footer__brand">SK Boutique Hotel</p>
+        <p class="site-footer__tag">— since 2020 —</p>
+        <p style="font-size:0.92rem; line-height:1.7;">Marina Complex Resort, Bim Group<br/>MP-135, Marina Square<br/>Dương Bảo Hamlet, Phú Quốc</p>
+      </div>
+      <div>
+        <h4 data-vi="KHÁM PHÁ" data-en="EXPLORE">KHÁM PHÁ</h4>
+        <ul>
+          <li><a href="Rooms.html" data-vi="Phòng nghỉ" data-en="Rooms">Phòng nghỉ</a></li>
+          <li><a href="Home.html#location" data-vi="Vị trí" data-en="Location">Vị trí</a></li>
+          <li><a href="Home.html#story" data-vi="Về chúng tôi" data-en="About us">Về chúng tôi</a></li>
+          <li><a href="Blog List.html" data-vi="Tạp chí" data-en="Journal">Tạp chí</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-vi="LIÊN HỆ" data-en="CONTACT">LIÊN HỆ</h4>
+        <ul>
+          <li><a href="tel:+84908233583">+84 908 233 583</a></li>
+          <li><a href="mailto:skhotel.phuquoc@gmail.com">skhotel.phuquoc@gmail.com</a></li>
+          <li><a href="https://www.skhotel.com.vn" target="_blank">www.skhotel.com.vn</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-vi="THEO DÕI" data-en="FOLLOW">THEO DÕI</h4>
+        <ul>
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Zalo</a></li>
+          <li><a href="#">TripAdvisor</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__lower">
+      <span>© 2026 SK Boutique Hotel. <span data-vi="Tất cả quyền được bảo lưu." data-en="All rights reserved.">Tất cả quyền được bảo lưu.</span></span>
+      <span data-vi="Thiết kế bởi đội ngũ SK" data-en="Designed by the SK team">Thiết kế bởi đội ngũ SK</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="blog-list.js"></script>
+
+</body>
+</html>
