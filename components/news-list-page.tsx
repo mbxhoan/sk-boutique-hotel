@@ -60,7 +60,9 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
   return (
     <>
       <style>{`
-        .news-hero { padding: 56px 0 24px; }
+        @keyframes news-enter { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .news-hero { padding: 56px 0 24px; animation: news-enter 560ms cubic-bezier(0.22,1,0.36,1) both; }
+        @media (prefers-reduced-motion: reduce) { .news-hero { animation: none; } }
         .news-hero__head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; gap: 32px; flex-wrap: wrap; }
         .news-hero__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(48px, 8vw, 100px); line-height: 0.95; letter-spacing: -0.03em; margin: 12px 0 0; color: var(--ink); }
         .news-hero__title em { font-family: "Dancing Script", cursive; font-style: italic; font-weight: 600; color: var(--gold); letter-spacing: -0.01em; font-size: 0.92em; display: inline-block; }
@@ -185,11 +187,13 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
         {featuredPost && (
           <article className="news-featured">
             <div className="news-featured__media">
-              {featuredPost.cover_image_path ? (
-                <img src={featuredPost.cover_image_path} alt={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} loading="eager" />
-              ) : (
-                <div style={{ width: "100%", height: "100%", background: "var(--surface-container-highest)" }} />
-              )}
+              <Link aria-label={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} href={appendLocaleQuery(`/news/${featuredPost.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%" }}>
+                {featuredPost.cover_image_path ? (
+                  <img src={featuredPost.cover_image_path} alt={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} loading="eager" />
+                ) : (
+                  <div style={{ width: "100%", height: "100%", background: "var(--surface-container-highest)" }} />
+                )}
+              </Link>
             </div>
             <div className="news-featured__panel">
               <div className="news-featured__cat">
@@ -282,11 +286,13 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
             pagePosts.map((post) => (
               <article className="post-card" key={post.id}>
                 <div className="post-card__media">
-                  {post.cover_image_path ? (
-                    <img src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} loading="lazy" />
-                  ) : (
-                    <div className="post-card__no-img" />
-                  )}
+                  <Link aria-label={localize(locale, { vi: post.title_vi, en: post.title_en })} href={appendLocaleQuery(`/news/${post.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%" }}>
+                    {post.cover_image_path ? (
+                      <img src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} loading="lazy" />
+                    ) : (
+                      <div className="post-card__no-img" />
+                    )}
+                  </Link>
                 </div>
                 <p className="news-cat-label">{localize(locale, CATEGORY_LABELS[post.category] ?? { vi: post.category, en: post.category })}</p>
                 <h3 className="post-card__title">
