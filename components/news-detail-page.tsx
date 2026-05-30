@@ -75,8 +75,10 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
   const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
   const articleRef = useRef<HTMLElement>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     function updateProgress() {
@@ -112,7 +114,12 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
 
   function copyLink() {
     const text = window.location.href;
-    const onOk = () => showToast(locale === "vi" ? "Đã sao chép liên kết" : "Link copied");
+    const onOk = () => {
+      showToast(locale === "vi" ? "Đã sao chép liên kết" : "Link copied");
+      setCopied(true);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 1800);
+    };
     navigator.clipboard?.writeText(text).then(onOk).catch(onOk);
   }
 
@@ -174,6 +181,10 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
         .nd-share-rail__label { font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto 12px; padding-top: 8px; }
         .nd-share-btn { width: 40px; height: 40px; display: grid; place-items: center; background: #fff; color: var(--muted); border-radius: 50%; border: 0; cursor: pointer; transition: all 240ms; box-shadow: 0 2px 8px rgba(0,12,30,0.06); }
         .nd-share-btn:hover { color: var(--gold); transform: translateY(-2px); }
+        .nd-share-btn.is-copied { background: var(--gold); color: #fff; box-shadow: 0 6px 18px rgba(0,12,30,0.18); animation: nd-pop 360ms cubic-bezier(0.34,1.56,0.64,1); }
+        .nd-share-btn.is-copied:hover { color: #fff; }
+        @keyframes nd-pop { 0% { transform: scale(1); } 45% { transform: scale(1.22); } 100% { transform: scale(1); } }
+        @media (prefers-reduced-motion: reduce) { .nd-share-btn.is-copied { animation: none; } }
 
         .nd-tags { margin-top: 56px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
         .nd-tags__label { font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
@@ -333,8 +344,18 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
             <button aria-label="Facebook" className="nd-share-btn" onClick={() => shareTo("facebook")} title="Facebook" type="button">
               <svg fill="currentColor" height="16" viewBox="0 0 24 24" width="16"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88V14.9H7.9V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.9h-2.34v6.98C18.34 21.13 22 17 22 12z" /></svg>
             </button>
-            <button aria-label={locale === "vi" ? "Sao chép liên kết" : "Copy link"} className="nd-share-btn" onClick={copyLink} title={locale === "vi" ? "Sao chép liên kết" : "Copy link"} type="button">
-              <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+            <button
+              aria-label={copied ? (locale === "vi" ? "Đã sao chép" : "Copied") : locale === "vi" ? "Sao chép liên kết" : "Copy link"}
+              className={`nd-share-btn${copied ? " is-copied" : ""}`}
+              onClick={copyLink}
+              title={copied ? (locale === "vi" ? "Đã sao chép" : "Copied") : locale === "vi" ? "Sao chép liên kết" : "Copy link"}
+              type="button"
+            >
+              {copied ? (
+                <svg key="check" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" viewBox="0 0 24 24" width="16"><path d="M20 6 9 17l-5-5" /></svg>
+              ) : (
+                <svg key="link" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+              )}
             </button>
           </aside>
         </div>
