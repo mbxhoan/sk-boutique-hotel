@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bạn có biết? Phú Quốc 575km² và những điều thú vị — SK Boutique Hotel</title>
+<link rel="icon" href="public/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  /* ===== Reading progress ===== */
+  .reading-progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .reading-progress__fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-soft) 100%);
+    transition: width 80ms linear;
+  }
+
+  /* ===== Breadcrumb ===== */
+  .breadcrumb {
+    padding: 32px 0 8px;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb__sep { opacity: 0.5; }
+
+  /* ===== Article header ===== */
+  .article-head {
+    padding: 24px 0 56px;
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .article-head__cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .article-head__cat .line {
+    width: 32px; height: 1px; background: var(--accent);
+  }
+  .article-head__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(36px, 5vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 0 0 28px;
+    text-wrap: balance;
+  }
+  .article-head__deck {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 680px;
+    margin: 0 auto 36px;
+  }
+  .article-head__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .article-head__avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface-highest);
+    background-image: url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80&fit=crop&crop=faces");
+    background-size: cover;
+    background-position: center;
+  }
+  .article-head__meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint); }
+  .article-head__author { font-weight: 600; color: var(--text); }
+
+  /* ===== Cover ===== */
+  .article-cover {
+    margin: 0 0 64px;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: var(--r-sm);
+    position: relative;
+    background: var(--surface-highest);
+  }
+  .article-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .article-cover__caption {
+    position: absolute;
+    bottom: 16px;
+    left: 24px;
+    background: color-mix(in oklab, var(--bg) 90%, transparent);
+    backdrop-filter: blur(8px);
+    padding: 8px 14px;
+    border-radius: var(--r-sm);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+  }
+
+  /* ===== Article body layout (TOC + content + share) ===== */
+  .article-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 60px;
+    gap: 48px;
+    align-items: start;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1080px) {
+    .article-layout { grid-template-columns: minmax(0, 1fr); }
+    .article-toc, .share-rail { display: none; }
+  }
+
+  /* TOC */
+  .article-toc {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+  }
+  .article-toc__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+  .article-toc ol {
+    list-style: none;
+    counter-reset: toc;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .article-toc li {
+    counter-increment: toc;
+    position: relative;
+    padding-left: 32px;
+  }
+  .article-toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-family: var(--font-display);
+    font-size: 0.74rem;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+  .article-toc a {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    display: block;
+    transition: color 200ms;
+  }
+  .article-toc a:hover, .article-toc a.is-active {
+    color: var(--text);
+  }
+  .article-toc a.is-active::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  /* Share rail */
+  .share-rail {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .share-rail__label {
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    margin: 0 auto 12px;
+    padding-top: 8px;
+  }
+  .share-btn {
+    width: 40px; height: 40px;
+    display: grid;
+    place-items: center;
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    transition: all 240ms var(--ease-out);
+    box-shadow: var(--shadow-card);
+  }
+  .share-btn:hover {
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .share-btn svg { width: 16px; height: 16px; }
+  .share-btn.is-copied {
+    background: var(--accent);
+    color: var(--cream);
+  }
+
+  /* ===== Article content ===== */
+  .article-content {
+    font-size: 1.06rem;
+    line-height: 1.75;
+    color: var(--text);
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .article-content > * + * { margin-top: 1.4em; }
+  .article-content h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 2.4em 0 0.6em;
+    text-wrap: balance;
+    scroll-margin-top: 96px;
+  }
+  .article-content h2 .eyebrow {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .article-content h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.25;
+    margin: 1.8em 0 0.4em;
+    letter-spacing: -0.01em;
+  }
+  .article-content p {
+    margin: 0;
+    text-wrap: pretty;
+    color: var(--text);
+  }
+  .article-content p.lead {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.32rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .article-content p.dropcap::first-letter {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 4.2em;
+    line-height: 0.9;
+    float: left;
+    padding: 0.08em 0.12em 0 0;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .article-content strong { font-weight: 600; }
+  .article-content em { font-style: italic; }
+  .article-content a {
+    color: var(--accent);
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 1px;
+  }
+
+  /* Article images */
+  .article-figure {
+    margin: 2em 0 !important;
+  }
+  .article-figure img {
+    width: 100%;
+    border-radius: var(--r-sm);
+    background: var(--surface-highest);
+  }
+  .article-figure--wide {
+    margin-left: calc(50% - 48vw) !important;
+    margin-right: calc(50% - 48vw) !important;
+    width: auto;
+  }
+  @media (max-width: 1080px) {
+    .article-figure--wide { margin-left: 0 !important; margin-right: 0 !important; }
+  }
+  .article-figure figcaption {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  /* Pull quote */
+  .pullquote {
+    margin: 3em 0 !important;
+    padding: 0;
+    border: 0;
+    text-align: center;
+  }
+  .pullquote__mark {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .pullquote p {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(22px, 2.6vw, 32px);
+    line-height: 1.4;
+    color: var(--text);
+    margin: 0 auto 16px !important;
+    max-width: 600px;
+  }
+  .pullquote cite {
+    font-style: normal;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  /* Number callouts */
+  .number-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 3em 0 !important;
+    padding: 32px;
+    background: var(--bg-sunken);
+    border-radius: var(--r-md);
+  }
+  .number-cell { text-align: center; }
+  .number-cell__big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--accent);
+  }
+  .number-cell__label {
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+  @media (max-width: 620px) {
+    .number-row { grid-template-columns: 1fr; }
+  }
+
+  /* Inline CTA */
+  .inline-cta {
+    margin: 3em 0 !important;
+    padding: 32px;
+    background: var(--bg-elevated);
+    border-radius: var(--r-md);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+  .inline-cta::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-soft) 100%);
+  }
+  .inline-cta__eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 8px;
+  }
+  .inline-cta__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0 0 8px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .inline-cta__desc { margin: 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+  @media (max-width: 620px) {
+    .inline-cta { grid-template-columns: 1fr; gap: 16px; }
+  }
+
+  /* Checklist */
+  .article-content ul.check {
+    list-style: none;
+    padding: 0;
+    margin: 1.4em 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .article-content ul.check li {
+    position: relative;
+    padding-left: 32px;
+  }
+  .article-content ul.check li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0.55em;
+    width: 14px;
+    height: 8px;
+    border-left: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(-45deg);
+  }
+
+  /* ===== Bottom CTA (Voucher) ===== */
+  .voucher-cta {
+    margin-top: 96px;
+    padding: 0;
+    background: var(--navy);
+    color: var(--cream);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    position: relative;
+  }
+  [data-theme="dark"] .voucher-cta { background: #0e1729; }
+  .voucher-cta__media {
+    background-image: url("https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=900&q=80");
+    background-size: cover;
+    background-position: center;
+    min-height: 360px;
+    position: relative;
+  }
+  .voucher-cta__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(0,12,30,0.4) 100%);
+  }
+  .voucher-cta__body { padding: 48px; }
+  .voucher-cta__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    border-radius: var(--r-pill);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: var(--cream);
+  }
+  .voucher-cta__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    color: var(--cream);
+  }
+  .voucher-cta__desc {
+    color: rgba(251, 249, 245, 0.75);
+    margin: 0 0 28px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .voucher-cta__form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .voucher-cta__form input {
+    grid-column: 1 / -1;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--cream);
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 200ms;
+  }
+  .voucher-cta__form input::placeholder { color: rgba(251, 249, 245, 0.45); }
+  .voucher-cta__form input:focus {
+    outline: none;
+    border-color: var(--gold-soft);
+  }
+  .voucher-cta__form button {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    color: var(--cream);
+    border: 0;
+    padding: 16px;
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: transform 200ms;
+  }
+  .voucher-cta__form button:hover { transform: translateY(-1px); }
+  .voucher-cta__small {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: rgba(251, 249, 245, 0.5);
+    line-height: 1.5;
+  }
+  @media (max-width: 880px) {
+    .voucher-cta { grid-template-columns: 1fr; }
+    .voucher-cta__media { min-height: 220px; }
+    .voucher-cta__body { padding: 36px 24px; }
+  }
+
+  /* ===== Tag chips ===== */
+  .tag-section {
+    margin-top: 56px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .tag-section__label {
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .tag {
+    display: inline-flex;
+    padding: 8px 14px;
+    background: var(--bg-sunken);
+    border-radius: var(--r-pill);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 240ms;
+  }
+  .tag:hover {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* ===== Author card ===== */
+  .author-card {
+    margin-top: 72px;
+    padding: 32px;
+    background: var(--bg-sunken);
+    border-radius: var(--r-md);
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .author-card__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background-image: url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=240&q=80&fit=crop&crop=faces");
+    background-size: cover;
+    background-position: center;
+  }
+  .author-card__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.32rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .author-card__role {
+    font-size: 0.82rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+  .author-card__bio {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  @media (max-width: 620px) {
+    .author-card { grid-template-columns: 64px 1fr; }
+    .author-card__avatar { width: 64px; height: 64px; }
+    .author-card__cta { grid-column: 1 / -1; }
+  }
+
+  /* ===== Related posts ===== */
+  .related-section {
+    margin-top: 120px;
+    padding-top: 56px;
+    position: relative;
+  }
+  .related-section::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in oklab, var(--outline-variant) 50%, transparent), transparent);
+  }
+  .related-section__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .related-section h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 44px);
+    letter-spacing: -0.025em;
+    margin: 8px 0 0;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 880px) {
+    .related-grid { grid-template-columns: 1fr; }
+  }
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  .related-card__media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--r-sm);
+    background: var(--surface-highest);
+    margin-bottom: 18px;
+  }
+  .related-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .related-card:hover .related-card__media img { transform: scale(1.05); }
+  .related-card__cat {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .related-card__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.18rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+  .related-card__meta {
+    margin-top: auto;
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 12px 20px;
+    border-radius: var(--r-md);
+    font-size: 0.86rem;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: var(--shadow-soft);
+    transition: opacity 240ms, transform 280ms var(--ease-out);
+  }
+  .toast.is-show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- Reading progress -->
+<div class="reading-progress" aria-hidden="true">
+  <div class="reading-progress__fill" id="progressFill"></div>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <a href="Home.html" class="brand">
+      <span class="brand__mark"><img src="public/logo.png" alt="SK Boutique Hotel" /></span>
+    </a>
+    <nav class="nav">
+      <a href="Rooms.html" data-vi="PHÒNG" data-en="ROOMS">PHÒNG</a>
+      <a href="Home.html#location" data-vi="VỊ TRÍ" data-en="LOCATION">VỊ TRÍ</a>
+      <a href="Home.html#story" data-vi="VỀ SK" data-en="ABOUT">VỀ SK</a>
+      <a href="Blog List.html" class="is-active" data-vi="TẠP CHÍ" data-en="JOURNAL">TẠP CHÍ</a>
+      <a href="#" data-vi="THÀNH VIÊN" data-en="MEMBERS">THÀNH VIÊN</a>
+    </nav>
+    <div class="header-tools">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang="vi" onclick="setLang('vi')" class="is-active">VI</button>
+        <button data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="book-btn" data-vi="ĐẶT PHÒNG" data-en="BOOK NOW">ĐẶT PHÒNG</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ BREADCRUMB + HEADER ============ -->
+  <div class="shell">
+    <nav class="breadcrumb">
+      <a href="Blog List.html" data-vi="Tạp chí" data-en="Journal">Tạp chí</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="Blog List.html?cat=cam-nang" data-vi="Cẩm nang du lịch" data-en="Travel guide">Cẩm nang du lịch</a>
+    </nav>
+
+    <header class="article-head">
+      <div class="article-head__cat">
+        <span class="line"></span>
+        <span class="eyebrow" data-vi="CẨM NANG DU LỊCH" data-en="TRAVEL GUIDE">CẨM NANG DU LỊCH</span>
+        <span class="line"></span>
+      </div>
+      <h1 class="article-head__title" data-vi="Bạn có biết? Phú Quốc 575km² và những điều thú vị ít ai kể" data-en="Did you know? Phu Quoc's 575 km² and stories few people tell">
+        Bạn có biết? Phú Quốc 575km² và những điều thú vị ít ai kể
+      </h1>
+      <p class="article-head__deck" data-vi="Hòn đảo lớn nhất Việt Nam có một lịch sử thú vị, một hệ sinh thái rất riêng và những góc nhỏ rất đáng yêu — chúng tôi đã tổng hợp lại trong một bài đọc dài 9 phút." data-en="Vietnam's largest island has a curious history, a unique ecosystem and many small lovely corners — we put it all in a 9-minute read.">
+        Hòn đảo lớn nhất Việt Nam có một lịch sử thú vị, một hệ sinh thái rất riêng và những góc nhỏ rất đáng yêu — chúng tôi đã tổng hợp lại trong một bài đọc dài 9 phút.
+      </p>
+      <div class="article-head__meta">
+        <span class="article-head__avatar"></span>
+        <span class="article-head__author">Linh Hoàng</span>
+        <span class="article-head__meta-dot"></span>
+        <span data-vi="23 tháng 5, 2026" data-en="May 23, 2026">23 tháng 5, 2026</span>
+        <span class="article-head__meta-dot"></span>
+        <span data-vi="9 phút đọc" data-en="9 min read">9 phút đọc</span>
+      </div>
+    </header>
+
+    <!-- Cover -->
+    <figure class="article-cover reveal">
+      <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=2000&q=80" alt="Bãi biển Phú Quốc nhìn từ trên cao" />
+      <figcaption class="article-cover__caption" data-vi="Bãi Khem, phía Nam đảo — ảnh chụp tháng 4, 2026" data-en="Khem Beach, southern Phu Quoc — April 2026">Bãi Khem, phía Nam đảo — ảnh chụp tháng 4, 2026</figcaption>
+    </figure>
+
+    <!-- ============ ARTICLE LAYOUT ============ -->
+    <div class="article-layout">
+
+      <!-- TOC -->
+      <aside class="article-toc" aria-label="Table of contents">
+        <p class="article-toc__label" data-vi="MỤC LỤC" data-en="CONTENTS">MỤC LỤC</p>
+        <ol id="tocList">
+          <li><a href="#s1" data-vi="Hòn đảo lớn nhất Việt Nam" data-en="Vietnam's largest island">Hòn đảo lớn nhất Việt Nam</a></li>
+          <li><a href="#s2" data-vi="Một hệ sinh thái rất riêng" data-en="A unique ecosystem">Một hệ sinh thái rất riêng</a></li>
+          <li><a href="#s3" data-vi="Lịch sử của hòn đảo" data-en="History of the island">Lịch sử của hòn đảo</a></li>
+          <li><a href="#s4" data-vi="Đặc sản và văn hoá địa phương" data-en="Local food &amp; culture">Đặc sản và văn hoá địa phương</a></li>
+          <li><a href="#s5" data-vi="Khi nào nên đến?" data-en="When to visit?">Khi nào nên đến?</a></li>
+          <li><a href="#s6" data-vi="Vài lời từ SK Boutique" data-en="A word from SK Boutique">Vài lời từ SK Boutique</a></li>
+        </ol>
+      </aside>
+
+      <!-- Content -->
+      <article class="article-content" id="articleContent">
+
+        <p class="lead reveal" data-vi="Phú Quốc — cái tên ai cũng nghe nhưng ít người thực sự biết hết. Hòn đảo này không chỉ có biển; nó có rừng nguyên sinh, có nước mắm 200 năm tuổi, có chó xoáy, và một câu chuyện rất riêng." data-en="Phu Quoc — a name everyone hears, but few really know. This island isn't just beaches; it has primary forest, 200-year-old fish sauce, ridgeback dogs, and a very particular story.">
+          Phú Quốc — cái tên ai cũng nghe nhưng ít người thực sự biết hết. Hòn đảo này không chỉ có biển; nó có rừng nguyên sinh, có nước mắm 200 năm tuổi, có chó xoáy, và một câu chuyện rất riêng.
+        </p>
+
+        <h2 id="s1" class="reveal">
+          <span class="eyebrow" data-vi="MỘT" data-en="ONE">MỘT</span>
+          <span data-vi="Hòn đảo lớn nhất Việt Nam" data-en="Vietnam's largest island">Hòn đảo lớn nhất Việt Nam</span>
+        </h2>
+
+        <p class="dropcap reveal" data-vi="Phú Quốc là hòn đảo lớn nhất Việt Nam, với diện tích khoảng 575 km² — nơi hội tụ biển xanh, nắng vàng, thiên nhiên nhiệt đới và những khoảnh khắc nghỉ dưỡng rất riêng. Đảo nằm trong vịnh Thái Lan, thuộc tỉnh Kiên Giang, cách thành phố Rạch Giá khoảng 120km về phía Tây." data-en="Phu Quoc is Vietnam's largest island, with an area of about 575 km² — where blue sea, golden sun, tropical nature and a very particular kind of leisure all meet. The island sits in the Gulf of Thailand, in Kien Giang Province, about 120km west of Rach Gia city.">
+          Phú Quốc là hòn đảo lớn nhất Việt Nam, với diện tích khoảng 575 km² — nơi hội tụ biển xanh, nắng vàng, thiên nhiên nhiệt đới và những khoảnh khắc nghỉ dưỡng rất riêng. Đảo nằm trong vịnh Thái Lan, thuộc tỉnh Kiên Giang, cách thành phố Rạch Giá khoảng 120km về phía Tây.
+        </p>
+
+        <p class="reveal" data-vi="Nếu đặt cạnh các đảo khác trong khu vực Đông Nam Á, Phú Quốc có kích thước tương đương với Singapore — một thực tế khiến nhiều người ngạc nhiên. Nhưng khác với một đô thị bê tông, Phú Quốc vẫn giữ được hơn 50% diện tích là rừng nguyên sinh được bảo vệ." data-en="Set against other Southeast Asian islands, Phu Quoc is roughly the size of Singapore — a fact that surprises many. But unlike a concrete metropolis, more than 50% of Phu Quoc remains protected primary forest.">
+          Nếu đặt cạnh các đảo khác trong khu vực Đông Nam Á, Phú Quốc có kích thước tương đương với Singapore — một thực tế khiến nhiều người ngạc nhiên. Nhưng khác với một đô thị bê tông, Phú Quốc vẫn giữ được hơn 50% diện tích là rừng nguyên sinh được bảo vệ.
+        </p>
+
+        <div class="number-row reveal">
+          <div class="number-cell">
+            <div class="number-cell__big">575</div>
+            <div class="number-cell__label" data-vi="KM² DIỆN TÍCH" data-en="KM² AREA">KM² DIỆN TÍCH</div>
+          </div>
+          <div class="number-cell">
+            <div class="number-cell__big">150</div>
+            <div class="number-cell__label" data-vi="KM ĐƯỜNG BỜ BIỂN" data-en="KM OF COASTLINE">KM ĐƯỜNG BỜ BIỂN</div>
+          </div>
+          <div class="number-cell">
+            <div class="number-cell__big">22</div>
+            <div class="number-cell__label" data-vi="HÒN ĐẢO NHỎ XUNG QUANH" data-en="SMALLER ISLANDS NEARBY">HÒN ĐẢO NHỎ XUNG QUANH</div>
+          </div>
+        </div>
+
+        <h2 id="s2" class="reveal">
+          <span class="eyebrow" data-vi="HAI" data-en="TWO">HAI</span>
+          <span data-vi="Một hệ sinh thái rất riêng" data-en="A unique ecosystem">Một hệ sinh thái rất riêng</span>
+        </h2>
+
+        <p class="reveal" data-vi="Vườn quốc gia Phú Quốc chiếm hơn 31.000 hecta — gần một nửa diện tích đảo. Đây là nơi sinh sống của 470 loài thực vật, 365 loài động vật, trong đó nhiều loài đặc hữu chỉ có ở đây. Loài nổi tiếng nhất có lẽ là chó xoáy Phú Quốc — một trong những giống chó cổ nhất Đông Nam Á." data-en="Phu Quoc National Park covers over 31,000 hectares — nearly half the island. It is home to 470 plant species, 365 animal species, many endemic. The most famous may be the Phu Quoc Ridgeback — one of Southeast Asia's oldest dog breeds.">
+          Vườn quốc gia Phú Quốc chiếm hơn 31.000 hecta — gần một nửa diện tích đảo. Đây là nơi sinh sống của 470 loài thực vật, 365 loài động vật, trong đó nhiều loài đặc hữu chỉ có ở đây. Loài nổi tiếng nhất có lẽ là chó xoáy Phú Quốc — một trong những giống chó cổ nhất Đông Nam Á.
+        </p>
+
+        <figure class="article-figure article-figure--wide reveal">
+          <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2000&q=80" alt="Rừng Phú Quốc" loading="lazy" />
+          <figcaption data-vi="Một góc rừng nguyên sinh phía Bắc đảo, nơi bạn có thể đi bộ vài tiếng mà không gặp một ai." data-en="A patch of primary forest in the north of the island, where you can walk for hours without meeting a soul.">Một góc rừng nguyên sinh phía Bắc đảo, nơi bạn có thể đi bộ vài tiếng mà không gặp một ai.</figcaption>
+        </figure>
+
+        <p class="reveal" data-vi="Vùng biển quanh đảo có hơn 100 loài san hô và 125 loài cá rạn — lý do mà các điểm lặn biển ở phía Nam Phú Quốc luôn được giới chuyên môn đánh giá cao. Nếu đi tour lặn ở đảo Hòn Mây Rút hay Hòn Móng Tay, bạn sẽ thấy điều đó tận mắt." data-en="Surrounding waters have over 100 coral species and 125 reef fish species — the reason southern Phu Quoc's dive spots are consistently highly rated. On a snorkeling tour to May Rut or Mong Tay islets, you'll see this firsthand.">
+          Vùng biển quanh đảo có hơn 100 loài san hô và 125 loài cá rạn — lý do mà các điểm lặn biển ở phía Nam Phú Quốc luôn được giới chuyên môn đánh giá cao. Nếu đi tour lặn ở đảo Hòn Mây Rút hay Hòn Móng Tay, bạn sẽ thấy điều đó tận mắt.
+        </p>
+
+        <blockquote class="pullquote reveal">
+          <span class="pullquote__mark">"</span>
+          <p data-vi="Phú Quốc không cố gắng trở thành Bali hay Phuket. Nó vẫn đang là chính nó — và đó chính là điều quý giá nhất." data-en="Phu Quoc isn't trying to be Bali or Phuket. It is still itself — and that is its most precious quality.">
+            Phú Quốc không cố gắng trở thành Bali hay Phuket. Nó vẫn đang là chính nó — và đó chính là điều quý giá nhất.
+          </p>
+          <cite data-vi="— CHÚ NĂM, NGƯ DÂN HÀM NINH, 62 TUỔI" data-en="— UNCLE NAM, HAM NINH FISHERMAN, AGE 62">— CHÚ NĂM, NGƯ DÂN HÀM NINH, 62 TUỔI</cite>
+        </blockquote>
+
+        <h2 id="s3" class="reveal">
+          <span class="eyebrow" data-vi="BA" data-en="THREE">BA</span>
+          <span data-vi="Lịch sử của hòn đảo" data-en="History of the island">Lịch sử của hòn đảo</span>
+        </h2>
+
+        <p class="reveal" data-vi="Người ta tìm thấy dấu tích người Việt định cư trên đảo từ thế kỷ 17. Nhưng câu chuyện thú vị nhất bắt đầu từ năm 1671, khi Mạc Cửu — một thương nhân gốc Quảng Đông — đặt chân lên đất Hà Tiên và mở mang vùng đất này, kéo theo cả Phú Quốc vào dòng chảy thương mại của khu vực." data-en="Vietnamese settlers were here as early as the 17th century. But the most curious story begins in 1671, when Mac Cuu — a merchant of Cantonese origin — arrived in Ha Tien and developed the region, pulling Phu Quoc into the area's trade routes.">
+          Người ta tìm thấy dấu tích người Việt định cư trên đảo từ thế kỷ 17. Nhưng câu chuyện thú vị nhất bắt đầu từ năm 1671, khi Mạc Cửu — một thương nhân gốc Quảng Đông — đặt chân lên đất Hà Tiên và mở mang vùng đất này, kéo theo cả Phú Quốc vào dòng chảy thương mại của khu vực.
+        </p>
+
+        <p class="reveal" data-vi="Hai trăm năm sau, người Pháp đến và xây dựng những đồn điền tiêu đầu tiên. Cây tiêu Phú Quốc nổi tiếng cay nồng — một di sản còn lại đến hôm nay mà bạn có thể nếm ngay trong bữa ăn ở khách sạn." data-en="Two hundred years later, the French arrived and built the first pepper plantations. The famously pungent Phu Quoc pepper is a legacy you can taste in any island meal today.">
+          Hai trăm năm sau, người Pháp đến và xây dựng những đồn điền tiêu đầu tiên. Cây tiêu Phú Quốc nổi tiếng cay nồng — một di sản còn lại đến hôm nay mà bạn có thể nếm ngay trong bữa ăn ở khách sạn.
+        </p>
+
+        <!-- INLINE CTA -->
+        <aside class="inline-cta reveal" role="complementary">
+          <div>
+            <p class="inline-cta__eyebrow" data-vi="GỢI Ý TỪ SK BOUTIQUE" data-en="SK BOUTIQUE TIP">GỢI Ý TỪ SK BOUTIQUE</p>
+            <h3 class="inline-cta__title" data-vi="Đang lên kế hoạch đi Phú Quốc?" data-en="Planning a Phu Quoc trip?">Đang lên kế hoạch đi Phú Quốc?</h3>
+            <p class="inline-cta__desc" data-vi="Phòng Family Room 60m² của SK Boutique — nằm gần Marina Square, cách bãi Trường 5 phút đi bộ — đang còn trống một số ngày trong tháng tới." data-en="Our 60m² Family Room near Marina Square, 5 minutes from Truong Beach — has some availability next month.">
+              Phòng Family Room 60m² của SK Boutique — nằm gần Marina Square, cách bãi Trường 5 phút đi bộ — đang còn trống một số ngày trong tháng tới.
+            </p>
+          </div>
+          <a class="btn btn--gold" href="#voucherCTA" data-vi="KIỂM TRA PHÒNG" data-en="CHECK ROOMS">KIỂM TRA PHÒNG</a>
+        </aside>
+
+        <h2 id="s4" class="reveal">
+          <span class="eyebrow" data-vi="BỐN" data-en="FOUR">BỐN</span>
+          <span data-vi="Đặc sản và văn hoá địa phương" data-en="Local food &amp; culture">Đặc sản và văn hoá địa phương</span>
+        </h2>
+
+        <p class="reveal" data-vi="Nước mắm Phú Quốc được Liên minh châu Âu công nhận chỉ dẫn địa lý từ năm 2012 — thành phẩm duy nhất của Việt Nam có vinh dự đó vào thời điểm ấy. Cá cơm than đánh bắt trong vùng biển sạch, ủ trong thùng gỗ bời lời nguyên khối từ 12 đến 15 tháng. Một giọt nước mắm cốt nhỉ ở đây có thể có giá cao gấp 10 lần loại thông thường ngoài siêu thị." data-en="Phu Quoc fish sauce received an EU Protected Geographical Indication in 2012 — the only Vietnamese product to have that honor at the time. Black anchovies are caught in clean waters and fermented in solid Boi Loi wood barrels for 12 to 15 months. A drop of first-press here can cost ten times what supermarket sauce costs.">
+          Nước mắm Phú Quốc được Liên minh châu Âu công nhận chỉ dẫn địa lý từ năm 2012 — thành phẩm duy nhất của Việt Nam có vinh dự đó vào thời điểm ấy. Cá cơm than đánh bắt trong vùng biển sạch, ủ trong thùng gỗ bời lời nguyên khối từ 12 đến 15 tháng. Một giọt nước mắm cốt nhỉ ở đây có thể có giá cao gấp 10 lần loại thông thường ngoài siêu thị.
+        </p>
+
+        <p class="reveal" data-vi="Ngoài nước mắm, đảo còn nổi tiếng với:" data-en="Beyond fish sauce, the island is famous for:">Ngoài nước mắm, đảo còn nổi tiếng với:</p>
+
+        <ul class="check reveal">
+          <li><strong data-vi="Tiêu Phú Quốc" data-en="Phu Quoc pepper">Tiêu Phú Quốc</strong> — <span data-vi="cay nồng, hạt chắc, thường được dùng làm quà." data-en="pungent and dense, often given as a gift.">cay nồng, hạt chắc, thường được dùng làm quà.</span></li>
+          <li><strong data-vi="Hải sản tươi" data-en="Fresh seafood">Hải sản tươi</strong> — <span data-vi="ghẹ Hàm Ninh, nhum biển, cá bớp, sò huyết." data-en="Ham Ninh crab, sea urchins, cobia, blood cockles.">ghẹ Hàm Ninh, nhum biển, cá bớp, sò huyết.</span></li>
+          <li><strong data-vi="Bún quậy" data-en="Bun Quay">Bún quậy</strong> — <span data-vi="món bún 'tự pha nước chấm' đặc trưng, chỉ có ở đảo." data-en="a 'mix your own sauce' noodle dish unique to the island.">món bún 'tự pha nước chấm' đặc trưng, chỉ có ở đảo.</span></li>
+          <li><strong data-vi="Sim rừng" data-en="Wild rose myrtle">Sim rừng</strong> — <span data-vi="trái rừng dùng làm rượu, mật, mứt." data-en="forest berries made into wine, syrup, and jam.">trái rừng dùng làm rượu, mật, mứt.</span></li>
+        </ul>
+
+        <h2 id="s5" class="reveal">
+          <span class="eyebrow" data-vi="NĂM" data-en="FIVE">NĂM</span>
+          <span data-vi="Khi nào nên đến?" data-en="When to visit?">Khi nào nên đến?</span>
+        </h2>
+
+        <p class="reveal" data-vi="Phú Quốc có hai mùa rõ rệt: mùa khô (tháng 11 đến tháng 4) — biển lặng, nắng đẹp, ít mưa, là thời điểm lý tưởng cho hầu hết hoạt động ngoài trời. Mùa mưa (tháng 5 đến tháng 10) — mưa rào và sấm, nhưng giá phòng mềm hơn, đảo vắng hơn và rừng xanh nhất." data-en="Phu Quoc has two clear seasons: dry (November to April) — calm sea, beautiful sun, little rain, ideal for most outdoor activity. Wet (May to October) — squalls and thunder, but softer room rates, a quieter island, and the greenest forests.">
+          Phú Quốc có hai mùa rõ rệt: mùa khô (tháng 11 đến tháng 4) — biển lặng, nắng đẹp, ít mưa, là thời điểm lý tưởng cho hầu hết hoạt động ngoài trời. Mùa mưa (tháng 5 đến tháng 10) — mưa rào và sấm, nhưng giá phòng mềm hơn, đảo vắng hơn và rừng xanh nhất.
+        </p>
+
+        <p class="reveal" data-vi="Lời khuyên của chúng tôi: tháng 3 và tháng 11 là 'mùa vàng' — thời tiết đẹp, giá vé máy bay chưa quá cao, và đặc biệt ít gặp gió mùa Tây Nam." data-en="Our advice: March and November are the 'golden months' — beautiful weather, airfares not yet peak, and notably free of the southwest monsoon.">
+          Lời khuyên của chúng tôi: tháng 3 và tháng 11 là 'mùa vàng' — thời tiết đẹp, giá vé máy bay chưa quá cao, và đặc biệt ít gặp gió mùa Tây Nam.
+        </p>
+
+        <h2 id="s6" class="reveal">
+          <span class="eyebrow" data-vi="SÁU" data-en="SIX">SÁU</span>
+          <span data-vi="Vài lời từ SK Boutique" data-en="A word from SK Boutique">Vài lời từ SK Boutique</span>
+        </h2>
+
+        <p class="reveal" data-vi="Sáu năm sống và đón khách trên đảo, chúng tôi nhận ra một điều: Phú Quốc không phải là một điểm đến để 'check-in nhanh'. Hòn đảo này tự thưởng cho những ai chịu đi chậm — chịu ngồi xuống bãi cát, chịu ăn một bữa hải sản 3 tiếng, chịu để một buổi chiều trôi qua không kế hoạch." data-en="Six years of living here and welcoming guests, we've noticed one thing: Phu Quoc isn't a place for fast check-ins. The island rewards those who go slow — who sit on the sand, take three hours over a seafood meal, let an afternoon pass without a plan.">
+          Sáu năm sống và đón khách trên đảo, chúng tôi nhận ra một điều: Phú Quốc không phải là một điểm đến để 'check-in nhanh'. Hòn đảo này tự thưởng cho những ai chịu đi chậm — chịu ngồi xuống bãi cát, chịu ăn một bữa hải sản 3 tiếng, chịu để một buổi chiều trôi qua không kế hoạch.
+        </p>
+
+        <p class="reveal" data-vi="Nếu bạn đang lên kế hoạch — hãy dành ít nhất 3 ngày 2 đêm. Hãy chọn một nơi ở mà bạn thấy thoải mái như nhà. Và đừng vội đi hết mọi nơi — chừa lại một vài điểm để có lý do quay lại." data-en="If you're planning — give yourself at least 3 days, 2 nights. Pick a place that feels like home. And don't rush to see it all — leave a few spots unseen, so you have reasons to return.">
+          Nếu bạn đang lên kế hoạch — hãy dành ít nhất 3 ngày 2 đêm. Hãy chọn một nơi ở mà bạn thấy thoải mái như nhà. Và đừng vội đi hết mọi nơi — chừa lại một vài điểm để có lý do quay lại.
+        </p>
+
+        <!-- Tag chips -->
+        <div class="tag-section reveal">
+          <span class="tag-section__label" data-vi="THẺ" data-en="TAGS">THẺ</span>
+          <a class="tag" href="Blog List.html">#PhuQuoc</a>
+          <a class="tag" href="Blog List.html">#CamNangDuLich</a>
+          <a class="tag" href="Blog List.html">#DaoNgoc</a>
+          <a class="tag" href="Blog List.html">#SKBoutique</a>
+          <a class="tag" href="Blog List.html">#VietnamTravel</a>
+        </div>
+
+        <!-- Author card -->
+        <aside class="author-card reveal">
+          <div class="author-card__avatar"></div>
+          <div>
+            <p class="author-card__name">Linh Hoàng</p>
+            <p class="author-card__role" data-vi="CONCIERGE LEAD · SK BOUTIQUE" data-en="CONCIERGE LEAD · SK BOUTIQUE">CONCIERGE LEAD · SK BOUTIQUE</p>
+            <p class="author-card__bio" data-vi="Sống ở Phú Quốc 8 năm. Hay viết về những góc nhỏ ít người biết. Có thể nói chuyện với bạn về tiêu, nước mắm và rượu sim cả buổi tối." data-en="8 years in Phu Quoc. Writes about small corners few people see. Could talk to you about pepper, fish sauce and sim wine all evening.">Sống ở Phú Quốc 8 năm. Hay viết về những góc nhỏ ít người biết. Có thể nói chuyện với bạn về tiêu, nước mắm và rượu sim cả buổi tối.</p>
+          </div>
+          <a class="btn btn--ghost author-card__cta" href="#" data-vi="XEM TẤT CẢ BÀI" data-en="ALL POSTS →">XEM TẤT CẢ BÀI</a>
+        </aside>
+
+        <!-- Voucher CTA -->
+        <section class="voucher-cta reveal" id="voucherCTA">
+          <div class="voucher-cta__media"></div>
+          <div class="voucher-cta__body">
+            <span class="voucher-cta__eyebrow" data-vi="ƯU ĐÃI ĐỘC QUYỀN" data-en="EXCLUSIVE OFFER">ƯU ĐÃI ĐỘC QUYỀN</span>
+            <h3 class="voucher-cta__title" data-vi="Nhận voucher giảm 25% cho lần lưu trú đầu tiên" data-en="Get a 25% voucher for your first stay">Nhận voucher giảm 25% cho lần lưu trú đầu tiên</h3>
+            <p class="voucher-cta__desc" data-vi="Để lại email — chúng tôi sẽ gửi voucher cá nhân hoá kèm gợi ý phòng phù hợp cho lịch trình của bạn." data-en="Leave your email — we'll send a personalized voucher with room suggestions for your itinerary.">
+              Để lại email — chúng tôi sẽ gửi voucher cá nhân hoá kèm gợi ý phòng phù hợp cho lịch trình của bạn.
+            </p>
+            <form class="voucher-cta__form" id="voucherForm" onsubmit="event.preventDefault(); handleVoucher(this);">
+              <input type="text" required placeholder="Họ và tên của bạn" data-vi-placeholder="Họ và tên của bạn" data-en-placeholder="Your name" />
+              <input type="email" required placeholder="email@cuaban.com" />
+              <button type="submit" data-vi="NHẬN VOUCHER" data-en="GET VOUCHER">NHẬN VOUCHER</button>
+            </form>
+            <p class="voucher-cta__small" data-vi="* Voucher có hiệu lực trong 90 ngày kể từ khi nhận. Áp dụng cho mọi hạng phòng. Không kết hợp với chương trình khác." data-en="* Voucher valid for 90 days. Applies to all room types. Not combinable with other offers.">
+              * Voucher có hiệu lực trong 90 ngày kể từ khi nhận. Áp dụng cho mọi hạng phòng. Không kết hợp với chương trình khác.
+            </p>
+          </div>
+        </section>
+
+      </article>
+
+      <!-- Share rail -->
+      <aside class="share-rail" aria-label="Share">
+        <span class="share-rail__label" data-vi="CHIA SẺ" data-en="SHARE">CHIA SẺ</span>
+        <button class="share-btn" onclick="shareTo('facebook')" aria-label="Share on Facebook" title="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88V14.9H7.9V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.9h-2.34v6.98C18.34 21.13 22 17 22 12z"/></svg>
+        </button>
+        <button class="share-btn" onclick="shareTo('zalo')" aria-label="Share on Zalo" title="Zalo">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.86 2 10.6c0 2.5 1.31 4.74 3.4 6.27V21l3.78-2.13c.91.16 1.85.25 2.82.25 5.52 0 10-3.86 10-8.6S17.52 2 12 2zm-2.5 11.4h-3v-.9l1.92-2.4H6.55v-.9h3.05v.9L7.66 12.5h1.84v.9zm.96 0v-4.2h.95v4.2h-.95zm3.2 0c-.42 0-.78-.13-1.06-.4-.28-.27-.42-.62-.42-1.04 0-.41.14-.76.42-1.04.28-.27.64-.41 1.06-.41.45 0 .81.14 1.07.42v-.32h.94v2.78h-.94v-.34c-.27.23-.63.35-1.07.35zm.16-.85c.21 0 .39-.07.54-.21.15-.14.22-.32.22-.55 0-.22-.07-.4-.22-.55a.72.72 0 0 0-.54-.21c-.21 0-.39.07-.53.21a.78.78 0 0 0-.22.55c0 .23.07.41.22.55.14.14.32.21.53.21zm2.93.85v-4.2h.95v4.2h-.95zm3.05 0c-.46 0-.84-.15-1.13-.43-.29-.29-.43-.66-.43-1.1 0-.43.14-.79.43-1.07.29-.29.67-.43 1.13-.43.45 0 .82.14 1.12.43.29.28.43.64.43 1.07 0 .44-.14.81-.43 1.1-.3.28-.67.43-1.12.43zm0-.85c.2 0 .36-.07.49-.21.13-.14.2-.32.2-.55 0-.22-.07-.4-.2-.54a.65.65 0 0 0-.49-.21c-.21 0-.37.07-.5.21a.77.77 0 0 0-.2.54c0 .23.07.41.2.55.13.14.29.21.5.21z"/></svg>
+        </button>
+        <button class="share-btn" onclick="shareTo('twitter')" aria-label="Share on Twitter" title="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </button>
+        <button class="share-btn" onclick="copyLink(this)" aria-label="Copy link" title="Copy link" id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+      </aside>
+
+    </div>
+
+    <!-- ============ RELATED POSTS ============ -->
+    <section class="related-section">
+      <div class="related-section__head reveal">
+        <div>
+          <p class="eyebrow" data-vi="ĐỌC TIẾP" data-en="KEEP READING">ĐỌC TIẾP</p>
+          <h2 data-vi="Bài viết liên quan" data-en="Related articles">Bài viết liên quan</h2>
+        </div>
+        <a class="btn btn--ghost" href="Blog List.html" data-vi="TẤT CẢ BÀI VIẾT" data-en="ALL ARTICLES">TẤT CẢ BÀI VIẾT</a>
+      </div>
+      <div class="related-grid">
+        <a class="related-card reveal" href="Blog Detail.html" style="--reveal-delay: 0ms">
+          <div class="related-card__media">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80" alt="5 bãi biển" loading="lazy" />
+          </div>
+          <p class="related-card__cat" data-vi="CẨM NANG" data-en="GUIDE">CẨM NANG</p>
+          <h3 class="related-card__title" data-vi="5 bãi biển đẹp nhất Phú Quốc 2026 — bản đồ trong tay" data-en="5 best beaches of Phu Quoc 2026">5 bãi biển đẹp nhất Phú Quốc 2026 — bản đồ trong tay</h3>
+          <p class="related-card__meta" data-vi="11 PHÚT ĐỌC · 16 THG 5" data-en="11 MIN · MAY 16">11 PHÚT ĐỌC · 16 THG 5</p>
+        </a>
+        <a class="related-card reveal" href="Blog Detail.html" style="--reveal-delay: 100ms">
+          <div class="related-card__media">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80" alt="Nước mắm" loading="lazy" />
+          </div>
+          <p class="related-card__cat" data-vi="ẨM THỰC" data-en="CUISINE">ẨM THỰC</p>
+          <h3 class="related-card__title" data-vi="Nước mắm Phú Quốc: hành trình của giọt vàng" data-en="Phu Quoc fish sauce: journey of the golden drop">Nước mắm Phú Quốc: hành trình của giọt vàng</h3>
+          <p class="related-card__meta" data-vi="8 PHÚT ĐỌC · 6 THG 5" data-en="8 MIN · MAY 6">8 PHÚT ĐỌC · 6 THG 5</p>
+        </a>
+        <a class="related-card reveal" href="Blog Detail.html" style="--reveal-delay: 200ms">
+          <div class="related-card__media">
+            <img src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=900&q=80" alt="Thời tiết" loading="lazy" />
+          </div>
+          <p class="related-card__cat" data-vi="CẨM NANG" data-en="GUIDE">CẨM NANG</p>
+          <h3 class="related-card__title" data-vi="Đi Phú Quốc mùa nào đẹp? Lịch thời tiết chi tiết" data-en="Best time to visit Phu Quoc? Detailed weather calendar">Đi Phú Quốc mùa nào đẹp? Lịch thời tiết chi tiết</h3>
+          <p class="related-card__meta" data-vi="10 PHÚT ĐỌC · 2 THG 5" data-en="10 MIN · MAY 2">10 PHÚT ĐỌC · 2 THG 5</p>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="shell">
+    <div class="site-footer__inner">
+      <div>
+        <p class="site-footer__brand">SK Boutique Hotel</p>
+        <p class="site-footer__tag">— since 2020 —</p>
+        <p style="font-size:0.92rem; line-height:1.7;">Marina Complex Resort, Bim Group<br/>MP-135, Marina Square<br/>Dương Bảo Hamlet, Phú Quốc</p>
+      </div>
+      <div>
+        <h4 data-vi="KHÁM PHÁ" data-en="EXPLORE">KHÁM PHÁ</h4>
+        <ul>
+          <li><a href="Rooms.html" data-vi="Phòng nghỉ" data-en="Rooms">Phòng nghỉ</a></li>
+          <li><a href="Home.html#location" data-vi="Vị trí" data-en="Location">Vị trí</a></li>
+          <li><a href="Home.html#story" data-vi="Về chúng tôi" data-en="About us">Về chúng tôi</a></li>
+          <li><a href="Blog List.html" data-vi="Tạp chí" data-en="Journal">Tạp chí</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-vi="LIÊN HỆ" data-en="CONTACT">LIÊN HỆ</h4>
+        <ul>
+          <li><a href="tel:+84908233583">+84 908 233 583</a></li>
+          <li><a href="mailto:skhotel.phuquoc@gmail.com">skhotel.phuquoc@gmail.com</a></li>
+          <li><a href="https://www.skhotel.com.vn" target="_blank">www.skhotel.com.vn</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-vi="THEO DÕI" data-en="FOLLOW">THEO DÕI</h4>
+        <ul>
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Zalo</a></li>
+          <li><a href="#">TripAdvisor</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__lower">
+      <span>© 2026 SK Boutique Hotel. <span data-vi="Tất cả quyền được bảo lưu." data-en="All rights reserved.">Tất cả quyền được bảo lưu.</span></span>
+      <span data-vi="Thiết kế bởi đội ngũ SK" data-en="Designed by the SK team">Thiết kế bởi đội ngũ SK</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+<script>
+  /* Reading progress */
+  function updateProgress() {
+    const article = document.getElementById("articleContent");
+    if (!article) return;
+    const rect = article.getBoundingClientRect();
+    const total = article.offsetHeight - window.innerHeight + 200;
+    const scrolled = Math.min(Math.max(-rect.top, 0), total);
+    const pct = total > 0 ? (scrolled / total) * 100 : 0;
+    document.getElementById("progressFill").style.width = Math.min(100, Math.max(0, pct)) + "%";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+
+  /* TOC active section */
+  function updateTOC() {
+    const sections = document.querySelectorAll(".article-content h2[id]");
+    let active = null;
+    sections.forEach((s) => {
+      const r = s.getBoundingClientRect();
+      if (r.top < 140) active = s.id;
+    });
+    document.querySelectorAll(".article-toc a").forEach((a) => {
+      a.classList.toggle("is-active", a.getAttribute("href") === "#" + active);
+    });
+  }
+  window.addEventListener("scroll", updateTOC, { passive: true });
+
+  /* Smooth scroll for TOC + breadcrumb */
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const href = a.getAttribute("href");
+      if (href === "#" || href.length < 2) return;
+      const t = document.querySelector(href);
+      if (!t) return;
+      e.preventDefault();
+      const y = t.getBoundingClientRect().top + window.scrollY - 88;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    });
+  });
+
+  /* Share */
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("is-show");
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove("is-show"), 2400);
+  }
+
+  function shareTo(network) {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+    const map = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+      zalo: `https://zalo.me/share/?u=${url}&t=${title}`
+    };
+    if (map[network]) window.open(map[network], "_blank", "noopener,width=600,height=520");
+  }
+  function copyLink(btn) {
+    const text = window.location.href;
+    const onOk = () => {
+      btn.classList.add("is-copied");
+      const lang = document.documentElement.getAttribute("data-lang") || "vi";
+      showToast(lang === "vi" ? "Đã sao chép liên kết" : "Link copied");
+      setTimeout(() => btn.classList.remove("is-copied"), 1600);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(onOk).catch(onOk);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); onOk(); } catch (_) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  /* Voucher form */
+  function handleVoucher(form) {
+    const btn = form.querySelector("button");
+    const lang = document.documentElement.getAttribute("data-lang") || "vi";
+    btn.textContent = lang === "vi" ? "Đã gửi voucher ✓" : "Voucher sent ✓";
+    btn.disabled = true;
+    btn.style.background = "var(--text)";
+    btn.style.color = "var(--bg)";
+    showToast(lang === "vi" ? "Cảm ơn bạn — kiểm tra email nhé." : "Thank you — please check your email.");
+  }
+
+  updateProgress();
+  updateTOC();
+</script>
+
+</body>
+</html>
