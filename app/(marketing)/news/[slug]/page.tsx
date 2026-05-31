@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { NewsDetailPage } from "@/components/news-detail-page";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { localize } from "@/lib/mock/i18n";
 import { getNewsPostBySlug, listNewsPostCards } from "@/lib/supabase/queries/news-posts";
 
@@ -20,14 +21,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
   if (!post) return { title: "Not found" };
 
-  return {
-    title: localize(locale, { vi: post.title_vi, en: post.title_en }) + " — SK Boutique Hotel",
-    description: localize(locale, { vi: post.excerpt_vi, en: post.excerpt_en }),
-    alternates: { canonical: `/news/${post.slug}` },
-    openGraph: {
-      images: post.cover_image_path ? [{ url: post.cover_image_path }] : undefined
-    }
-  };
+  return buildPageMetadata({
+    title: localize(locale, { vi: post.title_vi, en: post.title_en }),
+    description: localize(locale, { vi: post.excerpt_vi, en: post.excerpt_en }) || "",
+    path: `/news/${post.slug}`,
+    ogImagePath: post.cover_image_path || "/assets/reception/1.png",
+    locale,
+    type: "article"
+  });
 }
 
 export default async function NewsPostPage({ params, searchParams }: PageProps) {

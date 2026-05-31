@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { NewsListPage } from "@/components/news-list-page";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { resolveLocale } from "@/lib/locale";
+import { buildPageMetadata } from "@/lib/metadata";
 import { localize } from "@/lib/mock/i18n";
 import { listNewsPosts } from "@/lib/supabase/queries/news-posts";
 
@@ -14,14 +15,16 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const resolvedSearchParams = (await searchParams) ?? {};
   const locale = resolveLocale(resolvedSearchParams.lang);
 
-  return {
-    title: localize(locale, { vi: "Tạp chí — SK Boutique Hotel", en: "Journal — SK Boutique Hotel" }),
+  return buildPageMetadata({
+    title: localize(locale, { vi: "Tạp chí", en: "Journal" }),
     description: localize(locale, {
       vi: "Cẩm nang du lịch Phú Quốc, trải nghiệm tại khách sạn, ẩm thực đảo và những ưu đãi dành riêng cho khách của SK Boutique Hotel.",
       en: "Phu Quoc travel guides, hotel stories, island cuisine, and exclusive offers reserved for guests of SK Boutique Hotel."
     }),
-    alternates: { canonical: "/news" }
-  };
+    path: "/news",
+    ogImagePath: "/assets/reception/1.png",
+    locale
+  });
 }
 
 export default async function NewsPage({ searchParams }: PageProps) {

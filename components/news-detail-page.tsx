@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -234,7 +235,7 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
         .nd-related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
         @media (max-width: 880px) { .nd-related-grid { grid-template-columns: 1fr; } }
         .nd-related-card { display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; }
-        .nd-related-card__media { aspect-ratio: 4/3; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-container-highest); margin-bottom: 18px; }
+        .nd-related-card__media { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-container-highest); margin-bottom: 18px; }
         .nd-related-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(0.22,1,0.36,1); }
         .nd-related-card:hover .nd-related-card__media img { transform: scale(1.05); }
         .nd-related-card__cat { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
@@ -313,7 +314,7 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
         {/* Cover */}
         {post.cover_image_path && (
           <figure className="nd-cover">
-            <img src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} />
+            <Image src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} fill priority sizes="(max-width: 1180px) 100vw, 1180px" quality={90} style={{ objectFit: "cover" }} />
           </figure>
         )}
 
@@ -404,7 +405,7 @@ export function NewsDetailPage({ post, relatedPosts, locale }: { post: NewsPostR
                 <Link key={rel.id} className="nd-related-card" href={appendLocaleQuery(`/news/${rel.slug}`, locale)}>
                   <div className="nd-related-card__media">
                     {rel.cover_image_path ? (
-                      <img src={rel.cover_image_path} alt={localize(locale, { vi: rel.title_vi, en: rel.title_en })} loading="lazy" />
+                      <Image src={rel.cover_image_path} alt={localize(locale, { vi: rel.title_vi, en: rel.title_en })} fill sizes="(max-width: 880px) 100vw, 33vw" quality={85} style={{ objectFit: "cover" }} />
                     ) : (
                       <div style={{ width: "100%", height: "100%", background: "var(--surface-container-highest)" }} />
                     )}

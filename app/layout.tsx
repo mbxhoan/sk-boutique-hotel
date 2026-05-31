@@ -20,7 +20,10 @@ export const metadata: Metadata = {
     default: "SK Boutique Hotel",
     template: "%s | SK Boutique Hotel"
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.NODE_ENV === "production" ? "https://www.skhotel.com.vn" : "http://localhost:3000")
+  ),
   description:
     "SK Boutique Hotel - frontend foundation cho website khách sạn premium, member portal và admin shell theo Next.js App Router.",
   icons: {

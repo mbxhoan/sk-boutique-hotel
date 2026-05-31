@@ -21,7 +21,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     title: localize(locale, page.seo.title),
     description: localize(locale, page.seo.description),
     path: "/",
-    ogImagePath: "/api/og/home",
+    ogImagePath: "/assets/reception/1.png",
     locale
   });
 }

@@ -14,8 +14,16 @@ const nextConfig: NextConfig = {
     }
   },
   images: {
-    qualities: [85, 90],
-    minimumCacheTTL: 86400
+    qualities: [75, 85, 90],
+    minimumCacheTTL: 86400,
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**"
+      }
+    ]
   }
 };
 

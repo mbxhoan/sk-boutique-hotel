@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -97,7 +98,7 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
         .news-sub-featured { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 96px; padding-top: 48px; position: relative; }
         .news-sub-featured::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(0,12,30,0.1), transparent); }
         .news-sub-card { display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; align-items: start; cursor: pointer; }
-        .news-sub-card__media { aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-container-highest); }
+        .news-sub-card__media { position: relative; aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-container-highest); }
         .news-sub-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(0.22,1,0.36,1); }
         .news-sub-card:hover .news-sub-card__media img { transform: scale(1.05); }
         .news-sub-card__body { padding-top: 8px; }
@@ -187,9 +188,9 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
         {featuredPost && (
           <article className="news-featured">
             <div className="news-featured__media">
-              <Link aria-label={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} href={appendLocaleQuery(`/news/${featuredPost.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%" }}>
+              <Link aria-label={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} href={appendLocaleQuery(`/news/${featuredPost.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%", position: "relative" }}>
                 {featuredPost.cover_image_path ? (
-                  <img src={featuredPost.cover_image_path} alt={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} loading="eager" />
+                  <Image src={featuredPost.cover_image_path} alt={localize(locale, { vi: featuredPost.title_vi, en: featuredPost.title_en })} fill priority sizes="(max-width: 880px) 100vw, 60vw" quality={85} style={{ objectFit: "cover" }} />
                 ) : (
                   <div style={{ width: "100%", height: "100%", background: "var(--surface-container-highest)" }} />
                 )}
@@ -230,7 +231,7 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
               <Link key={post.id} className="news-sub-card" href={appendLocaleQuery(`/news/${post.slug}`, locale)} style={{ textDecoration: "none", color: "inherit" }}>
                 <div className="news-sub-card__media">
                   {post.cover_image_path ? (
-                    <img src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} loading="lazy" />
+                    <Image src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} fill sizes="(max-width: 880px) 100vw, 25vw" quality={85} style={{ objectFit: "cover" }} />
                   ) : (
                     <div style={{ width: "100%", height: "100%", background: "var(--surface-container-highest)" }} />
                   )}
@@ -286,9 +287,9 @@ export function NewsListPage({ posts, locale }: { posts: NewsPostRow[]; locale: 
             pagePosts.map((post) => (
               <article className="post-card" key={post.id}>
                 <div className="post-card__media">
-                  <Link aria-label={localize(locale, { vi: post.title_vi, en: post.title_en })} href={appendLocaleQuery(`/news/${post.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%" }}>
+                  <Link aria-label={localize(locale, { vi: post.title_vi, en: post.title_en })} href={appendLocaleQuery(`/news/${post.slug}`, locale)} style={{ display: "block", width: "100%", height: "100%", position: "relative" }}>
                     {post.cover_image_path ? (
-                      <img src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} loading="lazy" />
+                      <Image src={post.cover_image_path} alt={localize(locale, { vi: post.title_vi, en: post.title_en })} fill sizes="(max-width: 620px) 100vw, (max-width: 980px) 50vw, 33vw" quality={85} style={{ objectFit: "cover" }} />
                     ) : (
                       <div className="post-card__no-img" />
                     )}
